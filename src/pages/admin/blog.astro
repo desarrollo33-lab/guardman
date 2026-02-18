@@ -1,0 +1,10 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ConvexBlogPostsList from '../../components/admin/ConvexBlogPostsList';
+---
+
+<AdminLayout title="Blog">
+  <div class="space-y-6">
+    <ConvexBlogPostsList client:load />
+  </div>
+</AdminLayout>

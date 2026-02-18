@@ -1,0 +1,10 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ConvexHeroesList from '../../components/admin/ConvexHeroesList';
+---
+
+<AdminLayout title="Heroes">
+  <div class="space-y-6">
+    <ConvexHeroesList client:load />
+  </div>
+</AdminLayout>

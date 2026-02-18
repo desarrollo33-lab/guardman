@@ -911,27 +911,27 @@ Max Concurrent: 8 (Wave 3)
   - CRUD UI with related services multi-select
   - **Category**: `visual-engineering` | **Blocked By**: Tasks 8, 6 | **Parallel Group**: Wave 4
 
-- [ ] 24. Heroes Admin Page
+- [x] 24. Heroes Admin Page
   - Create `/admin/heroes` page
   - YouTube ID input OR image upload toggle
   - CTAs editor, trust badges editor
   - Page selector for hero assignment
   - **Category**: `visual-engineering` | **Blocked By**: Tasks 9, 5, 6 | **Parallel Group**: Wave 4
 
-- [ ] 25. Communes Admin Page (PSEO)
+- [x] 25. Communes Admin Page (PSEO)
   - Create `/admin/communes` page
   - List by zone, SEO fields editor
   - Bulk status toggle
   - **Category**: `visual-engineering` | **Blocked By**: Tasks 10, 6 | **Parallel Group**: Wave 4
 
-- [ ] 26. Blog Admin Page
+- [x] 26. Blog Admin Page
   - Create `/admin/blog` page
   - Posts list with status, featured toggle
   - Post editor with author selector, tags
   - Publish/unpublish actions
   - **Category**: `visual-engineering` | **Blocked By**: Tasks 20, 19, 6 | **Parallel Group**: Wave 4
 
-- [ ] 27. Site Config Admin Page
+- [x] 27. Site Config Admin Page
   - Create `/admin/config` page
   - Edit global settings (brand, phones, social links)
   - Navbar items editor

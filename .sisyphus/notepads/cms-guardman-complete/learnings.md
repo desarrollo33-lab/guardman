@@ -673,3 +673,146 @@ export const updateCommuneSEO = mutation({
 - Template-based content generation (frontend responsibility)
 - Same structure, different names/slugs
 - SEO fields for per-commune customization
+
+## [2026-02-18] Task 21: Admin Dashboard Expansion
+
+### File Modified: src/components/admin/Dashboard.tsx
+
+### Components Created:
+
+1. **StatCard** - Reusable stat display with icon, title, value, subtitle
+   - 9 color variants (blue, green, purple, indigo, amber, emerald, sky, rose, teal)
+   - Shows loading state with '...' when value is undefined
+
+2. **QuickLinkCard** - Navigation card with icon, title, description
+   - Hover states with shadow and border transitions
+   - Centered layout with icon above text
+
+3. **Icon** - Inline SVG icon component
+   - 14 icon types (users, check, document, shield, lightbulb, article, question, star, location, badge, building, chip, map, settings)
+   - Configurable className for size
+
+### Stats Displayed:
+
+**Leads Section:**
+
+- Total Leads, New, Converted (from api.leads.getLeadsCount)
+
+**Content Section:**
+
+- Services (active/total) - filters is_active !== false
+- Solutions (active/total) - filters is_active !== false
+- Blog Posts (published/total) - uses getPublishedPosts query
+- FAQs, Heroes, Communes counts
+
+**Partners Section:**
+
+- Certifications, Clients, Tech Partners - grouped by type field
+
+### Quick Links Added:
+
+Primary grid (6 columns on desktop):
+
+- /admin/services, /admin/solutions, /admin/heroes
+- /admin/blog, /admin/communes, /admin/faqs
+
+Secondary grid (4 columns):
+
+- /admin/partners, /admin/leads, /admin/locations, /admin/config
+
+### Pattern: Multiple useQuery Hooks
+
+```typescript
+const services = useQuery(api.services.getAllServices);
+const solutions = useQuery(api.solutions.getAllSolutions);
+// ... more queries
+
+// Derived stats computed in component body
+const activeServices =
+  services?.filter((s) => s.is_active !== false).length ?? 0;
+```
+
+### Pattern: Filtering Active Items
+
+Services and solutions use soft delete with is_active field:
+
+```typescript
+.filter((s) => s.is_active !== false)  // NOT false to handle undefined
+```
+
+### Convex Query Naming Note
+
+- partners.getAll (not getAllPartners)
+- heroes.getAllHeroes (not getAll)
+- communes.getAll (not getAllCommunes)
+
+Check each convex file for actual export names before using.
+
+## [2026-02-18] Task 22: Services Admin Page
+
+### Files Created:
+
+1. **src/pages/admin/services.astro** - Page wrapper with AdminLayout
+2. **src/components/admin/ConvexServicesList.tsx** - Convex + Auth wrapper
+3. **src/components/admin/ServicesList.tsx** - Full CRUD component
+4. **src/components/admin/ServiceForm.tsx** - Modal form with all fields
+
+### Admin Component Pattern:
+
+The project follows a consistent pattern for admin pages:
+
+1. **Astro page** - Simple wrapper with AdminLayout and Convex wrapper component
+2. **Convex wrapper component** - Provides ConvexProvider + AuthGuard
+3. **Main list component** - Full CRUD logic using useQuery/useMutation
+4. **Form component** - Modal form with all fields
+
+### Form Patterns:
+
+**Tag-style input for arrays (features, benefits):**
+
+- Single text input with "Add" button
+- Tags displayed as pills with remove buttons
+- Enter key triggers add
+- Uses filter to remove items by index
+
+**Slug auto-generation:**
+
+```typescript
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+    .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with dash
+    .replace(/^-|-$/g, ''); // Remove leading/trailing dashes
+}
+```
+
+**Image preview:**
+
+- URL input with onError to hide broken images
+- Shows thumbnail when URL is valid
+
+### Icon Options for Services:
+
+- shield-check, car, bell, cube, airplane, key, camera, lock, eye, users
+
+### Solution Categories:
+
+- condominios, mineria, retail, hoteleria, construccion, industria, eventos, corporativo
+
+### Convex Admin Integration Notes:
+
+- Use `@convex/_generated/api` for function references
+- Use `import type { Id }` for type-only imports (verbatimModuleSyntax)
+- Convex mutations return data after completion
+- Use `useMutation` hook for create/update/delete operations
+
+### Admin Navigation Update:
+
+Updated AdminLayout.astro to include links for:
+
+- Dashboard (/admin)
+- Leads (/admin/leads)
+- Services (/admin/services)
+- Solutions (/admin/solutions)
