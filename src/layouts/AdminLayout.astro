@@ -1,4 +1,7 @@
 ---
+import { AuthProvider } from '../lib/auth';
+import LogoutButton from '../components/admin/LogoutButton';
+
 interface Props {
   title: string;
 }
@@ -24,47 +27,41 @@ const fullTitle = `${title} | Admin - Guardman`;
   </head>
 
   <body class="min-h-screen bg-gray-100 font-sans antialiased">
-    <!-- Admin Header -->
-    <header class="bg-gray-900 text-white shadow-lg">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <div class="flex items-center gap-4">
-            <a href="/admin" class="text-xl font-bold hover:text-gray-300 transition-colors">
-              Guardman Admin
-            </a>
-          </div>
-          
-          <nav class="flex items-center gap-4">
-            <a 
-              href="/admin" 
-              class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              Dashboard
-            </a>
-            <form action="/api/admin/auth" method="POST">
-              <input type="hidden" name="action" value="logout" />
-              <button 
-                type="submit"
-                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+    <AuthProvider>
+      <!-- Admin Header -->
+      <header class="bg-gray-900 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center h-16">
+            <div class="flex items-center gap-4">
+              <a href="/admin" class="text-xl font-bold hover:text-gray-300 transition-colors">
+                Guardman Admin
+              </a>
+            </div>
+            
+            <nav class="flex items-center gap-4">
+              <a 
+                href="/admin" 
+                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
-                Cerrar Sesión
-              </button>
-            </form>
-          </nav>
+                Dashboard
+              </a>
+              <LogoutButton client:load />
+            </nav>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <slot />
-    </main>
+      <!-- Main Content -->
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <slot />
+      </main>
 
-    <!-- Admin Footer -->
-    <footer class="bg-gray-800 text-gray-400 py-4 mt-auto">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
-        Guardman Chile - Panel de Administración
-      </div>
-    </footer>
+      <!-- Admin Footer -->
+      <footer class="bg-gray-800 text-gray-400 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
+          Guardman Chile - Panel de Administración
+        </div>
+      </footer>
+    </AuthProvider>
   </body>
 </html>

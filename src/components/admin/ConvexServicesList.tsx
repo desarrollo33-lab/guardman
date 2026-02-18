@@ -1,18 +1,18 @@
 import { ConvexProvider } from 'convex/react';
 import { convex } from '../../lib/convex';
-import Dashboard from './Dashboard';
+import ServicesList from './ServicesList';
 import AuthGuard from './AuthGuard';
 
 /**
- * Wrapper that provides Convex context and auth guard to Dashboard.
- * Required for Astro integration - use this instead of Dashboard directly
+ * Wrapper that provides Convex context and auth guard to ServicesList.
+ * Required for Astro integration - use this instead of ServicesList directly
  * when rendering in .astro files with client:* directives.
  */
-export default function ConvexDashboard() {
+export default function ConvexServicesList() {
   return (
     <ConvexProvider client={convex}>
       <AuthGuard>
-        <Dashboard />
+        <ServicesList />
       </AuthGuard>
     </ConvexProvider>
   );

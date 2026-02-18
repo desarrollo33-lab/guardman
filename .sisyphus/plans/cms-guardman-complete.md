@@ -854,7 +854,7 @@ Max Concurrent: 8 (Wave 3)
 
 ### WAVE 4: Admin UI Pages
 
-- [ ] 21. Admin Dashboard Expansion
+- [x] 21. Admin Dashboard Expansion
 
   **What to do**:
   - Expand `src/components/admin/Dashboard.tsx`
@@ -898,7 +898,7 @@ Max Concurrent: 8 (Wave 3)
     Evidence: .sisyphus/evidence/task-21-dashboard.png
   ```
 
-- [ ] 22. Services Admin Page
+- [x] 22. Services Admin Page
   - Create `/admin/services` page with services list
   - Add/Edit/Delete service forms
   - Features/benefits array editor
@@ -906,7 +906,7 @@ Max Concurrent: 8 (Wave 3)
   - Slug auto-generation from title
   - **Category**: `visual-engineering` | **Blocked By**: Tasks 7, 6 | **Parallel Group**: Wave 4
 
-- [ ] 23. Solutions Admin Page
+- [x] 23. Solutions Admin Page
   - Create `/admin/solutions` page
   - CRUD UI with related services multi-select
   - **Category**: `visual-engineering` | **Blocked By**: Tasks 8, 6 | **Parallel Group**: Wave 4
