@@ -1,29 +1,17 @@
 ---
-// Login page using Convex Auth
-import { AuthProvider } from '../../lib/auth';
-import LoginForm from '../../components/admin/LoginForm';
+// Completely stripped for production debugging
 ---
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login | Admin - Guardman</title>
-    <meta name="robots" content="noindex, nofollow" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-
-  <body class="min-h-screen bg-gray-900 flex items-center justify-center font-sans antialiased">
-  <body class="min-h-screen bg-gray-900 flex items-center justify-center font-sans antialiased">
-    <AuthProvider client:only="react">
-      <LoginForm client:load />
-    </AuthProvider>
-  </body>
+    <title>Debug Admin</title>
+</head>
+<body style="background: #111; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; margin: 0;">
+    <div style="text-align: center;">
+        <h1 style="font-size: 2rem;">Debug Mode: TOTAL ISOLATION</h1>
+        <p>Si ves esto, el servidor de Vercel está funcionando bien.</p>
+        <p>Significa que el problema es una de las librerías o imports (Convex/Auth).</p>
+    </div>
+</body>
 </html>

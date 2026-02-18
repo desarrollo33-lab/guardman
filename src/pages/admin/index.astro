@@ -1,11 +1,14 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro';
-import ConvexDashboard from '../../components/admin/ConvexDashboard';
-import AuthGuard from '../../components/admin/AuthGuard';
+// Completely stripped for production debugging
 ---
-
-<AdminLayout title="Dashboard">
-  <AuthGuard client:load>
-    <ConvexDashboard client:load />
-  </AuthGuard>
-</AdminLayout>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Debug Admin Dashboard</title>
+</head>
+<body style="background: #111; color: white; padding: 2rem; font-family: sans-serif;">
+    <h1>Admin Debug Dashboard</h1>
+    <p>Esta página no tiene imports. Si carga, el problema son los componentes.</p>
+</body>
+</html>
