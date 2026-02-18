@@ -27,107 +27,11 @@ const fullTitle = `${title} | Admin - Guardman`;
   </head>
 
   <body class="min-h-screen bg-gray-100 font-sans antialiased">
-    <AuthProvider client:only="react">
-      <!-- Admin Header -->
-      <header class="bg-gray-900 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between items-center h-16">
-            <div class="flex items-center gap-4">
-              <a href="/admin" class="text-xl font-bold hover:text-gray-300 transition-colors">
-                Guardman Admin
-              </a>
-            </div>
-            
-            <nav class="flex items-center gap-2">
-              <a 
-                href="/admin" 
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Dashboard
-              </a>
-              <a 
-                href="/admin/leads" 
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Leads
-              </a>
-              <a 
-                href="/admin/services" 
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Servicios
-              </a>
-              <a
-                href="/admin/solutions"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Soluciones
-              </a>
-              <a
-                href="/admin/heroes"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Heroes
-              </a>
-              <a
-                href="/admin/blog"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Blog
-              </a>
-              <a
-                href="/admin/faqs"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                FAQs
-              </a>
-              <a
-                href="/admin/team"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Equipo
-              </a>
-              <a
-                href="/admin/testimonials"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Testimonios
-              </a>
-              <a
-                href="/admin/communes"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Comunas
-              </a>
-              <a
-                href="/admin/partners"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Partners
-              </a>
-              <a 
-                href="/admin/config" 
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Config
-              </a>
-              <LogoutButton client:load />
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      <!-- Main Content -->
-      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <slot />
-      </main>
-
-      <!-- Admin Footer -->
-      <footer class="bg-gray-800 text-gray-400 py-4 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
-          Guardman Chile - Panel de Administración
-        </div>
-      </footer>
-    </AuthProvider>
+    <header class="bg-gray-900 text-white p-4">
+      <h1 class="text-xl font-bold">Guardman Admin Debug</h1>
+    </header>
+    <main class="p-8">
+      <slot />
+    </main>
   </body>
 </html>

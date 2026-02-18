@@ -21,8 +21,9 @@ import LoginForm from '../../components/admin/LoginForm';
   </head>
 
   <body class="min-h-screen bg-gray-900 flex items-center justify-center font-sans antialiased">
-    <AuthProvider client:only="react">
-      <LoginForm client:load />
-    </AuthProvider>
+    <div class="text-white p-8">
+      <h1>Debug: Login Page</h1>
+      <p>Si ves esto, el problema son los componentes de Auth.</p>
+    </div>
   </body>
 </html>

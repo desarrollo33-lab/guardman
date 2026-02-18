@@ -1,8 +1,10 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import ConvexDashboard from '../../components/admin/ConvexDashboard';
 ---
 
 <AdminLayout title="Dashboard">
-  <ConvexDashboard client:load />
+  <div class="text-white p-8">
+    <h1>Debug: Admin Dashboard</h1>
+    <p>Si ves esto, el problema son los componentes de Auth.</p>
+  </div>
 </AdminLayout>
