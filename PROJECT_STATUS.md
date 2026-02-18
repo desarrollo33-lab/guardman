@@ -9,7 +9,10 @@ La aplicación se encuentra en una fase de estabilización y optimización. Se h
 ## Cambios Recientes
 - **Corrección de Configuración**: Se unificó el uso del proyecto Convex `opulent-cod-610` (guardman-100dd) en todo el entorno, eliminando referencias obsoletas a `brazen-meerkat-768`.
 - **Despliegue Vercel**: Se resolvió un error 500 en `/soluciones` mediante la correcta configuración de la variable de entorno `PUBLIC_CONVEX_URL`.
-- **Instalación de Plugins Convex**: Se instalaron skills (`convex-quickstart`, `schema-builder`, `function-creator`, `auth-setup`, `migration-helper`) y se configuró el servidor MCP de Convex.
+- **Migración CMS Completa**: Se ha finalizado la integración de contenidos dinámicos. Las páginas de Inicio, Servicios y Soluciones ahora se alimentan completamente desde Convex.
+- **Restauración de Esquema Estricto**: Se restauró la validación estricta en `schema.ts` para todas las tablas, garantizando la integridad de los datos de servicios, soluciones y configuración del sitio.
+- **Poblamiento de Datos (Seeding)**: Se implementó un script de seeding exhaustivo que incluye posts de blog, imágenes optimizadas para servicios y soluciones, y datos de clientes reales.
+- **Instalación de Plugins Convex**: Se instalaron skills y se configuró el servidor MCP de Convex para mejorar el flujo de desarrollo.
 - **Componentización de Secciones**: Se han modularizado las secciones clave de la landing page en `src/components/sections/`:
     - `BenefitsSection`
     - `CTASection`
@@ -35,6 +38,6 @@ La aplicación se encuentra en una fase de estabilización y optimización. Se h
 - **Integraciones**: Webhook a Google Sheets para nuevos leads.
 
 ## Próximos Pasos Identificados
-1.  **Refactorización**: Continuar la migración de componentes monolíticos a secciones modulares.
-2.  **Optimización**: Implementar mejoras sugeridas en la revisión de rendimiento.
-3.  **Contenido**: Expandir la cobertura de servicios y soluciones en la base de datos.
+1.  **Optimización**: Implementar mejoras sugeridas en la revisión de rendimiento (imágenes, fuentes).
+2.  **QA de Funcionalidad**: Verificar el flujo completo del formulario de contacto integrado en el footer.
+3.  **Expansión de Blog**: Continuar generando contenido relevante para mejorar el SEO orgánico.
