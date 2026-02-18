@@ -806,43 +806,43 @@ Max Concurrent: 8 (Wave 3)
 
 ### WAVE 3: Extended CRUD Mutations
 
-- [ ] 13. Testimonials CRUD Mutations
+- [x] 13. Testimonials CRUD Mutations
   - Create mutations in new `convex/testimonials.ts`
   - `createTestimonial`, `updateTestimonial`, `deleteTestimonial`, `reorderTestimonials`
   - Handle rating validation (1-5), verified flag
   - **Category**: `quick` | **Blocked By**: Task 3 | **Blocks**: Task 30
 
-- [ ] 14. Team Members CRUD Mutations
+- [x] 14. Team Members CRUD Mutations
   - Create mutations in new `convex/team_members.ts`
   - CRUD + reorder, handle avatar_url
   - **Category**: `quick` | **Blocked By**: Task 3 | **Blocks**: Task 31
 
-- [ ] 15. Company Values CRUD Mutations
+- [x] 15. Company Values CRUD Mutations
   - Create mutations in new `convex/company_values.ts`
   - CRUD + reorder, handle icon field
   - **Category**: `quick` | **Blocked By**: Task 3 | **Blocks**: Task 36 (nosotros page)
 
-- [ ] 16. Stats CRUD Mutations
+- [x] 16. Stats CRUD Mutations
   - Create mutations in new `convex/stats.ts`
   - CRUD by page_slug, reorder
   - **Category**: `quick` | **Blocked By**: Task 3 | **Blocks**: Task 36
 
-- [ ] 17. Industries CRUD Mutations
+- [x] 17. Industries CRUD Mutations
   - Create mutations in new `convex/industries.ts`
   - CRUD + reorder, handle icon
   - **Category**: `quick` | **Blocked By**: Task 3 | **Blocks**: Task 35 (servicios page)
 
-- [ ] 18. CTAs CRUD Mutations
+- [x] 18. CTAs CRUD Mutations
   - Create mutations in new `convex/ctas.ts`
   - CRUD by page_slug, handle button objects
   - **Category**: `quick` | **Blocked By**: Task 3 | **Blocks**: Frontend migration tasks
 
-- [ ] 19. Authors CRUD Mutations
+- [x] 19. Authors CRUD Mutations
   - Create mutations in new `convex/authors.ts`
   - CRUD for blog authors
   - **Category**: `quick` | **Blocked By**: Task 3 | **Blocks**: Task 20, Task 26
 
-- [ ] 20. Blog Posts CRUD Mutations
+- [x] 20. Blog Posts CRUD Mutations
   - Create mutations in `convex/blog_posts.ts`:
     - `createPost`, `updatePost`, `deletePost`, `publishPost`, `unpublishPost`
     - `getPosts`, `getPostBySlug`, `getFeaturedPosts`
