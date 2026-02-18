@@ -2,6 +2,7 @@
 /**
  * Blog Index Page - Guardman Chile
  * Lists all blog articles with title, description, date, and image.
+ * Data fetched from Convex database.
  */
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -9,19 +10,20 @@ import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
 import Icon from '@/components/ui/Icon.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
-import { getCollection } from 'astro:content';
+import { convexServer } from '@/lib/convex';
+import { api } from '@convex/_generated/api';
 
-// Fetch all blog posts and sort by pubDate descending
-const posts = (await getCollection('blog'))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+// Fetch published blog posts from Convex and sort by published_at descending
+const posts = (await convexServer.query(api.blog_posts.getPublishedPosts))
+  .sort((a, b) => b.published_at - a.published_at);
 
 // Page metadata
 const pageTitle = 'Blog de Seguridad Privada en Chile | Guardman';
 const pageDescription = 'Artículos y noticias sobre seguridad privada en Santiago, tecnología de protección, alarmas Ajax y consejos de seguridad para empresas y condominios.';
 
-// Format date to Spanish locale
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('es-CL', {
+// Format date to Spanish locale (accepts timestamp number)
+function formatDate(timestamp: number): string {
+  return new Date(timestamp).toLocaleDateString('es-CL', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -52,17 +54,17 @@ function formatDate(date: Date): string {
       {/* Posts Grid */}
       {posts.length > 0 ? (
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {posts.map((post, index) => (
+          {posts.map((post) => (
             <a
               href={`/blog/${post.slug}`}
               class="group bg-white rounded-2xl border border-gray-200 hover:border-gray-900/30 overflow-hidden transition-all duration-300 hover:shadow-elevated hover:-translate-y-1"
             >
               {/* Image */}
-              {post.data.image ? (
+              {post.cover_image ? (
                 <div class="aspect-video bg-gray-100 overflow-hidden">
                   <img
-                    src={post.data.image}
-                    alt={post.data.title}
+                    src={post.cover_image}
+                    alt={post.title}
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                   />
@@ -79,17 +81,17 @@ function formatDate(date: Date): string {
               <div class="p-6">
                 {/* Date */}
                 <time class="text-sm text-gray-500 mb-2 block">
-                  {formatDate(post.data.pubDate)}
+                  {formatDate(post.published_at)}
                 </time>
 
                 {/* Title */}
                 <h2 class="text-xl font-bold text-gray-900 group-hover:text-gray-600 transition-colors mb-3 line-clamp-2">
-                  {post.data.title}
+                  {post.title}
                 </h2>
 
                 {/* Description */}
                 <p class="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
-                  {post.data.description}
+                  {post.excerpt}
                 </p>
 
                 {/* Author */}
@@ -97,7 +99,7 @@ function formatDate(date: Date): string {
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                   </svg>
-                  <span>{post.data.author}</span>
+                  <span>{post.author}</span>
                 </div>
 
                 {/* Read More */}

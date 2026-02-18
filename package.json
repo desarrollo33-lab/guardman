@@ -29,6 +29,7 @@
     "@tanstack/react-query": "^5.0.0",
     "astro": "^5.1.0",
     "convex": "^1.12.0",
+    "marked": "^17.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "satori": "^0.19.2",

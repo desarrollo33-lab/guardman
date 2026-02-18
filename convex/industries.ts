@@ -14,7 +14,7 @@ export const getActiveIndustries = query({
     const all = await ctx.db.query('industries').collect();
     return all
       .filter((i) => i.is_active !== false)
-      .sort((a, b) => a.order - b.order);
+      .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
   },
 });
 

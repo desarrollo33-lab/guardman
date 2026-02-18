@@ -1115,7 +1115,7 @@ Max Concurrent: 8 (Wave 3)
   - Use heroes, ctas tables for sections
   - **Category**: `quick` | **Blocked By**: Tasks 9, 18 | **Parallel Group**: Wave 6
 
-- [ ] 38. Migrate Blog from Astro Content Collection
+- [x] 38. Migrate Blog from Astro Content Collection
 
   **What to do**:
   - Create migration script to move posts from Astro Content to Convex
