@@ -8,6 +8,15 @@
                 "--api-key",
                 "AQ.Ab8RN6Lw6E5_jJ4KtovSGYfvxHii6yZL1zjE8uttXEZoDZ6nWg"
             ]
+        },
+        "convex": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "convex@latest",
+                "mcp",
+                "start"
+            ]
         }
     }
 }
