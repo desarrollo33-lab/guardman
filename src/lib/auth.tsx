@@ -3,7 +3,7 @@ import {
   useAuthActions,
   useAuthToken,
 } from '@convex-dev/auth/react';
-import { convex } from './convex';
+import { convex, getConvexClient } from './convex';
 import type { ReactNode } from 'react';
 
 /**
@@ -21,7 +21,8 @@ import type { ReactNode } from 'react';
  * ```
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
-  return <ConvexAuthProvider client={convex}>{children}</ConvexAuthProvider>;
+  const client = getConvexClient();
+  return <ConvexAuthProvider client={client}>{children}</ConvexAuthProvider>;
 }
 
 // Re-export auth hooks for convenience
