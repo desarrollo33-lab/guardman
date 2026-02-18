@@ -19,6 +19,8 @@ import { site } from '@/data/site';
 import { generateBreadcrumbSchema } from '@/utils/seo';
 
 const services = await convexServer.query(api.services.getAllServices);
+const industries = await convexServer.query(api.industries.getActiveIndustries);
+const processSteps = await convexServer.query(api.process_steps.getByPage, { page_slug: 'servicios' });
 
 const title = 'Servicios de Seguridad Privada en Santiago | Guardman Chile';
 const description =
@@ -28,24 +30,6 @@ const breadcrumbSchema = generateBreadcrumbSchema([
   { name: 'Inicio', url: '/' },
   { name: 'Servicios', url: '/servicios' },
 ]);
-
-// Industries for the grid
-const industries = [
-  { name: 'Condominios', icon: 'home-modern' },
-  { name: 'Minería', icon: 'mountain' },
-  { name: 'Retail', icon: 'building-storefront' },
-  { name: 'Hotelería', icon: 'bed' },
-  { name: 'Construcción', icon: 'building-office-2' },
-  { name: 'Eventos', icon: 'calendar-days' },
-];
-
-// Process steps
-const processSteps = [
-  { number: 1, title: 'Diagnóstico', description: 'Análisis de riesgos y evaluación de vulnerabilidades' },
-  { number: 2, title: 'Propuesta', description: 'Diseño de solución personalizada a medida' },
-  { number: 3, title: 'Implementación', description: 'Despliegue operativo y configuración' },
-  { number: 4, title: 'Monitoreo', description: 'Supervisión continua y soporte 24/7' },
-];
 ---
 
 <BaseLayout title={title} description={description} schema={breadcrumbSchema}>

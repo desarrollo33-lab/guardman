@@ -24,6 +24,7 @@ import type * as leads from "../leads.js";
 import type * as locations from "../locations.js";
 import type * as pages from "../pages.js";
 import type * as partners from "../partners.js";
+import type * as process_steps from "../process_steps.js";
 import type * as seed from "../seed.js";
 import type * as services from "../services.js";
 import type * as site_config from "../site_config.js";
@@ -56,6 +57,7 @@ declare const fullApi: ApiFromModules<{
   locations: typeof locations;
   pages: typeof pages;
   partners: typeof partners;
+  process_steps: typeof process_steps;
   seed: typeof seed;
   services: typeof services;
   site_config: typeof site_config;

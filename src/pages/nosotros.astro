@@ -9,6 +9,8 @@ import Section from '@/components/ui/Section.astro';
 import Button from '@/components/ui/Button.astro';
 import Icon from '@/components/ui/Icon.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import { convexServer } from '@/lib/convex';
+import { api } from '@convex/_generated/api';
 import { site, getWhatsAppUrl } from '@/data/site';
 import { generateBreadcrumbSchema } from '@/utils/seo';
 
@@ -21,59 +23,41 @@ const breadcrumbSchema = generateBreadcrumbSchema([
   { name: 'Nosotros', url: '/nosotros' },
 ]);
 
-// Team members with placeholder data
-const teamMembers = [
-  {
-    name: 'Juan Pérez',
-    role: 'Gerente General',
-    avatar: 'https://ui-avatars.com/api?name=Juan+Perez&background=1f2937&color=fff&size=200',
-  },
-  {
-    name: 'María González',
-    role: 'Directora de Operaciones',
-    avatar: 'https://ui-avatars.com/api?name=Maria+Gonzalez&background=1f2937&color=fff&size=200',
-  },
-  {
-    name: 'Carlos Rodríguez',
-    role: 'Jefe de Seguridad',
-    avatar: 'https://ui-avatars.com/api?name=Carlos+Rodriguez&background=1f2937&color=fff&size=200',
-  },
-  {
-    name: 'Ana Martínez',
-    role: 'Gerente Comercial',
-    avatar: 'https://ui-avatars.com/api?name=Ana+Martinez&background=1f2937&color=fff&size=200',
-  },
-];
+// Fetch data from Convex
+let teamMembers: Array<{ name: string; role: string; avatar: string }> = [];
+let values: Array<{ title: string; icon: string; description: string }> = [];
+let stats: Array<{ value: string; label: string }> = [];
 
-// Company values
-const values = [
-  {
-    title: 'Misión',
-    icon: 'sparkles',
-    description:
-      'Brindar soluciones de seguridad privada integrales y personalizadas que protejan los activos más valiosos de nuestros clientes, con personal altamente capacitado y tecnología de vanguardia.',
-  },
-  {
-    title: 'Visión',
-    icon: 'globe-alt',
-    description:
-      'Ser la empresa de seguridad privada líder en Chile, reconocida por nuestra excelencia operativa, innovación tecnológica y compromiso inquebrantable con la seguridad de nuestros clientes.',
-  },
-  {
-    title: 'Valores',
-    icon: 'star',
-    description:
-      'Profesionalismo, confianza, innovación y disponibilidad 24/7. Trabajamos con integridad, respetamos a las personas y nos comprometemos con la excelencia en cada servicio.',
-  },
-];
+try {
+  const [teamData, valuesData, statsData] = await Promise.all([
+    convexServer.query(api.team_members.getAllTeamMembers),
+    convexServer.query(api.company_values.getAllCompanyValues),
+    convexServer.query(api.stats.getStatsByPage, { page_slug: 'nosotros' }),
+  ]);
 
-// Stats/cifras
-const stats = [
-  { value: '500+', label: 'Clientes Activos' },
-  { value: '52', label: 'Comunas Cubiertas' },
-  { value: '24/7', label: 'Cobertura Continua' },
-  { value: '+10', label: 'Años de Experiencia' },
-];
+  // Map team members with fallback avatar
+  teamMembers = teamData.map((member: any) => ({
+    name: member.name,
+    role: member.role,
+    avatar: member.avatar_url || `https://ui-avatars.com/api?name=${encodeURIComponent(member.name)}&background=1f2937&color=fff&size=200`,
+  }));
+
+  // Map company values
+  values = valuesData.map((value: any) => ({
+    title: value.title,
+    icon: value.icon || 'star',
+    description: value.description,
+  }));
+
+  // Map stats
+  stats = statsData.map((stat: any) => ({
+    value: stat.value,
+    label: stat.label,
+  }));
+} catch (error) {
+  console.error('Failed to fetch nosotros page data:', error);
+  // Keep empty arrays as fallback
+}
 ---
 
 <BaseLayout title={title} description={description} schema={breadcrumbSchema}>

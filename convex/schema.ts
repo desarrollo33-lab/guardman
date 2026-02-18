@@ -33,6 +33,7 @@ export default defineSchema({
     benefits: v.optional(v.array(v.string())),
     cta: v.optional(v.string()),
     solutions: v.optional(v.array(v.string())),
+    industries: v.optional(v.array(v.string())),
     image: v.optional(v.string()),
     meta_title: v.optional(v.string()),
     meta_description: v.optional(v.string()),
@@ -58,7 +59,8 @@ export default defineSchema({
   solutions: defineTable({
     id: v.optional(v.string()),
     slug: v.string(),
-    title: v.string(), // Changed from name to title for consistency
+    title: v.optional(v.string()), // Changed from name to title for consistency
+    name: v.optional(v.string()), // Legacy field
     description: v.string(),
     icon: v.optional(v.string()),
     features: v.optional(v.array(v.string())),
@@ -107,7 +109,8 @@ export default defineSchema({
     navbar_items: v.array(
       v.object({
         label: v.string(),
-        href: v.string(), // Changed from path to href
+        href: v.optional(v.string()), // Changed from path to href
+        path: v.optional(v.string()), // Legacy field
         is_button: v.optional(v.boolean()),
         children: v.optional(
           v.array(
@@ -267,8 +270,15 @@ export default defineSchema({
     slug: v.string(),
     icon: v.optional(v.string()),
     description: v.optional(v.string()),
-    order: v.number(),
+    order: v.optional(v.number()),
     is_active: v.optional(v.boolean()),
+    // Allow legacy fields during migration
+    id: v.optional(v.string()),
+    challenges: v.optional(v.any()),
+    meta_title: v.optional(v.string()),
+    meta_description: v.optional(v.string()),
+    relatedServices: v.optional(v.any()),
+    solutions: v.optional(v.any()),
   })
     .index('by_slug', ['slug'])
     .index('by_order', ['order']),

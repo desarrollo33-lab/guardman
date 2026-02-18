@@ -25,6 +25,20 @@ interface Props {
     text: string;
     icon?: string;
   }>;
+  data?: {
+    primary_cta?: { text: string; href: string };
+    secondary_ctas?: Array<{
+      text: string;
+      href: string;
+      variant?: 'primary' | 'secondary' | 'outline' | 'accent';
+    }>;
+    trust_badges?: Array<{ text: string; icon?: string }>;
+    background_type?: 'youtube' | 'image';
+    youtube_id?: string;
+    video_id?: string; // Legacy prop for backward compatibility
+    image_url?: string;
+    mobile_image_url?: string;
+  } | null;
 }
 
 const {
@@ -48,27 +62,62 @@ const trustBadges = data?.trust_badges || [
   { text: '+500 Clientes', icon: 'users' },
 ];
 
-const videoId = data?.video_id || 'r6OSTXanzmI';
+// Background configuration with backward compatibility
+// Priority: youtube_id > video_id (legacy) > default
+const backgroundType = data?.background_type || 'youtube';
+const videoId = data?.youtube_id || data?.video_id || 'r6OSTXanzmI';
+const imageUrl = data?.image_url || '';
+const mobileImageUrl = data?.mobile_image_url || '';
+
+// Fallback chain for mobile image: mobile_image_url > image_url > YouTube poster
+const getMobileImageSrc = () => {
+  if (mobileImageUrl) return mobileImageUrl;
+  if (imageUrl) return imageUrl;
+  // Fallback to YouTube poster image
+  return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+};
+
+const mobileImageSrc = getMobileImageSrc();
 
 ---
 
 <section
   class="relative min-h-[100vh] md:min-h-[90vh] flex items-center overflow-hidden bg-black"
 >
-  {/* Background Video Layer */}
+  {/* Background Layer */}
   <div class="absolute inset-0 z-0">
-    {/* YouTube Video Background */}
-    <div class="absolute inset-0 w-full h-full overflow-hidden">
-      <iframe
-        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&enablejsapi=1`}
-        class="absolute top-1/2 left-1/2 min-w-[100vw] min-h-[100vh] w-auto h-auto -translate-x-1/2 -translate-y-1/2 object-cover pointer-events-none"
-        style="aspect-ratio: 16/9; min-width: 177.78vh; min-height: 56.25vw;"
-        frameborder="0"
-        allow="autoplay; encrypted-media"
-        allowfullscreen="false"
-        loading="lazy"
-        title="Video de fondo Guardman"
-      ></iframe>
+    {/* Mobile: Static Image Background */}
+    <div class="block md:hidden absolute inset-0 w-full h-full">
+      <img
+        src={mobileImageSrc}
+        alt="Guardman seguridad"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+    </div>
+    
+    {/* Desktop: YouTube Video Background */}
+    <div class="hidden md:block absolute inset-0 w-full h-full overflow-hidden">
+      {backgroundType === 'youtube' && (
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&enablejsapi=1`}
+          class="absolute top-1/2 left-1/2 min-w-[100vw] min-h-[100vh] w-auto h-auto -translate-x-1/2 -translate-y-1/2 object-cover pointer-events-none"
+          style="aspect-ratio: 16/9; min-width: 177.78vh; min-height: 56.25vw;"
+          frameborder="0"
+          allow="autoplay; encrypted-media"
+          allowfullscreen="false"
+          loading="lazy"
+          title="Video de fondo Guardman"
+        ></iframe>
+      )}
+      {backgroundType === 'image' && imageUrl && (
+        <img
+          src={imageUrl}
+          alt="Guardman seguridad"
+          class="w-full h-full object-cover"
+          loading="eager"
+        />
+      )}
     </div>
     
     {/* Dark Overlay */}

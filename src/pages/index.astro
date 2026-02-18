@@ -27,7 +27,7 @@ let services = [];
 let solutions = [];
 let faqs = [];
 let siteConfig = null;
-let heroBlocks = [];
+let hero = null;
 let guardPodBlocks = [];
 let clients = [];
 
@@ -37,6 +37,7 @@ try {
     solutionsData,
     faqsData,
     siteConfigData,
+    heroData,
     contentBlocksData,
     clientsData
   ] = await Promise.all([
@@ -44,6 +45,7 @@ try {
     convexServer.query(api.solutions.getAllSolutions),
     convexServer.query(api.faqs.getAllFaqs),
     convexServer.query(api.site_config.get),
+    convexServer.query(api.heroes.getHeroByPage, { page_slug: 'home' }),
     convexServer.query(api.content_blocks.getByPage, { page_slug: '/' }),
     convexServer.query(api.partners.getAll),
   ]);
@@ -52,7 +54,7 @@ try {
   solutions = solutionsData;
   faqs = faqsData;
   siteConfig = siteConfigData;
-  heroBlocks = contentBlocksData.filter(b => b.type === 'hero_video');
+  hero = heroData;
   guardPodBlocks = contentBlocksData.filter(b => b.type === 'guardpod_feature');
   clients = clientsData.filter(c => c.type === 'client').sort((a, b) => a.order - b.order);
 
@@ -63,10 +65,26 @@ try {
 // Page metadata
 const pageTitle = 'Guardman Chile';
 const pageDescription = siteConfig?.description || 'Empresa líder en seguridad privada en Chile. Guardias OS10 certificados, alarmas Ajax, patrullaje de condominios, módulos GuardPod y control de acceso. Cobertura en toda la Región Metropolitana sin contratos forzosos.';
-const heroData = heroBlocks[0]?.data;
+
+// Transform hero data for Hero component
+const heroTitle = hero?.title;
+const heroSubtitle = hero?.subtitle;
+const heroDataTransformed = hero ? {
+  background_type: hero.background_type,
+  youtube_id: hero.youtube_id,
+  video_id: hero.youtube_id, // Legacy support
+  image_url: hero.image_url,
+  mobile_image_url: hero.mobile_image_url,
+  primary_cta: hero.ctas?.[0] || { text: 'Cotizar', href: '/cotizar' },
+  secondary_ctas: hero.ctas?.slice(1) || [{ text: 'Servicios', href: '/servicios', variant: 'outline' }],
+  trust_badges: hero.badges || [
+    { text: 'Ley 21.659', icon: 'shield-check' },
+    { text: 'OS10 Certificado', icon: 'badge-check' },
+    { text: '+500 Clientes', icon: 'users' },
+  ],
+} : null;
+
 const guardPodData = guardPodBlocks[0]?.data;
-const heroTitle = heroBlocks[0]?.title;
-const heroSubtitle = heroBlocks[0]?.subtitle;
 const guardPodTitle = guardPodBlocks[0]?.title;
 const guardPodSubtitle = guardPodBlocks[0]?.subtitle;
 const guardPodContent = guardPodBlocks[0]?.content;
@@ -98,7 +116,7 @@ const guardPodContent = guardPodBlocks[0]?.content;
   <Hero 
     title={heroTitle}
     subtitle={heroSubtitle}
-    data={heroData}
+    data={heroDataTransformed}
   />
 
   {/* SERVICE FINDER - Floating card */}

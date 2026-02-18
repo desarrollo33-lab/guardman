@@ -1054,7 +1054,7 @@ Max Concurrent: 8 (Wave 3)
 
 ### WAVE 6: Frontend Migration
 
-- [ ] 34. Migrate Home Page Heroes to Convex
+- [x] 34. Migrate Home Page Heroes to Convex
 
   **What to do**:
   - Update `src/pages/index.astro` to use heroes table
@@ -1097,19 +1097,19 @@ Max Concurrent: 8 (Wave 3)
     Evidence: .sisyphus/evidence/task-34-home-hero.png
   ```
 
-- [ ] 35. Migrate Servicios Page to Convex
+- [x] 35. Migrate Servicios Page to Convex
   - Update `src/pages/servicios/index.astro`
   - Replace hardcoded process steps, industries
   - Use process_steps, industries tables
   - **Category**: `quick` | **Blocked By**: Tasks 17, 18 | **Parallel Group**: Wave 6
 
-- [ ] 36. Migrate Nosotros Page to Convex
+- [x] 36. Migrate Nosotros Page to Convex
   - Update `src/pages/nosotros.astro`
   - Replace hardcoded team, values, stats
   - Use team_members, company_values, stats tables
   - **Category**: `quick` | **Blocked By**: Tasks 14, 15, 16 | **Parallel Group**: Wave 6
 
-- [ ] 37. Migrate Contacto Page to Convex
+- [x] 37. Migrate Contacto Page to Convex
   - Update `src/pages/contacto.astro`
   - Replace hardcoded content
   - Use heroes, ctas tables for sections
@@ -1169,7 +1169,7 @@ Max Concurrent: 8 (Wave 3)
     Evidence: .sisyphus/evidence/task-38-blog-index.png
   ```
 
-- [ ] 39. Update Hero Component for YouTube/Image
+- [x] 39. Update Hero Component for YouTube/Image
 
   **What to do**:
   - Update `src/components/sections/Hero.astro`
@@ -1223,7 +1223,7 @@ Max Concurrent: 8 (Wave 3)
     Evidence: .sisyphus/evidence/task-39-hero-youtube.png
   ```
 
-- [ ] 40. Mobile Hero Fallback Implementation
+- [x] 40. Mobile Hero Fallback Implementation
 
   **What to do**:
   - Add mobile detection to Hero component
