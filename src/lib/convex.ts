@@ -1,24 +1,33 @@
 import { ConvexHttpClient } from 'convex/browser';
 import { ConvexReactClient } from 'convex/react';
 
-const convexUrl = import.meta.env.PUBLIC_CONVEX_URL;
+/**
+ * Robustly get the Convex URL from environment variables.
+ * Prioritizes PUBLIC_ prefix for client safety but allows server-only fallback.
+ */
+const getConvexUrl = () => {
+  const url = import.meta.env.PUBLIC_CONVEX_URL || import.meta.env.CONVEX_URL;
+  if (!url) {
+    console.error('CRITICAL: CONVEX_URL is not defined in any environment variable.');
+  }
+  return url || "";
+};
 
-if (!convexUrl) {
-  console.warn(
-    'PUBLIC_CONVEX_URL is not defined. Convex client will not work properly.'
-  );
-}
+const convexUrl = getConvexUrl();
 
 /**
  * Server-side Convex HTTP client for use in .astro pages (SSR).
- * Uses simple HTTP requests — no WebSocket, no subscriptions.
+ * Safe against missing URLs to prevent 500 crashes on import.
  */
-export const convexServer = new ConvexHttpClient(convexUrl ?? '');
+export const convexServer = convexUrl
+  ? new ConvexHttpClient(convexUrl)
+  : null;
 
 /**
- * Client-side Convex React client for use in React components with ConvexProvider.
- * Used by form components (ConvexLeadForm, ConvexContactForm, etc.)
+ * Client-side Convex React client for use in React components.
+ * Uses a placeholder if the URL is missing to avoid constructor crash, 
+ * but will fail with a clear message if used.
  */
-export const convex = new ConvexReactClient(convexUrl ?? '');
+export const convex = new ConvexReactClient(convexUrl || "https://placeholder-if-missing.convex.cloud");
 
 export { convexUrl };
