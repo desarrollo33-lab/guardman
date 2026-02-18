@@ -18,6 +18,10 @@ import { site } from '@/data/site';
 import { generateBreadcrumbSchema } from '@/utils/seo';
 
 const solutions = await convexServer.query(api.solutions.getAllSolutions);
+console.log('Soluciones page: Fetched solutions count:', solutions?.length);
+if (!solutions || solutions.length === 0) {
+  console.warn('Soluciones page: No solutions found!');
+}
 
 const title = 'Soluciones de Seguridad | Guardman Chile';
 const description =
