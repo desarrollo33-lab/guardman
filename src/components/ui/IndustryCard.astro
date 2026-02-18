@@ -1,0 +1,42 @@
+---
+/**
+ * IndustryCard Component
+ * Minimal card for industry/sector grid.
+ * Used in IndustryGrid section.
+ */
+
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  name: string;
+  icon: string;
+  href?: string;
+  class?: string;
+}
+
+const { name, icon, href, class: className = '' } = Astro.props;
+
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag
+  href={href || undefined}
+  class:list={[
+    'flex flex-col items-center justify-center p-8',
+    'bg-white hover:bg-gray-50 transition-colors duration-300',
+    'cursor-pointer',
+    className,
+  ]}
+>
+  <!-- Icon -->
+  <Icon
+    name={icon}
+    size="md"
+    class="text-gray-300 mb-4 group-hover:text-black transition-colors duration-300"
+  />
+
+  <!-- Name -->
+  <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-black transition-colors duration-300">
+    {name}
+  </span>
+</Tag>

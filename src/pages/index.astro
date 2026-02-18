@@ -9,6 +9,7 @@ import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
 import Button from '@/components/ui/Button.astro';
 import OrganizationSchema from '@/components/seo/OrganizationSchema.astro';
+import FAQSchema from '@/components/seo/FAQSchema.astro';
 import Hero from '@/components/sections/Hero.astro';
 import ServiceFinder from '@/components/sections/ServiceFinder.astro';
 import ServicesGrid from '@/components/sections/ServicesGrid.astro';
@@ -68,6 +69,9 @@ const pageDescription = 'Empresa líder en seguridad privada en Chile. Guardias 
       country: 'CL',
     }}
   />
+
+  {/* Schema.org FAQ */}
+  <FAQSchema faqs={faqs} />
 
   {/* HERO SECTION */}
   <Hero />

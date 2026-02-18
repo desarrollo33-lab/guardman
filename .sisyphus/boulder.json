@@ -1,7 +1,8 @@
 {
-  "active_plan": "C:\\Users\\56930\\OneDrive\\Escritorio\\guardman\\.sisyphus\\plans\\paginas-completas.md",
-  "started_at": "2026-02-17T22:32:47.664Z",
-  "session_ids": ["ses_39243ef6fffe5J466uKxyt6kGG"],
-  "plan_name": "paginas-completas",
-  "agent": "atlas"
+  "active_plan": "C:\Users\56930\OneDrive\Escritorio\guardman\.sisyphus\plans\servicios-detalle-redesign.md",
+  "started_at": "2026-02-18T15:20:55.535Z",
+  "completed_at": "2026-02-18T15:50:15.000Z",
+  "session_ids": ["ses_38ec2173affe7OKofkMhCUYNyO"],
+  "plan_name": "servicios-detalle-redesign",
+  "status": "COMPLETE"
 }

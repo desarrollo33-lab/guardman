@@ -1,0 +1,31 @@
+SCHEMA VALIDATION RESULTS - Wed Feb 18 10:02:12 PSADT 2026
+========================================
+
+WebSite Schema: PASS
+  - Location: src/layouts/BaseLayout.astro (lines 28-40)
+  - Output: Line 89 with JSON.stringify()
+  - @context: https://schema.org
+  - @type: WebSite
+  - Fields: url, name, description, inLanguage, potentialAction
+
+Organization Schema: PASS
+  - Location: src/components/seo/OrganizationSchema.astro
+  - Used in: src/pages/index.astro (line 58-71)
+  - @context: https://schema.org
+  - @type: Organization
+  - Fields: name, url, logo, description, email, telephone, address, sameAs, contactPoint
+
+FAQPage Schema: PASS
+  - Location: src/components/seo/FAQSchema.astro
+  - Used in: src/pages/index.astro (line 74)
+  - @context: https://schema.org
+  - @type: FAQPage
+  - Structure: mainEntity -> Question -> acceptedAnswer -> Answer
+
+JSON-LD Syntax: PASS
+  - All schemas use: <script type="application/ld+json">
+  - All schemas use: JSON.stringify(schema)
+  - All have @context and @type properties
+
+========================================
+VERDICT: APPROVE

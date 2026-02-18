@@ -1,0 +1,61 @@
+---
+/**
+ * ServiceCard Component
+ * Premium monochromatic card for services and solutions.
+ * Reusable between /servicios and /soluciones pages.
+ * Inspired by Porsche/Ajax Systems design language.
+ */
+
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  icon: string;
+  href: string;
+  class?: string;
+}
+
+const { title, description, icon, href, class: className = '' } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={[
+    'group relative bg-white border border-gray-100 rounded-xl p-8',
+    'hover:border-black transition-all duration-300',
+    className,
+  ]}
+>
+  <div class="relative">
+    <!-- Icon Container -->
+    <div class="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center mb-8 border border-gray-100 group-hover:bg-black group-hover:text-white transition-colors duration-300">
+      <Icon name={icon} size="sm" />
+    </div>
+
+    <!-- Title -->
+    <h3 class="text-sm font-bold text-gray-900 mb-3 uppercase tracking-[0.2em]">
+      {title}
+    </h3>
+
+    <!-- Description -->
+    <p class="text-gray-400 text-xs leading-relaxed mb-8 line-clamp-3 font-medium uppercase tracking-wider">
+      {description}
+    </p>
+
+    <!-- CTA Link -->
+    <div class="flex items-center gap-3 text-[10px] uppercase tracking-widest font-bold text-gray-300 group-hover:text-black transition-colors duration-300">
+      <span>Explorar Configuración</span>
+      <Icon name="arrow-right" size="xs" class="group-hover:translate-x-1 transition-transform duration-300" />
+    </div>
+  </div>
+</a>
+
+<style>
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

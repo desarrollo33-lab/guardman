@@ -1,0 +1,66 @@
+---
+/**
+ * FeaturesSection Component
+ * 3-column grid layout displaying features with subtle hover states.
+ * Premium monochromatic design with border-separated cells.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import Container from '@/components/ui/Container.astro';
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  features: string[];
+  columns?: 2 | 3;
+  background?: 'white' | 'gray';
+  class?: string;
+}
+
+const {
+  title,
+  subtitle,
+  features,
+  columns = 3,
+  background = 'white',
+  class: className = '',
+} = Astro.props;
+
+const gridCols = columns === 2
+  ? 'md:grid-cols-2'
+  : 'md:grid-cols-2 lg:grid-cols-3';
+---
+
+<Section background={background} class={className}>
+  <Container>
+    {/* Header */}
+    {(title || subtitle) && (
+      <div class="mb-12">
+        {title && (
+          <h2 class="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight leading-tight">
+            {title}
+          </h2>
+        )}
+        {subtitle && (
+          <p class="text-gray-500 text-lg leading-relaxed max-w-xl">
+            {subtitle}
+          </p>
+        )}
+      </div>
+    )}
+
+    {/* Features Grid */}
+    <div class={`grid ${gridCols} gap-px bg-gray-100 border border-gray-100 rounded-xl overflow-hidden`}>
+      {features.map((feature) => (
+        <div class="flex items-start gap-4 p-8 bg-white hover:bg-gray-50 transition-colors group">
+          {/* Bullet Dot */}
+          <div class="w-1.5 h-1.5 rounded-full bg-black mt-1.5 shrink-0"></div>
+          {/* Feature Text */}
+          <span class="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed group-hover:text-black transition-colors">
+            {feature}
+          </span>
+        </div>
+      ))}
+    </div>
+  </Container>
+</Section>

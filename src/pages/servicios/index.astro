@@ -2,14 +2,17 @@
 /**
  * Services Page - Lists all security services
  * Hub page for all Guardman services
+ * REDESIGNED with new reusable components
  */
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Container from '@/components/ui/Container.astro';
 import Section from '@/components/ui/Section.astro';
-import Button from '@/components/ui/Button.astro';
-import Icon from '@/components/ui/Icon.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import ServiceCard from '@/components/ui/ServiceCard.astro';
+import ProcessSection from '@/components/sections/ProcessSection.astro';
+import IndustryGrid from '@/components/sections/IndustryGrid.astro';
+import CTASection from '@/components/sections/CTASection.astro';
 import { convexServer } from '@/lib/convex';
 import { api } from '@convex/_generated/api';
 import { site } from '@/data/site';
@@ -19,15 +22,30 @@ const services = await convexServer.query(api.services.getAllServices);
 
 const title = 'Servicios de Seguridad Privada en Santiago | Guardman Chile';
 const description =
-  'Guardias OS10 certificados, alarmas Ajax Systems, patrullaje de condominios, módulos GuardPod, drones y control de acceso en Santiago y Región Metropolitana. Cotiza sin compromiso.';
+  'Guardias OS10, alarmas Ajax, patrullaje y control de acceso ✓ 10+ años experiencia ✓ Sin contratos forzosos ✓ Cotiza hoy';
 
 const breadcrumbSchema = generateBreadcrumbSchema([
   { name: 'Inicio', url: '/' },
   { name: 'Servicios', url: '/servicios' },
 ]);
 
-// Service card styles unifed for premium look
-const serviceCardStyles = "bg-white border border-gray-100 rounded-xl p-8 hover:border-black transition-all duration-300 group";
+// Industries for the grid
+const industries = [
+  { name: 'Condominios', icon: 'home-modern' },
+  { name: 'Minería', icon: 'mountain' },
+  { name: 'Retail', icon: 'building-storefront' },
+  { name: 'Hotelería', icon: 'bed' },
+  { name: 'Construcción', icon: 'building-office-2' },
+  { name: 'Eventos', icon: 'calendar-days' },
+];
+
+// Process steps
+const processSteps = [
+  { number: 1, title: 'Diagnóstico', description: 'Análisis de riesgos y evaluación de vulnerabilidades' },
+  { number: 2, title: 'Propuesta', description: 'Diseño de solución personalizada a medida' },
+  { number: 3, title: 'Implementación', description: 'Despliegue operativo y configuración' },
+  { number: 4, title: 'Monitoreo', description: 'Supervisión continua y soporte 24/7' },
+];
 ---
 
 <BaseLayout title={title} description={description} schema={breadcrumbSchema}>
@@ -91,103 +109,44 @@ const serviceCardStyles = "bg-white border border-gray-100 rounded-xl p-8 hover:
       </div>
 
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {services.map((service, index) => (
-          <a
+        {services.map((service) => (
+          <ServiceCard
+            title={service.title}
+            description={service.description}
+            icon={service.icon}
             href={`/servicios/${service.slug}`}
-            class={serviceCardStyles}
-            style={`animation-delay: ${index * 100}ms`}
-          >
-            <div class="relative">
-              <!-- Icon -->
-              <div class="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center mb-8 border border-gray-100 group-hover:bg-black group-hover:text-white transition-colors duration-500">
-                <Icon name={service.icon} size="xs" />
-              </div>
-              
-              <!-- Content -->
-              <h3 class="text-sm font-bold text-gray-900 mb-3 uppercase tracking-[0.2em]">
-                {service.title}
-              </h3>
-              
-              <p class="text-gray-400 text-xs leading-relaxed mb-8 line-clamp-3 font-medium uppercase tracking-wider">
-                {service.description}
-              </p>
-              
-              <!-- CTA -->
-              <div class="flex items-center gap-3 text-[10px] uppercase tracking-widest font-bold text-gray-300 group-hover:text-black transition-colors">
-                <span>Explorar Configuración</span>
-                <Icon name="arrow-right" size="xs" class="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </a>
+          />
         ))}
       </div>
     </Container>
   </Section>
 
-  <!-- Solutions Section -->
-  <Section background="white">
-    <Container>
-      <div class="grid lg:grid-cols-2 gap-20 items-end mb-20">
-        <div>
-          <h2 class="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight">Sectores de Activación</h2>
-          <p class="text-gray-500 text-lg leading-relaxed max-w-xl">
-            Protocolos diseñados para la interoperabilidad en múltiples industrias y entornos urbanos.
-          </p>
-        </div>
-      </div>
+  <!-- Process Section -->
+  <ProcessSection
+    title="Nuestra Metodología"
+    subtitle="Un proceso estructurado para garantizar la máxima efectividad en su solución de seguridad."
+    steps={processSteps}
+    background="white"
+  />
 
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-gray-100 border border-gray-100 rounded-xl overflow-hidden">
-        {[
-          { name: 'Condominios', icon: 'home-modern' },
-          { name: 'Minería', icon: 'mountain' },
-          { name: 'Retail', icon: 'building-storefront' },
-          { name: 'Hotelería', icon: 'bed' },
-          { name: 'Construcción', icon: 'building-office-2' },
-          { name: 'Eventos', icon: 'calendar' }
-        ].map(sector => (
-          <div class="flex flex-col items-center justify-center p-8 bg-white hover:bg-gray-50 transition-colors group">
-            <Icon name={sector.icon} size="xs" class="text-gray-300 mb-4 group-hover:text-black transition-colors" />
-            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-black transition-colors">{sector.name}</span>
-          </div>
-        ))}
-      </div>
-    </Container>
-  </Section>
+  <!-- Industry Grid -->
+  <IndustryGrid
+    title="Sectores de Activación"
+    subtitle="Protocolos diseñados para la interoperabilidad en múltiples industrias y entornos urbanos."
+    industries={industries}
+    background="gray"
+    columns={6}
+  />
 
   <!-- CTA Section -->
-  <Section background="dark" class="relative overflow-hidden py-24">
-    <Container>
-      <div class="relative max-w-5xl mx-auto text-center">
-        <h2 class="text-3xl md:text-6xl font-semibold text-white mb-10 tracking-tight leading-tight">
-          Asegure sus <span class="italic text-white/40">activos</span> hoy
-        </h2>
-        
-        <p class="text-lg md:text-xl text-white/50 mb-14 max-w-2xl mx-auto leading-relaxed">
-          Inicie el despliegue de su solución de seguridad personalizada. Ingeniería táctica aplicada a su tranquilidad.
-        </p>
-
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button href="/contacto" variant="primary" size="lg" class="bg-white text-black hover:bg-gray-100 border-none transition-all px-12 font-bold tracking-widest text-xs uppercase">
-            Solicitar Auditoría
-          </Button>
-          <Button
-            href={`tel:${site.phone.replace(/\s/g, '')}`}
-            variant="outline"
-            size="lg"
-            class="px-12 border-white/20 hover:bg-white/5 text-white transition-all font-semibold"
-          >
-            Línea Directa: {site.phone}
-          </Button>
-        </div>
-        
-        <div class="flex items-center justify-center gap-12 mt-20 pt-10 border-t border-white/10 opacity-30">
-          {['Operativo 24/7', 'Certificación OS10', 'Estándar ISO'].map(label => (
-            <span class="text-[10px] uppercase tracking-[0.3em] font-bold text-white">{label}</span>
-          ))}
-        </div>
-      </div>
-    </Container>
-  </Section>
+  <CTASection
+    headline="Asegure sus activos hoy"
+    headlineAccent="activos"
+    subtitle="Inicie el despliegue de su solución de seguridad personalizada. Ingeniería táctica aplicada a su tranquilidad."
+    primaryButton={{ text: 'Solicitar Auditoría', href: '/contacto' }}
+    secondaryButton={{ text: `Línea Directa: ${site.phone}`, href: `tel:${site.phone.replace(/\s/g, '')}` }}
+    trustBadges={['Operativo 24/7', 'Certificación OS10', 'Estándar ISO']}
+  />
 </BaseLayout>
 
 <style>
