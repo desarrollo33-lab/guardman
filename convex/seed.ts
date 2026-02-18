@@ -22,6 +22,11 @@ const IMAGES = {
         construccion: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80', // Construction site
     },
     about: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=80', // Team/Meeting
+    blog: {
+        ai: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+        os10: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+        home: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    }
 };
 
 export const seedInitialData = mutation({
@@ -72,7 +77,22 @@ export const seedInitialData = mutation({
         for (const s of servicesData) {
             const exists = await ctx.db.query('services').withIndex('by_slug', q => q.eq('slug', s.slug)).first();
             if (!exists) {
-                await ctx.db.insert('services', { ...s, is_active: true, features: [] });
+                await ctx.db.insert('services', {
+                    ...s,
+                    is_active: true,
+                    features: [],
+                    benefits: [],
+                    solutions: [],
+                    industries: []
+                });
+            } else {
+                // Full patch to ensure schema compliance
+                await ctx.db.patch(exists._id, {
+                    title: s.title,
+                    description: s.description,
+                    icon: s.icon,
+                    image: s.image,
+                });
             }
         }
         console.log('✅ Services seeded');
@@ -91,16 +111,41 @@ export const seedInitialData = mutation({
             const exists = await ctx.db.query('solutions').withIndex('by_slug', q => q.eq('slug', sol.slug)).first();
             if (!exists) {
                 await ctx.db.insert('solutions', { ...sol, is_active: true });
+            } else {
+                await ctx.db.patch(exists._id, {
+                    title: sol.title,
+                    description: sol.description,
+                    image: sol.image
+                });
             }
         }
         console.log('✅ Solutions seeded');
 
-        // 4. Seed Pages & Content Blocks
+
+
+        // 4. Seed Partners (Clients)
+        const clientsData = [
+            { name: 'Marriott', industry: 'Hospitality & Events', type: 'client', order: 1, logo_url: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', quote: 'Seguridad impecable 24/7.', icon: 'building' },
+            { name: 'Kavak', industry: 'Automotriz', type: 'client', order: 2, logo_url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', quote: 'Control de acceso eficiente.', icon: 'car' },
+            { name: 'Cencosud', industry: 'Retail', type: 'client', order: 3, logo_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', quote: 'Respuesta inmediata.', icon: 'shopping-bag' },
+            { name: 'Walmart', industry: 'Logística', type: 'client', order: 4, logo_url: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', quote: 'Tecnología de punta.', icon: 'truck' },
+        ];
+
+        for (const client of clientsData) {
+            const exists = await ctx.db.query('partners').withIndex('by_type', q => q.eq('type', 'client')).filter(q => q.eq(q.field('name'), client.name)).first();
+            if (!exists) {
+                await ctx.db.insert('partners', client);
+            }
+        }
+        console.log('✅ Clients seeded');
+
+        // 5. Seed Pages & Content Blocks
 
         // Helper to seed a page if it doesn't exist
         const seedPage = async (slug: string, title: string, seoTitle: string, seoDesc: string) => {
             const exists = await ctx.db.query('pages').withIndex('by_slug', q => q.eq('slug', slug)).first();
             if (!exists) {
+                console.log(`Creating page: ${slug}`);
                 await ctx.db.insert('pages', {
                     slug,
                     title,
@@ -109,6 +154,8 @@ export const seedInitialData = mutation({
                     is_published: true,
                     og_image: IMAGES.hero.main
                 });
+            } else {
+                console.log(`Page already exists: ${slug}`);
             }
         };
 
@@ -127,16 +174,49 @@ export const seedInitialData = mutation({
         await seedPage('/', 'Home', 'Guardman Chile - Seguridad Privada Experta', 'Líderes en seguridad OS10 y tecnología en Chile.');
         await seedBlocks('/', [
             {
-                type: 'hero_ajax',
+                type: 'hero_video',
                 order: 1,
-                title: 'Seguridad sin compromisos',
-                subtitle: 'Protección integral con guardias OS10 y tecnología de punta.',
+                title: 'Seguridad Premium para tu Empresa',
+                subtitle: 'Guardias certificados, tecnología de vanguardia y protección integral sin contratos forzosos',
                 data: {
-                    backgroundImage: IMAGES.hero.main,
-                    primaryCta: { text: 'Cotizar Ahora', href: '/cotizar' },
-                    secondaryCta: { text: 'Nuestros Servicios', href: '/servicios' },
-                    align: 'left',
-                    size: 'full'
+                    video_id: 'r6OSTXanzmI',
+                    primary_cta: {
+                        text: 'Cotizar',
+                        href: '/cotizar',
+                    },
+                    secondary_ctas: [
+                        { text: 'Servicios', href: '/servicios', variant: 'outline' },
+                    ],
+                    trust_badges: [
+                        { text: 'Ley 21.659', icon: 'shield-check' },
+                        { text: 'OS10 Certificado', icon: 'badge-check' },
+                        { text: '+500 Clientes', icon: 'users' },
+                    ],
+                }
+            },
+            {
+                type: 'guardpod_feature',
+                order: 4,
+                title: 'GuardPod',
+                subtitle: 'Seguridad Modular Instantánea',
+                content: 'Unidad de seguridad autónoma lista para operar en 24 horas.',
+                data: {
+                    video_id: 'M9kZNHoHcS4',
+                    features: [
+                        { icon: 'clock', title: 'Instalación Rápida', description: 'Operativo en 24 horas' },
+                        { icon: 'signal', title: 'Conectividad 4G/5G', description: 'Internet satelital incluido' },
+                        { icon: 'map-pin', title: 'Fácil Despliegue', description: 'Cualquier ubicación remota' },
+                        { icon: 'shield-check', title: 'Blindaje Nivel 3', description: 'Protección certificada' },
+                    ],
+                    stats: [
+                        { value: '24 hrs', label: 'Instalación' },
+                        { value: '70%', label: 'Ahorro' },
+                        { value: '98%', label: 'Satisfacción' },
+                    ],
+                    ctas: [
+                        { text: 'Solicitar GuardPod', href: '/servicios/guardpod', variant: 'accent' },
+                        { text: 'WhatsApp', href: 'https://wa.me/56930000010', variant: 'whatsapp' },
+                    ],
                 }
             },
             {
@@ -261,6 +341,66 @@ export const seedInitialData = mutation({
             console.log('✅ Certifications seeded');
         }
 
+        // 7. Seed Blog Posts
+        const blogPosts = [
+            {
+                slug: 'futuro-seguridad-ia',
+                title: 'El Futuro de la Seguridad Privada: IA y Drones',
+                excerpt: 'Descubre cómo la inteligencia artificial y la vigilancia aérea están revolucionando la protección de activos en Chile.',
+                cover_image: IMAGES.blog.ai,
+                author: 'Carlos Ruiz',
+                published_at: Date.now(),
+                read_time: 5,
+                tags: ['Tecnología', 'Innovación', 'Drones'],
+                is_featured: true,
+                content: [
+                    { type: 'text', content: 'La seguridad privada está experimentando una transformación radical gracias a la incorporación de nuevas tecnologías.' },
+                    { type: 'h2', content: 'Vigilancia Aérea Autónoma' },
+                    { type: 'image', content: IMAGES.services.drones, alt: 'Drone vigilancia', caption: 'Drones patrullando.' },
+                    { type: 'text', content: 'Los drones permiten cubrir grandes extensiones de terreno en minutos.' },
+                    { type: 'video', content: 'https://www.youtube.com/watch?v=J5jZ15z-r_g', caption: 'Demo drones.' }
+                ]
+            },
+            {
+                slug: 'normativa-os10',
+                title: 'Certificación OS10: Guía Completa',
+                excerpt: 'Normativa esencial para la seguridad privada en Chile.',
+                cover_image: IMAGES.blog.os10,
+                author: 'Ana Morales',
+                published_at: Date.now() - 86400000 * 5,
+                read_time: 8,
+                tags: ['Legales', 'OS10'],
+                is_featured: false,
+                content: [
+                    { type: 'text', content: 'La certificación OS10 es la garantía de personal capacitado.' },
+                    { type: 'list', content: '', items: ['Legislación', 'Prevención', 'Emergencias'] }
+                ]
+            },
+            {
+                slug: 'seguridad-condominios',
+                title: 'Seguridad en Condominios en Verano',
+                excerpt: 'Consejos para proteger tu hogar en vacaciones.',
+                cover_image: IMAGES.blog.home,
+                author: 'Roberto Gomez',
+                published_at: Date.now() - 86400000 * 10,
+                read_time: 4,
+                tags: ['Hogar', 'Consejos'],
+                is_featured: false,
+                content: [
+                    { type: 'text', content: 'El verano es crítico para la seguridad del hogar.' },
+                    { type: 'quote', content: 'La prevención es clave.' }
+                ]
+            }
+        ];
+
+        for (const post of blogPosts) {
+            const exists = await ctx.db.query('blog_posts').withIndex('by_slug', q => q.eq('slug', post.slug)).first();
+            if (!exists) {
+                await ctx.db.insert('blog_posts', post);
+            }
+        }
+        console.log('✅ Blog Posts seeded');
+
         // 6. Seed Communes (PSEO)
         const communesData = [
             // Sector Oriente
@@ -323,7 +463,6 @@ export const seedInitialData = mutation({
         }
         console.log('✅ Communes seeded for PSEO');
 
-        return 'Full app seeding completed successfully';
     },
 });
 

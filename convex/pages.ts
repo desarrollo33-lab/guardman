@@ -11,3 +11,9 @@ export const getBySlug = query({
         return page;
     },
 });
+
+export const getAll = query({
+    handler: async (ctx) => {
+        return await ctx.db.query('pages').collect();
+    },
+});

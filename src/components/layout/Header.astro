@@ -5,12 +5,12 @@ const { navItems, siteConfig } = Astro.props;
 
 interface NavItem {
   label: string;
-  href: string; // Changed from path to href to match usage
+  href: string;
   children?: { label: string; href: string }[];
   is_button?: boolean;
 }
 
-const links = [
+const links: NavItem[] = navItems || [
   { label: 'Inicio', href: '/' },
   { 
     label: 'Servicios', 

@@ -30,19 +30,26 @@ interface Props {
 const {
   title = 'Seguridad Premium para tu Empresa',
   subtitle = 'Guardias certificados, tecnología de vanguardia y protección integral sin contratos forzosos',
-  primaryCta = {
-    text: 'Cotizar',
-    href: '/cotizar',
-  },
-  secondaryCtas = [
-    { text: 'Servicios', href: '/servicios', variant: 'outline' as const },
-  ],
-  trustBadges = [
-    { text: 'Ley 21.659', icon: 'shield-check' },
-    { text: 'OS10 Certificado', icon: 'badge-check' },
-    { text: '+500 Clientes', icon: 'users' },
-  ],
+  data,
 } = Astro.props;
+
+const primaryCta = data?.primary_cta || {
+  text: 'Cotizar',
+  href: '/cotizar',
+};
+
+const secondaryCtas = data?.secondary_ctas || [
+  { text: 'Servicios', href: '/servicios', variant: 'outline' },
+];
+
+const trustBadges = data?.trust_badges || [
+  { text: 'Ley 21.659', icon: 'shield-check' },
+  { text: 'OS10 Certificado', icon: 'badge-check' },
+  { text: '+500 Clientes', icon: 'users' },
+];
+
+const videoId = data?.video_id || 'r6OSTXanzmI';
+
 ---
 
 <section
@@ -53,7 +60,7 @@ const {
     {/* YouTube Video Background */}
     <div class="absolute inset-0 w-full h-full overflow-hidden">
       <iframe
-        src="https://www.youtube.com/embed/r6OSTXanzmI?autoplay=1&mute=1&loop=1&playlist=r6OSTXanzmI&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&enablejsapi=1"
+        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&enablejsapi=1`}
         class="absolute top-1/2 left-1/2 min-w-[100vw] min-h-[100vh] w-auto h-auto -translate-x-1/2 -translate-y-1/2 object-cover pointer-events-none"
         style="aspect-ratio: 16/9; min-width: 177.78vh; min-height: 56.25vw;"
         frameborder="0"

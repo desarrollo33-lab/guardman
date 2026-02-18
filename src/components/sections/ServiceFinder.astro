@@ -8,6 +8,7 @@
 import Container from '@/components/ui/Container.astro';
 
 // Cities and communes where Guardman operates (RM focus)
+// Cities (Keep hardcoded or fetch from locations.ts which is static for now)
 const cities = [
   'Santiago Centro',
   'Las Condes',
@@ -21,28 +22,17 @@ const cities = [
   'Puente Alto',
 ];
 
-// Services offered
-const serviceTypes = [
-  'Guardias de Seguridad',
-  'Patrullaje de Condominios',
-  'Alarmas Ajax Systems',
-  'GuardPod - Módulos',
-  'Drones de Seguridad',
-  'Control de Acceso',
-  'CCTV / Monitoreo',
-  'Consultoría',
+const { services = [], solutions = [] } = Astro.props;
+
+// Use props to populate dropdowns or fallback
+const serviceOptions = services.length > 0 ? services : [
+  { title: 'Guardias de Seguridad', slug: 'guardias-seguridad' },
+  { title: 'Patrullaje de Condominios', slug: 'patrullaje-condominios' },
 ];
 
-// Solutions served (aligned with src/data/solutions.ts)
-const solutionTypes = [
-  'Condominios',
-  'Minería',
-  'Retail',
-  'Construcción',
-  'Hotelería',
-  'Inmobiliaria',
-  'Eventos',
-  'Corporativo',
+const solutionOptions = solutions.length > 0 ? solutions : [
+  { title: 'Condominios', slug: 'condominios' },
+  { title: 'Minería', slug: 'mineria' },
 ];
 ---
 
@@ -94,8 +84,8 @@ const solutionTypes = [
             class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 appearance-none cursor-pointer hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 transition-all text-sm"
           >
             <option value="">Tipo de servicio</option>
-            {serviceTypes.map((service) => (
-              <option value={service.toLowerCase().replace(/\s/g, '-')}>{service}</option>
+            {serviceOptions.map((service) => (
+              <option value={service.slug}>{service.title}</option>
             ))}
           </select>
           <svg
@@ -118,8 +108,8 @@ const solutionTypes = [
             class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 appearance-none cursor-pointer hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 transition-all text-sm"
           >
             <option value="">Selecciona tu solución</option>
-            {solutionTypes.map((solution) => (
-              <option value={solution.toLowerCase().replace(/\s/g, '-')}>{solution}</option>
+            {solutionOptions.map((solution) => (
+              <option value={solution.slug}>{solution.title}</option>
             ))}
           </select>
           <svg

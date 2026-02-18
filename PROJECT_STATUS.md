@@ -9,6 +9,7 @@ La aplicación se encuentra en una fase de estabilización y optimización. Se h
 ## Cambios Recientes
 - **Corrección de Configuración**: Se unificó el uso del proyecto Convex `opulent-cod-610` (guardman-100dd) en todo el entorno, eliminando referencias obsoletas a `brazen-meerkat-768`.
 - **Despliegue Vercel**: Se resolvió un error 500 en `/soluciones` mediante la correcta configuración de la variable de entorno `PUBLIC_CONVEX_URL`.
+- **Instalación de Plugins Convex**: Se instalaron skills (`convex-quickstart`, `schema-builder`, `function-creator`, `auth-setup`, `migration-helper`) y se configuró el servidor MCP de Convex.
 - **Componentización de Secciones**: Se han modularizado las secciones clave de la landing page en `src/components/sections/`:
     - `BenefitsSection`
     - `CTASection`

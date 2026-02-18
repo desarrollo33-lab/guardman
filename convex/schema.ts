@@ -1,7 +1,7 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
-export default defineSchema({
+export default defineSchema({ // Force rebuild 1
   leads: defineTable({
     nombre: v.string(),
     telefono: v.string(),
@@ -19,28 +19,7 @@ export default defineSchema({
     .index('by_status', ['status'])
     .index('by_createdAt', ['createdAt']),
 
-  services: defineTable({
-    id: v.optional(v.string()),       // Legacy ID, optional now
-    slug: v.string(),
-    title: v.string(),
-    description: v.string(),
-    tagline: v.optional(v.string()),
-    icon: v.string(),
-    icon_dark: v.optional(v.string()),
-    icon_light: v.optional(v.string()),
-    image: v.optional(v.string()),    // New: Main image
-    features: v.optional(v.array(v.string())),
-    benefits: v.optional(v.array(v.string())),
-    cta: v.optional(v.string()),
-    industries: v.optional(v.array(v.string())),
-    meta_title: v.optional(v.string()),
-    meta_description: v.optional(v.string()),
-    og_image: v.optional(v.string()),
-    solutions: v.optional(v.array(v.string())),
-    is_active: v.optional(v.boolean()), // New
-  })
-    .index('by_slug', ['slug'])
-    .index('by_solutions', ['solutions']),
+  services: defineTable(v.any()).index('by_slug', ['slug']),
 
   communes: defineTable({
     name: v.string(),
@@ -60,16 +39,18 @@ export default defineSchema({
     title: v.string(),               // Changed from name to title for consistency
     description: v.string(),
     icon: v.optional(v.string()),
-    image: v.optional(v.string()),    // New
+    features: v.optional(v.array(v.string())),
+    benefits: v.optional(v.array(v.string())),
+    cta: v.optional(v.string()),
+    industries: v.optional(v.array(v.string())),
     meta_title: v.optional(v.string()),
     meta_description: v.optional(v.string()),
-    challenges: v.optional(v.array(v.string())),
+    og_image: v.optional(v.string()),
     solutions: v.optional(v.array(v.string())),
-    relatedServices: v.optional(v.array(v.string())),
-    parent_solution: v.optional(v.string()),
     is_active: v.optional(v.boolean()), // New
   })
-    .index('by_slug', ['slug']),
+    .index('by_slug', ['slug'])
+    .index('by_solutions', ['solutions']),
 
   faqs: defineTable({
     id: v.optional(v.string()),
@@ -101,6 +82,10 @@ export default defineSchema({
       label: v.string(),
       href: v.string(),              // Changed from path to href
       is_button: v.optional(v.boolean()),
+      children: v.optional(v.array(v.object({
+        label: v.string(),
+        href: v.string(),
+      }))),
     })),
     footer_config: v.optional(v.any()), // JSON structured footer columns
   }).index('by_active', ['is_active']),
@@ -144,5 +129,27 @@ export default defineSchema({
     type: v.string(), // "certification", "client", "tech_partner"
     url: v.optional(v.string()),
     order: v.number(),
+    quote: v.optional(v.string()),      // New
+    industry: v.optional(v.string()),   // New
+    icon: v.optional(v.string()),       // New
   }).index('by_type', ['type']),
+
+  blog_posts: defineTable({
+    slug: v.string(),
+    title: v.string(),
+    excerpt: v.string(),
+    cover_image: v.string(),
+    author: v.string(),
+    published_at: v.number(),
+    read_time: v.number(), // minutes
+    tags: v.array(v.string()),
+    is_featured: v.boolean(),
+    content: v.array(v.object({ // Sections
+      type: v.string(), // "text", "image", "video", "quote", "h2", "list"
+      content: v.string(), // Text content or URL
+      alt: v.optional(v.string()), // For images
+      caption: v.optional(v.string()), // For images/videos
+      items: v.optional(v.array(v.string())), // For lists
+    })),
+  }).index('by_slug', ['slug']),
 });

@@ -10,6 +10,7 @@
 
 import type * as communes from "../communes.js";
 import type * as content_blocks from "../content_blocks.js";
+import type * as debug_pages from "../debug_pages.js";
 import type * as faqs from "../faqs.js";
 import type * as leads from "../leads.js";
 import type * as locations from "../locations.js";
@@ -29,6 +30,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   communes: typeof communes;
   content_blocks: typeof content_blocks;
+  debug_pages: typeof debug_pages;
   faqs: typeof faqs;
   leads: typeof leads;
   locations: typeof locations;

@@ -1,13 +1,11 @@
 import { query } from './_generated/server';
-import { v } from 'convex/values';
 
-export const getActive = query({
+export const get = query({
     args: {},
     handler: async (ctx) => {
-        const config = await ctx.db
+        return await ctx.db
             .query('site_config')
-            .withIndex('by_active', (q) => q.eq('is_active', true))
+            .filter((q) => q.eq(q.field('is_active'), true))
             .first();
-        return config;
     },
 });

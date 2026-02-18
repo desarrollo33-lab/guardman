@@ -32,6 +32,7 @@ const SOLUTIONS_SEED_DATA = [
         meta_title: 'Seguridad para Condominios y Edificios Residenciales | Guardman',
         meta_description:
             'Protección integral para comunidades. Guardias OS10, control de acceso y tecnología de seguridad diseñada para condominios y edificios.',
+        image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     },
     {
         id: 'mineria',
@@ -63,6 +64,7 @@ const SOLUTIONS_SEED_DATA = [
         meta_title: 'Seguridad para Minería y Faenas Industriales | Guardman',
         meta_description:
             'Seguridad especializada para minería e industrias. Cumplimiento normativo, control de acceso y protección de activos críticos.',
+        image: 'https://images.unsplash.com/photo-1599829567931-18c738e4df5e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     },
     {
         id: 'retail',
@@ -89,6 +91,7 @@ const SOLUTIONS_SEED_DATA = [
         meta_title: 'Seguridad para Retail, Malls y Comercio | Guardman',
         meta_description:
             'Prevención de pérdidas y seguridad para retail. Guardias, CCTV y alarmas para tiendas, supermercados y centros comerciales.',
+        image: 'https://images.unsplash.com/photo-1555465089-0ae6b7e80d46?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     },
     {
         id: 'construccion',
@@ -120,6 +123,7 @@ const SOLUTIONS_SEED_DATA = [
         meta_title: 'Seguridad para Construcción y Obras | Guardman',
         meta_description:
             'Protección de obras y faenas de construcción. Módulos GuardPod, vigilancia perimetral y control de acceso para evitar robos.',
+        image: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     },
     {
         id: 'hoteleria',
@@ -146,6 +150,7 @@ const SOLUTIONS_SEED_DATA = [
         meta_title: 'Seguridad para Hoteles y Turismo | Guardman',
         meta_description:
             'Seguridad hotelera y turística. Protección discreta para huéspedes, control de acceso y monitoreo 24/7 sin afectar la experiencia.',
+        image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     },
     {
         id: 'inmobiliaria',
@@ -172,6 +177,7 @@ const SOLUTIONS_SEED_DATA = [
         meta_title: 'Seguridad para Inmobiliarias y Propiedades | Guardman',
         meta_description:
             'Protección de proyectos inmobiliarios y propiedades piloto. Guardias, alarmas y control de acceso para evitar usurpaciones y robos.',
+        image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     },
     {
         id: 'eventos',
@@ -198,6 +204,7 @@ const SOLUTIONS_SEED_DATA = [
         meta_title: 'Seguridad Privada para Eventos Masivos | Guardman',
         meta_description:
             'Guardias de seguridad para eventos, conciertos y ferias. Control de acceso, manejo de multitudes y protección VIP.',
+        image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     },
     {
         id: 'corporativo',
@@ -224,6 +231,7 @@ const SOLUTIONS_SEED_DATA = [
         meta_title: 'Seguridad para Oficinas y Edificios Corporativos | Guardman',
         meta_description:
             'Servicios de seguridad para empresas y oficinas. Control de acceso, recepción y vigilancia 24/7 para proteger su negocio.',
+        image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     },
 ];
 
@@ -262,6 +270,7 @@ export const seedSolutions = mutation({
                 await ctx.db.patch(existing._id, {
                     meta_title: data.meta_title,
                     meta_description: data.meta_description,
+                    image: data.image,
                 });
                 skipped++;
                 continue;

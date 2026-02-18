@@ -33,6 +33,7 @@ const SERVICES_SEED_DATA = [
       'hoteleria',
       'construccion',
     ],
+    image: 'https://images.unsplash.com/photo-1555529733-1e944b204e33?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     meta_title: 'Guardias de Seguridad Privada OS10 en Chile | Guardman',
     meta_description:
       'Servicio de guardias de seguridad OS10 certificados para empresas y condominios. Protección 24/7 con supervisión en tiempo real y personal calificado.',
@@ -61,6 +62,7 @@ const SERVICES_SEED_DATA = [
     ],
     cta: 'Cotizar Patrullaje',
     solutions: ['condominios'],
+    image: 'https://images.unsplash.com/photo-1541560052-7eec2fde978d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     meta_title: 'Patrullaje de Seguridad para Condominios | Guardman',
     meta_description:
       'Servicio de patrullaje móvil para condominios. Rondas de seguridad con vehículos identificados y monitoreo GPS para tu comunidad.',
@@ -89,6 +91,7 @@ const SERVICES_SEED_DATA = [
     ],
     cta: 'Cotizar Alarmas',
     solutions: ['condominios', 'retail', 'hoteleria', 'construccion'],
+    image: 'https://images.unsplash.com/photo-1558002038-1091a1661116?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     meta_title: 'Alarmas Ajax y Monitoreo Inteligente | Guardman',
     meta_description:
       'Instalación de alarmas Ajax con monitoreo sin contratos forzosos. Detectores de movimiento, incendio e inundación con control desde tu smartphone.',
@@ -117,6 +120,7 @@ const SERVICES_SEED_DATA = [
     ],
     cta: 'Cotizar GuardPod',
     solutions: ['construccion', 'mineria', 'industria', 'eventos'],
+    image: 'https://images.unsplash.com/photo-1496247749665-49cf5b102269?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     meta_title: 'Módulos de Seguridad GuardPod Blindados | Guardman',
     meta_description:
       'Casetas de seguridad GuardPod totalmente equipadas. Solución portátil con baño, blindaje y tecnología para obras, minería y eventos.',
@@ -145,6 +149,7 @@ const SERVICES_SEED_DATA = [
     ],
     cta: 'Cotizar Drones',
     solutions: ['mineria', 'construccion'],
+    image: 'https://images.unsplash.com/photo-1508614589041-895b8c9d7e72?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
   },
   {
     id: 'control-acceso',
@@ -170,6 +175,7 @@ const SERVICES_SEED_DATA = [
     ],
     cta: 'Cotizar Control',
     solutions: ['mineria', 'retail', 'hoteleria', 'construccion'],
+    image: 'https://images.unsplash.com/photo-1623941002345-0374e304859a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
   },
 ];
 
@@ -225,6 +231,7 @@ export const seedServices = mutation({
           meta_title: serviceData.meta_title,
           meta_description: serviceData.meta_description,
           solutions: serviceData.solutions,
+          image: serviceData.image,
         });
         skipped++;
         continue;

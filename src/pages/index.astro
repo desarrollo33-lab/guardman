@@ -26,28 +26,50 @@ import { site } from '@/data/site';
 let services = [];
 let solutions = [];
 let faqs = [];
+let siteConfig = null;
+let heroBlocks = [];
+let guardPodBlocks = [];
+let clients = [];
 
 try {
-  services = await convexServer.query(api.services.getAllServices);
-} catch (e) {
-  console.error('Error fetching services:', e);
-}
+  const [
+    servicesData,
+    solutionsData,
+    faqsData,
+    siteConfigData,
+    contentBlocksData,
+    clientsData
+  ] = await Promise.all([
+    convexServer.query(api.services.getAllServices),
+    convexServer.query(api.solutions.getAllSolutions),
+    convexServer.query(api.faqs.getAllFaqs),
+    convexServer.query(api.site_config.get),
+    convexServer.query(api.content_blocks.getByPage, { page_slug: '/' }),
+    convexServer.query(api.partners.getAll),
+  ]);
 
-try {
-  solutions = await convexServer.query(api.solutions.getAllSolutions);
-} catch (e) {
-  console.error('Error fetching solutions:', e);
-}
+  services = servicesData;
+  solutions = solutionsData;
+  faqs = faqsData;
+  siteConfig = siteConfigData;
+  heroBlocks = contentBlocksData.filter(b => b.type === 'hero_video');
+  guardPodBlocks = contentBlocksData.filter(b => b.type === 'guardpod_feature');
+  clients = clientsData.filter(c => c.type === 'client').sort((a, b) => a.order - b.order);
 
-try {
-  faqs = await convexServer.query(api.faqs.getAllFaqs);
 } catch (e) {
-  console.error('Error fetching faqs:', e);
+  console.error('Error fetching data:', e);
 }
 
 // Page metadata
 const pageTitle = 'Guardman Chile';
-const pageDescription = 'Empresa líder en seguridad privada en Chile. Guardias OS10 certificados, alarmas Ajax, patrullaje de condominios, módulos GuardPod y control de acceso. Cobertura en toda la Región Metropolitana sin contratos forzosos.';
+const pageDescription = siteConfig?.description || 'Empresa líder en seguridad privada en Chile. Guardias OS10 certificados, alarmas Ajax, patrullaje de condominios, módulos GuardPod y control de acceso. Cobertura en toda la Región Metropolitana sin contratos forzosos.';
+const heroData = heroBlocks[0]?.data;
+const guardPodData = guardPodBlocks[0]?.data;
+const heroTitle = heroBlocks[0]?.title;
+const heroSubtitle = heroBlocks[0]?.subtitle;
+const guardPodTitle = guardPodBlocks[0]?.title;
+const guardPodSubtitle = guardPodBlocks[0]?.subtitle;
+const guardPodContent = guardPodBlocks[0]?.content;
 
 
 ---
@@ -73,10 +95,17 @@ const pageDescription = 'Empresa líder en seguridad privada en Chile. Guardias 
   <FAQSchema faqs={faqs} />
 
   {/* HERO SECTION */}
-  <Hero />
+  <Hero 
+    title={heroTitle}
+    subtitle={heroSubtitle}
+    data={heroData}
+  />
 
   {/* SERVICE FINDER - Floating card */}
-  <ServiceFinder />
+  <ServiceFinder 
+    services={services}
+    solutions={solutions}
+  />
 
   {/* SERVICIOS SECTION */}
   <ServicesGrid 
@@ -85,7 +114,12 @@ const pageDescription = 'Empresa líder en seguridad privada en Chile. Guardias 
   />
 
   {/* GUARDPOD - Featured Section */}
-  <GuardPodSection />
+  <GuardPodSection 
+    title={guardPodTitle}
+    subtitle={guardPodSubtitle}
+    description={guardPodContent}
+    data={guardPodData}
+  />
 
   {/* SOLUCIONES - Grid Section */}
   <SolutionsGrid
@@ -99,7 +133,7 @@ const pageDescription = 'Empresa líder en seguridad privada en Chile. Guardias 
 
 
   {/* CLIENTES - New section from Stitch */}
-  <ClientsGrid />
+  <ClientsGrid clients={clients} />
 
   {/* FAQ SECTION */}
   <FAQ 
