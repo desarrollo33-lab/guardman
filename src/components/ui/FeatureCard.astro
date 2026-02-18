@@ -1,0 +1,107 @@
+---
+/**
+ * FeatureCard Component
+ * Unified card component for Services and Industries sections.
+ * Clean, minimal design with image header and icon overlay.
+ */
+
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  image: string;
+  imageAlt?: string;
+  icon?: string;
+  href: string;
+  badge?: string;
+  linkText?: string;
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  image,
+  imageAlt = '',
+  icon = 'shield-check',
+  href,
+  badge,
+  linkText = 'Conocer más',
+  class: className = '',
+} = Astro.props;
+
+// Icon SVG paths
+const iconPaths: Record<string, string> = {
+  'shield-check': '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.954 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />',
+  car: '<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />',
+  bell: '<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />',
+  building: '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />',
+  airplane: '<path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />',
+  key: '<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />',
+  home: '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />',
+  mountain: '<path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />',
+  'shopping-bag': '<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />',
+  'hard-hat': '<path stroke-linecap="round" stroke-linejoin="round" d="M12 10.5v3.75m-9.303 3.376C1.83 16.238 1.5 15.18 1.5 14.1c0-1.094.405-2.135 1.197-2.904.793-.77 1.87-1.267 3.053-1.48.274-.05.551-.085.828-.102a3.093 3.093 0 011.097-.166 5.474 5.474 0 012.475.627 4.5 4.5 0 016.75 3.88v.375c0 1.1-.4 2.135-1.197 2.904-.793.77-1.87 1.267-3.053 1.48-.274.05-.551-.085-.828.102a3.093 3.093 0 01-1.097.166 5.474 5.474 0 01-2.475-.627 4.5 4.5 0 01-6.75-3.88v-.375" />',
+  bed: '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />',
+};
+---
+
+<a
+  href={href}
+  class:list={[
+    'group relative bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-all duration-300 hover:shadow-lg block',
+    className,
+  ]}
+>
+  {/* Image Header */}
+  <div class="relative h-48 overflow-hidden">
+    <img
+      src={image}
+      alt={imageAlt}
+      class={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${image.includes('logo') ? 'object-contain p-8 bg-gray-900' : 'object-cover'}`}
+      loading="lazy"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+    
+    {/* Badge */}
+    {badge && (
+      <div class="absolute top-3 right-3">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-white text-gray-900 text-xs font-semibold">
+          {badge}
+        </span>
+      </div>
+    )}
+    
+    {/* Icon Overlay */}
+    <div class="absolute bottom-3 left-3">
+      <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
+        <svg
+          class="w-5 h-5 text-gray-900"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          set:html={iconPaths[icon] || iconPaths['shield-check']}
+        />
+      </div>
+    </div>
+  </div>
+
+  {/* Content */}
+  <div class="p-6">
+    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-gray-600 transition-colors mb-2">
+      {title}
+    </h3>
+
+    <p class="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">
+      {description}
+    </p>
+
+    {/* Link */}
+    <div class="flex items-center gap-2 text-gray-900 font-medium text-sm group-hover:gap-3 transition-all">
+      <span>{linkText}</span>
+      <Icon name="arrow-right" size="sm" color="dark" />
+    </div>
+  </div>
+</a>

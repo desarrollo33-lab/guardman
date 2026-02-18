@@ -1,0 +1,213 @@
+---
+/**
+ * Services Page - Lists all security services
+ * Hub page for all Guardman services
+ */
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import { convexServer } from '@/lib/convex';
+import { api } from '@convex/_generated/api';
+import { site } from '@/data/site';
+import { generateBreadcrumbSchema } from '@/utils/seo';
+
+const services = await convexServer.query(api.services.getAllServices);
+
+const title = 'Servicios de Seguridad Privada en Santiago | Guardman Chile';
+const description =
+  'Guardias OS10 certificados, alarmas Ajax Systems, patrullaje de condominios, módulos GuardPod, drones y control de acceso en Santiago y Región Metropolitana. Cotiza sin compromiso.';
+
+const breadcrumbSchema = generateBreadcrumbSchema([
+  { name: 'Inicio', url: '/' },
+  { name: 'Servicios', url: '/servicios' },
+]);
+
+// Service card styles unifed for premium look
+const serviceCardStyles = "bg-white border border-gray-100 rounded-xl p-8 hover:border-black transition-all duration-300 group";
+---
+
+<BaseLayout title={title} description={description} schema={breadcrumbSchema}>
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden bg-black py-20 md:py-32">
+    <!-- Background layer -->
+    <div class="absolute inset-0 z-0">
+      <div class="absolute inset-0 bg-black/80 z-10"></div>
+      <img 
+        src="https://images.unsplash.com/photo-1454165833767-027ffea9e778?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+        alt="Centro de Operaciones"
+        class="w-full h-full object-cover grayscale opacity-30"
+      />
+    </div>
+    
+    <Container class="relative z-20">
+      <Breadcrumbs items={[{ name: 'Servicios' }]} />
+
+      <div class="max-w-4xl">
+        
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8">
+          <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+          <span class="text-xs text-white/70 uppercase tracking-widest font-medium">Ecosistema de Protección</span>
+        </div>
+        
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-semibold text-white mb-6 tracking-tight leading-[1.1]">
+          Despliegue de<br/>
+          <span class="text-white/40 italic">Servicios</span>
+        </h1>
+
+        <p class="text-lg md:text-xl text-white/60 mb-10 max-w-2xl leading-relaxed">
+          Sistemas operativos de alta fidelidad para la gestión de <span class="text-white font-medium">riesgos críticos</span> y protección patrimonial.
+        </p>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 pt-12 border-t border-white/10 overflow-hidden">
+          {['24/7', 'OS10', '+10', 'RM'].map((stat, i) => (
+            <div class="group">
+              <div class="text-3xl md:text-4xl font-semibold text-white mb-1 tabular-nums tracking-tighter">
+                {stat === '24/7' ? '24/7' : stat === 'OS10' ? 'OS10' : stat === '+10' ? '+10' : 'RM'}
+              </div>
+              <div class="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold">
+                {i === 0 ? 'Operativo' : i === 1 ? 'Certificado' : i === 2 ? 'Años' : 'Alcance'}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Services Grid -->
+  <Section background="gray">
+    <Container>
+      <div class="mb-16">
+        <h2 class="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight">Capacidades Operativas</h2>
+        <p class="text-gray-500 text-lg max-w-2xl leading-relaxed">
+          Ingeniería de protección adaptada a ecosistemas críticos y entornos corporativos.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {services.map((service, index) => (
+          <a
+            href={`/servicios/${service.slug}`}
+            class={serviceCardStyles}
+            style={`animation-delay: ${index * 100}ms`}
+          >
+            <div class="relative">
+              <!-- Icon -->
+              <div class="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center mb-8 border border-gray-100 group-hover:bg-black group-hover:text-white transition-colors duration-500">
+                <Icon name={service.icon} size="xs" />
+              </div>
+              
+              <!-- Content -->
+              <h3 class="text-sm font-bold text-gray-900 mb-3 uppercase tracking-[0.2em]">
+                {service.title}
+              </h3>
+              
+              <p class="text-gray-400 text-xs leading-relaxed mb-8 line-clamp-3 font-medium uppercase tracking-wider">
+                {service.description}
+              </p>
+              
+              <!-- CTA -->
+              <div class="flex items-center gap-3 text-[10px] uppercase tracking-widest font-bold text-gray-300 group-hover:text-black transition-colors">
+                <span>Explorar Configuración</span>
+                <Icon name="arrow-right" size="xs" class="group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </Container>
+  </Section>
+
+  <!-- Solutions Section -->
+  <Section background="white">
+    <Container>
+      <div class="grid lg:grid-cols-2 gap-20 items-end mb-20">
+        <div>
+          <h2 class="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight">Sectores de Activación</h2>
+          <p class="text-gray-500 text-lg leading-relaxed max-w-xl">
+            Protocolos diseñados para la interoperabilidad en múltiples industrias y entornos urbanos.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-gray-100 border border-gray-100 rounded-xl overflow-hidden">
+        {[
+          { name: 'Condominios', icon: 'home-modern' },
+          { name: 'Minería', icon: 'mountain' },
+          { name: 'Retail', icon: 'building-storefront' },
+          { name: 'Hotelería', icon: 'bed' },
+          { name: 'Construcción', icon: 'building-office-2' },
+          { name: 'Eventos', icon: 'calendar' }
+        ].map(sector => (
+          <div class="flex flex-col items-center justify-center p-8 bg-white hover:bg-gray-50 transition-colors group">
+            <Icon name={sector.icon} size="xs" class="text-gray-300 mb-4 group-hover:text-black transition-colors" />
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-black transition-colors">{sector.name}</span>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </Section>
+
+  <!-- CTA Section -->
+  <Section background="dark" class="relative overflow-hidden py-24">
+    <Container>
+      <div class="relative max-w-5xl mx-auto text-center">
+        <h2 class="text-3xl md:text-6xl font-semibold text-white mb-10 tracking-tight leading-tight">
+          Asegure sus <span class="italic text-white/40">activos</span> hoy
+        </h2>
+        
+        <p class="text-lg md:text-xl text-white/50 mb-14 max-w-2xl mx-auto leading-relaxed">
+          Inicie el despliegue de su solución de seguridad personalizada. Ingeniería táctica aplicada a su tranquilidad.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button href="/contacto" variant="primary" size="lg" class="bg-white text-black hover:bg-gray-100 border-none transition-all px-12 font-bold tracking-widest text-xs uppercase">
+            Solicitar Auditoría
+          </Button>
+          <Button
+            href={`tel:${site.phone.replace(/\s/g, '')}`}
+            variant="outline"
+            size="lg"
+            class="px-12 border-white/20 hover:bg-white/5 text-white transition-all font-semibold"
+          >
+            Línea Directa: {site.phone}
+          </Button>
+        </div>
+        
+        <div class="flex items-center justify-center gap-12 mt-20 pt-10 border-t border-white/10 opacity-30">
+          {['Operativo 24/7', 'Certificación OS10', 'Estándar ISO'].map(label => (
+            <span class="text-[10px] uppercase tracking-[0.3em] font-bold text-white">{label}</span>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>
+
+<style>
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Custom focus states */
+  a:focus-visible {
+    outline: 2px solid #10B981;
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+  
+  /* Line clamp utility */
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

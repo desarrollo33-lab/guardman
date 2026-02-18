@@ -1,0 +1,316 @@
+---
+/**
+ * Soluciones que Ofrecemos
+ * Hub page listing all solutions we offer
+ */
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import { convexServer } from '@/lib/convex';
+import { api } from '@convex/_generated/api';
+import { site } from '@/data/site';
+import { generateBreadcrumbSchema } from '@/utils/seo';
+
+const solutions = await convexServer.query(api.solutions.getAllSolutions);
+
+const title = 'Soluciones de Seguridad | Guardman Chile';
+const description =
+  'Soluciones de seguridad especializadas para condominios, minería, retail, construcción, hotelería, inmobiliaria, eventos y corporativos. Protección profesional adaptada a tu industria.';
+
+const breadcrumbSchema = generateBreadcrumbSchema([
+  { name: 'Inicio', url: '/' },
+  { name: 'Soluciones', url: '/soluciones' },
+]);
+
+// Icon mapping for solutions
+const iconMap: Record<string, string> = {
+  home: 'home',
+  mountain: 'mountain',
+  'shopping-bag': 'shopping-bag',
+  'hard-hat': 'building',
+  bed: 'bed',
+  building: 'building',
+};
+
+// Monochromatic design tokens inspired by the home
+const solutionDesign = {
+  bg: 'bg-white',
+  hoverBg: 'hover:bg-gray-50',
+  iconBg: 'bg-gray-900',
+  accent: 'text-gray-900',
+  border: 'border-gray-200',
+  hoverBorder: 'hover:border-gray-900',
+};
+
+// Stats for the page
+const stats = [
+  { value: solutions.length.toString(), label: 'Soluciones' },
+  { value: '100+', label: 'Clientes' },
+  { value: '24/7', label: 'Cobertura' },
+  { value: '10+', label: 'Años' },
+];
+---
+
+<BaseLayout title={title} description={description} schema={breadcrumbSchema}>
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden bg-black py-20 md:py-32">
+    <!-- Background Video layer (similar to home) -->
+    <div class="absolute inset-0 z-0">
+      <div class="absolute inset-0 bg-black/80 z-10"></div>
+      <img 
+        src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+        alt="Soluciones Guardman"
+        class="w-full h-full object-cover grayscale opacity-40"
+      />
+    </div>
+
+    <Container class="relative z-20">
+      <Breadcrumbs items={[{ name: 'Soluciones' }]} />
+
+      <div class="max-w-4xl">
+        <!-- Badge -->
+        <div
+          class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+          <span class="text-xs text-white/70 uppercase tracking-widest font-medium">Especialización por Sector</span>
+        </div>
+
+        <h1
+          class="text-4xl md:text-5xl lg:text-7xl font-semibold text-white mb-6 tracking-tight leading-[1.1]"
+        >
+          Soluciones<br />
+          <span class="text-white/50 italic">Empresariales</span>
+        </h1>
+
+        <p class="text-lg md:text-xl text-white/60 mb-10 max-w-2xl leading-relaxed">
+          Seguridad de alto estándar adaptada a las complejidades de cada industria.
+          Protección profesional con más de una década de experiencia comprobada.
+        </p>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12 pt-12 border-t border-white/10">
+          {stats.map((stat, index) => (
+            <div class="group">
+              <div
+                class="text-3xl md:text-4xl font-semibold text-white mb-1 tabular-nums tracking-tight"
+              >
+                {stat.value}
+              </div>
+              <div class="text-[10px] text-white/40 uppercase tracking-[0.3em] font-medium">
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Solutions Grid -->
+  <Section background="gray">
+    <Container size="lg">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+          Sectores Especializados
+        </h2>
+        <p class="text-gray-600 max-w-xl mx-auto text-lg">
+          Cada industria tiene desafíos únicos. Nuestras soluciones están diseñadas específicamente
+          para tu sector.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {solutions.map((solution) => {
+          const iconName = iconMap[solution.icon] || 'building';
+          return (
+            <a
+              href={`/soluciones/${solution.slug}`}
+              class="group relative bg-white p-8 rounded-xl border border-gray-100 hover:border-black transition-all duration-500 flex flex-col items-start"
+            >
+              <!-- Icon -->
+              <div class="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-lg mb-6 group-hover:bg-black group-hover:text-white transition-colors duration-300">
+                <Icon name={iconName} size="md" />
+              </div>
+
+              <!-- Name -->
+              <h3 class="text-lg font-semibold text-gray-900 mb-3 group-hover:translate-x-1 transition-transform duration-300">
+                {solution.name}
+              </h3>
+
+              <!-- Description -->
+              <p class="text-sm text-gray-500 leading-relaxed mb-8 flex-1">
+                {solution.description}
+              </p>
+
+              <!-- Link indicator -->
+              <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-black transition-colors">
+                Explorar solución
+                <Icon name="arrow-right" size="xs" />
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </Container>
+  </Section>
+
+  <!-- Why Solutions Matter Section -->
+  <Section background="white">
+    <Container>
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <!-- Left content -->
+        <div>
+          <h2 class="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight leading-tight">
+            Experiencia que marca la diferencia
+          </h2>
+          <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+            No todos los servicios de seguridad son iguales. Cada industria tiene sus propios
+            desafíos, regulaciones y necesidades específicas. Nuestro equipo conoce tu sector.
+          </p>
+
+          <div class="space-y-6">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+                <Icon name="check" size="xs" color="white" />
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-1">Conocimiento del sector</h4>
+                <p class="text-gray-500 text-sm leading-relaxed">Guardias capacitados en protocolos específicos para tu industria.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+                <Icon name="check" size="xs" color="white" />
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-1">Cumplimiento normativo</h4>
+                <p class="text-gray-500 text-sm leading-relaxed">Conocemos las regulaciones de cada sector y las cumplimos estrictamente.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+                <Icon name="check" size="xs" color="white" />
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-1">Soluciones a medida</h4>
+                <p class="text-gray-500 text-sm leading-relaxed">Diseñamos planes de seguridad adaptados a tus desafíos operativos.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right visual -->
+        <div class="relative group">
+          <div class="absolute -inset-1 bg-black rounded-3xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+          <div class="relative bg-white border border-gray-100 rounded-2xl p-8 overflow-hidden shadow-2xl">
+            <!-- Decorative pattern -->
+            <div
+              class="absolute inset-0 opacity-[0.02]"
+              style="background-image: radial-gradient(circle at 1px 1px, black 1px, transparent 0); background-size: 24px 24px;"
+            ></div>
+            
+            <div class="relative">
+              <div class="flex items-center gap-1.5 mb-8">
+                <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+                <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+                <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+              </div>
+
+              <div class="space-y-4">
+                {solutions.slice(0, 4).map((solution) => {
+                  return (
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-transparent hover:border-gray-200 transition-all group/item">
+                      <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center group-hover/item:bg-gray-900 group-hover/item:text-white transition-colors">
+                          <Icon name={iconMap[solution.icon] || 'building'} size="sm" />
+                        </div>
+                        <span class="text-gray-900 font-medium">{solution.name}</span>
+                      </div>
+                      <Icon name="chevron-right" size="xs" class="text-gray-300 group-hover/item:text-black" />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  <!-- CTA Section -->
+  <Section background="dark" class="relative overflow-hidden">
+    <Container>
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl md:text-5xl font-semibold text-white mb-8 tracking-tight">
+          Seguridad de élite para su industria
+        </h2>
+
+        <p class="text-lg md:text-xl text-white/50 mb-12 max-w-2xl mx-auto leading-relaxed">
+          Diseñamos protocolos de protección a medida basados en un análisis exhaustivo de sus riesgos operativos.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button href="/cotizar" variant="accent" size="lg" class="bg-white text-black hover:bg-gray-100 border-none">
+            Consultar especialista
+            <Icon name="arrow-right" size="sm" class="ml-2" />
+          </Button>
+          <Button
+            href={`tel:${site.phone.replace(/\s/g, '')}`}
+            variant="outline"
+            size="lg"
+            class="border-white/20 hover:bg-white/10 text-white"
+          >
+            {site.phone}
+          </Button>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+        <!-- Trust indicators -->
+        <div class="flex items-center justify-center gap-8 mt-12 pt-8 border-t border-white/10">
+          <div class="flex items-center gap-2 text-gray-400">
+            <Icon name="shield-check" size="sm" />
+            <span class="text-sm">Guardias OS10</span>
+          </div>
+          <div class="flex items-center gap-2 text-gray-400">
+            <Icon name="clock" size="sm" />
+            <span class="text-sm">Respuesta 24/7</span>
+          </div>
+          <div class="flex items-center gap-2 text-gray-400">
+            <Icon name="badge-check" size="sm" />
+            <span class="text-sm">Certificados</span>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>
+
+<style>
+  /* Line clamp utility */
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom focus states */
+  a:focus-visible {
+    outline: 2px solid #f59e0b;
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+</style>

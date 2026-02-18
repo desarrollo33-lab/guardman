@@ -1,0 +1,74 @@
+---
+/**
+ * Organization Schema Component
+ * JSON-LD structured data for Organization
+ */
+import { site } from '@/data/site';
+
+interface Props {
+  name?: string;
+  url?: string;
+  logo?: string;
+  description?: string;
+  email?: string;
+  telephone?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    region?: string;
+    postalCode?: string;
+    country?: string;
+  };
+  sameAs?: string[];
+}
+
+const {
+  name = site.name,
+  url = site.url,
+  logo = new URL('/images/guardman_logo.png', site.url).href,
+  description = site.description,
+  email = site.email,
+  telephone = site.phone,
+  address = {
+    street: site.address.street,
+    city: site.address.city,
+    region: site.address.region,
+    postalCode: site.address.postalCode,
+    country: 'CL',
+  },
+  sameAs = [
+    site.social.instagram,
+    site.social.linkedin,
+    site.social.youtube,
+  ],
+} = Astro.props;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name,
+  url,
+  logo,
+  description,
+  email,
+  telephone,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: address.street,
+    addressLocality: address.city,
+    addressRegion: address.region,
+    postalCode: address.postalCode,
+    addressCountry: address.country,
+  },
+  sameAs,
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone,
+    contactType: 'customer service',
+    availableLanguage: ['Spanish'],
+    areaServed: 'CL',
+  },
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

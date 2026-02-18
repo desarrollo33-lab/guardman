@@ -1,0 +1,311 @@
+---
+/**
+ * About Us Page - Company history, mission, vision, values, and team
+ */
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import { site, getWhatsAppUrl } from '@/data/site';
+import { generateBreadcrumbSchema } from '@/utils/seo';
+
+const title = 'Nosotros — Empresa de Seguridad Privada en Santiago | Guardman';
+const description =
+  'Conoce a Guardman Chile: más de 10 años protegiendo empresas, condominios y sectores industriales en la Región Metropolitana. Guardias OS10 certificados, tecnología Ajax y cobertura 24/7.';
+
+const breadcrumbSchema = generateBreadcrumbSchema([
+  { name: 'Inicio', url: '/' },
+  { name: 'Nosotros', url: '/nosotros' },
+]);
+
+// Team members with placeholder data
+const teamMembers = [
+  {
+    name: 'Juan Pérez',
+    role: 'Gerente General',
+    avatar: 'https://ui-avatars.com/api?name=Juan+Perez&background=1f2937&color=fff&size=200',
+  },
+  {
+    name: 'María González',
+    role: 'Directora de Operaciones',
+    avatar: 'https://ui-avatars.com/api?name=Maria+Gonzalez&background=1f2937&color=fff&size=200',
+  },
+  {
+    name: 'Carlos Rodríguez',
+    role: 'Jefe de Seguridad',
+    avatar: 'https://ui-avatars.com/api?name=Carlos+Rodriguez&background=1f2937&color=fff&size=200',
+  },
+  {
+    name: 'Ana Martínez',
+    role: 'Gerente Comercial',
+    avatar: 'https://ui-avatars.com/api?name=Ana+Martinez&background=1f2937&color=fff&size=200',
+  },
+];
+
+// Company values
+const values = [
+  {
+    title: 'Misión',
+    icon: 'sparkles',
+    description:
+      'Brindar soluciones de seguridad privada integrales y personalizadas que protejan los activos más valiosos de nuestros clientes, con personal altamente capacitado y tecnología de vanguardia.',
+  },
+  {
+    title: 'Visión',
+    icon: 'globe-alt',
+    description:
+      'Ser la empresa de seguridad privada líder en Chile, reconocida por nuestra excelencia operativa, innovación tecnológica y compromiso inquebrantable con la seguridad de nuestros clientes.',
+  },
+  {
+    title: 'Valores',
+    icon: 'star',
+    description:
+      'Profesionalismo, confianza, innovación y disponibilidad 24/7. Trabajamos con integridad, respetamos a las personas y nos comprometemos con la excelencia en cada servicio.',
+  },
+];
+
+// Stats/cifras
+const stats = [
+  { value: '500+', label: 'Clientes Activos' },
+  { value: '52', label: 'Comunas Cubiertas' },
+  { value: '24/7', label: 'Cobertura Continua' },
+  { value: '+10', label: 'Años de Experiencia' },
+];
+---
+
+<BaseLayout title={title} description={description} schema={breadcrumbSchema}>
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden bg-black py-20 md:py-32">
+    <!-- Background layer -->
+    <div class="absolute inset-0 z-0">
+      <div class="absolute inset-0 bg-black/80 z-10"></div>
+      <img 
+        src="https://images.unsplash.com/photo-1454165205744-3b78555e5572?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+        alt="Equipo Guardman"
+        class="w-full h-full object-cover grayscale opacity-40"
+      />
+    </div>
+    
+    <Container class="relative z-20">
+      <Breadcrumbs items={[{ name: 'Nosotros' }]} />
+
+      <div class="max-w-4xl">
+        
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8">
+          <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+          <span class="text-xs text-white/70 uppercase tracking-widest font-medium">Desde {site.founded} — Trayectoria</span>
+        </div>
+        
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-semibold text-white mb-6 tracking-tight leading-[1.1]">
+          Más de 10 años<br/>
+          <span class="text-white/40 italic">protegiendo Chile</span>
+        </h1>
+
+        <p class="text-lg md:text-xl text-white/60 mb-10 max-w-2xl leading-relaxed">
+          Somos <span class="text-white font-medium">{site.legalName}</span>, una organización dedicada a la seguridad táctica y protección patrimonial de alto estándar en la Región Metropolitana.
+        </p>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12 pt-12 border-t border-white/10">
+          {stats.map((stat) => (
+            <div class="group">
+              <div class="text-3xl md:text-4xl font-semibold text-white mb-1 tabular-nums tracking-tight group-hover:text-white transition-colors">
+                {stat.value}
+              </div>
+              <div class="text-[10px] text-white/40 uppercase tracking-[0.3em] font-medium">
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- History Section -->
+  <Section background="white">
+    <Container>
+      <div class="max-w-4xl mx-auto">
+        <div class="mb-16">
+          <p class="text-xs font-bold uppercase tracking-[0.3em] text-gray-400 mb-4">Trayectoria Operativa</p>
+          <h2 class="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight">
+            Una década de compromiso
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-1 gap-12">
+          <div class="prose prose-lg prose-gray-900 max-w-none">
+            <p class="text-xl text-gray-500 leading-relaxed font-light">
+              <strong class="text-gray-900 font-semibold">{site.legalName}</strong> nació con una misión elemental: transformar la seguridad privada en Chile integrando personal táctico y tecnología de última generación.
+            </p>
+          </div>
+          
+          <div class="grid md:grid-cols-2 gap-10 mt-4">
+             <p class="text-gray-500 leading-relaxed">
+              Desde nuestros inicios, nos hemos enfocado en brindar soluciones personalizadas. Lo que comenzó con un equipo selecto de guardias certificados, hoy es una operación robusta con cientos de profesionales dedicados a la protección patrimonial.
+            </p>
+             <p class="text-gray-500 leading-relaxed">
+              Nuestra expansión nos ha permitido cubrir integralmente la Región Metropolitana, atendiendo a condominios de alta complejidad, plantas industriales y eventos corporativos que exigen el máximo estándar de discreción y eficiencia.
+            </p>
+          </div>
+        </div>
+
+        <!-- Visual accent -->
+        <div class="mt-20 h-px w-full bg-gray-100"></div>
+      </div>
+    </Container>
+  </Section>
+
+  <!-- Mission, Vision, Values -->
+  <Section background="gray">
+    <Container>
+      <div class="mb-16">
+        <h2 class="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight">
+          Nuestra Constitución
+        </h2>
+        <p class="text-gray-500 text-lg max-w-2xl leading-relaxed">
+          Los principios fundamentales que rigen nuestras operaciones y definen nuestro estándar de servicio.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        {values.map((value) => (
+          <div class="group bg-white p-10 rounded-xl border border-gray-100 hover:border-black transition-all">
+             <div class="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center mb-8 group-hover:bg-black group-hover:text-white transition-colors">
+              <Icon name={value.icon} size="sm" />
+            </div>
+            
+            <h3 class="text-xl font-bold text-gray-900 mb-4 uppercase tracking-widest">
+              {value.title}
+            </h3>
+            
+            <p class="text-gray-500 leading-relaxed text-sm">
+              {value.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </Section>
+
+  <!-- Team Section -->
+  <Section background="white">
+    <Container>
+      <div class="mb-16">
+        <h2 class="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight">
+          Liderazgo táctico
+        </h2>
+        <p class="text-gray-500 text-lg max-w-2xl leading-relaxed">
+          Un equipo de especialistas dedicados a la planificación y ejecución de su seguridad.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-12">
+        {teamMembers.map((member) => (
+          <div class="group text-center">
+            <!-- Avatar -->
+            <div class="relative mb-8 mx-auto w-40 h-40 filter grayscale hover:grayscale-0 transition-all duration-500">
+              <img
+                src={member.avatar}
+                alt={member.name}
+                class="relative w-full h-full object-cover rounded-2xl grayscale brightness-90 group-hover:brightness-100 group-hover:grayscale-0 transition-all duration-500"
+                loading="lazy"
+              />
+               <div class="absolute inset-0 border border-black/5 rounded-2xl pointer-events-none"></div>
+            </div>
+            
+            <h3 class="text-sm font-bold text-gray-900 mb-1 uppercase tracking-widest">
+              {member.name}
+            </h3>
+            
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">
+              {member.role}
+            </p>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </Section>
+
+  <!-- Stats Banner -->
+  <Section background="dark" class="relative overflow-hidden py-24">
+    <Container class="relative">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16">
+        {stats.map((stat) => (
+          <div class="text-center group">
+            <div class="text-4xl md:text-6xl font-semibold text-white mb-2 tabular-nums">
+              {stat.value}
+            </div>
+            <div class="text-white/30 text-[10px] uppercase font-bold tracking-[0.4em]">
+              {stat.label}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </Section>
+
+  <!-- CTA Section -->
+  <Section background="gray">
+    <Container>
+      <div class="relative max-w-5xl mx-auto text-center">
+        <h2 class="text-3xl md:text-6xl font-semibold text-gray-900 mb-10 tracking-tight">
+          Diseñamos su <span class="italic text-gray-400">seguridad</span>
+        </h2>
+        
+        <p class="text-lg md:text-xl text-gray-500 mb-14 max-w-2xl mx-auto leading-relaxed">
+          Agenda un análisis táctico con nuestro equipo de consultores y reciba una propuesta personalizada para su organización.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+           <Button href="/cotizar" variant="primary" size="lg" class="px-12 py-5 bg-black text-white hover:bg-gray-900 border-none transition-all">
+            Solicitar análisis técnico
+          </Button>
+          <Button
+            href={getWhatsAppUrl('Hola, quiero información sobre los servicios de Guardman')}
+            variant="outline"
+            size="lg"
+            target="_blank"
+            class="px-12 py-5 border-gray-200 hover:bg-gray-50 text-gray-900 transition-all font-semibold"
+          >
+            WhatsApp
+          </Button>
+        </div>
+        
+        <!-- Trust indicators -->
+        <div class="flex flex-wrap items-center justify-center gap-12 mt-20 pt-10 border-t border-gray-100">
+           <div class="flex items-center gap-3 text-gray-400 grayscale">
+            <Icon name="shield-check" size="sm" />
+            <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Sello OS10</span>
+          </div>
+          <div class="flex items-center gap-3 text-gray-400 grayscale">
+            <Icon name="clock" size="sm" />
+            <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Disponibilidad 24/7</span>
+          </div>
+          <div class="flex items-center gap-3 text-gray-400 grayscale">
+            <Icon name="users" size="sm" />
+            <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Despliegue RM</span>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>
+
+<style>
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Custom focus states */
+  a:focus-visible {
+    outline: 2px solid black;
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+</style>

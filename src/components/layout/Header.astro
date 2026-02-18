@@ -1,0 +1,98 @@
+---
+import MobileMenu from './MobileMenu.tsx';
+
+const navLinks = [
+  { label: 'Inicio', href: '/' },
+  {
+    label: 'Servicios',
+    href: '/servicios',
+    children: [
+      { label: 'Guardias de Seguridad', href: '/servicios/guardias-seguridad' },
+      { label: 'Patrullaje de Condominios', href: '/servicios/patrullaje-condominios' },
+      { label: 'Alarmas Ajax Systems', href: '/servicios/alarmas-ajax' },
+      { label: 'GuardPod', href: '/servicios/guardpod' },
+      { label: 'Drones de Seguridad', href: '/servicios/drones-seguridad' },
+      { label: 'Control de Acceso', href: '/servicios/control-acceso' },
+    ],
+  },
+  { label: 'Soluciones', href: '/soluciones' },
+  { label: 'Cobertura', href: '/cobertura' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'Contacto', href: '/contacto' },
+];
+---
+
+<header id="main-header" class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 transition-all duration-300">
+  <nav class="container mx-auto px-4 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-3 group" aria-label="Guardman - Ir al inicio">
+        <img 
+          src="/images/guardman_logo.png" 
+          alt="Grupo Guardman" 
+          class="h-10 lg:h-12 w-auto brightness-0"
+        />
+        <span class="text-xl font-bold tracking-tight text-gray-900 hidden sm:block">Grupo Guardman</span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden lg:flex items-center gap-1">
+        {navLinks.map((link) => (
+          link.children ? (
+            <div class="relative group">
+              <button
+                class="flex items-center gap-1 px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-50"
+                aria-expanded="false"
+                aria-haspopup="true"
+              >
+                {link.label}
+                <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <!-- Dropdown -->
+              <div class="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div class="bg-white rounded-xl shadow-elevated border border-gray-100 py-2 min-w-[220px]">
+                  {link.children.map((child) => (
+                    <a
+                      href={child.href}
+                      class="block px-4 py-2.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                    >
+                      {child.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <a
+              href={link.href}
+              class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-50"
+            >
+              {link.label}
+            </a>
+          )
+        ))}
+      </div>
+
+      <!-- CTA Button -->
+      <div class="hidden lg:block">
+        <a
+          href="/cotizar"
+          class="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-sm rounded-lg transition-all duration-200 hover:-translate-y-0.5"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          Cotizar Ahora
+        </a>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <MobileMenu client:load links={navLinks} />
+    </div>
+  </nav>
+</header>
+
+<!-- Spacer for fixed header -->
+<div class="h-16 lg:h-20"></div>

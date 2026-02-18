@@ -1,0 +1,150 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import Button from '@/components/ui/Button.astro';
+import ServiceSchema from '@/components/seo/ServiceSchema.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import { convexServer } from '@/lib/convex';
+import { api } from '@convex/_generated/api';
+import { site } from '@/data/site';
+
+// SSR: fetch service by slug from Convex at request time
+const { slug } = Astro.params;
+let service = null;
+
+try {
+  service = await convexServer.query(api.services.getServiceBySlug, { slug: slug! });
+} catch (e) {
+  console.error('Error fetching service:', e);
+}
+
+if (!service) {
+  return Astro.redirect('/servicios');
+}
+
+const safeService = service!;
+
+const title = safeService.meta_title || `${safeService.title} | Guardman Chile`;
+const description = safeService.meta_description || safeService.description;
+const ogImage = safeService.og_image || `${Astro.url.origin}/og/services/${slug}.png`;
+---
+
+<BaseLayout title={title} description={description} ogImage={ogImage}>
+  <ServiceSchema service={{ name: safeService.title, description: safeService.description }} />
+
+  <!-- Hero del Servicio -->
+  <section class="relative overflow-hidden bg-black py-20 md:py-32">
+    <!-- Background layer -->
+    <div class="absolute inset-0 z-0">
+      <div class="absolute inset-0 bg-black/85 z-10"></div>
+      <img 
+        src={safeService.image || "https://images.unsplash.com/photo-1557597774-9d273605dfa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"} 
+        alt={safeService.title}
+        class="w-full h-full object-cover grayscale opacity-40"
+      />
+    </div>
+
+    <Container class="relative z-20">
+      <Breadcrumbs items={[
+        { name: 'Servicios', url: '/servicios' },
+        { name: safeService.title }
+      ]} />
+
+      <div class="max-w-4xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8">
+          <span class="text-[10px] text-white/70 uppercase tracking-widest font-bold">{safeService.tagline}</span>
+        </div>
+        
+        <h1 class="text-4xl md:text-6xl font-semibold text-white mb-8 tracking-tight leading-[1.1]">
+          {safeService.title.split(' ').slice(0, -1).join(' ')}<br/>
+          <span class="text-white/40 italic">{safeService.title.split(' ').slice(-1)}</span>
+        </h1>
+        
+        <p class="text-lg md:text-xl text-white/60 mb-12 max-w-2xl leading-relaxed">
+          {safeService.description}
+        </p>
+        
+        <div class="flex flex-wrap gap-4">
+          <Button href="/cotizar" variant="primary" size="lg" class="bg-white text-black hover:bg-gray-100 border-none transition-all px-10">
+            Cotizar Servicio
+          </Button>
+          <Button
+            href={`https://wa.me/${site.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola, necesito información sobre ${safeService.title}`)}`}
+            variant="outline"
+            size="lg"
+            class="px-8 border-white/20 hover:bg-white/5 text-white transition-all"
+            target="_blank"
+          >
+            WhatsApp Directo
+          </Button>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Características -->
+  <Section id="caracteristicas" background="white">
+    <Container>
+      <div class="mb-16">
+        <h2 class="text-3xl font-semibold text-gray-900 mb-4 tracking-tight uppercase tracking-widest text-xs font-bold">Especificaciones del Protocolo</h2>
+        <p class="text-gray-400 text-sm">Detalle técnico de los componentes operativos incluídos en el programa.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-100 border border-gray-100 rounded-xl overflow-hidden">
+        {
+          safeService.features?.map((feature: string) => (
+            <div class="flex items-start gap-4 p-8 bg-white hover:bg-gray-50 transition-colors group">
+              <div class="w-1.5 h-1.5 rounded-full bg-black mt-1.5 shrink-0"></div>
+              <span class="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed group-hover:text-black transition-colors">{feature}</span>
+            </div>
+          ))
+        }
+      </div>
+    </Container>
+  </Section>
+
+  <!-- Beneficios -->
+  <Section background="gray" id="beneficios">
+    <Container>
+      <div class="mb-16">
+        <h2 class="text-3xl font-semibold text-gray-900 mb-6 tracking-tight">Valor Agregado</h2>
+        <p class="text-gray-500 text-lg max-w-2xl leading-relaxed">
+          Impacto positivo en la continuidad operativa y seguridad patrimonial.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        {
+          safeService.benefits?.map((benefit: string) => (
+            <div class="p-8 bg-white border border-gray-100 rounded-xl hover:border-black transition-all group">
+              <div class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center mb-6 group-hover:bg-black group-hover:text-white transition-colors">
+                <Icon name="shield-check" size="xs" />
+              </div>
+              <p class="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed group-hover:text-black transition-colors">{benefit}</p>
+            </div>
+          ))
+        }
+      </div>
+    </Container>
+  </Section>
+
+  <!-- CTA -->
+  <Section id="cta" background="white">
+    <Container>
+      <div class="bg-black rounded-xl p-12 md:p-20 text-center text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://www.ajax.systems/wp-content/themes/ajax/assets/img/patterns/pattern-grid.svg')] opacity-5"></div>
+        <div class="relative z-10">
+          <h2 class="text-3xl md:text-5xl font-semibold mb-8 tracking-tight italic">¿Interesado en {safeService.title}?</h2>
+          <p class="mb-12 text-white/50 text-xl max-w-2xl mx-auto leading-relaxed">
+            Configure su solución de seguridad táctica. Respuesta garantizada en menos de 12 horas.
+          </p>
+          <Button href="/cotizar" variant="primary" size="lg" class="bg-white text-black hover:bg-gray-100 border-none transition-all px-12 font-bold tracking-widest text-xs uppercase">
+            {safeService.cta || 'Iniciar Activación'}
+          </Button>
+        </div>
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>

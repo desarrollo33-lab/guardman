@@ -1,0 +1,128 @@
+---
+/**
+ * GuardPod Section - Premium Product Showcase
+ * Clean, monochromatic dark-themed section.
+ * Highlights the exclusive GuardPod modular security unit.
+ */
+
+import Container from '@/components/ui/Container.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+
+const features = [
+  {
+    icon: 'clock',
+    title: 'Instalación Rápida',
+    description: 'Operativo en 24 horas',
+  },
+  {
+    icon: 'signal',
+    title: 'Conectividad 4G/5G',
+    description: 'Internet satelital incluido',
+  },
+  {
+    icon: 'map-pin',
+    title: 'Fácil Despliegue',
+    description: 'Cualquier ubicación remota',
+  },
+  {
+    icon: 'shield-check',
+    title: 'Blindaje Nivel 3',
+    description: 'Protección certificada',
+  },
+];
+
+const stats = [
+  { value: '24 hrs', label: 'Instalación' },
+  { value: '70%', label: 'Ahorro' },
+  { value: '98%', label: 'Satisfacción' },
+];
+---
+
+<section class="relative bg-black py-20 md:py-28">
+  <Container>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      {/* Left: Video */}
+      <div class="relative">
+        {/* Video Container */}
+        <div class="relative rounded-2xl overflow-hidden bg-gray-900">
+          <iframe
+            src="https://www.youtube.com/embed/M9kZNHoHcS4?autoplay=1&mute=1&loop=1&playlist=M9kZNHoHcS4&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1"
+            class="aspect-video w-full"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen="false"
+            loading="lazy"
+            title="GuardPod - Seguridad Modular"
+          ></iframe>
+        </div>
+      </div>
+
+      {/* Right: Content */}
+      <div>
+        {/* Title */}
+        <h2 class="text-4xl md:text-5xl font-semibold text-white mb-3 tracking-tight">
+          GuardPod<sup class="text-white/50 text-xl">®</sup>
+        </h2>
+        
+        {/* Subtitle */}
+        <p class="text-white/50 text-lg mb-6">
+          Seguridad Modular Instantánea
+        </p>
+
+        {/* Description */}
+        <p class="text-white/70 text-lg leading-relaxed mb-10 max-w-xl">
+          Unidad de seguridad autónoma lista para operar en 24 horas. Incluye módulo habitable, conexión a internet, sistema CCTV y guardia certificado. La solución perfecta para obras, faenas y cualquier lugar sin infraestructura.
+        </p>
+
+        {/* Features Grid */}
+        <div class="grid grid-cols-2 gap-6 mb-10">
+          {features.map((feature) => (
+            <div class="flex items-start gap-3">
+              <Icon name={feature.icon} size="lg" color="white" />
+              <div>
+                <h3 class="text-white font-medium">{feature.title}</h3>
+                <p class="text-white/50 text-sm">{feature.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Stats Row */}
+        <div class="flex items-center gap-8 mb-10 py-6 border-y border-white/10">
+          {stats.map((stat, index) => (
+            <div class="flex items-center">
+              {index > 0 && <div class="w-px h-10 bg-white/10 mr-8"></div>}
+              <div>
+                <div class="text-2xl font-semibold text-white">{stat.value}</div>
+                <div class="text-white/50 text-sm">{stat.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA Buttons */}
+        <div class="flex flex-col sm:flex-row gap-4">
+          <Button 
+            href="/servicios/guardpod" 
+            variant="accent" 
+            size="lg"
+            class="font-medium bg-white text-black hover:bg-gray-100"
+          >
+            Solicitar GuardPod
+          </Button>
+          <Button 
+            href="https://wa.me/56930000010?text=Hola,%20necesito%20información%20sobre%20GuardPod"
+            variant="outline"
+            size="lg"
+            class="border-white/40 text-white hover:bg-white hover:text-black"
+            target="_blank"
+          >
+            <Icon name="chat-bubble-left" size="sm" color="white" class="mr-2" />
+            WhatsApp
+          </Button>
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>

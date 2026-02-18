@@ -1,0 +1,217 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Button from '@/components/ui/Button.astro';
+
+const lastUpdated = '17 de Febrero, 2026';
+---
+
+<BaseLayout
+  title="Términos de Servicio"
+  description="Términos de servicio de Guardman Chile. Condiciones de uso y contratación de servicios de seguridad privada."
+>
+  <!-- Hero Section -->
+  <section class="bg-black py-20 text-center">
+    <Container>
+      <Breadcrumbs items={[{ name: 'Términos' }]} class="justify-center mb-8" />
+      <h1 class="text-4xl md:text-5xl font-semibold text-white mb-6 tracking-tight italic">
+        Términos de Servicio
+      </h1>
+      <p class="text-white/40 text-xs font-bold uppercase tracking-[0.3em]">Última actualización: {lastUpdated}</p>
+    </Container>
+  </section>
+
+  <!-- Content Section -->
+  <Section background="white">
+    <Container>
+      <div class="prose prose-lg max-w-3xl mx-auto">
+        <!-- Introducción -->
+        <p class="lead">
+          Bienvenido a Guardman Chile. Al acceder y utilizar nuestros servicios
+          de seguridad privada, usted acepta estar sujeto a estos términos y
+          condiciones. Por favor, lea cuidadosamente este documento antes de
+          contratar nuestros servicios.
+        </p>
+
+        <!-- 1. Aceptación de los Términos -->
+        <h2>1. Aceptación de los Términos</h2>
+        <p>
+          Al solicitar información, cotizar o contratar los servicios de
+          Guardman Chile, usted reconoce que ha leído, comprendido y acepta
+          estos términos de servicio en su totalidad. Si no está de acuerdo con
+          alguna parte de estos términos, no debe utilizar nuestros servicios.
+        </p>
+        <p>
+          Estos términos constituyen un acuerdo legal vinculante entre usted
+          (el "Cliente") y Guardman Chile (el "Proveedor").
+        </p>
+
+        <!-- 2. Descripción de los Servicios -->
+        <h2>2. Descripción de los Servicios</h2>
+        <p>
+          Guardman Chile ofrece servicios de seguridad privada que incluyen,
+          pero no se limitan a:
+        </p>
+        <ul>
+          <li>
+            <strong>Guardias de seguridad:</strong> Personal capacitado para
+            vigilancia y protección de instalaciones.
+          </li>
+          <li>
+            <strong>Seguridad para eventos:</strong> Control de acceso y
+            resguardo durante eventos públicos y privados.
+          </li>
+          <li>
+            <strong>Vigilancia y monitoreo:</strong> Sistemas de cámaras y
+            monitoreo 24/7.
+          </li>
+          <li>
+            <strong>Escoltas:</strong> Protección personal para ejecutivos y
+            personas que requieran seguridad especializada.
+          </li>
+          <li>
+            <strong>Consultoría en seguridad:</strong> Evaluación de riesgos y
+            planes de seguridad personalizados.
+          </li>
+        </ul>
+        <p>
+          Los servicios específicos serán definidos en el contrato individual
+          que se suscriba con cada cliente.
+        </p>
+
+        <!-- 3. Obligaciones del Cliente -->
+        <h2>3. Obligaciones del Cliente</h2>
+        <p>El cliente se compromete a:</p>
+        <ul>
+          <li>
+            Proporcionar información veraz y completa sobre las instalaciones
+            o personas a proteger.
+          </li>
+          <li>
+            Informar de manera oportuna sobre cualquier situación de riesgo
+            conocida.
+          </li>
+          <li>
+            Facilitar el acceso necesario para que el personal de seguridad
+            cumpla sus funciones.
+          </li>
+          <li>
+            Realizar los pagos según las condiciones acordadas en el contrato.
+          </li>
+          <li>
+            Respetar las indicaciones y protocolos de seguridad establecidos.
+          </li>
+          <li>
+            No solicitar actividades que estén fuera del marco legal o que
+            pongan en riesgo al personal de seguridad.
+          </li>
+        </ul>
+
+        <!-- 4. Limitación de Responsabilidad -->
+        <h2>4. Limitación de Responsabilidad</h2>
+        <p>
+          Guardman Chile se compromete a proporcionar servicios de seguridad
+          profesional y de alta calidad. Sin embargo:
+        </p>
+        <ul>
+          <li>
+            No garantizamos que los servicios impedirán todos los incidentes
+            de seguridad, ya que existen factores externos fuera de nuestro
+            control.
+          </li>
+          <li>
+            Nuestra responsabilidad se limita a los servicios específicos
+            contratados y descritos en el contrato individual.
+          </li>
+          <li>
+            No nos hacemos responsables de pérdidas o daños causados por
+            fuerza mayor, casos fortuitos, o acciones de terceros fuera del
+            alcance de nuestros servicios.
+          </li>
+          <li>
+            La responsabilidad máxima de Guardman Chile estará limitada al
+            valor de los servicios contratados durante los últimos 12 meses.
+          </li>
+        </ul>
+
+        <!-- 5. Propiedad Intelectual -->
+        <h2>5. Propiedad Intelectual</h2>
+        <p>
+          Todo el contenido de este sitio web, incluyendo logos, textos,
+          imágenes, diseños y software, es propiedad de Guardman Chile y está
+          protegido por las leyes de propiedad intelectual de Chile.
+        </p>
+        <p>
+          Queda prohibida la reproducción, distribución, modificación o uso
+          comercial de nuestro contenido sin autorización expresa por escrito.
+        </p>
+        <p>
+          Los protocolos de seguridad, procedimientos operativos y manuales
+          desarrollados para cada cliente son confidenciales y propiedad de
+          Guardman Chile.
+        </p>
+
+        <!-- 6. Modificaciones -->
+        <h2>6. Modificaciones</h2>
+        <p>
+          Guardman Chile se reserva el derecho de modificar estos términos de
+          servicio en cualquier momento. Las modificaciones entrarán en vigor
+          inmediatamente después de su publicación en este sitio web.
+        </p>
+        <p>
+          Se recomienda revisar periódicamente esta página para estar informado
+          sobre los cambios. El uso continuado de nuestros servicios después de
+          cualquier modificación constituye la aceptación de los nuevos términos.
+        </p>
+
+        <!-- 7. Ley Aplicable -->
+        <h2>7. Ley Aplicable</h2>
+        <p>
+          Estos términos de servicio se rigen por las leyes de la República de
+          Chile. Cualquier controversia derivada de estos términos será
+          sometida a la jurisdicción de los tribunales de justicia de Santiago
+          de Chile.
+        </p>
+        <p>
+          Nuestros servicios cumplen con la normativa chilena vigente en
+          materia de seguridad privada, incluyendo la Ley N° 18.771 y
+          disposiciones reglamentarias aplicables.
+        </p>
+
+        <!-- 8. Contacto -->
+        <h2>8. Contacto</h2>
+        <p>
+          Si tiene preguntas sobre estos términos de servicio o desea
+          solicitar información adicional, puede contactarnos:
+        </p>
+        <ul>
+          <li>
+            <strong>Correo electrónico:</strong>
+            <a href="mailto:info@guardman.cl">info@guardman.cl</a>
+          </li>
+          <li>
+            <strong>Teléfono:</strong> +56 9 3000 0010
+          </li>
+          <li>
+            <strong>Dirección:</strong> Santiago, Chile
+          </li>
+        </ul>
+
+        <!-- CTA -->
+        <div class="not-prose mt-20 p-12 bg-gray-50 border border-gray-100 rounded-xl text-center group hover:border-black transition-all">
+          <h3 class="text-xl font-bold text-gray-900 mb-6 uppercase tracking-widest">
+            Compromiso de Seguridad
+          </h3>
+          <p class="text-gray-400 text-sm mb-10 max-w-md mx-auto leading-relaxed">
+            Solicite una cotización técnica y descubra cómo aplicamos estos estándares a su programa de protección.
+          </p>
+          <Button href="/cotizar" variant="primary" class="bg-black text-white hover:bg-gray-900 border-none px-10 text-xs tracking-widest uppercase font-bold">
+            Solicitar Protocolo
+          </Button>
+        </div>
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>

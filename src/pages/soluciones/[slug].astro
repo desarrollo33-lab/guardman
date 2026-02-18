@@ -1,0 +1,176 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import Button from '@/components/ui/Button.astro';
+import Card from '@/components/ui/Card.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import { convexServer } from '@/lib/convex';
+import { api } from '@convex/_generated/api';
+import { site } from '@/data/site';
+
+// SSR: fetch solution by slug and all services from Convex
+const { slug } = Astro.params;
+let solution = null;
+
+try {
+  solution = await convexServer.query(api.solutions.getSolutionBySlug, { slug: slug! });
+} catch (e) {
+  console.error('Error fetching solution:', e);
+}
+
+if (!solution) {
+  return Astro.redirect('/soluciones');
+}
+
+const safeSolution = solution!;
+
+let allServices = [];
+try {
+  allServices = await convexServer.query(api.services.getAllServices);
+} catch (e) {
+  console.error('Error fetching services for solution:', e);
+  allServices = [];
+}
+const relatedServices = allServices.filter(
+  (s: any) =>
+    safeSolution.relatedServices?.includes(s.slug) ||
+    s.solutions?.includes(safeSolution.slug)
+);
+
+const title = safeSolution.meta_title || `Seguridad para ${safeSolution.name} | Guardman Chile`;
+const description = safeSolution.meta_description || safeSolution.description;
+const ogImage = safeSolution.og_image || `${Astro.url.origin}/og/solutions/${slug}.png`;
+---
+
+<BaseLayout title={title} description={description} ogImage={ogImage}>
+  <!-- Hero de la Solución -->
+  <section class="relative bg-black py-20 px-4 overflow-hidden">
+    <div class="absolute inset-0 opacity-20">
+      <div class="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black z-10"></div>
+      <img src="https://images.unsplash.com/photo-1557597774-9d2739f85a76?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" alt="" class="w-full h-full object-cover grayscale" />
+    </div>
+
+    <Container class="relative z-20">
+      <Breadcrumbs items={[
+        { name: 'Soluciones', url: '/soluciones' },
+        { name: safeSolution.name }
+      ]} />
+
+      <div class="max-w-4xl">
+        <h1 class="text-4xl md:text-6xl font-semibold text-white mb-8 tracking-tight leading-[1.1]">
+          Especialidad en<br/>
+          <span class="text-white/40 italic">{safeSolution.name}</span>
+        </h1>
+        <p class="text-lg md:text-xl text-white/50 mb-12 max-w-2xl leading-relaxed">
+          {safeSolution.description}
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <Button href="/cotizar" variant="accent" size="lg" class="bg-white text-black hover:bg-gray-100 border-none">
+            Consultar ahora
+          </Button>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Desafíos / Pain Points -->
+  <Section id="desafios" background="white">
+    <Container>
+      <div class="mb-16">
+        <h2 class="text-3xl md:text-4xl font-semibold text-gray-900 mb-4 tracking-tight">
+          Desafíos operacionales
+        </h2>
+        <p class="text-gray-500 text-lg">Puntos críticos que resolvemos en su sector.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {
+          safeSolution.challenges?.map((challenge: string) => (
+            <div class="group p-8 rounded-xl border border-gray-100 hover:border-black transition-all duration-300">
+              <div class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center mb-6 group-hover:bg-black group-hover:text-white transition-colors">
+                <Icon name="shield-check" size="sm" />
+              </div>
+              <p class="text-gray-600 leading-relaxed font-medium">{challenge}</p>
+            </div>
+          ))
+        }
+      </div>
+    </Container>
+  </Section>
+
+  <!-- Soluciones -->
+  <Section background="gray" id="soluciones">
+    <Container>
+      <div class="mb-16">
+        <h2 class="text-3xl md:text-4xl font-semibold text-gray-900 mb-4 tracking-tight">
+          Nuestra Respuesta
+        </h2>
+        <p class="text-gray-500 text-lg">Protocolos especializados para {safeSolution.name}.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {
+          safeSolution.solutions?.map((solution: string) => (
+            <div class="bg-white p-8 rounded-xl border border-gray-100 hover:shadow-xl transition-shadow">
+              <div class="inline-flex items-center gap-2 px-3 py-1 bg-gray-900 text-white text-[10px] uppercase tracking-widest font-bold rounded mb-6">
+                Estrategia
+              </div>
+              <p class="text-gray-900 font-semibold leading-relaxed">{solution}</p>
+            </div>
+          ))
+        }
+      </div>
+    </Container>
+  </Section>
+
+  <!-- Servicios Relacionados -->
+  {
+    relatedServices.length > 0 && (
+      <Section id="servicios">
+        <Container>
+          <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
+            Servicios para {safeSolution.name}
+          </h2>
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {relatedServices.map((service: any) => (
+              <Card
+                title={service.title}
+                description={service.description}
+                href={`/servicios/${service.slug}`}
+              />
+            ))}
+          </div>
+        </Container>
+      </Section>
+    )
+  }
+
+  <!-- CTA -->
+  <Section id="cta" background="dark">
+    <Container>
+      <div class="text-center">
+        <h2 class="text-3xl md:text-5xl font-semibold mb-8 tracking-tight">
+          Asegure su operación industrial
+        </h2>
+        <p class="text-lg md:text-xl text-white/50 mb-12 max-w-2xl mx-auto leading-relaxed">
+          Nuestros asesores diseñarán un plan de seguridad específico para las necesidades de {safeSolution.name}.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button href="/cotizar" variant="accent" size="lg" class="bg-white text-black hover:bg-gray-100 border-none">
+            Solicitar análisis de riesgo
+          </Button>
+          <Button
+            href={`https://wa.me/${site.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola, necesito seguridad para ${safeSolution.name}`)}`}
+            variant="outline"
+            class="border-white/20 text-white hover:bg-white/10"
+            target="_blank"
+          >
+            Contactar vía WhatsApp
+          </Button>
+        </div>
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>

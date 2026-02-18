@@ -1,0 +1,132 @@
+---
+/**
+ * Hero Section - Monochromatic Design
+ * Clean, minimal hero with video background.
+ * Design inspired by Porsche and Ajax Systems.
+ */
+
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  primaryCta?: {
+    text: string;
+    href: string;
+  };
+  secondaryCtas?: Array<{
+    text: string;
+    href: string;
+    variant?: 'primary' | 'secondary' | 'outline' | 'accent';
+  }>;
+  trustBadges?: Array<{
+    text: string;
+    icon?: string;
+  }>;
+}
+
+const {
+  title = 'Seguridad Premium para tu Empresa',
+  subtitle = 'Guardias certificados, tecnología de vanguardia y protección integral sin contratos forzosos',
+  primaryCta = {
+    text: 'Cotizar',
+    href: '/cotizar',
+  },
+  secondaryCtas = [
+    { text: 'Servicios', href: '/servicios', variant: 'outline' as const },
+  ],
+  trustBadges = [
+    { text: 'Ley 21.659', icon: 'shield-check' },
+    { text: 'OS10 Certificado', icon: 'badge-check' },
+    { text: '+500 Clientes', icon: 'users' },
+  ],
+} = Astro.props;
+---
+
+<section
+  class="relative min-h-[100vh] md:min-h-[90vh] flex items-center overflow-hidden bg-black"
+>
+  {/* Background Video Layer */}
+  <div class="absolute inset-0 z-0">
+    {/* YouTube Video Background */}
+    <div class="absolute inset-0 w-full h-full overflow-hidden">
+      <iframe
+        src="https://www.youtube.com/embed/r6OSTXanzmI?autoplay=1&mute=1&loop=1&playlist=r6OSTXanzmI&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&playsinline=1&enablejsapi=1"
+        class="absolute top-1/2 left-1/2 min-w-[100vw] min-h-[100vh] w-auto h-auto -translate-x-1/2 -translate-y-1/2 object-cover pointer-events-none"
+        style="aspect-ratio: 16/9; min-width: 177.78vh; min-height: 56.25vw;"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen="false"
+        loading="lazy"
+        title="Video de fondo Guardman"
+      ></iframe>
+    </div>
+    
+    {/* Dark Overlay */}
+    <div class="absolute inset-0 bg-black/70"></div>
+  </div>
+
+  {/* Content */}
+  <Container class="relative z-10 py-20 md:py-28">
+    <div class="max-w-4xl">
+      {/* Main Headline */}
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold text-white mb-6 tracking-tight leading-[1.1]">
+        {title}
+      </h1>
+
+      {/* Subheadline */}
+      <p class="text-lg sm:text-xl lg:text-2xl text-white/70 max-w-2xl mb-10 leading-relaxed">
+        {subtitle}
+      </p>
+
+      {/* CTAs */}
+      <div class="flex flex-col sm:flex-row gap-4 mb-12">
+        <Button
+          href={primaryCta.href}
+          variant="accent"
+          size="lg"
+          class="text-base sm:text-lg font-medium bg-white text-black hover:bg-gray-100"
+        >
+          {primaryCta.text}
+        </Button>
+
+        {
+          secondaryCtas.map((cta) => (
+            <Button
+              href={cta.href}
+              variant={cta.variant || 'outline'}
+              size="lg"
+              class="text-base sm:text-lg border-white/40 text-white hover:bg-white hover:text-black"
+            >
+              {cta.text}
+            </Button>
+          ))
+        }
+      </div>
+
+      {/* Trust Badges */}
+      <div class="flex flex-wrap items-center gap-6 md:gap-10">
+        {
+          trustBadges.map((badge) => (
+            <div class="flex items-center gap-3 text-white/60 text-sm font-medium">
+              <Icon name={badge.icon || 'shield-check'} size="md" color="white" />
+              <span>{badge.text}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </Container>
+
+  {/* Scroll Indicator */}
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce hidden md:block">
+    <a
+      href="#service-finder"
+      class="flex flex-col items-center gap-2 text-white/40 hover:text-white/70 transition-colors"
+    >
+      <Icon name="chevron-down" size="lg" color="white" />
+    </a>
+  </div>
+</section>

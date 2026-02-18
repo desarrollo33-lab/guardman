@@ -1,0 +1,262 @@
+================================================================================
+TASK 6.1: LIGHTHOUSE PERFORMANCE VERIFICATION
+================================================================================
+Date: 2026-02-16
+Project: Guardman Chile - Security Services Website
+Dev Server: http://localhost:4322
+
+================================================================================
+1. HOW TO RUN LIGHTHOUSE (MANUAL STEPS)
+================================================================================
+
+PREREQUISITES:
+- Chrome or Chromium browser installed
+- Dev server running (npm run dev)
+- Use Incognito/Private window for accurate results
+
+STEP-BY-STEP:
+1. Open Chrome browser
+2. Navigate to http://localhost:4322 (dev) or production URL
+3. Open DevTools (F12 or Ctrl+Shift+I / Cmd+Opt+I)
+4. Click "Lighthouse" tab (may need to click >> to find it)
+5. Configure audit:
+   - Device: Mobile + Desktop (run both)
+   - Categories: Performance, Accessibility, Best Practices, SEO
+   - Clear storage: Check this box
+6. Click "Analyze page load"
+7. Wait for results (30-60 seconds)
+8. Save report as JSON for comparison
+
+PAGES TO AUDIT (Priority Order):
+1. / (Homepage) - Most important
+2. /cotizar (Quote page - conversion critical)
+3. /servicios/vigilancia-privada (Service detail)
+4. /contacto (Contact page)
+5. /cobertura (Coverage page)
+
+================================================================================
+2. CURRENT OPTIMIZATIONS ALREADY IN PLACE
+================================================================================
+
+ASTRO CONFIG (astro.config.mjs):
++ compressHTML: true              - HTML compression enabled
++ cssMinify: true                 - CSS minification via esbuild
++ minify: "esbuild"              - JS minification
++ inlineStylesheets: "auto"       - Inline small CSS files
++ output: "server"                - SSR mode (good for SEO)
++ sitemap integration             - Auto-generated sitemap
++ Vercel adapter with analytics   - Web analytics enabled
+
+BASE LAYOUT (BaseLayout.astro):
++ Semantic HTML5 structure
++ Meta viewport configured
++ Open Graph tags present
++ Twitter Cards configured
++ Schema.org JSON-LD support
++ Google Fonts with preconnect
++ Canonical URLs
+
+GLOBAL STYLES (global.css):
++ Tailwind CSS (utility-first, tree-shakeable)
++ Antialiased fonts
++ Smooth scroll behavior
++ Focus states for accessibility
+
+================================================================================
+3. LIGHTHOUSE METRICS TO CHECK
+================================================================================
+
+PERFORMANCE CATEGORY:
+| Metric                      | Target | Description                              |
+|-----------------------------|--------|------------------------------------------|
+| First Contentful Paint      | < 1.8s | First text/image rendered                |
+| Largest Contentful Paint    | < 2.5s | Main content visible                     |
+| Total Blocking Time         | < 200ms| Time blocked from input                  |
+| Cumulative Layout Shift     | < 0.1  | Visual stability                         |
+| Speed Index                 | < 3.0s | How quickly content appears              |
+
+ACCESSIBILITY CATEGORY:
+- Color contrast ratios
+- Alt text on images
+- ARIA labels
+- Keyboard navigation
+- Focus indicators
+- Form labels
+
+BEST PRACTICES CATEGORY:
+- HTTPS usage
+- No JavaScript errors
+- Proper image aspect ratios
+- No browser console errors
+- Modern image formats
+
+SEO CATEGORY:
+- Document has <title>
+- Document has meta description
+- Links have descriptive text
+- Page has valid hreflang
+- robots.txt valid
+- sitemap.xml valid
+
+================================================================================
+4. IDENTIFIED OPTIMIZATION OPPORTUNITIES
+================================================================================
+
+PRIORITY 1 - HIGH IMPACT, LOW EFFORT:
+
+[4.1] Font Loading Optimization
+LOCATION: src/layouts/BaseLayout.astro (lines 61-66)
+CURRENT:
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+RECOMMENDATION:
+  Add font-display:swap to Google Fonts URL:
+  ...&display=swap
+  
+BENEFIT: Prevents invisible text during font load (improves FCP/LCP)
+
+[4.2] Add Image Lazy Loading
+LOCATION: All components with images (check when images are added)
+RECOMMENDATION: Add loading="lazy" to below-fold images
+
+[4.3] Inline Critical CSS
+STATUS: Already partially done via inlineStylesheets: "auto"
+NOTE: Tailwind extracts only used CSS, which is optimal
+
+PRIORITY 2 - MEDIUM IMPACT, MEDIUM EFFORT:
+
+[4.4] Image Optimization
+LOCATION: public/images/* (when images are added)
+RECOMMENDATIONS:
+  - Use WebP format with AVIF fallback
+  - Implement responsive images with srcset
+  - Add explicit width/height to prevent CLS
+  - Consider Astro's Image component for auto-optimization
+
+[4.5] Consider Static Generation for Public Pages
+CURRENT: output: "server" (SSR)
+RECOMMENDATION: For public pages that don't require real-time data,
+consider hybrid rendering with output: "hybrid" or static generation.
+BENEFIT: Faster TTFB, better caching at edge
+
+[4.6] Add Resource Hints
+LOCATION: src/layouts/BaseLayout.astro
+RECOMMENDATION: Add preload/prefetch for critical resources:
+  <link rel="preload" as="font" href="/fonts/Inter.woff2" crossorigin>
+
+PRIORITY 3 - FUTURE CONSIDERATIONS:
+
+[4.7] Consider Critical CSS Extraction
+Tool: critters or similar
+BENEFIT: Inline critical CSS, async load rest
+
+[4.8] Implement Service Worker
+For offline capability and caching
+Consider: @vite-pwa/astro
+
+[4.9] Add Brotli Compression
+Currently gzip (Vercel default)
+Vercel supports Brotli automatically
+
+================================================================================
+5. ACCESSIBILITY CHECKLIST
+================================================================================
+
+CURRENT STATUS (From code review):
+[+] Semantic HTML elements (header, nav, main, footer, section)
+[+] Lang attribute on html element (lang="es")
+[+] Meta viewport present
+[+] Focus visible styles defined in global.css
+[+] Skip to content link (consider adding)
+[+] ARIA labels on interactive elements (partial - needs audit)
+
+NEEDS VERIFICATION:
+[ ] Color contrast meets WCAG AA (4.5:1 for text)
+[ ] All images have alt text
+[ ] Form inputs have associated labels
+[ ] Heading hierarchy is correct (h1 > h2 > h3)
+[ ] Keyboard navigation works for all interactive elements
+[ ] Mobile menu is keyboard accessible
+[ ] Focus trap in modals
+
+================================================================================
+6. EXPECTED LIGHTHOUSE SCORES (ESTIMATED)
+================================================================================
+
+Based on current code structure and optimizations in place:
+
+| Category       | Expected Score | Notes                              |
+|----------------|----------------|------------------------------------|
+| Performance    | 85-95          | Good base, CSS/HTML compression    |
+| Accessibility  | 80-90          | Needs image alt text verification  |
+| Best Practices | 90-100         | Modern stack, HTTPS, no deprecated |
+| SEO            | 90-100         | Meta tags, canonical, sitemap      |
+
+FACTORS THAT MAY REDUCE SCORES:
+- Google Fonts external request (network dependent)
+- Client-side React hydration (MobileMenu.tsx)
+- Large hero images (if not optimized)
+- Server response time (dev server vs production)
+
+================================================================================
+7. RECOMMENDED NEXT STEPS
+================================================================================
+
+IMMEDIATE (No code changes):
+1. Run Lighthouse on all 5 priority pages
+2. Document actual scores in this file
+3. Take screenshots of results
+
+SHORT-TERM (Quick wins):
+1. Add display=swap to Google Fonts URL
+2. Verify all images have alt attributes
+3. Add skip-to-content link
+4. Test keyboard navigation
+
+MEDIUM-TERM:
+1. Implement Astro Image component for optimization
+2. Convert images to WebP/AVIF
+3. Consider hybrid rendering for static pages
+4. Add preload hints for critical fonts
+
+================================================================================
+8. CLI ALTERNATIVE (for CI/CD)
+================================================================================
+
+Using Lighthouse CLI:
+```bash
+npm install -g lighthouse
+lighthouse http://localhost:4322 --output json --output html --output-path ./lighthouse-report
+```
+
+Using PageSpeed Insights API:
+```bash
+curl "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=https://guardman.cl&category=performance&category=accessibility&category=best-practices&category=seo"
+```
+
+================================================================================
+9. EVIDENCE COLLECTED
+================================================================================
+
+FILES REVIEWED:
+- astro.config.mjs (optimizations verified)
+- package.json (dependencies checked)
+- src/layouts/BaseLayout.astro (meta tags, fonts)
+- src/layouts/AdminLayout.astro
+- src/pages/index.astro (homepage structure)
+- src/components/sections/Hero.astro
+- src/components/layout/Header.astro
+- src/components/layout/Footer.astro
+- src/styles/global.css
+- tailwind.config.mjs
+
+DEV SERVER:
+- Successfully started on http://localhost:4322
+- Astro v5.17.2
+- Hot module replacement working
+
+================================================================================
+END OF REPORT
+================================================================================

@@ -1,0 +1,28 @@
+---
+/**
+ * Section Component
+ * Semantic section wrapper with configurable background and vertical padding.
+ */
+
+interface Props {
+  id?: string;
+  background?: 'white' | 'gray' | 'primary' | 'dark';
+  class?: string;
+}
+
+const { id, background = 'white', class: className = '' } = Astro.props;
+
+const backgroundClasses = {
+  white: 'bg-white',
+  gray: 'bg-gray-50',
+  primary: 'bg-gray-900 text-white',
+  dark: 'bg-gray-900 text-gray-100',
+};
+---
+
+<section
+  id={id}
+  class:list={['py-16 md:py-24', backgroundClasses[background], className]}
+>
+  <slot />
+</section>

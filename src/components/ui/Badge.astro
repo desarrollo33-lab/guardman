@@ -1,0 +1,32 @@
+---
+/**
+ * Badge Component - Monochromatic Design
+ * Small status indicators for certifications, trust signals, and labels.
+ */
+
+interface Props {
+  text: string;
+  variant?: 'default' | 'success' | 'warning' | 'outline';
+  class?: string;
+}
+
+const { text, variant = 'default', class: className = '' } = Astro.props;
+
+const variantClasses = {
+  default: 'bg-gray-100 text-gray-700',
+  success: 'bg-gray-900 text-white',
+  warning: 'bg-gray-200 text-gray-800',
+  outline: 'bg-transparent border border-gray-300 text-gray-700',
+};
+---
+
+<span
+  class:list={[
+    'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+    'tracking-wide uppercase',
+    variantClasses[variant],
+    className,
+  ]}
+>
+  {text}
+</span>

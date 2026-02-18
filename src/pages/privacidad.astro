@@ -1,0 +1,193 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import Button from '@/components/ui/Button.astro';
+
+const lastUpdated = '17 de Febrero, 2026';
+---
+
+<BaseLayout
+  title="Política de Privacidad"
+  description="Política de privacidad de Guardman Chile. Información sobre el tratamiento de datos personales y protección de su información."
+>
+  <!-- Hero Section -->
+  <section class="bg-black py-20 text-center">
+    <Container>
+      <Breadcrumbs items={[{ name: 'Privacidad' }]} class="justify-center mb-8" />
+      <h1 class="text-4xl md:text-5xl font-semibold text-white mb-6 tracking-tight italic">
+        Política de Privacidad
+      </h1>
+      <p class="text-white/40 text-xs font-bold uppercase tracking-[0.3em]">Última actualización: {lastUpdated}</p>
+    </Container>
+  </section>
+
+  <!-- Content Section -->
+  <Section background="white">
+    <Container>
+      <div class="prose prose-lg max-w-3xl mx-auto">
+        <!-- Introducción -->
+        <p class="lead">
+          En Guardman Chile, nos comprometemos a proteger su privacidad. Esta
+          política describe cómo recopilamos, usamos y protegemos su información
+          personal cuando utiliza nuestros servicios de seguridad privada.
+        </p>
+
+        <!-- 1. Información que Recopilamos -->
+        <h2>1. Información que Recopilamos</h2>
+        <p>
+          Recopilamos información necesaria para proporcionar nuestros servicios
+          de seguridad y responder a sus consultas. Esta información incluye:
+        </p>
+        <ul>
+          <li>
+            <strong>Datos de contacto:</strong> Nombre completo, correo
+            electrónico y número de teléfono.
+          </li>
+          <li>
+            <strong>Información de cotización:</strong> Detalles sobre el
+            servicio requerido, ubicación y horarios.
+          </li>
+          <li>
+            <strong>Datos de navegación:</strong> Información sobre cómo
+            interactúa con nuestro sitio web (páginas visitadas, tiempo de
+            permanencia).
+          </li>
+        </ul>
+
+        <!-- 2. Uso de la Información -->
+        <h2>2. Uso de la Información</h2>
+        <p>Utilizamos su información personal para:</p>
+        <ul>
+          <li>Proporcionar cotizaciones personalizadas para nuestros servicios.</li>
+          <li>Responder a sus consultas y solicitudes de información.</li>
+          <li>Comunicarnos con usted sobre nuestros servicios.</li>
+          <li>Mejorar nuestro sitio web y experiencia de usuario.</li>
+          <li>Cumplir con obligaciones legales aplicables.</li>
+        </ul>
+
+        <!-- 3. Cookies y Tecnologías Similares -->
+        <h2>3. Cookies y Tecnologías Similares</h2>
+        <p>
+          Utilizamos cookies y tecnologías de seguimiento para mejorar su
+          experiencia en nuestro sitio web. Estas tecnologías nos permiten:
+        </p>
+        <ul>
+          <li>Recordar sus preferencias de navegación.</li>
+          <li>Analizar el tráfico del sitio web.</li>
+          <li>Personalizar el contenido mostrado.</li>
+        </ul>
+        <p>
+          Puede configurar su navegador para rechazar cookies, pero esto puede
+          afectar algunas funcionalidades del sitio.
+        </p>
+
+        <!-- 4. Compartición de Información -->
+        <h2>4. Compartición de Información</h2>
+        <p>
+          <strong>No vendemos ni alquilamos su información personal a terceros.</strong>
+        </p>
+        <p>
+          Solo compartimos su información en las siguientes circunstancias:
+        </p>
+        <ul>
+          <li>
+            <strong>Proveedores de servicios:</strong> Con empresas que nos
+            ayudan a operar nuestro negocio (hosting, análisis).
+          </li>
+          <li>
+            <strong>Requerimientos legales:</strong> Cuando sea requerido por
+            ley o para proteger nuestros derechos legales.
+          </li>
+          <li>
+            <strong>Consentimiento:</strong> Cuando usted nos autoriza
+            expresamente.
+          </li>
+        </ul>
+
+        <!-- 5. Seguridad de Datos -->
+        <h2>5. Seguridad de Datos</h2>
+        <p>
+          Implementamos medidas de seguridad técnicas y organizativas para
+          proteger su información personal, incluyendo:
+        </p>
+        <ul>
+          <li>Encriptación de datos en tránsito (HTTPS).</li>
+          <li>Acceso restringido a información personal.</li>
+          <li>Monitoreo regular de nuestros sistemas.</li>
+          <li>Capacitación de personal en protección de datos.</li>
+        </ul>
+
+        <!-- 6. Derechos del Usuario -->
+        <h2>6. Derechos del Usuario</h2>
+        <p>
+          De acuerdo con la legislación chilena sobre protección de datos
+          personales, usted tiene derecho a:
+        </p>
+        <ul>
+          <li>
+            <strong>Acceso:</strong> Solicitar información sobre los datos que
+            tenemos sobre usted.
+          </li>
+          <li>
+            <strong>Rectificación:</strong> Solicitar la corrección de datos
+            incorrectos o incompletos.
+          </li>
+          <li>
+            <strong>Eliminación:</strong> Solicitar la eliminación de sus datos
+            personales.
+          </li>
+          <li>
+            <strong>Oposición:</strong> Oponerse al tratamiento de sus datos
+            para ciertos fines.
+          </li>
+        </ul>
+        <p>
+          Para ejercer estos derechos, contáctenos a través de
+          <a href="mailto:privacidad@guardman.cl">privacidad@guardman.cl</a>.
+        </p>
+
+        <!-- 7. Contacto -->
+        <h2>7. Contacto</h2>
+        <p>
+          Si tiene preguntas sobre esta política de privacidad o sobre cómo
+          manejamos sus datos personales, puede contactarnos:
+        </p>
+        <ul>
+          <li>
+            <strong>Correo electrónico:</strong>
+            <a href="mailto:privacidad@guardman.cl">privacidad@guardman.cl</a>
+          </li>
+          <li>
+            <strong>Teléfono:</strong> +56 9 3000 0010
+          </li>
+          <li>
+            <strong>Dirección:</strong> Santiago, Chile
+          </li>
+        </ul>
+
+        <!-- 8. Cambios a esta Política -->
+        <h2>8. Cambios a esta Política</h2>
+        <p>
+          Podemos actualizar esta política de privacidad periódicamente. Le
+          notificaremos sobre cambios significativos publicando la nueva
+          política en nuestro sitio web con la fecha de actualización revisada.
+        </p>
+
+        <!-- CTA -->
+        <div class="not-prose mt-20 p-12 bg-gray-50 border border-gray-100 rounded-xl text-center group hover:border-black transition-all">
+          <h3 class="text-xl font-bold text-gray-900 mb-6 uppercase tracking-widest">
+            ¿Consultas sobre Datos?
+          </h3>
+          <p class="text-gray-400 text-sm mb-10 max-w-md mx-auto leading-relaxed">
+            Nuestro departamento legal está disponible para resolver cualquier duda sobre el tratamiento de su información técnica.
+          </p>
+          <Button href="/contacto" variant="primary" class="bg-black text-white hover:bg-gray-900 border-none px-10 text-xs tracking-widest uppercase font-bold">
+            Contactar DPO
+          </Button>
+        </div>
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>

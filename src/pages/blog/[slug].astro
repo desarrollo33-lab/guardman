@@ -1,0 +1,124 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import { site } from '@/data/site';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const title = `${post.data.title} | ${site.name}`;
+const description = post.data.description;
+const ogImage = post.data.image || '/og-default.jpg';
+const publishedDate = post.data.pubDate.toISOString();
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  description: post.data.description,
+  author: {
+    '@type': 'Person',
+    name: post.data.author,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: site.name,
+    logo: {
+      '@type': 'ImageObject',
+      url: new URL('/favicon.svg', site.url).href,
+    },
+  },
+  datePublished: publishedDate,
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': Astro.url.href,
+  },
+  ...(post.data.image && {
+    image: new URL(post.data.image, site.url).href,
+  }),
+};
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('es-CL', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+---
+
+<BaseLayout title={title} description={description} ogImage={ogImage} schema={articleSchema}>
+  <article>
+    <header class="bg-gradient-to-br from-gray-800 to-gray-900 py-12 md:py-20">
+      <Container class="relative z-20 text-white">
+      <Breadcrumbs items={[
+        { name: 'Blog', url: '/blog' },
+        { name: post.data.title }
+      ]} />
+
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+          {post.data.title}
+        </h1>
+        <p class="text-xl text-white/80 mb-6 max-w-3xl">
+          {post.data.description}
+        </p>
+
+        <div class="flex flex-wrap items-center gap-4 text-white/70 text-sm">
+          <span class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            {post.data.author}
+          </span>
+          <span class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <time datetime={publishedDate}>{formatDate(post.data.pubDate)}</time>
+          </span>
+        </div>
+
+        {post.data.tags.length > 0 && (
+          <div class="flex flex-wrap gap-2 mt-6">
+            {post.data.tags.map((tag: string) => (
+              <span class="px-3 py-1 rounded-full bg-white/20 text-white text-sm">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </Container>
+    </header>
+
+    <div class="py-12 md:py-16">
+      <Container size="md">
+        <div class="prose prose-lg prose-gray max-w-none
+          prose-headings:text-gray-900 prose-headings:font-bold
+          prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
+          prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+          prose-p:text-gray-700 prose-p:leading-relaxed
+          prose-a:text-gray-900 prose-a:no-underline hover:prose-a:underline
+          prose-strong:text-gray-900
+          prose-ul:my-4 prose-ol:my-4
+          prose-li:my-1
+          prose-blockquote:border-l-gray-400 prose-blockquote:bg-gray-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:not-italic
+          prose-img:rounded-lg prose-img:shadow-md">
+          <Content />
+        </div>
+      </Container>
+    </div>
+  </article>
+</BaseLayout>
