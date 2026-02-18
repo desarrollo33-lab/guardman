@@ -10,16 +10,34 @@ interface NavItem {
   is_button?: boolean;
 }
 
-const defaultNavLinks = [
+const links = [
   { label: 'Inicio', href: '/' },
-  { label: 'Servicios', href: '/servicios' },
-  { label: 'Soluciones', href: '/soluciones' },
+  { 
+    label: 'Servicios', 
+    href: '/servicios',
+    children: [
+      { label: 'Guardias de Seguridad', href: '/servicios/guardias-seguridad' },
+      { label: 'Patrullaje Preventivo', href: '/servicios/patrullaje-condominios' },
+      { label: 'Alarmas Ajax', href: '/servicios/alarmas-ajax' },
+      { label: 'GuardPod', href: '/servicios/guardpod' },
+      { label: 'Vigilancia Aérea', href: '/servicios/drones-seguridad' },
+      { label: 'Control de Acceso', href: '/servicios/control-acceso' },
+    ]
+  },
+  { 
+    label: 'Soluciones', 
+    href: '/soluciones',
+    children: [
+      { label: 'Condominios', href: '/soluciones/condominios' },
+      { label: 'Minería e Industrial', href: '/soluciones/mineria' },
+      { label: 'Retail', href: '/soluciones/retail' },
+      { label: 'Eventos', href: '/soluciones/eventos' },
+      { label: 'Construcción', href: '/soluciones/construccion' },
+    ]
+  },
   { label: 'Cobertura', href: '/cobertura' },
-  { label: 'Blog', href: '/blog' },
   { label: 'Contacto', href: '/contacto' },
 ];
-
-const links = navItems || defaultNavLinks;
 ---
 
 
