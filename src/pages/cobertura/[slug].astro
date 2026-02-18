@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DynamicSection from '../../components/DynamicSection.astro';
+import { convexServer } from '@/lib/convex';
+import { api } from '@convex/_generated/api';
+
+export const prerender = false; // Server Side Rendering for dynamic slugs
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/404');
+}
+
+// 1. Fetch Commune Data
+const commune = await convexServer.query(api.communes.getBySlug, { slug });
+
+if (!commune) {
+  return Astro.redirect('/404');
+}
+
+// 2. Fetch Site Config (for Layout)
+// BaseLayout handles this internally but we might want to pass specific SEO overrides
+// Actually BaseLayout fetches it itself, so we just need to pass SEO props.
+
+// 3. Construct Page Content Programmatically
+// We reuse the existing Ajax components but inject commune-specific text.
+
+const IMAGES = {
+    hero: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=2000&q=80',
+    services: {
+        guardias: 'https://images.unsplash.com/photo-1590422915838-8e6d23485ce0?auto=format&fit=crop&w=800&q=80',
+        patrullaje: 'https://images.unsplash.com/photo-1548695602-9984e1b4db1b?auto=format&fit=crop&w=800&q=80',
+        alarmas: 'https://images.unsplash.com/photo-1558002038-1091a5756131?auto=format&fit=crop&w=800&q=80',
+    }
+};
+
+const blocks = [
+  {
+    type: 'hero_ajax',
+    order: 1,
+    title: `Seguridad Privada en ${commune.name}`,
+    subtitle: `Expertos en seguridad OS10 con cobertura inmediata en ${commune.name} y sector ${commune.zone || 'oriente'}.`,
+    data: {
+      backgroundImage: IMAGES.hero,
+      primaryCta: { text: 'Cotizar en ' + commune.name, href: '/cotizar' },
+      secondaryCta: { text: 'Ver Servicios', href: '/servicios' },
+      align: 'left',
+      size: 'full'
+    }
+  },
+  {
+    type: 'services_grid_ajax',
+    order: 2,
+    title: `Servicios Disponibles en ${commune.name}`,
+    subtitle: 'Despliegue táctico y preventivo en su comuna.',
+    data: {
+      services: [
+        {
+            title: 'Guardias OS10',
+            description: `Seguridad física permanente para condominios y empresas en ${commune.name}.`,
+            href: '/servicios/guardias-seguridad',
+            image: IMAGES.services.guardias
+        },
+        {
+            title: 'Patrullaje Móvil',
+            description: `Rondas preventivas 24/7 en sectores de ${commune.name}.`,
+            href: '/servicios/patrullaje-condominios',
+            image: IMAGES.services.patrullaje
+        },
+        {
+            title: 'Alarmas Monitoreadas',
+            description: 'Sistemas de intrusión Ajax con respuesta inmediata.',
+            href: '/servicios/alarmas-ajax',
+            image: IMAGES.services.alarmas,
+            badge: 'Instalación 24H'
+        }
+      ],
+      columns: 3,
+      showAllLink: true
+    }
+  },
+  {
+    type: 'stats_section',
+    order: 3,
+    data: {
+      stats: [
+        { value: '100%', label: `Cobertura en ${commune.name}` },
+        { value: '15min', label: 'Tiempo de Respuesta' },
+        { value: '24/7', label: 'Monitoreo GPS' },
+        { value: 'OS10', label: 'Personal Certificado' }
+      ],
+      background: 'dark'
+    }
+  },
+    {
+        type: 'cta_dual',
+        order: 4,
+        data: {
+            leftCta: {
+                title: `Emergencias en ${commune.name}`,
+                description: 'Línea directa con nuestra central de operaciones.',
+                buttonText: 'Llamar Ahora',
+                buttonHref: 'tel:+56900000000',
+                icon: 'phone'
+            },
+            rightCta: {
+                title: 'Seguridad para tu Comunidad',
+                description: 'Planes especiales para juntas de vecinos y condominios.',
+                buttonText: 'Solicitar Evaluación',
+                buttonHref: '/cotizar',
+                icon: 'shield'
+            }
+        }
+    }
+];
+
+---
+
+<BaseLayout
+  title={commune.meta_title || `Seguridad en ${commune.name}`}
+  description={commune.meta_description || `Empresa de seguridad privada en ${commune.name}. Guardias, patrullaje y alarmas.`}
+>
+  {blocks.map((block) => (
+    <DynamicSection type={block.type} data={block.data} />
+  ))}
+</BaseLayout>

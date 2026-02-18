@@ -1,112 +1,39 @@
 ---
-/**
- * Homepage - Guardman Chile
- * Complete landing page with all sections for security services.
- */
-
-import BaseLayout from '@/layouts/BaseLayout.astro';
-import Container from '@/components/ui/Container.astro';
-import Section from '@/components/ui/Section.astro';
-import Button from '@/components/ui/Button.astro';
-import OrganizationSchema from '@/components/seo/OrganizationSchema.astro';
-import FAQSchema from '@/components/seo/FAQSchema.astro';
-import Hero from '@/components/sections/Hero.astro';
-import ServiceFinder from '@/components/sections/ServiceFinder.astro';
-import ServicesGrid from '@/components/sections/ServicesGrid.astro';
-import SolutionsGrid from '@/components/sections/SolutionsGrid.astro';
-import ClientsGrid from '@/components/sections/ClientsGrid.astro';
-import GuardPodSection from '@/components/sections/GuardPodSection.astro';
-import FAQ from '@/components/sections/FAQ.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DynamicSection from '../components/DynamicSection.astro';
 import { convexServer } from '@/lib/convex';
 import { api } from '@convex/_generated/api';
-import { site } from '@/data/site';
 
+// This is meant to be used for dynamic routes like [...slug].astro
+// But for now we name it index-dynamic to test locally or replace index.astro after verification.
 
-// SSR: Fetch all data from Convex at request time
-// SSR: Fetch all data from Convex at request time (with error handling)
-let services = [];
-let solutions = [];
-let faqs = [];
+const { slug } = Astro.props; // Or fetch from params if this was a route file
+const pageSlug = slug || '/'; 
 
-try {
-  services = await convexServer.query(api.services.getAllServices);
-} catch (e) {
-  console.error('Error fetching services:', e);
+const page = await convexServer.query(api.pages.getBySlug, { slug: pageSlug });
+const blocks = await convexServer.query(api.content_blocks.getByPage, { page_slug: pageSlug });
+
+if (!page) {
+  // Handle 404 or fallback
 }
-
-try {
-  solutions = await convexServer.query(api.solutions.getAllSolutions);
-} catch (e) {
-  console.error('Error fetching solutions:', e);
-}
-
-try {
-  faqs = await convexServer.query(api.faqs.getAllFaqs);
-} catch (e) {
-  console.error('Error fetching faqs:', e);
-}
-
-// Page metadata
-const pageTitle = 'Guardman Chile';
-const pageDescription = 'Empresa líder en seguridad privada en Chile. Guardias OS10 certificados, alarmas Ajax, patrullaje de condominios, módulos GuardPod y control de acceso. Cobertura en toda la Región Metropolitana sin contratos forzosos.';
-
-
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription}>
-  {/* Schema.org Organization */}
-  <OrganizationSchema 
-    name="Guardman Chile"
-    url="https://guardman.cl"
-    description={pageDescription}
-    email="info@guardman.cl"
-    telephone="+56 9 3000 0010"
-    address={{
-      street: site.address.street,
-      city: site.address.city,
-      region: site.address.region,
-      postalCode: site.address.postalCode,
-      country: 'CL',
-    }}
-  />
-
-  {/* Schema.org FAQ */}
-  <FAQSchema faqs={faqs} />
-
-  {/* HERO SECTION */}
-  <Hero />
-
-  {/* SERVICE FINDER - Floating card */}
-  <ServiceFinder />
-
-  {/* SERVICIOS SECTION */}
-  <ServicesGrid 
-    services={services} 
-    showAllLink={true}
-  />
-
-  {/* GUARDPOD - Featured Section */}
-  <GuardPodSection />
-
-  {/* SOLUCIONES - Grid Section */}
-  <SolutionsGrid
-    solutions={solutions}
-    title="Soluciones"
-    subtitle="Tecnología y personal adaptado a cada sector"
-    showAllLink={true}
-    background="white"
-  />
-
-
-
-  {/* CLIENTES - New section from Stitch */}
-  <ClientsGrid />
-
-  {/* FAQ SECTION */}
-  <FAQ 
-    faqs={faqs} 
-    maxItems={6}
-  />
-
-
+<BaseLayout
+  title={page?.seo_title || 'Guardman Chile'}
+  description={page?.seo_description || ''}
+  ogImage={page?.og_image}
+>
+  {
+    blocks && blocks.length > 0 ? (
+      blocks.map((block) => (
+        <DynamicSection type={block.type} data={block.data} />
+      ))
+    ) : (
+      // Fallback content or empty state
+      <div class="py-20 text-center">
+        <h1 class="text-4xl font-bold">Welcome to Guardman</h1>
+        <p>Loading content from database...</p>
+      </div>
+    )
+  }
 </BaseLayout>

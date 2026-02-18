@@ -1,0 +1,37 @@
+---
+import HeroAjax from './sections/HeroAjax.astro';
+import ServicesGridAjax from './sections/ServicesGridAjax.astro';
+import CTADual from './sections/CTADual.astro';
+import StatsSection from './sections/StatsSection.astro';
+// import FAQAjax from './sections/FAQAjax.astro'; // Uncomment when created
+
+interface Props {
+  type: string;
+  data: any;
+  order?: number;
+}
+
+const { type, data } = Astro.props;
+
+// Component Mapping
+const components: Record<string, any> = {
+  hero_ajax: HeroAjax,
+  services_grid_ajax: ServicesGridAjax,
+  cta_dual: CTADual,
+  stats_section: StatsSection,
+  // faq_ajax: FAQAjax,
+};
+
+const Component = components[type];
+---
+
+{
+  Component ? (
+    <Component {...data} />
+  ) : (
+    <div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+      <p class="font-bold">Error: Unknown component type "{type}"</p>
+      <pre class="text-xs mt-2 overflow-auto">{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  )
+}

@@ -6,7 +6,7 @@ const SOLUTIONS_SEED_DATA = [
     {
         id: 'condominios',
         slug: 'condominios',
-        name: 'Condominios Residenciales',
+        title: 'Condominios Residenciales',
         description:
             'Protección integral para comunidades residenciales. Guardias, patrullaje y alarmas diseñados para condominios.',
         icon: 'home',
@@ -36,7 +36,7 @@ const SOLUTIONS_SEED_DATA = [
     {
         id: 'mineria',
         slug: 'mineria',
-        name: 'Minería e Industria',
+        title: 'Minería e Industria',
         description:
             'Soluciones de seguridad para faenas mineras e industriales. Cumplimiento normativo SERNAGEOMIN y protección de activos.',
         icon: 'mountain',
@@ -67,7 +67,7 @@ const SOLUTIONS_SEED_DATA = [
     {
         id: 'retail',
         slug: 'retail',
-        name: 'Retail y Comercio',
+        title: 'Retail y Comercio',
         description:
             'Seguridad para tiendas, malls y centros comerciales. Prevención de pérdidas y protección de clientes.',
         icon: 'shopping-bag',
@@ -93,7 +93,7 @@ const SOLUTIONS_SEED_DATA = [
     {
         id: 'construccion',
         slug: 'construccion',
-        name: 'Construcción y Obras',
+        title: 'Construcción y Obras',
         description:
             'Protección de obras en construcción. GuardPod, vigilancia perimetral y control de herramientas.',
         icon: 'hard-hat',
@@ -124,7 +124,7 @@ const SOLUTIONS_SEED_DATA = [
     {
         id: 'hoteleria',
         slug: 'hoteleria',
-        name: 'Hotelería y Turismo',
+        title: 'Hotelería y Turismo',
         description:
             'Seguridad para hoteles, resorts y centros turísticos. Experiencia premium sin comprometer la protección.',
         icon: 'bed',
@@ -150,7 +150,7 @@ const SOLUTIONS_SEED_DATA = [
     {
         id: 'inmobiliaria',
         slug: 'inmobiliaria',
-        name: 'Inmobiliaria y Propiedades',
+        title: 'Inmobiliaria y Propiedades',
         description:
             'Seguridad para proyectos inmobiliarios, propiedades desocupadas y visitas guiadas. Protección de activos en venta y arriendo.',
         icon: 'home',
@@ -176,7 +176,7 @@ const SOLUTIONS_SEED_DATA = [
     {
         id: 'eventos',
         slug: 'eventos',
-        name: 'Eventos y Espectáculos',
+        title: 'Eventos y Espectáculos',
         description:
             'Seguridad especializada para eventos masivos, conciertos, ferias y espectáculos. Control de multitudes y protección VIP.',
         icon: 'shopping-bag',
@@ -202,7 +202,7 @@ const SOLUTIONS_SEED_DATA = [
     {
         id: 'corporativo',
         slug: 'corporativo',
-        name: 'Corporativo y Oficinas',
+        title: 'Corporativo y Oficinas',
         description:
             'Seguridad integral para edificios corporativos, oficinas y centros de negocios. Protección de personal e información.',
         icon: 'building',

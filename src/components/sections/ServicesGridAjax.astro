@@ -1,0 +1,107 @@
+---
+import Container from '../ui/Container.astro';
+import Section from '../ui/Section.astro';
+import ServiceCard from '../ui/ServiceCard.astro'; // Assuming this exists or using the inline definition from spec
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+
+// We can define ServiceCard inline here if it's specific or import it.
+// For now, let's assume we use the UI component but pass props.
+
+interface Service {
+  title: string;
+  description: string;
+  image: string;
+  href: string;
+  badge?: string;
+  features?: string[];
+}
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  services?: Service[]; // Optional to allow fallback or query inside
+  columns?: 2 | 3 | 4;
+  showAllLink?: boolean;
+  background?: 'white' | 'gray' | 'dark';
+}
+
+const {
+  title = 'Nuestros Servicios',
+  subtitle,
+  services = [],
+  columns = 3,
+  showAllLink = false,
+  background = 'white',
+} = Astro.props;
+
+const gridClasses = {
+  2: 'md:grid-cols-2',
+  3: 'md:grid-cols-2 lg:grid-cols-3',
+  4: 'md:grid-cols-2 lg:grid-cols-4',
+};
+---
+
+<Section background={background}>
+  <Container>
+    {/* Header */}
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 tracking-tight">
+        {title}
+      </h2>
+      {subtitle && <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">{subtitle}</p>}
+    </div>
+
+    {/* Grid */}
+    {services.length > 0 ? (
+      <div class={`grid gap-8 ${gridClasses[columns]}`}>
+        {services.map((service) => (
+             <article class="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100">
+                <a href={service.href} class="block h-full flex flex-col">
+                    <figure class="aspect-[4/3] overflow-hidden relative">
+                        <img
+                            src={service.image}
+                            alt={service.title}
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            loading="lazy"
+                        />
+                        {service.badge && (
+                            <span class="absolute top-4 left-4 px-3 py-1 bg-blue-700 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md backdrop-blur-md bg-opacity-90">
+                                {service.badge}
+                            </span>
+                        )}
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </figure>
+                    <div class="p-8 flex-grow flex flex-col">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-700 transition-colors">
+                            {service.title}
+                        </h3>
+                        <p class="text-gray-600 mb-6 flex-grow leading-relaxed">
+                            {service.description}
+                        </p>
+                        <div class="flex items-center text-blue-700 font-semibold mt-auto group-hover:gap-2 transition-all">
+                            Conocer más <Icon name="arrow-right" class="w-4 h-4 ml-2" />
+                        </div>
+                    </div>
+                </a>
+             </article>
+        ))}
+      </div>
+    ) : (
+      <div class="text-center py-12 text-gray-500">
+        <p>No services available at the moment.</p>
+      </div>
+    )}
+
+    {/* Show All Link */}
+    {
+      showAllLink && (
+        <div class="text-center mt-16">
+          <Button href="/servicios" variant="outline" size="lg">
+            Ver todos los servicios
+          </Button>
+        </div>
+      )
+    }
+  </Container>
+</Section>

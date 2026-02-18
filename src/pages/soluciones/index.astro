@@ -17,6 +17,7 @@ import { api } from '@convex/_generated/api';
 import { site } from '@/data/site';
 import { generateBreadcrumbSchema } from '@/utils/seo';
 
+console.log('Soluciones page: PUBLIC_CONVEX_URL:', import.meta.env.PUBLIC_CONVEX_URL);
 const solutions = await convexServer.query(api.solutions.getAllSolutions);
 console.log('Soluciones page: Fetched solutions count:', solutions?.length);
 if (!solutions || solutions.length === 0) {
