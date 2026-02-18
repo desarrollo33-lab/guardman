@@ -574,7 +574,7 @@ Max Concurrent: 8 (Wave 3)
 
 ### WAVE 2: Core CRUD Mutations
 
-- [ ] 7. Services CRUD Mutations
+- [x] 7. Services CRUD Mutations
 
   **What to do**:
   - Create `convex/services.ts` mutations:
@@ -630,7 +630,7 @@ Max Concurrent: 8 (Wave 3)
     Evidence: .sisyphus/evidence/task-07-list-services.txt
   ```
 
-- [ ] 8. Solutions CRUD Mutations
+- [x] 8. Solutions CRUD Mutations
 
   **What to do**:
   - Create mutations in `convex/solutions.ts`:
@@ -671,7 +671,7 @@ Max Concurrent: 8 (Wave 3)
     Evidence: .sisyphus/evidence/task-08-create-solution.txt
   ```
 
-- [ ] 9. Heroes CRUD Mutations
+- [x] 9. Heroes CRUD Mutations
 
   **What to do**:
   - Create `convex/heroes.ts`:
@@ -722,7 +722,7 @@ Max Concurrent: 8 (Wave 3)
     Evidence: .sisyphus/evidence/task-09-hero-image.txt
   ```
 
-- [ ] 10. Communes CRUD Mutations (PSEO)
+- [x] 10. Communes CRUD Mutations (PSEO)
 
   **What to do**:
   - Create mutations in `convex/communes.ts` or new `convex/pseo.ts`:
@@ -764,7 +764,7 @@ Max Concurrent: 8 (Wave 3)
     Evidence: .sisyphus/evidence/task-10-commune-seo.txt
   ```
 
-- [ ] 11. FAQs CRUD Mutations
+- [x] 11. FAQs CRUD Mutations
 
   **What to do**:
   - Create mutations in `convex/faqs.ts`:
@@ -785,7 +785,7 @@ Max Concurrent: 8 (Wave 3)
   **References**:
   - `convex/faqs.ts` - Existing queries
 
-- [ ] 12. Partners CRUD Mutations
+- [x] 12. Partners CRUD Mutations
 
   **What to do**:
   - Create mutations in `convex/partners.ts`:

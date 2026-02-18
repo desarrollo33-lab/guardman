@@ -1,0 +1,65 @@
+# Task 08: Solutions CRUD Mutations - Evidence
+
+## Date: 2026-02-18
+
+## File Modified
+- `convex/solutions.ts`
+
+## Mutations Added
+
+### 1. createSolution (lines 267-302)
+Creates a new solution with proper slug uniqueness check.
+- All schema fields supported as args
+- Validates slug uniqueness before insert
+- Returns the new solution ID
+- Defaults is_active to true
+
+### 2. updateSolution (lines 304-333)
+Updates an existing solution by ID.
+- Takes solution ID as required arg
+- All other fields optional
+- Filters out undefined values before patch
+- Returns updated solution
+
+### 3. deleteSolution (lines 335-340)
+Soft-deletes a solution by setting is_active to false.
+- Takes solution ID as required arg
+- Does not permanently remove the record
+
+### 4. reorderSolutions (lines 342-356)
+Batch updates order field for multiple solutions.
+- Takes array of { id, order } objects
+- Updates each solution's order field
+
+## Field Coverage
+All schema fields are supported:
+- slug (required for create)
+- title (required for create)
+- description (required for create)
+- icon
+- features[]
+- benefits[]
+- cta
+- industries[]
+- meta_title
+- meta_description
+- og_image
+- solutions[]
+- image
+- challenges[]
+- relatedServices[]
+- is_active
+- order
+
+## Verification
+- File compiles without errors (pre-existing node_modules errors only)
+- All mutations follow Convex mutation pattern with args and handler
+- Validators match schema.ts definitions
+- relatedServices array field properly handled
+
+## Pattern Used
+Same pattern as services CRUD following AGENTS.md guidelines:
+- Use .withIndex() for lookups
+- Filter undefined values in updates
+- Soft delete pattern (is_active = false)
+- Batch operations for reorder

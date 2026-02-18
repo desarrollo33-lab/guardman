@@ -1,0 +1,42 @@
+# Task 09: Heroes CRUD Mutations - Evidence
+
+## Date: 2026-02-18
+
+## File Created: convex/heroes.ts
+
+## Functions Implemented:
+
+### Queries:
+1. `getAllHeroes` - Returns all hero records
+2. `getHeroByPage` - Returns active hero by page_slug using index
+3. `getActiveHeroes` - Returns only active heroes
+
+### Mutations:
+1. `createHero` - Creates new hero with validation:
+   - youtube_id required if background_type is 'youtube'
+   - image_url required if background_type is 'image'
+   - Default is_active = true
+
+2. `updateHero` - Updates existing hero by ID
+   - Filters out undefined values before patching
+   - Returns updated document
+
+3. `deleteHero` - Deletes hero by ID
+
+## Schema Fields Covered:
+- page_slug (string, indexed)
+- title (string)
+- subtitle (optional string)
+- background_type (youtube | image)
+- youtube_id (optional string)
+- image_url (optional string)
+- mobile_image_url (optional string)
+- ctas (optional array of {text, href, variant?})
+- badges (optional array of {text, icon?})
+- is_active (optional boolean, defaults to true)
+
+## Validation:
+- Background type enum enforced via v.union(v.literal('youtube'), v.literal('image'))
+- Conditional validation for youtube_id and image_url based on background_type
+
+## File Size: 3255 bytes

@@ -33,7 +33,8 @@ const SERVICES_SEED_DATA = [
       'hoteleria',
       'construccion',
     ],
-    image: 'https://images.unsplash.com/photo-1555529733-1e944b204e33?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    image:
+      'https://images.unsplash.com/photo-1555529733-1e944b204e33?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     meta_title: 'Guardias de Seguridad Privada OS10 en Chile | Guardman',
     meta_description:
       'Servicio de guardias de seguridad OS10 certificados para empresas y condominios. Protección 24/7 con supervisión en tiempo real y personal calificado.',
@@ -62,7 +63,8 @@ const SERVICES_SEED_DATA = [
     ],
     cta: 'Cotizar Patrullaje',
     solutions: ['condominios'],
-    image: 'https://images.unsplash.com/photo-1541560052-7eec2fde978d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    image:
+      'https://images.unsplash.com/photo-1541560052-7eec2fde978d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     meta_title: 'Patrullaje de Seguridad para Condominios | Guardman',
     meta_description:
       'Servicio de patrullaje móvil para condominios. Rondas de seguridad con vehículos identificados y monitoreo GPS para tu comunidad.',
@@ -91,7 +93,8 @@ const SERVICES_SEED_DATA = [
     ],
     cta: 'Cotizar Alarmas',
     solutions: ['condominios', 'retail', 'hoteleria', 'construccion'],
-    image: 'https://images.unsplash.com/photo-1558002038-1091a1661116?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    image:
+      'https://images.unsplash.com/photo-1558002038-1091a1661116?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     meta_title: 'Alarmas Ajax y Monitoreo Inteligente | Guardman',
     meta_description:
       'Instalación de alarmas Ajax con monitoreo sin contratos forzosos. Detectores de movimiento, incendio e inundación con control desde tu smartphone.',
@@ -120,7 +123,8 @@ const SERVICES_SEED_DATA = [
     ],
     cta: 'Cotizar GuardPod',
     solutions: ['construccion', 'mineria', 'industria', 'eventos'],
-    image: 'https://images.unsplash.com/photo-1496247749665-49cf5b102269?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    image:
+      'https://images.unsplash.com/photo-1496247749665-49cf5b102269?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     meta_title: 'Módulos de Seguridad GuardPod Blindados | Guardman',
     meta_description:
       'Casetas de seguridad GuardPod totalmente equipadas. Solución portátil con baño, blindaje y tecnología para obras, minería y eventos.',
@@ -149,7 +153,8 @@ const SERVICES_SEED_DATA = [
     ],
     cta: 'Cotizar Drones',
     solutions: ['mineria', 'construccion'],
-    image: 'https://images.unsplash.com/photo-1508614589041-895b8c9d7e72?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    image:
+      'https://images.unsplash.com/photo-1508614589041-895b8c9d7e72?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
   },
   {
     id: 'control-acceso',
@@ -175,7 +180,8 @@ const SERVICES_SEED_DATA = [
     ],
     cta: 'Cotizar Control',
     solutions: ['mineria', 'retail', 'hoteleria', 'construccion'],
-    image: 'https://images.unsplash.com/photo-1623941002345-0374e304859a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    image:
+      'https://images.unsplash.com/photo-1623941002345-0374e304859a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
   },
 ];
 
@@ -242,5 +248,93 @@ export const seedServices = mutation({
     }
 
     return { inserted, skipped, total: SERVICES_SEED_DATA.length };
+  },
+});
+
+// === CRUD MUTATIONS ===
+
+export const createService = mutation({
+  args: {
+    slug: v.string(),
+    title: v.string(),
+    description: v.string(),
+    tagline: v.optional(v.string()),
+    icon: v.optional(v.string()),
+    features: v.optional(v.array(v.string())),
+    benefits: v.optional(v.array(v.string())),
+    cta: v.optional(v.string()),
+    solutions: v.optional(v.array(v.string())),
+    image: v.optional(v.string()),
+    meta_title: v.optional(v.string()),
+    meta_description: v.optional(v.string()),
+    is_active: v.optional(v.boolean()),
+    order: v.optional(v.number()),
+  },
+  returns: v.id('services'),
+  handler: async (ctx, args) => {
+    // Check slug uniqueness
+    const existing = await ctx.db
+      .query('services')
+      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
+      .first();
+    if (existing) throw new Error('Service with this slug already exists');
+
+    return await ctx.db.insert('services', {
+      ...args,
+      is_active: args.is_active ?? true,
+    });
+  },
+});
+
+export const updateService = mutation({
+  args: {
+    id: v.id('services'),
+    slug: v.optional(v.string()),
+    title: v.optional(v.string()),
+    description: v.optional(v.string()),
+    tagline: v.optional(v.string()),
+    icon: v.optional(v.string()),
+    features: v.optional(v.array(v.string())),
+    benefits: v.optional(v.array(v.string())),
+    cta: v.optional(v.string()),
+    solutions: v.optional(v.array(v.string())),
+    image: v.optional(v.string()),
+    meta_title: v.optional(v.string()),
+    meta_description: v.optional(v.string()),
+    is_active: v.optional(v.boolean()),
+    order: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    // Remove undefined values
+    const cleanUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([_, v]) => v !== undefined)
+    );
+    await ctx.db.patch(id, cleanUpdates);
+    return await ctx.db.get(id);
+  },
+});
+
+export const deleteService = mutation({
+  args: { id: v.id('services') },
+  handler: async (ctx, args) => {
+    // Soft delete - set is_active to false
+    await ctx.db.patch(args.id, { is_active: false });
+  },
+});
+
+export const reorderServices = mutation({
+  args: {
+    orders: v.array(
+      v.object({
+        id: v.id('services'),
+        order: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    for (const item of args.orders) {
+      await ctx.db.patch(item.id, { order: item.order });
+    }
   },
 });

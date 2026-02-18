@@ -334,28 +334,21 @@ export default function ConvexDashboard() {
 1. **heroes** - Page hero sections with youtube/image backgrounds
    - Index: `by_page_slug`
    - Supports CTAs and badges arrays
-   
 2. **team_members** - Team member profiles
    - Index: `by_order`
    - Avatar, role, bio fields
-   
 3. **company_values** - Company values with icons
    - Index: `by_order`
-   
 4. **process_steps** - Multi-step processes by page
    - Index: `by_page_slug`
-   
 5. **stats** - Statistics counters by page
    - Index: `by_page_slug`
    - Value/label pattern (e.g., "500+", "Clientes")
-   
 6. **industries** - Industry verticals
    - Indexes: `by_slug`, `by_order`
-   
 7. **ctas** - Call-to-action blocks by page
    - Index: `by_page_slug`
    - Supports image/gradient backgrounds
-   
 8. **authors** - Blog/content authors
    - Index: `by_slug`
 
@@ -368,6 +361,7 @@ export default function ConvexDashboard() {
 ### Pattern: Nested Object Validators
 
 For array of objects, use nested v.object():
+
 ```typescript
 ctas: v.optional(
   v.array(
@@ -383,3 +377,299 @@ ctas: v.optional(
 ### Pre-existing Issue Not Fixed (Outside Scope)
 
 - convex/seed.ts line 86 references `industries` field on services table that doesn't exist
+
+## [2026-02-18] Task 09: Heroes CRUD Mutations
+
+### File Created: convex/heroes.ts
+
+### Functions:
+
+**Queries:**
+
+- `getAllHeroes` - Returns all hero records
+- `getHeroByPage` - Returns active hero by page_slug using index
+- `getActiveHeroes` - Returns only active heroes
+
+**Mutations:**
+
+- `createHero` - Creates hero with validation for background type
+- `updateHero` - Updates hero, filters undefined values
+- `deleteHero` - Deletes hero by ID
+
+### Pattern: Conditional Validation
+
+```typescript
+// Validate: youtube_id required if youtube type
+if (args.background_type === 'youtube' && !args.youtube_id) {
+  throw new Error('youtube_id is required for youtube background type');
+}
+// Validate: image_url required if image type
+if (args.background_type === 'image' && !args.image_url) {
+  throw new Error('image_url is required for image background type');
+}
+```
+
+### Pattern: Clean Update Object
+
+Filter out undefined values before patching:
+
+```typescript
+const cleanUpdates = Object.fromEntries(
+  Object.entries(updates).filter(([_, v]) => v !== undefined)
+);
+await ctx.db.patch(id, cleanUpdates);
+```
+
+### Index Used: `by_page_slug`
+
+The heroes table has an index on `page_slug` for efficient lookups by page
+
+## [2026-02-18] Task 07: Services CRUD Mutations
+
+### File Modified: convex/services.ts
+
+### Functions Added:
+
+**Mutations:**
+
+- `createService` - Insert new service with slug uniqueness check
+- `updateService` - Update by ID, filters undefined values before patching
+- `deleteService` - Soft delete (sets is_active=false)
+- `reorderServices` - Batch update order field for multiple services
+
+### Pattern: Soft Delete
+
+```typescript
+export const deleteService = mutation({
+  args: { id: v.id('services') },
+  handler: async (ctx, args) => {
+    // Soft delete - set is_active to false
+    await ctx.db.patch(args.id, { is_active: false });
+  },
+});
+```
+
+### Pattern: Slug Uniqueness Check
+
+```typescript
+const existing = await ctx.db
+  .query('services')
+  .withIndex('by_slug', (q) => q.eq('slug', args.slug))
+  .first();
+if (existing) throw new Error('Service with this slug already exists');
+```
+
+### Pattern: Batch Reorder
+
+```typescript
+export const reorderServices = mutation({
+  args: {
+    orders: v.array(
+      v.object({
+        id: v.id('services'),
+        order: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    for (const item of args.orders) {
+      await ctx.db.patch(item.id, { order: item.order });
+    }
+  },
+});
+```
+
+### Index Used: `by_slug`
+
+The services table has an index on `slug` for uniqueness validation.
+
+## [2026-02-18] Task 12: Partners CRUD Mutations
+
+### Mutations Added to convex/partners.ts
+
+1. **createPartner** - Insert new partner with all fields
+2. **updatePartner** - Partial update with undefined filtering
+3. **deletePartner** - Remove partner by ID
+4. **reorderPartners** - Batch update order for drag-and-drop
+
+### Pattern: Update Mutation with Undefined Filtering
+
+```typescript
+export const updatePartner = mutation({
+  args: {
+    id: v.id('partners'),
+    name: v.optional(v.string()),
+    // ...other optional fields
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    const cleanUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([_, v]) => v !== undefined)
+    );
+    await ctx.db.patch(id, cleanUpdates);
+    return await ctx.db.get(id);
+  },
+});
+```
+
+### Pattern: Batch Reorder Mutation
+
+```typescript
+export const reorderPartners = mutation({
+  args: {
+    orders: v.array(
+      v.object({
+        id: v.id('partners'),
+        order: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    for (const item of args.orders) {
+      await ctx.db.patch(item.id, { order: item.order });
+    }
+  },
+});
+```
+
+### Partners Table Fields
+
+- name (required)
+- logo_url (required)
+- type (required - string, flexible for "certification", "client", "tech_partner")
+- order (required)
+- url, quote, industry, icon (optional)
+
+## [2026-02-18] Task 11: FAQs CRUD Mutations
+
+### File Modified: convex/faqs.ts
+
+### Added CRUD Mutations:
+
+- `createFaq` - Create new FAQ with question, answer, category, order
+- `updateFaq` - Update FAQ by ID with optional fields
+- `deleteFaq` - Delete FAQ by ID
+- `reorderFaqs` - Batch update order for multiple FAQs
+
+### Pattern: Batch Reorder Mutation
+
+```typescript
+export const reorderFaqs = mutation({
+  args: {
+    orders: v.array(
+      v.object({
+        id: v.id('faqs'),
+        order: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    for (const item of args.orders) {
+      await ctx.db.patch(item.id, { order: item.order });
+    }
+  },
+});
+```
+
+## [2026-02-18] Task 08: Solutions CRUD Mutations
+
+### File Modified: convex/solutions.ts
+
+### Mutations Added:
+
+1. **createSolution** - Creates solution with slug uniqueness check
+2. **updateSolution** - Updates solution, filters undefined values
+3. **deleteSolution** - Soft delete (sets is_active to false)
+4. **reorderSolutions** - Batch update order field
+
+### Pattern: Soft Delete
+
+```typescript
+export const deleteSolution = mutation({
+  args: { id: v.id('solutions') },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { is_active: false });
+  },
+});
+```
+
+### Pattern: Batch Reorder
+
+```typescript
+export const reorderSolutions = mutation({
+  args: {
+    orders: v.array(
+      v.object({
+        id: v.id('solutions'),
+        order: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    for (const item of args.orders) {
+      await ctx.db.patch(item.id, { order: item.order });
+    }
+  },
+});
+```
+
+### Field: relatedServices
+
+The `relatedServices` field is an array of service slugs (strings), enabling manual linking from solutions to services without auto-linking logic.
+
+### Index Used: `by_slug`
+
+Solutions table uses the `by_slug` index for uniqueness validation and lookups.
+
+## [2026-02-18] Task 10: Communes CRUD Mutations
+
+### Mutations Added to convex/communes.ts
+
+1. **createCommune** - Create new commune with slug uniqueness validation
+2. **updateCommune** - Update any commune field by ID
+3. **updateCommuneSEO** - Dedicated mutation for PSEO fields only
+4. **deleteCommune** - Delete commune by ID
+5. **reorderCommunes** - Placeholder for future ordering (no order field yet)
+
+### PSEO Field Handling
+
+Communes table supports PSEO-specific fields:
+
+- `hero_title` - Hero section title
+- `hero_subtitle` - Hero section subtitle
+- `intro_content` - Introduction content
+
+These are separate from standard SEO fields:
+
+- `meta_title` - Page title tag
+- `meta_description` - Meta description
+
+### Pattern: Dedicated SEO Mutation
+
+```typescript
+export const updateCommuneSEO = mutation({
+  args: {
+    id: v.id('communes'),
+    meta_title: v.optional(v.string()),
+    meta_description: v.optional(v.string()),
+    hero_title: v.optional(v.string()),
+    hero_subtitle: v.optional(v.string()),
+    intro_content: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...seoFields } = args;
+    const cleanUpdates = Object.fromEntries(
+      Object.entries(seoFields).filter(([_, v]) => v !== undefined)
+    );
+    await ctx.db.patch(id, cleanUpdates);
+    return await ctx.db.get(id);
+  },
+});
+```
+
+### PSEO Content Strategy
+
+- 52 Chilean communes in database
+- Template-based content generation (frontend responsibility)
+- Same structure, different names/slugs
+- SEO fields for per-commune customization

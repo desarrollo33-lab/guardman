@@ -1,0 +1,53 @@
+# Task 10: Communes CRUD Mutations - Evidence
+
+## Date: 2026-02-18
+
+## File Modified
+- `convex/communes.ts`
+
+## Mutations Added
+
+### 1. createCommune
+- Creates a new commune with all fields
+- Validates slug uniqueness via `by_slug` index
+- Returns the new commune ID
+
+### 2. updateCommune
+- Updates any commune field by ID
+- Filters undefined values before patching
+- Returns the updated document
+
+### 3. updateCommuneSEO
+- Dedicated mutation for PSEO fields only
+- Updates: meta_title, meta_description, hero_title, hero_subtitle, intro_content
+- Returns the updated document
+
+### 4. deleteCommune
+- Deletes commune by ID
+- No return value
+
+### 5. reorderCommunes
+- Placeholder for future ordering functionality
+- Schema doesn't currently have `order` field
+- Reserved for when order field is added
+
+## Schema Fields Covered
+- name: v.string() (required)
+- slug: v.string() (required)
+- zone: v.optional(v.string())
+- isOtherCity: v.optional(v.boolean())
+- meta_title: v.optional(v.string())
+- meta_description: v.optional(v.string())
+- hero_title: v.optional(v.string())
+- hero_subtitle: v.optional(v.string())
+- intro_content: v.optional(v.string())
+
+## PSEO Strategy
+- 52 communes in Chile
+- Template-based content (same structure, different names)
+- SEO fields for meta tags and hero sections
+
+## Verification
+- File syntax is correct
+- All mutations follow Convex patterns
+- Slug uniqueness check uses indexed query
