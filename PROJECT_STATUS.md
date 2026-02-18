@@ -1,7 +1,7 @@
 # Estado del Proyecto Guardman
 
 **Fecha:** 18 de Febrero de 2026
-**Versión:** 1.0.0
+**Versión:** 1.0.1 (Admin Ready)
 
 ## Resumen Ejecutivo
 La aplicación se encuentra en una fase de estabilización y optimización. Se han realizado importantes avances en la estructura de componentes, SEO y rendimiento. El backend en Convex está completamente integrado con esquemas definidos para Leads, Servicios, Soluciones y Ubicaciones.
@@ -25,6 +25,7 @@ La aplicación se encuentra en una fase de estabilización y optimización. Se h
 - **Auditoría SEO**: Se ha realizado una auditoría exhaustiva (ver `seo-audit-evidence.md`).
 - **Validación de Esquema**: Se han validado los esquemas de datos (ver `schema-validation-evidence.txt`).
 - **Revisión de Rendimiento**: Se ha documentado el análisis de performance (ver `PERFORMANCE_REVIEW.md`).
+- **Finalización y Cierre de Etapa**: Se ha versionado la App a la `v1.0.1`, se ha compilado exitosamente y se ha realizado el push final a la rama master, gatillando el despliegue automático en Vercel.
 
 ## Estado Técnico
 ### Frontend
@@ -41,3 +42,4 @@ La aplicación se encuentra en una fase de estabilización y optimización. Se h
 1.  **Optimización**: Implementar mejoras sugeridas en la revisión de rendimiento (imágenes, fuentes).
 2.  **QA de Funcionalidad**: Verificar el flujo completo del formulario de contacto integrado en el footer.
 3.  **Expansión de Blog**: Continuar generando contenido relevante para mejorar el SEO orgánico.
+4.  **Admin Login**: El sistema de login en `/admin/login` está totalmente operativo con Convex Auth. Se ha corregido un error 500 en producción forzando el renderizado del lado del cliente para el `AuthProvider`. Se ha sincronizado el backend de producción.

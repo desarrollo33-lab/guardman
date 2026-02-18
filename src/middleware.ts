@@ -20,13 +20,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
-  // Verificar cookie de autenticación
-  const authToken = context.cookies.get('admin_auth')?.value;
+  // Verificar cookie de autenticación (Opcional, AuthGuard maneja esto en el cliente)
+  // const authToken = context.cookies.get('admin_auth')?.value;
 
-  if (!authToken || authToken !== 'authenticated') {
-    // Redirigir a login si no está autenticado
-    return context.redirect('/admin/login');
-  }
+  // if (!authToken || authToken !== 'authenticated') {
+  //   // Redirigir a login si no está autenticado
+  //   return context.redirect('/admin/login');
+  // }
 
   return next();
 });

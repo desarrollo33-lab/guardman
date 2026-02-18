@@ -1,7 +1,7 @@
 {
   "name": "guardman",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Sitio web de Guardman Chile - Seguridad Privada",
   "scripts": {
     "dev": "astro dev",

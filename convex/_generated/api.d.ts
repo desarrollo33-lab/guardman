@@ -9,6 +9,7 @@
  */
 
 import type * as _test_utils from "../_test/utils.js";
+import type * as admin_utils from "../admin_utils.js";
 import type * as auth from "../auth.js";
 import type * as authors from "../authors.js";
 import type * as blog_posts from "../blog_posts.js";
@@ -42,6 +43,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   "_test/utils": typeof _test_utils;
+  admin_utils: typeof admin_utils;
   auth: typeof auth;
   authors: typeof authors;
   blog_posts: typeof blog_posts;

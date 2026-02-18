@@ -4,6 +4,12 @@ import { authTables } from '@convex-dev/auth/server';
 
 export default defineSchema({
   ...authTables,
+  users: defineTable({
+    name: v.optional(v.string()),
+    image: v.optional(v.string()),
+    email: v.optional(v.string()),
+    role: v.optional(v.string()), // 'admin' or 'user'
+  }).index('by_email', ['email']),
   // Force rebuild 1
   leads: defineTable({
     nombre: v.string(),
