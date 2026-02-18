@@ -941,28 +941,28 @@ Max Concurrent: 8 (Wave 3)
 
 ### WAVE 5: Admin UI Extended + Components
 
-- [ ] 28. FAQs Admin Page
+- [x] 28. FAQs Admin Page
   - Create `/admin/faqs` page
   - Drag-drop reorder, category filter
   - **Category**: `visual-engineering` | **Blocked By**: Tasks 11, 6 | **Parallel Group**: Wave 5
 
-- [ ] 29. Partners Admin Page
+- [x] 29. Partners Admin Page
   - Create `/admin/partners` page
   - Type filter, logo upload
   - **Category**: `visual-engineering` | **Blocked By**: Tasks 12, 5, 6 | **Parallel Group**: Wave 5
 
-- [ ] 30. Testimonials Admin Page
+- [x] 30. Testimonials Admin Page
   - Create `/admin/testimonials` page
   - Rating input, verified toggle
   - **Category**: `visual-engineering` | **Blocked By**: Tasks 13, 6 | **Parallel Group**: Wave 5
 
-- [ ] 31. Team Admin Page
+- [x] 31. Team Admin Page
   - Create `/admin/team` page
   - Avatar upload, role input
   - Drag-drop reorder
   - **Category**: `visual-engineering` | **Blocked By**: Tasks 14, 5, 6 | **Parallel Group**: Wave 5
 
-- [ ] 32. Markdown Editor Component
+- [x] 32. Markdown Editor Component
 
   **What to do**:
   - Create reusable `MarkdownEditor.tsx` component
@@ -1006,7 +1006,7 @@ Max Concurrent: 8 (Wave 3)
     Evidence: .sisyphus/evidence/task-32-markdown-preview.png
   ```
 
-- [ ] 33. Image Upload Component
+- [x] 33. Image Upload Component
 
   **What to do**:
   - Create reusable `ImageUploader.tsx` component
