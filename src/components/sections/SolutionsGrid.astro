@@ -10,9 +10,10 @@ import FeatureCard from '@/components/ui/FeatureCard.astro';
 
 interface Solution {
   slug: string;
-  name: string;
+  title: string;
   description: string;
   icon: string;
+  image?: string;
   [key: string]: any;
 }
 
@@ -67,10 +68,10 @@ function getSolutionImage(slug: string) {
       {
         solutions.map((solution) => (
           <FeatureCard
-            title={solution.name}
+            title={solution.title}
             description={solution.description}
-            image={getSolutionImage(solution.slug)}
-            imageAlt={solution.name}
+            image={solution.image || getSolutionImage(solution.slug)}
+            imageAlt={solution.title}
             icon={solution.icon}
             href={`/soluciones/${solution.slug}`}
             linkText="Ver soluciones"

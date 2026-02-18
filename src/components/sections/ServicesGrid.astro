@@ -96,7 +96,7 @@ function getServiceImage(slug: string) {
     >
       {
         services.map((service) => {
-          const image = getServiceImage(service.slug);
+          const image = service.image ? { url: service.image, alt: service.title } : getServiceImage(service.slug);
           const isExclusive = exclusiveServices.includes(service.slug);
           
           return (
