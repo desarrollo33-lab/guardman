@@ -1270,44 +1270,44 @@ Max Concurrent: 8 (Wave 3)
 
 ### WAVE 7: Testing + Verification
 
-- [ ] 41. Unit Tests for Services
+- [x] 41. Unit Tests for Services
   - Create `convex/services.test.ts`
   - Test CRUD mutations, validation
   - Test slug uniqueness, ordering
   - **Category**: `quick` | **Blocked By**: Tasks 1, 7 | **Parallel Group**: Wave 7
 
-- [ ] 42. Unit Tests for Solutions
+- [x] 42. Unit Tests for Solutions
   - Create `convex/solutions.test.ts`
   - Test CRUD, related services handling
   - **Category**: `quick` | **Blocked By**: Tasks 1, 8 | **Parallel Group**: Wave 7
 
-- [ ] 43. Unit Tests for Heroes
+- [x] 43. Unit Tests for Heroes
   - Create `convex/heroes.test.ts`
   - Test CRUD, background type validation
   - Test page slug association
   - **Category**: `quick` | **Blocked By**: Tasks 1, 9 | **Parallel Group**: Wave 7
 
-- [ ] 44. Unit Tests for Blog
+- [x] 44. Unit Tests for Blog
   - Create `convex/blog_posts.test.ts`
   - Test CRUD, publishing workflow
   - Test author relationship, slug uniqueness
   - **Category**: `quick` | **Blocked By**: Tasks 1, 20 | **Parallel Group**: Wave 7
 
-- [ ] 45. E2E Tests for Admin Panel
+- [x] 45. E2E Tests for Admin Panel
   - Create Playwright tests for admin flows
   - Test login/logout
   - Test CRUD for services, solutions
   - Test image upload
   - **Category**: `deep` | **Blocked By**: Tasks 1, 21-33 | **Parallel Group**: Wave 7
 
-- [ ] 46. E2E Tests for PSEO Pages
+- [x] 46. E2E Tests for PSEO Pages
   - Create Playwright tests for commune pages
   - Test all 52 pages render
   - Test meta tags present
   - Test services list shows
   - **Category**: `deep` | **Blocked By**: Task 10 | **Parallel Group**: Wave 7
 
-- [ ] 47. Integration Tests for Auth
+- [x] 47. Integration Tests for Auth
   - Test protected routes redirect
   - Test session persistence
   - Test logout clears session
