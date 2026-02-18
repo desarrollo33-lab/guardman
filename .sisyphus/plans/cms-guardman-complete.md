@@ -1319,19 +1319,19 @@ Max Concurrent: 8 (Wave 3)
 
 > 4 review agents run in PARALLEL. ALL must APPROVE. Rejection → fix → re-run.
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
       Read the plan end-to-end. For each "Must Have": verify implementation exists. For each "Must NOT Have": search codebase for forbidden patterns. Check evidence files exist in .sisyphus/evidence/.
       Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
+- [x] F2. **Code Quality Review** — `unspecified-high`
       Run `tsc --noEmit` + linter + `bun test`. Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, unused imports.
       Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | VERDICT`
 
-- [ ] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill)
+- [x] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill)
       Start from clean state. Execute EVERY QA scenario from EVERY task. Test cross-task integration.
       Output: `Scenarios [N/N pass] | Integration [N/N] | VERDICT`
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
       For each task: read "What to do", read actual diff. Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance.
       Output: `Tasks [N/N compliant] | Scope Creep [CLEAN/N issues] | VERDICT`
 
@@ -1376,11 +1376,11 @@ curl http://localhost:4321/cobertura/las-condes  # Expected: 200, contains "Las 
 
 ### Final Checklist
 
-- [ ] All "Must Have" present
-- [ ] All "Must NOT Have" absent
-- [ ] All tests pass
-- [ ] 100% content from Convex (no hardcoded content remaining)
-- [ ] Admin panel functional with auth
-- [ ] Blog migrated from Astro Content Collection
-- [ ] 52 PSEO commune pages working
-- [ ] Heroes support YouTube OR image with mobile fallback
+- [x] All "Must Have" present
+- [x] All "Must NOT Have" absent
+- [x] All tests pass
+- [x] 100% content from Convex (no hardcoded content remaining)
+- [x] Admin panel functional with auth
+- [x] Blog migrated from Astro Content Collection
+- [x] 52 PSEO commune pages working
+- [x] Heroes support YouTube OR image with mobile fallback
