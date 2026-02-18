@@ -1,6 +1,7 @@
 ---
-// Página de login para el admin - Client-side validation
-const adminPassword = import.meta.env.PUBLIC_ADMIN_PASSWORD || 'guardman2024';
+// Login page using Convex Auth
+import { AuthProvider } from '../../lib/auth';
+import LoginForm from '../../components/admin/LoginForm';
 ---
 
 <!doctype html>
@@ -20,98 +21,8 @@ const adminPassword = import.meta.env.PUBLIC_ADMIN_PASSWORD || 'guardman2024';
   </head>
 
   <body class="min-h-screen bg-gray-900 flex items-center justify-center font-sans antialiased">
-    <div class="max-w-md w-full mx-4">
-      <div class="bg-gray-800 rounded-lg shadow-xl p-8">
-        <div class="text-center mb-8">
-          <h1 class="text-2xl font-bold text-white">Guardman Admin</h1>
-          <p class="text-gray-400 mt-2">Ingresa tu contrasena para continuar</p>
-        </div>
-
-        <div
-          id="errorMessage"
-          class="hidden bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-md mb-6"
-        >
-          Contrasena incorrecta. Intenta nuevamente.
-        </div>
-
-        <form id="loginForm" class="space-y-6">
-          <div>
-            <label for="password" class="block text-sm font-medium text-gray-300 mb-2">
-              Contrasena
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              autofocus
-              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              placeholder="Ingresa la contrasena"
-            />
-          </div>
-
-          <button
-            type="submit"
-            id="submitBtn"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-          >
-            Ingresar
-          </button>
-        </form>
-
-        <div class="mt-6 text-center">
-          <a href="/" class="text-gray-400 hover:text-gray-300 text-sm transition-colors">
-            &larr; Volver al sitio
-          </a>
-        </div>
-      </div>
-    </div>
+    <AuthProvider>
+      <LoginForm client:load />
+    </AuthProvider>
   </body>
 </html>
-
-<script define:vars={{ adminPassword }}>
-  const correctPassword = adminPassword;
-
-  const form = document.getElementById('loginForm');
-  const errorMessage = document.getElementById('errorMessage');
-  const passwordInput = document.getElementById('password');
-  const submitBtn = document.getElementById('submitBtn');
-
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const password = passwordInput.value;
-
-    if (password === correctPassword) {
-      // Set auth cookie (expires in 24 hours)
-      const expires = new Date();
-      expires.setTime(expires.getTime() + 24 * 60 * 60 * 1000);
-      document.cookie = `admin_auth=true; expires=${expires.toUTCString()}; path=/; SameSite=Strict`;
-
-      // Show loading state
-      submitBtn.textContent = 'Redirigiendo...';
-      submitBtn.disabled = true;
-
-      // Redirect to admin leads page
-      window.location.href = '/admin/leads';
-    } else {
-      // Show error
-      errorMessage.classList.remove('hidden');
-      passwordInput.classList.add('border-red-500');
-      passwordInput.value = '';
-      passwordInput.focus();
-
-      // Hide error after 3 seconds
-      setTimeout(() => {
-        errorMessage.classList.add('hidden');
-        passwordInput.classList.remove('border-red-500');
-      }, 3000);
-    }
-  });
-
-  // Hide error when user starts typing
-  passwordInput.addEventListener('input', () => {
-    errorMessage.classList.add('hidden');
-    passwordInput.classList.remove('border-red-500');
-  });
-</script>

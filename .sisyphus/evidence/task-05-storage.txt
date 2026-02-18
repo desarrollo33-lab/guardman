@@ -1,0 +1,39 @@
+# Task 05: File Storage Mutations - Evidence
+
+## Files Created/Modified
+
+### convex/storage.ts (created)
+Contains the following functions:
+- generateUploadUrl - mutation that returns upload URL
+- saveFileMetadata - mutation to save file metadata to files table
+- getFileUrl - query to get URL from storage ID
+- deleteFile - mutation to delete file from storage
+- getFileMetadata - query to get file metadata by storage ID
+- listFiles - query to list all files
+
+### convex/schema.ts (modified)
+Added files table with:
+- storageId: v.id('_storage')
+- fileName: v.string()
+- fileType: v.string()
+- fileSize: v.number()
+- uploadedBy: v.optional(v.string())
+- createdAt: v.number()
+- Index: by_storageId
+
+## Grep Output (Verification)
+
+```
+export const generateUploadUrl = mutation({
+    return await ctx.storage.generateUploadUrl();
+ * Call this after uploading to the URL returned by generateUploadUrl.
+export const saveFileMetadata = mutation({
+export const getFileUrl = query({
+export const deleteFile = mutation({
+```
+
+## Date
+2026-02-18
+
+## Status
+COMPLETED

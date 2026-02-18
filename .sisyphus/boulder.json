@@ -1,8 +1,9 @@
 {
-  "active_plan": "C:\Users\56930\OneDrive\Escritorio\guardman\.sisyphus\plans\servicios-detalle-redesign.md",
-  "started_at": "2026-02-18T15:20:55.535Z",
-  "completed_at": "2026-02-18T15:50:15.000Z",
-  "session_ids": ["ses_38ec2173affe7OKofkMhCUYNyO"],
-  "plan_name": "servicios-detalle-redesign",
-  "status": "COMPLETE"
+  "active_plan": "C:\\Users\\56930\\OneDrive\\Escritorio\\guardman\\.sisyphus\\plans\\cms-guardman-complete.md",
+  "started_at": "2026-02-18T19:49:08.822Z",
+  "session_ids": [
+    "ses_38db365dcffeTo5SsN30Mfx8bv"
+  ],
+  "plan_name": "cms-guardman-complete",
+  "agent": "atlas"
 }

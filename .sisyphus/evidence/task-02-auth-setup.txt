@@ -1,0 +1,112 @@
+# Task 2: Convex Auth Setup - Evidence
+
+## Date: 2026-02-18
+
+## 1. Package Installation
+
+```bash
+$ grep "@convex-dev/auth" package.json
+    "@convex-dev/auth": "^0.0.90",
+```
+
+✅ @convex-dev/auth package installed (version 0.0.90)
+
+## 2. Files Created/Modified
+
+### convex/auth.ts (NEW)
+- Password authentication provider configured
+- Exports: auth, signIn, signOut, store, isAuthenticated
+- File size: 226 bytes
+
+### convex/schema.ts (MODIFIED)
+- Added import for `authTables` from '@convex-dev/auth/server'
+- Spread `...authTables` into schema definition
+- Adds auth tables: authAccounts, authKeys, authRefreshTokens, authSessions, authVerifications
+
+### src/lib/auth.tsx (NEW)
+- AuthProvider component wrapping ConvexAuthProvider
+- Re-exports: useAuthActions, useAuthToken
+- File size: 710 bytes
+
+## 3. Convex Auth Configuration
+
+### Server-side (convex/auth.ts)
+```typescript
+import { Password } from '@convex-dev/auth/providers/Password';
+import { convexAuth } from '@convex-dev/auth/server';
+
+export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
+  providers: [Password],
+});
+```
+
+### Schema Integration (convex/schema.ts)
+```typescript
+import { authTables } from '@convex-dev/auth/server';
+
+export default defineSchema({
+  ...authTables,
+  // ... existing tables
+});
+```
+
+### Client-side (src/lib/auth.tsx)
+```typescript
+import { ConvexAuthProvider, useAuthActions, useAuthToken } from '@convex-dev/auth/react';
+import { convex } from './convex';
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  return <ConvexAuthProvider client={convex}>{children}</ConvexAuthProvider>;
+}
+
+export { useAuthActions, useAuthToken };
+```
+
+## 4. Available Auth Hooks
+
+From @convex-dev/auth/react:
+- `useAuthActions()` - Returns `{ signIn, signOut }` methods
+- `useAuthToken()` - Returns JWT token for HTTP action auth
+- `ConvexAuthProvider` - Provider component wrapping the app
+
+## 5. Usage Pattern
+
+```tsx
+// In Astro page with React components
+import { AuthProvider, useAuthActions } from '@/lib/auth';
+
+<AuthProvider>
+  <LoginForm client:load />
+</AuthProvider>
+
+// In React component
+function LoginForm() {
+  const { signIn, signOut } = useAuthActions();
+  
+  const handleLogin = async (email: string, password: string) => {
+    await signIn('password', { email, password });
+  };
+  
+  return (/* form */);
+}
+```
+
+## 6. Notes
+
+- Single admin user model (no roles implemented)
+- Password-only authentication (no social providers)
+- UI implementation is Task 6 (Admin Layout + Auth Guard)
+- Existing AuthGuard.tsx needs updates to use new hook APIs
+
+## 7. Verification Commands
+
+```bash
+# Verify package
+grep "@convex-dev/auth" package.json
+
+# Verify files exist
+ls -la convex/auth.ts src/lib/auth.tsx
+
+# Check schema includes authTables
+grep "authTables" convex/schema.ts
+```
