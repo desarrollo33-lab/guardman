@@ -3,6 +3,10 @@ import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import vercel from '@astrojs/vercel';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   site: 'https://guardman.cl',
@@ -12,6 +16,11 @@ export default defineConfig({
     webAnalytics: { enabled: true },
   }),
   vite: {
+    resolve: {
+      alias: {
+        '@convex': path.resolve(__dirname, '../convex'),
+      },
+    },
     build: {
       cssMinify: true,
       minify: 'esbuild',
