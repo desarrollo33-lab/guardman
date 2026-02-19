@@ -16,24 +16,38 @@ const vercelOutput = resolve(webDir, '.vercel/output/static/admin');
 const convexGenerated = resolve(projectRoot, 'convex/_generated');
 const webConvex = resolve(webDir, 'convex/_generated');
 
-// Copy convex _generated to web/convex/
-console.log('Copying convex/_generated...');
-mkdirSync(webConvex, { recursive: true });
-cpSync(convexGenerated, webConvex, { recursive: true });
-console.log('✅ Convex generated copied');
-
-// Build admin if needed
-if (!existsSync(adminDist)) {
-  console.log('Admin dist not found, building...');
-  const { execSync } = require('child_process');
-  execSync('npm run build', {
-    cwd: resolve(projectRoot, 'admin'),
-    stdio: 'inherit',
-  });
+// Copy convex _generated to web/convex/ (only if source exists - for local dev)
+if (existsSync(convexGenerated)) {
+  console.log('Copying convex/_generated...');
+  mkdirSync(webConvex, { recursive: true });
+  cpSync(convexGenerated, webConvex, { recursive: true });
+  console.log('✅ Convex generated copied');
+} else {
+  console.log('Using existing web/convex/_generated');
 }
 
-// Copy admin to Vercel output
-console.log('Copying admin to .vercel/output/static/admin...');
-mkdirSync(vercelOutput, { recursive: true });
-cpSync(adminDist, vercelOutput, { recursive: true });
-console.log('✅ Admin copied to Vercel output');
+// Build admin if needed (only if admin folder exists)
+if (existsSync(resolve(projectRoot, 'admin'))) {
+  if (!existsSync(adminDist)) {
+    console.log('Admin dist not found, building...');
+    const { execSync } = require('child_process');
+    try {
+      execSync('npm run build', {
+        cwd: resolve(projectRoot, 'admin'),
+        stdio: 'inherit',
+      });
+    } catch {
+      console.log('Could not build admin, skipping...');
+    }
+  }
+
+  if (existsSync(adminDist)) {
+    // Copy admin to Vercel output
+    console.log('Copying admin to .vercel/output/static/admin...');
+    mkdirSync(vercelOutput, { recursive: true });
+    cpSync(adminDist, vercelOutput, { recursive: true });
+    console.log('✅ Admin copied to Vercel output');
+  }
+} else {
+  console.log('Admin folder not found, skipping admin copy');
+}

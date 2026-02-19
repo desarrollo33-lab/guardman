@@ -21,6 +21,10 @@
 13. [Content Strategy for SEO](#13-content-strategy-for-seo)
 14. [Technical SEO Checklist](#14-technical-seo-checklist)
 15. [Implementation Roadmap](#15-implementation-roadmap)
+16. [Competitive Landscape](#16-competitive-landscape-chile-security-market)
+17. [Convex Performance Optimization](#17-convex-performance-optimization)
+18. [Advanced Schema.org Implementation](#18-advanced-schemaorg-implementation)
+19. [Data Unification Strategy](#19-data-unification-strategy)
 
 ---
 
@@ -1229,5 +1233,449 @@ convex/
 
 ---
 
-> **Document Version**: Draft 1 — February 19, 2026
-> **Next Steps**: Research loop 2 — Contrast with competitor analysis, Convex performance optimization, and advanced schema.org patterns.
+## 16. Competitive Landscape (Chile Security Market)
+
+### 16.1 Key Competitors
+
+| Company | Focus | SEO Strength | Key Differentiator |
+|---------|-------|-------------|-------------------|
+| **Prosegur Chile** | B2B + B2C, full spectrum | 🔴 Strong — national brand, massive content | International backing, brand recognition |
+| **Brinks Chile** | Cash-in-transit, B2B | 🟡 Medium — brand searches dominate | Niche in transport security |
+| **G4S Chile** | Corporate + industrial | 🟡 Medium — corporate focus | Global partner network |
+| **Gard Security** | B2B mining, logistics | 🟢 Weak — limited web presence | OS10 cert rates, sector specialization |
+| **AKA Seguridad** | Risk management, OS10 | 🟢 Weak — basic website | Central Santiago location, dual security |
+| **VSM Seguridad** | General | 🟢 Weak | Local focus |
+| **CAPESEG** | 30yr experience | 🟢 Weak — legacy site | Regulatory compliance expertise |
+
+### 16.2 Competitive SEO Gaps (Opportunity)
+
+> **Most Chilean security companies have weak to non-existent local SEO.** None of the mid-tier competitors have:
+> - Programmatic service × location pages  
+> - Structured data (JSON-LD) beyond basic Organization  
+> - AggregateRating schema  
+> - Dynamic sitemaps  
+> - Service area pages per commune
+
+**Implication**: Guardman can dominate 300+ long-tail keywords with minimal competition by implementing the programmatic SEO strategy outlined in this plan. The big players (Prosegur, Brinks) compete on brand terms but NOT on hyper-local terms like "guardias de seguridad en Peñalolén" or "alarmas ajax Maipú."
+
+### 16.3 Target Keyword Difficulty
+
+| Keyword Type | Est. Difficulty | Competition | Guardman Strategy |
+|-------------|-----------------|-------------|-------------------|
+| "seguridad privada chile" | 🔴 High | Prosegur, Brinks, G4S | Blog content, long-tail |
+| "empresa seguridad santiago" | 🟡 Medium | Multiple local | Home page + service pages |
+| "guardias seguridad {commune}" | 🟢 Low | Almost none | **Programmatic pages** ← FOCUS |
+| "alarmas ajax {commune}" | 🟢 Very Low | None | **Service×Commune pages** |
+| "seguridad condominios {commune}" | 🟢 Very Low | None | **Solution×Commune content** |
+
+---
+
+## 17. Convex Performance Optimization
+
+### 17.1 Index Strategy for Scale
+
+With 312+ `service_locations` records and growing, proper indexing is critical.
+
+#### Current Index Audit
+
+| Table | Index | Used By | Status |
+|-------|-------|---------|--------|
+| `communes` | `by_slug` | `getCommuneBySlug` | ✅ Good |
+| `communes` | `by_zone` | `getCommunesByZone` | ✅ Good |
+| `communes` | `by_isOtherCity` | `getOtherCities` | ✅ Good |
+| `services` | `by_slug` | `getServiceBySlug` | ✅ Good |
+| `leads` | `by_status` | `getLeadsByStatus` | ✅ Good |
+| `leads` | `by_createdAt` | `getLeads` (paginated) | ✅ Good |
+| `blog_posts` | `by_slug` | `getPostBySlug` | ✅ Good |
+| `heroes` | `by_page_slug` | `getHeroByPage` | ✅ Good |
+
+#### Recommended New Indexes
+
+```typescript
+// service_locations — compound index for page lookup
+service_locations
+  .index('by_service_commune', ['service_slug', 'commune_slug'])  // Primary lookup
+  .index('by_service', ['service_slug'])                          // List by service
+  .index('by_commune', ['commune_slug'])                          // List by commune
+
+// reviews — aggregate queries need these
+reviews
+  .index('by_commune', ['commune_slug'])
+  .index('by_service', ['service_slug'])
+  .index('by_published', ['is_published'])
+  .index('by_rating', ['rating'])
+
+// For sitemap generation — need to enumerate all published content
+communes.index('by_published', ['is_published'])  // If we add is_published
+```
+
+### 17.2 Query Best Practices
+
+| Pattern | ❌ Avoid | ✅ Prefer |
+|---------|---------|----------|
+| **Lookup by slug** | `.filter(q => q.eq(q.field('slug'), slug))` | `.withIndex('by_slug', q => q.eq('slug', slug))` |
+| **Large result sets** | `.collect()` on 100+ docs | `.paginate()` or `.take(limit)` |
+| **Cross-table joins** | N+1 queries in a loop | Batch queries, or denormalize data |
+| **Aggregate counts** | Counting in query handler | Use Convex counter component or cache |
+
+### 17.3 SSR Query Batching
+
+For Astro SSR pages that need multiple queries (e.g., commune page needs commune + services + reviews), use `Promise.all` for parallel execution:
+
+```typescript
+// ✅ Good — parallel queries
+const [commune, services, reviews] = await Promise.all([
+  convexServer.query(api.locations.getCommuneBySlug, { slug }),
+  convexServer.query(api.services.getAllServices),
+  convexServer.query(api.reviews.getByCommune, { commune_slug: slug }),
+]);
+
+// ❌ Bad — sequential queries
+const commune = await convexServer.query(api.locations.getCommuneBySlug, { slug });
+const services = await convexServer.query(api.services.getAllServices);
+const reviews = await convexServer.query(api.reviews.getByCommune, { commune_slug: slug });
+```
+
+### 17.4 Caching Strategy
+
+| Content Type | Cache TTL | Strategy |
+|-------------|-----------|----------|
+| Static pages (carreras, privacidad) | Long (1hr+) | Astro `static` mode |
+| Service pages | Medium (5min) | SSR with Vercel edge cache |
+| Commune pages | Medium (5min) | SSR with cache headers |
+| Service×Commune pages | Medium (5min) | SSR, pre-render popular pages |
+| Blog posts | Long (30min) | SSR with ISR-like behavior |
+| Admin CMS | None | Real-time Convex reactivity |
+
+---
+
+## 18. Advanced Schema.org Implementation
+
+### 18.1 Use `SecurityService` instead of `LocalBusiness`
+
+Schema.org has no official `SecurityService` type, but the recommended approach is:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": ["LocalBusiness", "ProfessionalService"],
+  "additionalType": "https://schema.org/SecurityService",
+  "name": "Guardman Chile - Las Condes"
+}
+```
+
+> **Why**: Using both `LocalBusiness` and `ProfessionalService` gives Google maximum context about the business type while maintaining eligibility for local pack results.
+
+### 18.2 Multi-Location Parent Organization Pattern
+
+On the home page, establish the parent organization:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://guardman.cl/#organization",
+  "name": "Guardman Chile",
+  "url": "https://guardman.cl",
+  "logo": "https://guardman.cl/logo.png",
+  "sameAs": [
+    "https://instagram.com/grupo_guardman",
+    "https://linkedin.com/company/guardman-chile"
+  ],
+  "areaServed": {
+    "@type": "AdministrativeArea",
+    "name": "Región Metropolitana de Santiago"
+  },
+  "department": [
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://guardman.cl/cobertura/las-condes",
+      "name": "Guardman Chile - Las Condes"
+    },
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://guardman.cl/cobertura/providencia",
+      "name": "Guardman Chile - Providencia"  
+    }
+  ]
+}
+```
+
+> **Key**: Use `department` property to link each commune-specific `LocalBusiness` back to the parent `Organization`. Each commune page's `LocalBusiness` should reference the parent with `"parentOrganization": {"@id": "https://guardman.cl/#organization"}`.
+
+### 18.3 Service Catalog Schema
+
+Each service detail page should include an `OfferCatalog`:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Guardias de Seguridad OS10",
+  "provider": { "@id": "https://guardman.cl/#organization" },
+  "areaServed": [
+    { "@type": "City", "name": "Santiago" },
+    { "@type": "City", "name": "Las Condes" },
+    { "@type": "City", "name": "Providencia" }
+  ],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Planes de Guardias",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "name": "Guardia 24/7",
+        "description": "Servicio de guardia permanente"
+      }
+    ]
+  }
+}
+```
+
+### 18.4 Blog Article Schema
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{title}}",
+  "datePublished": "{{published_at ISO}}",
+  "dateModified": "{{updated_at ISO}}",
+  "author": {
+    "@type": "Person",
+    "name": "{{author_name}}",
+    "url": "https://guardman.cl/blog/autor/{{author_slug}}"
+  },
+  "publisher": { "@id": "https://guardman.cl/#organization" },
+  "image": "{{cover_image}}",
+  "mainEntityOfPage": "https://guardman.cl/blog/{{slug}}"
+}
+```
+
+---
+
+## 19. Data Unification Strategy
+
+### 19.1 Resolve `site.ts` vs `site_config` Duplication
+
+**Current State**: Two sources of truth for business info.
+
+| Data Point | `data/site.ts` | `site_config` table |
+|-----------|---------------|---------------------|
+| Phone | ✅ `+56 9 3000 0010` | ✅ `phone_primary` |
+| WhatsApp | ✅ `+56930000010` | ✅ `whatsapp_number` |
+| Email | ✅ `info@guardman.cl` | ✅ `email_contact` |
+| Address | ✅ Full structured | ❌ Only `address_main` (string) |
+| Social links | ✅ Full structured | ✅ `social_links` |
+| Brand name | ✅ `Guardman Chile` | ✅ `brand_name` |
+| Navbar | ❌ | ✅ `navbar_items` |
+| Footer | ❌ | ✅ `footer_config` |
+| Colors | ✅ | ❌ |
+| Hours | ✅ | ❌ |
+
+**Proposed Fix**: Migrate ALL data to `site_config` and DELETE `data/site.ts`:
+
+```typescript
+// Add to site_config schema:
+address: v.optional(v.object({
+  street: v.string(),
+  city: v.string(),
+  region: v.string(),
+  country: v.string(),
+  postalCode: v.string(),
+})),
+business_hours: v.optional(v.object({
+  days: v.string(),
+  open: v.string(),
+  close: v.string(),
+})),
+colors: v.optional(v.object({
+  primary: v.string(),
+  accent: v.string(),
+  secondary: v.string(),
+  dark: v.string(),
+  light: v.string(),
+})),
+founded_year: v.optional(v.number()),
+total_clients: v.optional(v.number()),
+total_guards: v.optional(v.number()),
+```
+
+> This ensures **single source of truth** for NAP data — critical for local SEO consistency.
+
+---
+
+## Appendix C: Astro Dynamic Sitemap Generation
+
+> **Important**: The `@astrojs/sitemap` package does NOT work with SSR dynamic routes. A custom endpoint is required.
+
+### `web/src/pages/sitemap.xml.ts`
+
+```typescript
+import type { APIRoute } from 'astro';
+import { convexServer } from '../lib/convex-server';
+import { api } from '../../convex/_generated/api';
+
+const SITE_URL = 'https://guardman.cl';
+
+export const GET: APIRoute = async () => {
+  // Fetch all dynamic content from Convex
+  const [services, solutions, communes, blogPosts, serviceLocations] = await Promise.all([
+    convexServer.query(api.services.getAllServices),
+    convexServer.query(api.solutions.getAllSolutions),
+    convexServer.query(api.locations.getAllCommunes),
+    convexServer.query(api.blog_posts.getPublishedPosts),
+    convexServer.query(api.service_locations.getAll),  // NEW table
+  ]);
+
+  const urls: { loc: string; priority: string; changefreq: string }[] = [];
+
+  // Static pages
+  urls.push({ loc: '/', priority: '1.0', changefreq: 'weekly' });
+  urls.push({ loc: '/servicios', priority: '0.9', changefreq: 'weekly' });
+  urls.push({ loc: '/soluciones', priority: '0.8', changefreq: 'weekly' });
+  urls.push({ loc: '/cobertura', priority: '0.9', changefreq: 'weekly' });
+  urls.push({ loc: '/contacto', priority: '0.8', changefreq: 'monthly' });
+  urls.push({ loc: '/cotizar', priority: '0.9', changefreq: 'monthly' });
+  urls.push({ loc: '/nosotros', priority: '0.5', changefreq: 'monthly' });
+  urls.push({ loc: '/blog', priority: '0.7', changefreq: 'daily' });
+
+  // Service pages
+  for (const s of services) {
+    if (s.is_active !== false) {
+      urls.push({ loc: `/servicios/${s.slug}`, priority: '0.8', changefreq: 'weekly' });
+    }
+  }
+
+  // Solution pages
+  for (const s of solutions) {
+    if (s.is_active !== false) {
+      urls.push({ loc: `/soluciones/${s.slug}`, priority: '0.7', changefreq: 'weekly' });
+    }
+  }
+
+  // Commune pages
+  for (const c of communes) {
+    urls.push({ loc: `/cobertura/${c.slug}`, priority: '0.7', changefreq: 'weekly' });
+  }
+
+  // Service × Commune pages (programmatic SEO)
+  for (const sl of serviceLocations) {
+    if (sl.is_published !== false) {
+      urls.push({
+        loc: `/servicios/${sl.service_slug}/${sl.commune_slug}`,
+        priority: '0.6',
+        changefreq: 'monthly',
+      });
+    }
+  }
+
+  // Blog posts
+  for (const p of blogPosts) {
+    urls.push({ loc: `/blog/${p.slug}`, priority: '0.5', changefreq: 'monthly' });
+  }
+
+  // Generate XML
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(u => `  <url>
+    <loc>${SITE_URL}${u.loc}</loc>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+
+  return new Response(xml, {
+    headers: { 'Content-Type': 'application/xml' },
+  });
+};
+```
+
+### `web/public/robots.txt`
+
+```
+User-agent: *
+Allow: /
+
+Sitemap: https://guardman.cl/sitemap.xml
+```
+
+---
+
+## Appendix D: Seed Script for `service_locations`
+
+```typescript
+// convex/service_locations.ts — seed mutation
+export const seedServiceLocations = mutation({
+  handler: async (ctx) => {
+    const services = await ctx.db.query('services').collect();
+    const communes = await ctx.db
+      .query('communes')
+      .filter(q => q.neq(q.field('isOtherCity'), true))
+      .collect();
+
+    let inserted = 0;
+    for (const service of services) {
+      for (const commune of communes) {
+        // Check if already exists
+        const existing = await ctx.db
+          .query('service_locations')
+          .withIndex('by_service_commune', q => 
+            q.eq('service_slug', service.slug).eq('commune_slug', commune.slug)
+          )
+          .first();
+
+        if (!existing) {
+          await ctx.db.insert('service_locations', {
+            service_slug: service.slug,
+            commune_slug: commune.slug,
+            meta_title: `${service.title} en ${commune.name} | Guardman Chile`,
+            meta_description: `Servicio de ${service.title.toLowerCase()} en ${commune.name}. ${service.tagline || service.description.substring(0, 100)}. Cotiza sin compromiso.`,
+            hero_title: `${service.title} en ${commune.name}`,
+            is_published: true,
+          });
+          inserted++;
+        }
+      }
+    }
+    return { inserted, total: services.length * communes.length };
+  },
+});
+```
+
+---
+
+## Appendix E: Quick Reference — All Convex Functions
+
+| File | Queries | Mutations | Actions |
+|------|---------|-----------|---------|
+| `services.ts` | `getAllServices`, `getServiceBySlug`, `getServicesBySolution` | `createService`, `updateService`, `deleteService`, `reorderServices`, `seedServices` | — |
+| `solutions.ts` | `getAllSolutions`, `getSolutionBySlug` | `createSolution`, `updateSolution`, `deleteSolution`, `reorderSolutions`, `seedSolutions` | — |
+| `locations.ts` | `getAllCommunes`, `getCommuneBySlug`, `getCommunesByZone`, `getOtherCities`, `getAllLocations` | `seedCommunes`, `clearCommunes` | — |
+| `communes.ts` | `getAll`, `getBySlug` | `create`, `update`, `updateSEO`, `delete` | — |
+| `leads.ts` | `getLeads`, `getLeadsByStatus`, `getLeadById`, `getLeadsCount` | `createLead`, `updateLeadStatus` | `triggerWebhook` |
+| `faqs.ts` | `getAllFaqs`, `getFaqsByCategory` | CRUD + `seedFaqs`, `reorderFaqs` | — |
+| `blog_posts.ts` | `getAllPosts`, `getPublishedPosts`, `getFeaturedPosts`, `getPostBySlug` | CRUD + `publishPost`, `unpublishPost`, `reorderPosts` | — |
+| `heroes.ts` | `getAllHeroes`, `getHeroByPage`, `getActiveHeroes` | CRUD | — |
+| `testimonials.ts` | `getAll` | CRUD + `reorder` | — |
+| `partners.ts` | `getAll`, `getByType` | CRUD + `reorder` | — |
+| `industries.ts` | `getAll`, `getActiveIndustries`, `getBySlug` | CRUD + `reorder` | — |
+| `team_members.ts` | `getAll` | CRUD + `reorder` | — |
+| `company_values.ts` | `getAll` | CRUD + `reorder` | — |
+| `process_steps.ts` | `getByPage`, `getAll` | CRUD | — |
+| `stats.ts` | `getAll`, `getByPage` | CRUD + `reorder` | — |
+| `ctas.ts` | `getAll`, `getByPage` | CRUD | — |
+| `authors.ts` | `getAll`, `getBySlug` | CRUD | — |
+| `pages.ts` | `getBySlug`, `getAll` | ❌ None | — |
+| `content_blocks.ts` | `getByPage` | ❌ None | — |
+| `site_config.ts` | `get` | `update` | — |
+| `storage.ts` | `getFileUrl`, `getFileMetadata`, `listFiles` | `generateUploadUrl`, `saveFileMetadata`, `deleteFile` | — |
+| `auth.ts` | — | — | Auth config |
+
+---
+
+> **Document Version**: Draft 3 (Final) — February 19, 2026
+> **Total Sections**: 19 chapters + 5 appendices
+> **Total Tables Audited**: 22 (+ 4 proposed new)
+> **Total Pages Projected**: ~395 (from current ~83)
+> **Key Recommendations**: Programmatic SEO (312 service×commune pages), AggregateRating schema, data source unification, CRUD completion for pages/content_blocks
