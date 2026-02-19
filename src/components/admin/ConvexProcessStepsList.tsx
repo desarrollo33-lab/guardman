@@ -1,4 +1,4 @@
-import { ConvexProvider } from 'convex/react';
+import { ConvexAuthProvider } from '@convex-dev/auth/react';
 import { getConvexClient } from '../../lib/convex';
 import ProcessStepsList from './ProcessStepsList';
 import AuthGuard from './AuthGuard';
@@ -7,10 +7,10 @@ export default function ConvexProcessStepsList() {
   const convex = getConvexClient();
 
   return (
-    <ConvexProvider client={convex}>
+    <ConvexAuthProvider client={convex}>
       <AuthGuard>
         <ProcessStepsList />
       </AuthGuard>
-    </ConvexProvider>
+    </ConvexAuthProvider>
   );
 }

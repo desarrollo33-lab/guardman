@@ -1,4 +1,4 @@
-import { ConvexProvider } from 'convex/react';
+import { ConvexAuthProvider } from '@convex-dev/auth/react';
 import { getConvexClient } from '../../lib/convex';
 import LeadDetail from './LeadDetail';
 import AuthGuard from './AuthGuard';
@@ -15,7 +15,7 @@ interface ConvexLeadDetailProps {
 export default function ConvexLeadDetail({ leadId }: ConvexLeadDetailProps) {
   if (!leadId) {
     return (
-      <ConvexProvider client={getConvexClient()}>
+      <ConvexAuthProvider client={getConvexClient()}>
         <AuthGuard>
           <div className="bg-white shadow-sm rounded-lg p-8 text-center">
             <svg
@@ -58,15 +58,15 @@ export default function ConvexLeadDetail({ leadId }: ConvexLeadDetailProps) {
             </a>
           </div>
         </AuthGuard>
-      </ConvexProvider>
+      </ConvexAuthProvider>
     );
   }
 
   return (
-    <ConvexProvider client={getConvexClient()}>
+    <ConvexAuthProvider client={getConvexClient()}>
       <AuthGuard>
         <LeadDetail leadId={leadId} />
       </AuthGuard>
-    </ConvexProvider>
+    </ConvexAuthProvider>
   );
 }

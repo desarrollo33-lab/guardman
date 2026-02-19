@@ -1,4 +1,4 @@
-import { ConvexProvider } from 'convex/react';
+import { ConvexAuthProvider } from '@convex-dev/auth/react';
 import { getConvexClient } from '../../lib/convex';
 import SiteConfigForm from './SiteConfigForm';
 import AuthGuard from './AuthGuard';
@@ -12,10 +12,10 @@ export default function ConvexSiteConfigForm() {
   const convex = getConvexClient();
 
   return (
-    <ConvexProvider client={convex}>
+    <ConvexAuthProvider client={convex}>
       <AuthGuard>
         <SiteConfigForm />
       </AuthGuard>
-    </ConvexProvider>
+    </ConvexAuthProvider>
   );
 }

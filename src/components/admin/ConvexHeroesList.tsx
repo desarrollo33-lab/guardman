@@ -1,4 +1,4 @@
-import { ConvexProvider } from 'convex/react';
+import { ConvexAuthProvider } from '@convex-dev/auth/react';
 import { getConvexClient } from '../../lib/convex';
 import HeroesList from './HeroesList';
 import AuthGuard from './AuthGuard';
@@ -10,10 +10,10 @@ import AuthGuard from './AuthGuard';
  */
 export default function ConvexHeroesList() {
   return (
-    <ConvexProvider client={getConvexClient()}>
+    <ConvexAuthProvider client={getConvexClient()}>
       <AuthGuard>
         <HeroesList />
       </AuthGuard>
-    </ConvexProvider>
+    </ConvexAuthProvider>
   );
 }

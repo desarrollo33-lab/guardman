@@ -1,0 +1,10 @@
+[31m[1m00:03:11[22m [ERROR] [vite][39m [31m✗[39m Build failed in 113ms
+Unexpected closing "ConvexAuthProvider" tag does not match opening "ConvexProvider" tag
+  [1mLocation:[22m
+    [4mC:/Users/56930/OneDrive/Escritorio/guardman/src/components/admin/ConvexAuthorsList.tsx:14:6[24m
+  [1mStack trace:[22m
+[2m    at failureErrorWithLog (C:\Users\56930\OneDrive\Escritorio\guardman\node_modules\esbuild\lib\main.js:1467:15)
+    at responseCallbacks.<computed> (C:\Users\56930\OneDrive\Escritorio\guardman\node_modules\esbuild\lib\main.js:603:9)
+    at Socket.readFromStdout (C:\Users\56930\OneDrive\Escritorio\guardman\node_modules\esbuild\lib\main.js:581:7)
+    at addChunk (node:internal/streams/readable:564:12)
+    at Readable.push (node:internal/streams/readable:395:5)[22m
