@@ -1,4 +1,9 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "turbo run build --filter=web",
+  "outputDirectory": "web/.vercel/output/static",
+  "installCommand": "npm install",
+  "framework": null,
   "headers": [
     {
       "source": "/images/(.*)",
