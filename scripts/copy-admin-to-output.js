@@ -1,6 +1,6 @@
 /**
- * Copy admin build and convex generated to web/
- * This allows serving the admin SPA from /admin/* in Vercel
+ * Copy admin build to Vercel output and convex generated to web/
+ * This runs AFTER astro build completes
  */
 import { cpSync, existsSync, mkdirSync } from 'fs';
 import { resolve, dirname } from 'path';
@@ -11,20 +11,19 @@ const __dirname = dirname(__filename);
 
 const projectRoot = resolve(__dirname, '..');
 const adminDist = resolve(projectRoot, 'admin/dist');
-const webDist = resolve(projectRoot, 'web/dist/admin');
+const vercelOutput = resolve(projectRoot, 'web/.vercel/output/static/admin');
 const convexGenerated = resolve(projectRoot, 'convex/_generated');
 const webConvex = resolve(projectRoot, 'web/convex/_generated');
 
-// Copy convex _generated to web/convex/ (for Vercel build)
+// Copy convex _generated to web/convex/
 console.log('Copying convex/_generated to web/convex/_generated...');
 mkdirSync(webConvex, { recursive: true });
 cpSync(convexGenerated, webConvex, { recursive: true });
 console.log('✅ Convex generated copied');
 
-// Check if admin dist exists
+// Build admin if needed
 if (!existsSync(adminDist)) {
   console.log('Admin dist not found, building...');
-  // Build admin first
   const { execSync } = require('child_process');
   execSync('npm run build', {
     cwd: resolve(projectRoot, 'admin'),
@@ -32,10 +31,8 @@ if (!existsSync(adminDist)) {
   });
 }
 
-// Create target directory
-mkdirSync(webDist, { recursive: true });
-
-// Copy admin dist to web/dist/admin
-cpSync(adminDist, webDist, { recursive: true });
-
-console.log('✅ Admin copied to web/dist/admin/');
+// Copy admin to Vercel output
+console.log('Copying admin to .vercel/output/static/admin...');
+mkdirSync(vercelOutput, { recursive: true });
+cpSync(adminDist, vercelOutput, { recursive: true });
+console.log('✅ Admin copied to Vercel output');

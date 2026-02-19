@@ -83,6 +83,10 @@
   ],
   "rewrites": [
     {
+      "source": "/admin/assets/:path*",
+      "destination": "/admin/assets/:path*"
+    },
+    {
       "source": "/admin/:path*",
       "destination": "/admin/index.html"
     }

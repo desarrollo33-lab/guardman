@@ -18,7 +18,7 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
-        '@convex': path.resolve(__dirname, '../convex'),
+        '@convex': path.resolve(__dirname, './convex'),
       },
     },
     build: {
