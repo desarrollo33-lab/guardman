@@ -1,48 +1,28 @@
 {
-  "name": "guardman",
+  "name": "guardman-monorepo",
+  "private": true,
   "type": "module",
   "version": "1.0.1",
-  "description": "Sitio web de Guardman Chile - Seguridad Privada",
+  "description": "Guardman Chile - Monorepo (Web + Admin)",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro",
-    "lint": "eslint src/ convex/",
-    "lint:fix": "eslint src/ convex/ --fix",
-    "format": "prettier --write \"src/**/*.{ts,tsx,astro,css}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,astro,css}\"",
-    "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run lint && npm run format:check",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
-  },
-  "dependencies": {
-    "@astrojs/react": "^4.1.0",
-    "@astrojs/sitemap": "^3.2.0",
-    "@astrojs/tailwind": "^6.0.0",
-    "@astrojs/vercel": "^8.0.0",
-    "@convex-dev/auth": "^0.0.90",
-    "@resvg/resvg-js": "^2.6.2",
-    "@tanstack/react-query": "^5.0.0",
-    "astro": "^5.1.0",
-    "convex": "^1.12.0",
-    "marked": "^17.0.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "satori": "^0.19.2",
-    "tailwindcss": "^3.4.17"
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=web",
+    "dev:admin": "turbo run dev --filter=admin",
+    "build": "turbo run build",
+    "build:web": "turbo run build --filter=web",
+    "build:admin": "turbo run build --filter=admin",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "convex:dev": "convex dev",
+    "convex:deploy": "convex deploy"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.6",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
-    "@vitest/coverage-v8": "^4.0.18",
-    "prettier": "^3.4.2",
-    "prettier-plugin-astro": "^0.14.1",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
-  }
+    "turbo": "^2.3.0"
+  },
+  "packageManager": "npm@10.0.0",
+  "workspaces": [
+    "web",
+    "admin"
+  ]
 }

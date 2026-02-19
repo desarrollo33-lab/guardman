@@ -1,0 +1,24 @@
+{
+  "$schema": "https://openapi.vercel.sh/microfrontends.json",
+  "applications": {
+    "web": {
+      "development": {
+        "local": {
+          "port": 4321
+        }
+      }
+    },
+    "admin": {
+      "development": {
+        "local": {
+          "port": 3001
+        }
+      },
+      "routing": [
+        {
+          "paths": ["/admin/:path*"]
+        }
+      ]
+    }
+  }
+}

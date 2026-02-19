@@ -1,0 +1,176 @@
+// @ts-check
+
+// Browser globals
+const browserGlobals = {
+  window: 'readonly',
+  document: 'readonly',
+  navigator: 'readonly',
+  console: 'readonly',
+  localStorage: 'readonly',
+  sessionStorage: 'readonly',
+  fetch: 'readonly',
+  setTimeout: 'readonly',
+  clearTimeout: 'readonly',
+  setInterval: 'readonly',
+  clearInterval: 'readonly',
+  requestAnimationFrame: 'readonly',
+  cancelAnimationFrame: 'readonly',
+  alert: 'readonly',
+  confirm: 'readonly',
+  prompt: 'readonly',
+  Event: 'readonly',
+  CustomEvent: 'readonly',
+  MutationObserver: 'readonly',
+  IntersectionObserver: 'readonly',
+  ResizeObserver: 'readonly',
+  URL: 'readonly',
+  URLSearchParams: 'readonly',
+  FormData: 'readonly',
+  Headers: 'readonly',
+  Request: 'readonly',
+  Response: 'readonly',
+  Blob: 'readonly',
+  File: 'readonly',
+  FileReader: 'readonly',
+  Image: 'readonly',
+  Audio: 'readonly',
+  HTMLElement: 'readonly',
+  Element: 'readonly',
+  Node: 'readonly',
+  DOMParser: 'readonly',
+  XMLSerializer: 'readonly',
+};
+
+// Node.js globals
+const nodeGlobals = {
+  process: 'readonly',
+  global: 'readonly',
+  Buffer: 'readonly',
+  __dirname: 'readonly',
+  __filename: 'readonly',
+  module: 'readonly',
+  require: 'readonly',
+  exports: 'writable',
+};
+
+// ES2021 globals
+const es2021Globals = {
+  Array: 'readonly',
+  ArrayBuffer: 'readonly',
+  BigInt: 'readonly',
+  BigInt64Array: 'readonly',
+  BigUint64Array: 'readonly',
+  Boolean: 'readonly',
+  DataView: 'readonly',
+  Date: 'readonly',
+  Error: 'readonly',
+  EvalError: 'readonly',
+  FinalizationRegistry: 'readonly',
+  Float32Array: 'readonly',
+  Float64Array: 'readonly',
+  Function: 'readonly',
+  Infinity: 'readonly',
+  Int8Array: 'readonly',
+  Int16Array: 'readonly',
+  Int32Array: 'readonly',
+  Intl: 'readonly',
+  JSON: 'readonly',
+  Map: 'readonly',
+  Math: 'readonly',
+  NaN: 'readonly',
+  Number: 'readonly',
+  Object: 'readonly',
+  Promise: 'readonly',
+  Proxy: 'readonly',
+  RangeError: 'readonly',
+  ReferenceError: 'readonly',
+  Reflect: 'readonly',
+  RegExp: 'readonly',
+  Set: 'readonly',
+  SharedArrayBuffer: 'readonly',
+  String: 'readonly',
+  Symbol: 'readonly',
+  SyntaxError: 'readonly',
+  TypeError: 'readonly',
+  URIError: 'readonly',
+  Uint8Array: 'readonly',
+  Uint8ClampedArray: 'readonly',
+  Uint16Array: 'readonly',
+  Uint32Array: 'readonly',
+  WeakMap: 'readonly',
+  WeakRef: 'readonly',
+  WeakSet: 'readonly',
+  Atomics: 'readonly',
+  decodeURI: 'readonly',
+  decodeURIComponent: 'readonly',
+  encodeURI: 'readonly',
+  encodeURIComponent: 'readonly',
+  escape: 'readonly',
+  eval: 'readonly',
+  globalThis: 'readonly',
+  isFinite: 'readonly',
+  isNaN: 'readonly',
+  null: 'readonly',
+  parseFloat: 'readonly',
+  parseInt: 'readonly',
+  undefined: 'readonly',
+  unescape: 'readonly',
+};
+
+/** @type {import('eslint').Linter.Config[]} */
+export default [
+  // Global ignores - TypeScript and Astro need special parsers
+  // Install @typescript-eslint/parser and eslint-plugin-astro for full support
+  {
+    ignores: [
+      'dist/**',
+      '.astro/**',
+      'node_modules/**',
+      '*.config.*',
+      'env.d.ts',
+      // TypeScript files - need @typescript-eslint/parser
+      '**/*.ts',
+      '**/*.tsx',
+      // Astro files - need eslint-plugin-astro
+      '**/*.astro',
+    ],
+  },
+
+  // Base config for JavaScript files only
+  {
+    files: ['**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        ...browserGlobals,
+        ...nodeGlobals,
+        ...es2021Globals,
+      },
+    },
+    rules: {
+      // Possible Problems
+      'no-console': 'warn',
+      'no-debugger': 'warn',
+      'no-duplicate-imports': 'error',
+      'no-self-assign': 'error',
+      'no-unreachable': 'error',
+      'no-unsafe-finally': 'error',
+      'no-unsafe-negation': 'error',
+
+      // Suggestions
+      'no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+      'prefer-const': 'warn',
+      'no-var': 'error',
+      'object-shorthand': ['warn', 'always'],
+      'prefer-template': 'warn',
+    },
+  },
+];
