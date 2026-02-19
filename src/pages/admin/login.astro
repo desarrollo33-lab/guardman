@@ -1,7 +1,6 @@
 ---
 // Login page using Convex Auth
-import { AuthProvider } from '../../lib/auth';
-import LoginForm from '../../components/admin/LoginForm';
+import ConvexLoginForm from '../../components/admin/ConvexLoginForm';
 ---
 
 <!doctype html>
@@ -21,8 +20,6 @@ import LoginForm from '../../components/admin/LoginForm';
   </head>
 
   <body class="min-h-screen bg-gray-900 flex items-center justify-center font-sans antialiased">
-    <AuthProvider client:only="react">
-      <LoginForm client:only="react" />
-    </AuthProvider>
+    <ConvexLoginForm client:only="react" />
   </body>
 </html>
