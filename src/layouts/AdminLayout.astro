@@ -1,5 +1,4 @@
 ---
-import { AuthProvider } from '../lib/auth';
 import Sidebar from '../components/admin/Sidebar';
 
 interface Props {
@@ -28,26 +27,22 @@ const currentPath = Astro.url.pathname;
   </head>
 
   <body class="min-h-screen bg-gray-100 font-sans antialiased">
-    <AuthProvider client:only="react">
-      <div class="flex h-screen overflow-hidden">
-        {/* Sidebar */}
-        <Sidebar client:load currentPath={currentPath} />
+    <div class="flex h-screen overflow-hidden">
+      <!-- Sidebar (self-contained with its own Convex context) -->
+      <Sidebar client:only="react" currentPath={currentPath} />
 
-        {/* Main Content Area */}
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-          {/* Main Content */}
-          <main class="flex-1 overflow-y-auto focus:outline-none p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8 bg-gray-100">
-            <div class="max-w-7xl mx-auto">
-              <slot />
-            </div>
-            
-             {/* Admin Footer */}
-            <footer class="mt-8 text-center text-sm text-gray-500 pb-4">
-              Guardman Chile - Panel de Administración
-            </footer>
-          </main>
-        </div>
+      <!-- Main Content Area -->
+      <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8 bg-gray-100">
+          <div class="max-w-7xl mx-auto">
+            <slot />
+          </div>
+
+          <footer class="mt-8 text-center text-sm text-gray-400 pb-4">
+            Guardman Chile - Panel de Administración
+          </footer>
+        </main>
       </div>
-    </AuthProvider>
+    </div>
   </body>
 </html>

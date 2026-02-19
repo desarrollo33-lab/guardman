@@ -1,11 +1,26 @@
 import { useState } from 'react';
-import LogoutButton from './LogoutButton';
+import { ConvexProvider } from 'convex/react';
+import { ConvexAuthProvider, useAuthActions } from '@convex-dev/auth/react';
+import { getConvexClient } from '../../lib/convex';
 
 interface SidebarProps {
     currentPath: string;
 }
 
-export default function Sidebar({ currentPath }: SidebarProps) {
+/**
+ * Self-contained Sidebar wrapper with its own Convex context.
+ * This is needed because Astro islands don't share React context.
+ */
+export default function SidebarWrapper({ currentPath }: SidebarProps) {
+    const client = getConvexClient();
+    return (
+        <ConvexAuthProvider client={client}>
+            <SidebarContent currentPath={currentPath} />
+        </ConvexAuthProvider>
+    );
+}
+
+function SidebarContent({ currentPath }: SidebarProps) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const navigation = [
@@ -32,11 +47,12 @@ export default function Sidebar({ currentPath }: SidebarProps) {
     return (
         <>
             {/* Mobile menu button */}
-            <div className="lg:hidden fixed top-0 left-0 right-0 z-20 bg-gray-900 px-4 py-2 flex items-center justify-between shadow-md">
-                <span className="text-white font-bold text-lg">Guardman Admin</span>
+            <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-gray-900 px-4 py-3 flex items-center justify-between shadow-md">
+                <a href="/admin" className="text-white font-bold text-lg">Guardman Admin</a>
                 <button
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     className="text-gray-300 hover:text-white p-2"
+                    aria-label="Toggle menu"
                 >
                     <Icon name={isMobileMenuOpen ? 'x' : 'menu'} className="w-6 h-6" />
                 </button>
@@ -45,29 +61,31 @@ export default function Sidebar({ currentPath }: SidebarProps) {
             {/* Sidebar backdrop for mobile */}
             {isMobileMenuOpen && (
                 <div
-                    className="fixed inset-0 z-10 bg-black/50 lg:hidden"
+                    className="fixed inset-0 z-20 bg-black/50 lg:hidden"
                     onClick={() => setIsMobileMenuOpen(false)}
                 />
             )}
 
-            {/* Sidebar container */}
+            {/* Sidebar */}
             <aside
                 className={`
-          fixed top-0 left-0 z-20 h-full w-64 bg-gray-900 text-white transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:h-screen lg:overflow-y-auto
+          fixed top-0 left-0 z-30 h-full w-64 bg-gray-900 text-white
+          transition-transform duration-300 ease-in-out
+          lg:translate-x-0 lg:static lg:z-auto
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
             >
                 <div className="flex flex-col h-full">
                     {/* Logo */}
-                    <div className="flex items-center justify-center h-16 border-b border-gray-800 shrink-0">
-                        <span className="text-xl font-bold">Guardman Admin</span>
+                    <div className="flex items-center h-16 px-5 border-b border-gray-800 shrink-0">
+                        <a href="/admin" className="text-xl font-bold tracking-tight">
+                            🛡️ Guardman
+                        </a>
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1">
+                    <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
                         {navigation.map((item) => {
-                            // Exact match for dashboard, startswith for others if needed, 
-                            // but mostly simple exact match works or robust logic
                             const isActive =
                                 item.href === '/admin'
                                     ? currentPath === '/admin' || currentPath === '/admin/'
@@ -77,17 +95,18 @@ export default function Sidebar({ currentPath }: SidebarProps) {
                                 <a
                                     key={item.name}
                                     href={item.href}
+                                    onClick={() => setIsMobileMenuOpen(false)}
                                     className={`
-                    flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors group
+                    flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all group
                     ${isActive
-                                            ? 'bg-gray-800 text-white'
-                                            : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                                            ? 'bg-blue-600 text-white shadow-sm'
+                                            : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                                         }
                   `}
                                 >
                                     <Icon
                                         name={item.icon}
-                                        className={`mr-3 h-5 w-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'
+                                        className={`mr-3 h-5 w-5 flex-shrink-0 transition-colors ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-300'
                                             }`}
                                     />
                                     {item.name}
@@ -98,7 +117,7 @@ export default function Sidebar({ currentPath }: SidebarProps) {
 
                     {/* Footer / Logout */}
                     <div className="p-4 border-t border-gray-800 shrink-0">
-                        <LogoutButton />
+                        <SidebarLogoutButton />
                     </div>
                 </div>
             </aside>
@@ -106,9 +125,30 @@ export default function Sidebar({ currentPath }: SidebarProps) {
     );
 }
 
-// Simple Icon component for Sidebar
+/**
+ * Logout button that uses auth actions from the Sidebar's own ConvexAuthProvider.
+ */
+function SidebarLogoutButton() {
+    const { signOut } = useAuthActions();
+
+    const handleLogout = async () => {
+        await signOut();
+        window.location.href = '/admin/login';
+    };
+
+    return (
+        <button
+            onClick={handleLogout}
+            className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-900/30 hover:text-red-300 transition-all"
+        >
+            <Icon name="logout" className="mr-3 h-5 w-5 flex-shrink-0" />
+            Cerrar Sesión
+        </button>
+    );
+}
+
+// ─── Icon Component ────────────────────────────────────────
 function Icon({ name, className }: { name: string; className?: string }) {
-    // Mapping names to SVGs
     const icons: Record<string, JSX.Element> = {
         home: (
             <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -188,7 +228,7 @@ function Icon({ name, className }: { name: string; className?: string }) {
         ),
         chart: (
             <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
         ),
         'cursor-click': (
@@ -200,6 +240,11 @@ function Icon({ name, className }: { name: string; className?: string }) {
             <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        ),
+        logout: (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
         ),
         menu: (
