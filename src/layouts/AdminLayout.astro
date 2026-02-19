@@ -1,6 +1,6 @@
 ---
 import { AuthProvider } from '../lib/auth';
-import LogoutButton from '../components/admin/LogoutButton';
+import Sidebar from '../components/admin/Sidebar';
 
 interface Props {
   title: string;
@@ -8,6 +8,7 @@ interface Props {
 
 const { title } = Astro.props;
 const fullTitle = `${title} | Admin - Guardman`;
+const currentPath = Astro.url.pathname;
 ---
 
 <!doctype html>
@@ -28,142 +29,25 @@ const fullTitle = `${title} | Admin - Guardman`;
 
   <body class="min-h-screen bg-gray-100 font-sans antialiased">
     <AuthProvider client:only="react">
-      <!-- Admin Header -->
-      <header class="bg-gray-900 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between items-center h-16">
-            <div class="flex items-center gap-4">
-              <a href="/admin" class="text-xl font-bold hover:text-gray-300 transition-colors">
-                Guardman Admin
-              </a>
+      <div class="flex h-screen overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar client:load currentPath={currentPath} />
+
+        {/* Main Content Area */}
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {/* Main Content */}
+          <main class="flex-1 overflow-y-auto focus:outline-none p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8 bg-gray-100">
+            <div class="max-w-7xl mx-auto">
+              <slot />
             </div>
             
-            <nav class="flex items-center gap-2">
-              <a 
-                href="/admin" 
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Dashboard
-              </a>
-              <a 
-                href="/admin/leads" 
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Leads
-              </a>
-              <a 
-                href="/admin/services" 
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Servicios
-              </a>
-              <a
-                href="/admin/solutions"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Soluciones
-              </a>
-              <a
-                href="/admin/heroes"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Heroes
-              </a>
-              <a
-                href="/admin/blog"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Blog
-              </a>
-              <a
-                href="/admin/faqs"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                FAQs
-              </a>
-              <a
-                href="/admin/team"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Equipo
-              </a>
-              <a
-                href="/admin/testimonials"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Testimonios
-              </a>
-              <a
-                href="/admin/communes"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Comunas
-              </a>
-              <a
-                href="/admin/partners"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Partners
-              </a>
-              <a
-                href="/admin/industries"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Industrias
-              </a>
-              <a
-                href="/admin/authors"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Autores
-              </a>
-              <a
-                href="/admin/company-values"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Valores
-              </a>
-              <a
-                href="/admin/process-steps"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Procesos
-              </a>
-              <a
-                href="/admin/stats"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Estadísticas
-              </a>
-              <a
-                href="/admin/ctas"
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                CTAs
-              </a>
-              <a 
-                href="/admin/config" 
-                class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Config
-              </a>
-              <LogoutButton client:only="react" />
-            </nav>
-          </div>
+             {/* Admin Footer */}
+            <footer class="mt-8 text-center text-sm text-gray-500 pb-4">
+              Guardman Chile - Panel de Administración
+            </footer>
+          </main>
         </div>
-      </header>
-
-      <!-- Main Content -->
-      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <slot />
-      </main>
-
-      <!-- Admin Footer -->
-      <footer class="bg-gray-800 text-gray-400 py-4 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
-          Guardman Chile - Panel de Administración
-        </div>
-      </footer>
+      </div>
     </AuthProvider>
   </body>
 </html>
