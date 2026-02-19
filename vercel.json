@@ -1,17 +1,4 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "turbo run build --filter=web",
-  "outputDirectory": "web/.vercel/output",
-  "installCommand": "npm install",
-  "framework": null,
-  "rewrites": [
-    {
-      "source": "/admin/assets/:path*",
-      "destination": "/static/admin/assets/:path*"
-    },
-    {
-      "source": "/admin/:path*",
-      "destination": "/static/admin/index.html"
-    }
-  ]
+  "buildCommand": "cd web && npm run build",
+  "outputDirectory": "web/.vercel/output"
 }

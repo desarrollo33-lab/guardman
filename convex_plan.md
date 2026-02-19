@@ -33,6 +33,11 @@
 25. [Design System — Visual DNA](#25-design-system--visual-dna)
 26. [Component Registry — Data Mapping](#26-component-registry--data-mapping)
 27. [Page-by-Page Blueprint](#27-page-by-page-blueprint)
+28. [Zero Hardcoded Text — Complete Content Externalization](#28-zero-hardcoded-text--complete-content-externalization)
+29. [Refine CMS Integration — Admin UX & Data Flow](#29-refine-cms-integration--admin-ux--data-flow)
+30. [Photography & Image SEO Treatment](#30-photography--image-seo-treatment)
+31. [Advanced Local SEO — Chile Market Domination](#31-advanced-local-seo--chile-market-domination)
+32. [File Tree Architecture Blueprint](#32-file-tree-architecture-blueprint)
 
 ---
 
@@ -2744,8 +2749,992 @@ Summary of every Convex API endpoint consumed by the frontend:
 
 ---
 
-> **Document Version**: Draft 5 — February 19, 2026
-> **Total Sections**: 27 chapters + 5 appendices
-> **Total Tables Audited**: 22 existing + 4 proposed new
-> **Total Pages Projected**: ~395 (from current ~83)
-> **New in Draft 5**: Complete Design System tokens (§25), Master Component Registry with exact Convex field mapping for all 37 components (§26), Page-by-Page Blueprint for all 9+ page types with section-level data flow (§27), 11 identified gaps with fixes
+## 28. Zero Hardcoded Text — Complete Content Externalization
+
+> **Goal**: No visible text in the frontend should be hardcoded in `.astro`/`.tsx` files. Every string must originate from either Convex DB (for dynamic content) or a centralized i18n dictionary (for UI chrome).
+
+### 28.1. Audit Results — Every Hardcoded String
+
+| File | Category | Hardcoded Strings Found | Proposed Source |
+|------|----------|------------------------|-----------------|
+| `Header.astro` | Navigation | 8 nav labels, 6 service dropdown items, 5 solution dropdown items, "Cotizar Ahora" CTA | `site_config.nav_items[]` from Convex |
+| `Footer.astro` | Navigation + Contact | 6 service links, 8 solution links, 4 company links, "Servicios"/"Soluciones"/"Empresa"/"Contacto" column titles, "¿Listo para proteger lo que importa?", "Solicitar cotización", "Política de Privacidad", "Términos de Servicio", copyright text | `site_config.footer_config` from Convex |
+| `MobileMenu.tsx` | Navigation | Same as Header (receives links prop) | Same as Header |
+| `index.astro` | Page metadata | Title, description, OG tags | `heroes.getByPage('home')` |
+| `carreras.astro` | **100% static** | 5 benefits (title+description), 4 jobs (title+type+location+description+requirements[]), hero badge "Oportunidades de Despliegue", hero title "Evolucione con Nosotros", hero subtitle, section titles "Estándar Operativo", "Células Disponibles", CTA "¿No encuentra la posición ideal?", button labels "Ver Vacantes", "WhatsApp Operaciones", "Aplicar Despliegue", "Enviar CV", "Consulta WhatsApp" | NEW `careers` table + `ctas` table |
+| `contacto.astro` | Mixed | Hero text, "Horario de Operaciones", "Lun-Vie: 08:00 - 18:00", "Emergencias: 24/7", trust indicators, Schema.org properties | `heroes`, `site_config`, `ctas` |
+| `cotizar.astro` | Mixed | Hero badge "Cotización Express", hero title, subtitle, trust indicators "Respuesta <24h", "Sin Compromiso", "Asesor Dedicado" | `heroes`, `site_config` |
+| `nosotros.astro` | Mixed | Hero text, "Nuestra Historia" title, history paragraphs (200+ words), mission/vision/values labels, stat labels | NEW `pages` table or `content_blocks` |
+| `cobertura/index.astro` | Mixed | Hero title "Cobertura Operativa", subtitle, zone headers, stat labels, CTA text | `heroes`, `site_config`, `ctas` |
+| `cobertura/[comuna].astro` | Templated | `zoneDisplayNames` object (5 entries), `getLocalBenefits()` (4 benefits), `serviceIconMap` (6 entries), 3 intro prose paragraphs (100+ words), section titles "Protocolos disponibles", "Presencia local estratégica", CTA text | `content_blocks` (commune template), `site_config` |
+| `privacidad.astro` | **100% static legal** | 8 sections of legal prose (~1200 words), CTA, contact info | NEW `pages` table (type: 'legal') |
+| `terminos.astro` | **100% static legal** | 8 sections of legal prose (~1400 words), CTA, contact info | NEW `pages` table (type: 'legal') |
+| `blog/index.astro` | Page chrome | "Blog" title, section header, empty state message | `site_config` or i18n dictionary |
+| `blog/[slug].astro` | Minimal | `site.name` reference for title construction | `site_config` |
+| `servicios/index.astro` | Mixed | Section headers, CTA text | `heroes`, `ctas` |
+| `servicios/[slug].astro` | Mostly dynamic | CTA text | `ctas` |
+| `soluciones/index.astro` | Mixed | Hero stats labels, section titles | `heroes`, `ctas` |
+| `CTASection.astro` | **100% static** | headline, subtitle, button labels (passed as props but always hardcoded from parent) | `ctas` table |
+| `FAQ.astro` | Category labels | "Todas", "General", "Servicios", etc. (category tabs hardcoded) | `faqs` table (derive from distinct categories) |
+| `ServiceFinder.astro` | City data | List of cities hardcoded as `<option>` elements | `locations.getAllCommunes()` |
+
+### 28.2. Content Externalization Strategy
+
+#### Tier 1 — Dynamic CMS Content (from Convex via Refine CMS)
+Content that changes frequently or is managed by non-technical editors.
+
+| Content Type | Convex Table | CMS Resource |
+|-------------|-------------|--------------|
+| Hero sections (title, subtitle, CTA, badge, bg) | `heroes` | Heroes |
+| Services (title, tagline, description, features, image) | `services` | Services |
+| Solutions (title, description, features, image) | `solutions` | Solutions |
+| FAQs (question, answer, category) | `faqs` | FAQs |
+| Blog posts (title, content, author, tags) | `blog_posts` | Blog Posts |
+| Team members (name, role, bio, image) | `team_members` | Team Members |
+| Company values (title, description, icon) | `company_values` | Company Values |
+| Statistics (label, value, icon) | `stats` | Statistics |
+| Process steps (title, description, order) | `process_steps` | Process Steps |
+| Industries (name, description, icon) | `industries` | Industries |
+| Locations / Communes (name, zone, slug, meta) | `locations` | Locations |
+| Partners / Clients (name, logo, industry, quote) | `partners` | Partners |
+| CTAs (headline, subtitle, cta_primary, cta_secondary) | `ctas` | Call-to-Actions |
+| Content blocks (for composite sections like GuardPod) | `content_blocks` | Content Blocks |
+| Job listings (title, type, location, description, reqs) | NEW `careers` | Careers |
+| Legal pages (title, slug, body_md, last_updated) | NEW `pages` | Pages |
+| Navigation config (nav_items, footer_config) | `site_config` | Site Config |
+| Site globals (name, phone, email, address, social) | `site_config` | Site Config |
+
+#### Tier 2 — UI Chrome (from i18n Dictionary)
+Static labels that don't change but should be centralized for consistency and future i18n support.
+
+```typescript
+// src/i18n/es.ts — Centralized UI strings
+export const ui = {
+  nav: {
+    home: 'Inicio',
+    services: 'Servicios',
+    solutions: 'Soluciones',
+    coverage: 'Cobertura',
+    contact: 'Contacto',
+    quote: 'Cotizar Ahora',
+  },
+  footer: {
+    copyright: '© {year} Guardman Chile. Todos los derechos reservados.',
+    privacy: 'Política de Privacidad',
+    terms: 'Términos de Servicio',
+    phone_label: 'Teléfono',
+    email_label: 'Email',
+    location_label: 'Ubicación',
+  },
+  forms: {
+    name: 'Nombre Completo',
+    email: 'Correo Electrónico',
+    phone: 'Teléfono',
+    company: 'Empresa',
+    message: 'Mensaje',
+    service: 'Servicio',
+    city: 'Ciudad',
+    submit: 'Enviar',
+    submitting: 'Enviando...',
+    success: '¡Mensaje enviado correctamente!',
+    error: 'Error al enviar. Intente nuevamente.',
+  },
+  sections: {
+    read_more: 'Ver más',
+    view_all: 'Ver todos',
+    back: 'Volver',
+    loading: 'Cargando...',
+  },
+  breadcrumbs: {
+    home: 'Inicio',
+  },
+} as const;
+```
+
+#### Tier 3 — Template Strings (Convex + Interpolation)
+Strings that combine CMS data with templates (e.g., commune pages).
+
+```typescript
+// src/i18n/templates.ts
+export const templates = {
+  commune: {
+    hero_title: (name: string) => `Seguridad en\n${name}`,
+    hero_subtitle: (name: string) =>
+      `Operación táctica y protección integral para empresas y condominios en ${name}. Personal certificado OS10 con presencia local permanente.`,
+    intro_p1: (name: string) =>
+      `Guardman ofrece soluciones integrales de seguridad privada en ${name} y toda la Región Metropolitana.`,
+    cta_title: (name: string) => `Asegure su propiedad en ${name}`,
+    zone_coverage: (commune: string, zone: string) =>
+      `Además de ${commune}, operamos en otras comunas de la ${zone}.`,
+  },
+  careers: {
+    positions_count: (count: number) =>
+      `${count} posiciones abiertas para despliegue inmediato en la corporación.`,
+  },
+} as const;
+```
+
+### 28.3. New Tables Required
+
+#### `careers` Table
+```typescript
+careers: defineTable({
+  title: v.string(),           // "Guardia de Seguridad OS10"
+  slug: v.string(),
+  type: v.string(),            // "Tiempo Completo", "Part-time"
+  location: v.string(),        // "Santiago, RM"
+  description: v.string(),
+  requirements: v.array(v.string()),
+  benefits_ids: v.optional(v.array(v.id("career_benefits"))),
+  is_active: v.boolean(),
+  sort_order: v.number(),
+})
+
+career_benefits: defineTable({
+  title: v.string(),
+  description: v.string(),
+  icon: v.string(),
+  sort_order: v.number(),
+})
+```
+
+#### `pages` Table (Legal / Static Content)
+```typescript
+pages: defineTable({
+  title: v.string(),           // "Política de Privacidad"
+  slug: v.string(),            // "privacidad"
+  type: v.union(v.literal("legal"), v.literal("info"), v.literal("landing")),
+  body_md: v.string(),         // Full markdown content
+  meta_title: v.optional(v.string()),
+  meta_description: v.optional(v.string()),
+  last_updated: v.string(),    // "17 de Febrero, 2026"
+  is_published: v.boolean(),
+})
+```
+
+### 28.4. Implementation Priority
+
+| Priority | Action | Impact |
+|----------|--------|--------|
+| **P0** | Wire Header/Footer nav from `site_config` | Eliminates 30+ hardcoded nav strings |
+| **P0** | Create `careers` table + wire `carreras.astro` | Eliminates 100% hardcoded page |
+| **P0** | Create `pages` table + wire `privacidad`/`terminos` | Eliminates 2 fully hardcoded pages |
+| **P1** | Wire all CTAs from `ctas` table | Eliminates 20+ scattered CTA strings |
+| **P1** | Create `i18n/es.ts` dictionary | Centralizes 60+ UI chrome strings |
+| **P1** | Wire `ServiceFinder` cities from `locations` | Removes hardcoded city dropdown |
+| **P2** | Create `i18n/templates.ts` | Centralizes template strings for communes |
+| **P2** | Wire FAQ category tabs from distinct categories | Removes hardcoded category labels |
+
+---
+
+## 29. Refine CMS Integration — Admin UX & Data Flow
+
+> **Goal**: Map every Convex table to a Refine CMS resource and design the admin experience for non-technical content editors.
+
+### 29.1. Architecture Overview
+
+```
+┌──────────────────────────────────────────────────┐
+│  REFINE CMS (React SPA)                          │
+│  @refinedev/core + @refinedev/antd               │
+│                                                   │
+│  ┌─────────────────────────────────────────────┐ │
+│  │  CUSTOM CONVEX DATA PROVIDER                │ │
+│  │  Implements: getList, getOne, create,       │ │
+│  │  update, deleteOne, getMany                 │ │
+│  │                                              │ │
+│  │  Maps Refine CRUD ops → Convex queries/     │ │
+│  │  mutations via ConvexHttpClient             │ │
+│  └──────────────┬──────────────────────────────┘ │
+│                 │                                 │
+│  ┌──────────────▼──────────────────────────────┐ │
+│  │  CONVEX BACKEND                             │ │
+│  │  15 existing tables + 2 new tables          │ │
+│  │  Queries: getAll, getById, getBySlug        │ │
+│  │  Mutations: create, update, delete          │ │
+│  └─────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────┘
+```
+
+### 29.2. Convex Data Provider for Refine
+
+```typescript
+// admin/src/providers/convexDataProvider.ts
+import { DataProvider } from "@refinedev/core";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "@convex/_generated/api";
+
+const convex = new ConvexHttpClient(import.meta.env.VITE_CONVEX_URL);
+
+export const convexDataProvider: DataProvider = {
+  getList: async ({ resource, pagination, sorters, filters }) => {
+    // Map resource name → Convex query
+    const queryMap: Record<string, any> = {
+      services: api.services.getAllServices,
+      solutions: api.solutions.getAllSolutions,
+      heroes: api.heroes.getAll,
+      faqs: api.faqs.getAllFAQs,
+      blog_posts: api.blog_posts.getAllPosts,
+      site_config: api.site_config.getAll,
+      locations: api.locations.getAllCommunes,
+      team_members: api.team_members.getAll,
+      company_values: api.company_values.getAll,
+      stats: api.stats.getAll,
+      process_steps: api.process_steps.getAll,
+      industries: api.industries.getAll,
+      partners: api.partners.getAll,
+      ctas: api.ctas.getAll,
+      content_blocks: api.content_blocks.getAll,
+      careers: api.careers.getAll,        // NEW
+      pages: api.pages.getAll,            // NEW
+    };
+    const data = await convex.query(queryMap[resource]);
+    // Apply client-side pagination, sorting, filtering
+    return { data, total: data.length };
+  },
+
+  getOne: async ({ resource, id }) => {
+    const data = await convex.query(api[resource].getById, { id });
+    return { data };
+  },
+
+  create: async ({ resource, variables }) => {
+    const data = await convex.mutation(api[resource].create, variables);
+    return { data };
+  },
+
+  update: async ({ resource, id, variables }) => {
+    const data = await convex.mutation(api[resource].update, { id, ...variables });
+    return { data };
+  },
+
+  deleteOne: async ({ resource, id }) => {
+    await convex.mutation(api[resource].remove, { id });
+    return { data: { id } as any };
+  },
+
+  getApiUrl: () => import.meta.env.VITE_CONVEX_URL,
+};
+```
+
+### 29.3. CMS Resource Registry
+
+| Resource | Convex Table | List Fields | Form Fields | Special UX |
+|----------|-------------|-------------|-------------|------------|
+| **Heroes** | `heroes` | page, title, badge | title, subtitle, badge, cta_primary_text/href, cta_secondary_text/href, background_type, background_url, trust_badges[] | YouTube URL preview, image upload |
+| **Services** | `services` | title, slug, is_active | title, slug, tagline, description, features[], benefits[], icon, image, is_active, sort_order | Slug auto-gen from title, features as tag input |
+| **Solutions** | `solutions` | name, slug, is_active | name→title (rename), slug, description, features[], icon, image, is_active, sort_order | Same as Services |
+| **FAQs** | `faqs` | question, category | question, answer (rich text), category (select), sort_order | Category grouping, markdown editor for answer |
+| **Blog Posts** | `blog_posts` | title, author, status | title, slug, excerpt, content[] (markdown blocks), author, cover_image, tags[], status, published_at | Markdown editor, tag input, cover image upload, draft/publish toggle |
+| **Team Members** | `team_members` | name, role | name, role, bio, image, social_links{}, sort_order | Image upload, social links as key-value pairs |
+| **Company Values** | `company_values` | title, icon | title, description, icon (select), sort_order | Icon selector component |
+| **Statistics** | `stats` | label, value | label, value, suffix, icon, sort_order | Numeric input with suffix preview |
+| **Process Steps** | `process_steps` | title, order | title, description, step_number, icon | Drag-and-drop reorder |
+| **Industries** | `industries` | name, icon | name, slug, description, icon, image, is_active, sort_order | Icon selector |
+| **Locations** | `locations` | name, zone | name, slug, zone (select), population, meta_title, meta_description, og_image | Zone dropdown, SEO fields preview |
+| **Partners** | `partners` | name, industry | name, industry, logo, quote, is_featured, sort_order | Logo upload |
+| **CTAs** | `ctas` | identifier, headline | identifier (slug), headline, subtitle, cta_primary_text, cta_primary_href, cta_secondary_text, cta_secondary_href, background | Identifier for referencing from pages |
+| **Content Blocks** | `content_blocks` | identifier, type | identifier, type, title, subtitle, body_md, features[], stats[], media_url | Flexible block editor |
+| **Site Config** | `site_config` | key | key, value (JSON editor) | Key-value config with JSON validation |
+| **Careers** | `careers` | title, type, is_active | title, slug, type, location, description, requirements[], is_active, sort_order | Requirements as tag list |
+| **Pages** | `pages` | title, type, is_published | title, slug, type, body_md, meta_title, meta_description, last_updated, is_published | Full markdown editor, SEO preview |
+
+### 29.4. Admin Navigation Structure
+
+```
+📦 Guardman CMS
+├── 📊 Dashboard                  ← Stats overview (leads, contacts, page views)
+├── 📝 Content
+│   ├── Heroes                    ← Section-level hero content
+│   ├── CTAs                      ← Reusable call-to-action blocks
+│   ├── Content Blocks            ← Flexible sections (GuardPod, etc.)
+│   ├── Pages                     ← Legal / static pages (privacidad, terminos)
+│   └── Blog Posts                ← Article management with drafts
+├── 🏢 Business
+│   ├── Services                  ← Service pages and details
+│   ├── Solutions                 ← Industry solution pages
+│   ├── Industries                ← Industry categories
+│   └── Careers                   ← Job listings
+├── 🌍 SEO & Coverage
+│   ├── Locations / Communes      ← 52+ commune pages
+│   ├── FAQs                      ← Grouped by category
+│   └── Statistics                ← Trust numbers (clients, guards, etc.)
+├── 👥 About
+│   ├── Team Members              ← Staff profiles
+│   ├── Company Values            ← Mission/vision/values
+│   ├── Partners                  ← Client logos and quotes
+│   └── Process Steps             ← How-we-work timeline
+└── ⚙️ Settings
+    └── Site Config               ← Global settings, nav, footer, social links
+```
+
+### 29.5. Key UX Features for Non-Technical Editors
+
+| Feature | Implementation | Benefit |
+|---------|---------------|---------|
+| **Live Preview** | Iframe showing site with draft changes via Convex real-time subscriptions | Editors see changes before publishing |
+| **Slug Auto-Generation** | `useWatch` hook on title field → `slugify(title)` | Prevents broken URLs |
+| **Image Upload** | Convex file storage + upload component in forms | No external image hosting needed |
+| **Rich Text / Markdown** | `@uiw/react-md-editor` integrated in form fields | Editors write in visual WYSIWYG |
+| **Drag-and-Drop Reorder** | `@dnd-kit/sortable` on list views for `sort_order` tables | Intuitive content ordering |
+| **SEO Preview** | Google SERP preview component showing title (60ch max) + description (155ch max) | Editors optimize for search |
+| **Publish/Draft Toggle** | `is_published`/`is_active` boolean switch in forms | Content staging before going live |
+| **Audit Log** | `_creationTime` from Convex + custom `updated_by` field | Track who changed what |
+| **Bulk Actions** | Refine's built-in list selection + bulk delete/publish | Efficient content management |
+
+### 29.6. Media Management
+
+```
+┌─────────────────────────────────┐
+│  MEDIA FLOW                     │
+│                                  │
+│  Refine Upload Widget           │
+│       ↓                          │
+│  Convex File Storage             │
+│  (convex.storage.store())       │
+│       ↓                          │
+│  Returns: storageId             │
+│       ↓                          │
+│  convex.storage.getUrl(id)      │
+│  → https://xxx.convex.cloud/... │
+│       ↓                          │
+│  Astro <Image> component        │
+│  → Auto WebP/AVIF conversion   │
+│  → Responsive srcset            │
+└─────────────────────────────────┘
+```
+
+---
+
+## 30. Photography & Image SEO Treatment
+
+> **Goal**: Every image in the system must be optimized for performance (WebP/AVIF), accessibility (alt text), and SEO (structured data, sitemaps).
+
+### 30.1. Current State — Image Audit
+
+| Component | Image Source | Issues |
+|-----------|------------|--------|
+| `Hero.astro` | YouTube embed OR `background_url` from Convex | No `<Image>` optimization, no alt text on bg |
+| `ServicesGrid.astro` | Hardcoded Unsplash URLs in `serviceImages{}` map | 6 external URLs, no responsive variants, no alt from Convex |
+| `SolutionsGrid.astro` | Hardcoded Unsplash URLs in `solutionImages{}` map | 5 external URLs, same problems |
+| `ClientsGrid.astro` | `partner.logo` from Convex | No `<Image>` processing, raw URL |
+| `FeatureCard.astro` | `image` prop from parent | Uses raw `<img>`, no optimization |
+| `ServiceCard.astro` | `icon` prop only (no photo) | OK — icon-based |
+| `IndustryCard.astro` | `image` prop | Uses raw `<img>` |
+| Blog cover images | `post.cover_image` from Convex | Raw URL, no srcset |
+| Team member photos | `member.image` from Convex | Raw URL, no optimization |
+| `cobertura/[comuna].astro` | Hardcoded Unsplash in hero bg | External URL, not managed |
+| `carreras.astro` | Hardcoded Unsplash in hero bg | External URL, not managed |
+| Logo (`Header`/`Footer`) | `/images/guardman_logo.png` in `public/` | Static, no optimization |
+
+### 30.2. Astro Image Optimization Pipeline
+
+#### Using `<Image />` Component
+```astro
+---
+import { Image } from 'astro:assets';
+---
+
+<!-- Astro automatically: -->
+<!-- 1. Converts to WebP (default) -->
+<!-- 2. Generates width/height for CLS prevention -->
+<!-- 3. Adds loading="lazy" for below-fold -->
+<!-- 4. Infers dimensions from local files -->
+
+<Image
+  src={service.image}
+  alt={service.title + ' - Guardman Chile'}
+  width={800}
+  height={600}
+  format="webp"
+  quality={80}
+  loading="lazy"
+  decoding="async"
+  class="rounded-xl object-cover"
+/>
+```
+
+#### Using `<Picture />` for Multi-Format Fallback
+```astro
+---
+import { Picture } from 'astro:assets';
+---
+
+<!-- Generates <picture> with AVIF → WebP → JPEG fallback -->
+<Picture
+  src={hero.background_url}
+  alt={hero.title}
+  formats={['avif', 'webp']}
+  widths={[400, 800, 1200, 1920]}
+  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1920px"
+  loading="eager"  <!-- Hero images must NOT be lazy -->
+  class="w-full h-full object-cover"
+/>
+```
+
+### 30.3. Image SEO Checklist
+
+| Requirement | Implementation | Impact |
+|------------|---------------|--------|
+| **Descriptive alt text** | Every `<Image>` must have alt from CMS: `{service.title} - Guardman Chile` | Accessibility + Google Image Search |
+| **Filename optimization** | Convex storage → rename on upload: `guardias-seguridad-santiago.webp` | Google indexes filenames |
+| **Width & Height attributes** | Always set via `<Image>` component to prevent CLS | Core Web Vitals |
+| **Lazy loading** | `loading="lazy"` for all below-fold images | LCP optimization |
+| **Eager loading for hero** | `loading="eager"` + `fetchpriority="high"` for above-fold LCP images | LCP score improvement |
+| **Preload critical images** | `<link rel="preload" as="image">` in `<head>` for hero background | LCP < 2.5s |
+| **AVIF + WebP** | `<Picture formats={['avif', 'webp']}>` | 50-80% smaller than JPEG |
+| **Responsive srcset** | `widths={[400, 800, 1200]}` + `sizes` attribute | Serve correct size per device |
+| **Image sitemap** | Auto-generate at `/sitemap-images.xml` | Google discovers all images |
+| **Open Graph images** | 1200×630 OG images per page, from Convex or auto-generated | Social sharing previews |
+| **Schema.org ImageObject** | Add `image` property to LocalBusiness, Service, Article schemas | Rich snippets in SERPs |
+
+### 30.4. Image Storage Architecture
+
+```
+┌──────────────────────┐
+│  CMS Upload (Refine) │
+│  Accepts: JPG, PNG,  │
+│  WebP, AVIF, SVG     │
+└─────────┬────────────┘
+          ↓
+┌──────────────────────┐
+│  Convex File Storage │
+│  Returns: storageId  │
+│  URL: convex.cloud/  │
+└─────────┬────────────┘
+          ↓
+┌──────────────────────┐
+│  Astro Build Time    │
+│  <Image> / <Picture> │
+│  → WebP/AVIF convert │
+│  → srcset generation │
+│  → width/height calc │
+│  → lazy/eager attrs  │
+└─────────┬────────────┘
+          ↓
+┌──────────────────────┐
+│  CDN (Vercel Edge)   │
+│  Cached, compressed  │
+│  Brotli/gzip         │
+└──────────────────────┘
+```
+
+### 30.5. Alt Text Generation Strategy
+
+| Image Type | Alt Text Pattern | Example |
+|-----------|-----------------|---------|
+| Service hero | `{service.title} en {commune OR Santiago}` | "Guardias de Seguridad en Las Condes" |
+| Solution card | `{solution.title} - seguridad privada` | "Seguridad para Condominios - seguridad privada" |
+| Team member | `{member.name}, {member.role} en Guardman` | "Carlos Soto, Jefe de Operaciones en Guardman" |
+| Client logo | `Logo de {partner.name}` | "Logo de Falabella" |
+| Blog cover | `{post.title}` | "5 Claves para la Seguridad en Condominios" |
+| Hero background | `Servicios de seguridad Guardman Chile` | Decorative but still indexed |
+| Commune hero | `Seguridad privada en {commune.name}` | "Seguridad privada en Providencia" |
+
+### 30.6. Convex Schema for Image Fields
+
+Every table that stores images should use this pattern:
+
+```typescript
+// Standard image field pattern
+image: v.optional(v.string()),           // Convex storage URL
+image_alt: v.optional(v.string()),       // SEO alt text
+image_storage_id: v.optional(v.string()), // Convex storageId for deletion
+```
+
+Tables needing `image` + `image_alt` fields added: `services`, `solutions`, `industries`, `careers`, `pages`.
+
+---
+
+## 31. Advanced Local SEO — Chile Market Domination
+
+> **Goal**: Implement cutting-edge local SEO techniques specifically for dominating "seguridad privada" searches in Chile's Región Metropolitana, covering Google Business Profile, Schema.org, programmatic SEO, and Chile-specific legal compliance signals.
+
+### 31.1. Google Business Profile (GBP) Optimization
+
+#### Service Area Business Configuration
+Since Guardman covers the entire Región Metropolitana without a public storefront, configure as a **Service Area Business (SAB)**:
+
+| Setting | Value |
+|---------|-------|
+| Business Name | Guardman Chile - Seguridad Privada |
+| Primary Category | Security Guard Service |
+| Secondary Categories | Security Alarm System Supplier, Security System Installer, Business Security System |
+| Service Areas | All 52 communes of Región Metropolitana (individual entries) |
+| Address | Hidden (SAB mode) |
+| Phone | +56 9 3000 0010 |
+| Website | https://guardman.cl |
+| Hours | Mon-Fri 08:00-18:00, Emergency: 24/7 |
+
+#### GBP Content Calendar (Monthly)
+
+| Week | Action | Content Type |
+|------|--------|-------------|
+| 1 | Google Post: service highlight | "Servicio del Mes: Patrullaje Preventivo para Condominios" |
+| 2 | Photo upload (5-10 images) | Team photos, equipment, vehicles, client sites (with consent) |
+| 3 | Google Post: local coverage | "Ahora con cobertura ampliada en Maipú y Pudahuel" |
+| 4 | Q&A proactive seeding | Pre-populate "Ask" section with top 5 FAQs |
+
+#### Review Acquisition Strategy
+
+| Technique | Implementation |
+|-----------|---------------|
+| Post-service email | Automated email 24h after service delivery with GBP review link |
+| WhatsApp follow-up | Manual message with direct review URL |
+| QR code on guard reports | Physical QR linking to GBP review page |
+| Response protocol | Reply to ALL reviews within 24h, mention service + commune in response |
+| Target | 5+ reviews/month with ≥4.5 average rating |
+
+### 31.2. Schema.org — Advanced Implementation
+
+#### 31.2.1. LocalBusiness per Commune
+Each `/cobertura/[comuna]` page should have its own `LocalBusiness` schema:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "SecurityCompany",
+  "name": "Guardman Chile - Seguridad en Las Condes",
+  "description": "Servicios de seguridad privada en Las Condes...",
+  "url": "https://guardman.cl/cobertura/las-condes",
+  "telephone": "+56930000010",
+  "areaServed": {
+    "@type": "City",
+    "name": "Las Condes",
+    "containedInPlace": {
+      "@type": "AdministrativeArea",
+      "name": "Región Metropolitana de Santiago"
+    }
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Servicios de Seguridad",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Guardias de Seguridad OS10",
+          "url": "https://guardman.cl/servicios/guardias-seguridad"
+        }
+      }
+    ]
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "reviewCount": "127"
+  }
+}
+```
+
+#### 31.2.2. Service Schema per Service Page
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "serviceType": "Guardias de Seguridad Privada",
+  "provider": { "@type": "SecurityCompany", "name": "Guardman Chile" },
+  "areaServed": "Región Metropolitana de Santiago, Chile",
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "itemListElement": []
+  },
+  "termsOfService": "https://guardman.cl/terminos",
+  "review": []
+}
+```
+
+#### 31.2.3. BreadcrumbList on ALL Pages
+Already partially implemented; ensure consistency:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://guardman.cl/" },
+    { "@type": "ListItem", "position": 2, "name": "Cobertura", "item": "https://guardman.cl/cobertura" },
+    { "@type": "ListItem", "position": 3, "name": "Las Condes" }
+  ]
+}
+```
+
+### 31.3. Programmatic SEO — Commune × Service Matrix
+
+Generate pages at the intersection of **services × communes** for maximum long-tail coverage:
+
+| URL Pattern | Target Query | Page Count |
+|-------------|-------------|-----------|
+| `/cobertura/{comuna}` | "seguridad privada {comuna}" | 52 pages |
+| `/servicios/{service}` | "guardias de seguridad Chile" | 6 pages |
+| `/servicios/{service}/{comuna}` | "guardias seguridad Las Condes" | 312 pages |
+| **Total programmatic pages** | | **370 pages** |
+
+#### Content Uniqueness Strategy (Avoid Thin Content)
+Each service×commune page must have **≥300 words of unique content**:
+
+1. **Dynamic intro paragraph** — generated template with commune-specific data (population, zone, known landmarks)
+2. **Local benefits** — 4 benefits with commune-interpolated descriptions
+3. **Service feature list** — from `services` table features[]
+4. **Zone coverage section** — links to neighboring communes in same zone
+5. **LocalBusiness + Service Schema** — unique structured data per page
+6. **Unique meta title/description** — from template: `"{service} en {commune} | Guardman"`
+
+### 31.4. Chile-Specific Legal Compliance Signals
+
+#### Ley N° 21.659 (New Private Security Law, Nov 2025)
+Signal compliance prominently in content and schema to build E-E-A-T:
+
+| Signal | Where | Content |
+|--------|-------|---------|
+| OS10 Certification | Service pages, About page | "Personal certificado bajo normativa OS10 del Ministerio del Interior" |
+| Company authorization | Footer, About page | "Empresa autorizada por la Subsecretaría de Prevención del Delito" |
+| Insurance and bonding | Terms page, Service pages | "Cobertura de responsabilidad civil conforme a Ley 21.659" |
+| Schema.org `knowsAbout` | Organization schema | `["Ley 21.659", "OS10", "Seguridad Privada Chile"]` |
+
+#### Ley N° 21.719 (Data Protection, 2024)
+| Signal | Where |
+|--------|-------|
+| Privacy policy page | `/privacidad` — already exists |
+| Cookie consent banner | Global — needed |
+| Data processing notice | Contact/quote forms |
+| DPO contact | Footer or privacy page |
+
+### 31.5. Link Building — Chile Local Strategies
+
+| Strategy | Target | Action |
+|----------|--------|--------|
+| **Industry Directories** | ACHS (Asociación Chilena de Seguridad), Cámara de Comercio | Register and maintain profiles |
+| **Local Directories** | PaginasAmarillas.cl, EmolNegocios, CyLex Chile | NAP-consistent listings |
+| **Content Partnerships** | Chilean security/business blogs | Guest posts on security trends |
+| **Sponsorships** | Local events, industry conferences (EXPO Seguridad) | Event sponsorship with backlinks |
+| **Municipality pages** | Commune official websites | Partner for community safety programs |
+| **HARO / Connectively** | Security journalists | Expert quotes on security topics |
+
+### 31.6. Core Web Vitals Optimization
+
+| Metric | Target | Astro Technique |
+|--------|--------|----------------|
+| **LCP** < 2.5s | Hero image | `<Image loading="eager" fetchpriority="high">`, `<link rel="preload">` |
+| **FID/INP** < 200ms | Interactive forms | `client:visible` for forms (defer hydration) |
+| **CLS** < 0.1 | All images | `width` + `height` on every `<img>`, fixed-size containers |
+| **TTFB** < 800ms | SSR | Vercel Edge Functions, Convex edge caching |
+| **TBT** < 200ms | All pages | Astro ships 0 JS by default; only hydrate islands |
+
+### 31.7. Semantic HTML & Heading Hierarchy
+
+Every page must follow this heading structure:
+
+```
+<h1> — Unique per page, contains primary keyword (1 per page only)
+  <h2> — Section headers (services, benefits, coverage, CTA)
+    <h3> — Sub-section items (individual service, benefit, commune)
+```
+
+Example for `/cobertura/las-condes`:
+```
+<h1>Seguridad Privada en Las Condes</h1>
+  <h2>Empresa de Seguridad en Las Condes</h2>
+  <h2>Protocolos disponibles</h2>
+    <h3>Guardias de Seguridad</h3>
+    <h3>Alarmas Ajax</h3>
+  <h2>Presencia local estratégica</h2>
+  <h2>Zona de Cobertura - Zona Oriente</h2>
+  <h2>Asegure su propiedad en Las Condes</h2>
+```
+
+---
+
+## 32. File Tree Architecture Blueprint
+
+> **Goal**: Define a clean, scalable, simple, and functional file system structure that supports the entire application including the public site, admin CMS, Convex backend, and SEO infrastructure.
+
+### 32.1. Current State — File Tree Audit
+
+```
+web/src/
+├── components/        ← 43 files, FLAT subdirectories
+│   ├── forms/         ← 4 form components
+│   ├── layout/        ← Header, Footer, MobileMenu
+│   ├── og/            ← OG image template
+│   ├── sections/      ← 18 section components (LARGEST folder)
+│   ├── seo/           ← 4 SEO schema components
+│   └── ui/            ← 10 UI primitives
+├── config/            ← 1 file (navigation?)
+├── content/           ← 10 files (Astro content collections)
+├── data/              ← 1 file (site.ts — NEEDS REMOVAL)
+├── layouts/           ← 1 file (BaseLayout.astro)
+├── lib/               ← 1 file (convex.ts client)
+├── pages/             ← 20 files across 6 subdirectories
+├── styles/            ← 1 file (global.css)
+└── utils/             ← 1 file (seo.ts)
+```
+
+**Problems identified:**
+- `data/site.ts` is a static data source that should be eliminated (move to Convex `site_config`)
+- `config/` has only 1 file — could be merged with `lib/`
+- No `i18n/` directory for content externalization
+- No `types/` directory for shared TypeScript types
+- `sections/` has 18+ files and growing — could benefit from feature grouping
+- No `hooks/` directory for shared React hooks
+- Missing `assets/` directory for local images that need Astro optimization
+
+### 32.2. Proposed File Tree — Clean Architecture
+
+```
+guardman/
+├── convex/                          # ← CONVEX BACKEND (unchanged)
+│   ├── _generated/                  #    Auto-generated types
+│   ├── schema.ts                    #    Database schema
+│   ├── services.ts                  #    Service queries/mutations
+│   ├── solutions.ts                 #    Solution queries/mutations
+│   ├── heroes.ts                    #    Hero queries/mutations
+│   ├── faqs.ts                      #    FAQ queries/mutations
+│   ├── blog_posts.ts                #    Blog queries/mutations
+│   ├── site_config.ts               #    Site config queries/mutations
+│   ├── locations.ts                 #    Location queries/mutations
+│   ├── team_members.ts              #    Team member queries/mutations
+│   ├── company_values.ts            #    Company values queries/mutations
+│   ├── stats.ts                     #    Stats queries/mutations
+│   ├── process_steps.ts             #    Process steps queries/mutations
+│   ├── industries.ts                #    Industry queries/mutations
+│   ├── partners.ts                  #    Partner queries/mutations
+│   ├── ctas.ts                      #    CTA queries/mutations
+│   ├── content_blocks.ts            #    Content block queries/mutations
+│   ├── contacts.ts                  #    Contact form mutations
+│   ├── leads.ts                     #    Lead form mutations
+│   ├── careers.ts                   #    NEW: Career queries/mutations
+│   ├── pages.ts                     #    NEW: Static page queries/mutations
+│   └── auth.ts                      #    Admin authentication
+│
+├── web/                             # ← ASTRO FRONTEND
+│   ├── public/                      #    Static assets (no processing)
+│   │   ├── fonts/                   #    Custom fonts (Inter, etc.)
+│   │   ├── images/                  #    Static images (logo, favicon)
+│   │   │   └── guardman_logo.png
+│   │   ├── robots.txt
+│   │   ├── sitemap.xml
+│   │   └── favicon.svg
+│   │
+│   └── src/
+│       ├── assets/                  #    NEW: Images processed by Astro
+│       │   ├── heroes/              #    Hero background images
+│       │   ├── services/            #    Service card images
+│       │   ├── solutions/           #    Solution card images
+│       │   └── team/                #    Team member photos
+│       │
+│       ├── components/              #    UI Components (organized by concern)
+│       │   ├── layout/              #    Page scaffold
+│       │   │   ├── Header.astro
+│       │   │   ├── Footer.astro
+│       │   │   └── MobileMenu.tsx
+│       │   │
+│       │   ├── sections/            #    Page sections (composites)
+│       │   │   ├── Hero.astro
+│       │   │   ├── ServicesGrid.astro
+│       │   │   ├── SolutionsGrid.astro
+│       │   │   ├── ClientsGrid.astro
+│       │   │   ├── GuardPodSection.astro
+│       │   │   ├── FAQ.astro
+│       │   │   ├── CTASection.astro
+│       │   │   ├── ServiceFinder.astro
+│       │   │   ├── ProcessSection.astro
+│       │   │   ├── BenefitsSection.astro
+│       │   │   ├── FeaturesSection.astro
+│       │   │   ├── IndustryGrid.astro
+│       │   │   ├── StatsSection.astro
+│       │   │   └── ChallengesSection.astro
+│       │   │
+│       │   ├── ui/                  #    Atomic UI primitives
+│       │   │   ├── Badge.astro
+│       │   │   ├── Breadcrumbs.astro
+│       │   │   ├── Button.astro
+│       │   │   ├── Card.astro
+│       │   │   ├── Container.astro
+│       │   │   ├── FeatureCard.astro
+│       │   │   ├── Icon.astro
+│       │   │   ├── IndustryCard.astro
+│       │   │   ├── Section.astro
+│       │   │   ├── ServiceCard.astro
+│       │   │   └── index.ts          #    NEW: barrel exports
+│       │   │
+│       │   ├── forms/               #    Form components (React islands)
+│       │   │   ├── ConvexContactForm.tsx
+│       │   │   ├── ConvexLeadForm.tsx
+│       │   │   └── index.ts
+│       │   │
+│       │   └── seo/                 #    SEO schema components
+│       │       ├── FAQSchema.astro
+│       │       ├── LocalBusinessSchema.astro
+│       │       ├── OrganizationSchema.astro
+│       │       ├── ServiceSchema.astro
+│       │       └── BreadcrumbSchema.astro  # NEW
+│       │
+│       ├── i18n/                    #    NEW: Content externalization
+│       │   ├── es.ts                #    Spanish UI strings
+│       │   └── templates.ts         #    Template functions
+│       │
+│       ├── layouts/                 #    Page layouts
+│       │   └── BaseLayout.astro
+│       │
+│       ├── lib/                     #    Shared utilities & clients
+│       │   ├── convex.ts            #    ConvexHttpClient init
+│       │   ├── seo.ts              #    SEO utility functions (moved from utils/)
+│       │   └── image.ts            #    NEW: Image helper functions
+│       │
+│       ├── pages/                   #    File-based routing
+│       │   ├── index.astro          #    Homepage
+│       │   ├── nosotros.astro       #    About page
+│       │   ├── contacto.astro       #    Contact page
+│       │   ├── cotizar.astro        #    Quote page
+│       │   ├── carreras.astro       #    Careers page
+│       │   ├── privacidad.astro     #    Privacy policy (from `pages` table)
+│       │   ├── terminos.astro       #    Terms of service (from `pages` table)
+│       │   ├── servicios/
+│       │   │   ├── index.astro      #    Services hub
+│       │   │   └── [slug].astro     #    Service detail
+│       │   ├── soluciones/
+│       │   │   ├── index.astro      #    Solutions hub
+│       │   │   └── [slug].astro     #    Solution detail
+│       │   ├── cobertura/
+│       │   │   ├── index.astro      #    Coverage hub
+│       │   │   └── [comuna].astro   #    Commune detail (52 pages)
+│       │   ├── blog/
+│       │   │   ├── index.astro      #    Blog index
+│       │   │   └── [slug].astro     #    Blog post detail
+│       │   ├── api/                 #    API routes
+│       │   │   ├── admin/           #    Admin auth endpoints
+│       │   │   └── webhooks/        #    External webhooks
+│       │   ├── og/                  #    OG image generation
+│       │   └── sitemap-images.xml.ts  # NEW: Image sitemap
+│       │
+│       ├── styles/                  #    Global styles
+│       │   └── global.css
+│       │
+│       └── types/                   #    NEW: Shared TypeScript types
+│           ├── convex.ts            #    Convex response types
+│           ├── components.ts        #    Component prop types
+│           └── seo.ts              #    SEO/Schema types
+│
+├── admin/                           # ← REFINE CMS (separate build)
+│   ├── src/
+│   │   ├── App.tsx                  #    Refine app root
+│   │   ├── providers/
+│   │   │   ├── convexDataProvider.ts  # Custom Convex data provider
+│   │   │   └── authProvider.ts        # Auth provider
+│   │   ├── resources/               #    CMS resource pages
+│   │   │   ├── heroes/
+│   │   │   │   ├── list.tsx
+│   │   │   │   ├── create.tsx
+│   │   │   │   └── edit.tsx
+│   │   │   ├── services/
+│   │   │   ├── solutions/
+│   │   │   ├── faqs/
+│   │   │   ├── blog-posts/
+│   │   │   ├── locations/
+│   │   │   ├── careers/
+│   │   │   ├── pages/
+│   │   │   ├── site-config/
+│   │   │   └── ... (other resources)
+│   │   ├── components/              #    Shared CMS components
+│   │   │   ├── ImageUpload.tsx
+│   │   │   ├── MarkdownEditor.tsx
+│   │   │   ├── SeoPreview.tsx
+│   │   │   ├── SlugField.tsx
+│   │   │   └── IconSelector.tsx
+│   │   └── layouts/
+│   │       └── AdminLayout.tsx
+│   └── package.json
+│
+├── convex_plan.md                   # ← This document
+├── package.json
+└── astro.config.mjs
+```
+
+### 32.3. Naming Conventions
+
+| Item | Convention | Example |
+|------|-----------|---------|
+| **Components** | PascalCase | `ServicesGrid.astro`, `FeatureCard.astro` |
+| **Pages** | kebab-case | `index.astro`, `nosotros.astro` |
+| **Dynamic routes** | `[param].astro` | `[slug].astro`, `[comuna].astro` |
+| **Utilities** | camelCase | `convex.ts`, `seo.ts` |
+| **Types** | camelCase files, PascalCase exports | `types/convex.ts` → `ServiceDoc` |
+| **i18n keys** | snake_case nested | `ui.nav.home`, `ui.forms.submit` |
+| **CSS classes** | Tailwind utilities | `text-gray-900 tracking-tight` |
+| **Convex tables** | snake_case | `blog_posts`, `site_config` |
+| **Convex functions** | camelCase | `getAllServices`, `getBySlug` |
+| **Image files** | kebab-case descriptive | `guardias-seguridad-santiago.webp` |
+
+### 32.4. Import Aliases
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@ui/*": ["src/components/ui/*"],
+      "@sections/*": ["src/components/sections/*"],
+      "@layouts/*": ["src/layouts/*"],
+      "@lib/*": ["src/lib/*"],
+      "@i18n/*": ["src/i18n/*"],
+      "@types/*": ["src/types/*"],
+      "@assets/*": ["src/assets/*"],
+      "@convex/*": ["../convex/*"]
+    }
+  }
+}
+```
+
+### 32.5. Barrel Exports for Clean Imports
+
+```typescript
+// src/components/ui/index.ts
+export { default as Badge } from './Badge.astro';
+export { default as Button } from './Button.astro';
+export { default as Card } from './Card.astro';
+export { default as Container } from './Container.astro';
+export { default as Icon } from './Icon.astro';
+export { default as Section } from './Section.astro';
+
+// Usage in pages:
+// import { Container, Section, Button } from '@ui';
+```
+
+### 32.6. Files to Delete
+
+| File | Reason |
+|------|--------|
+| `src/data/site.ts` | All data migrated to Convex `site_config` |
+| `src/config/` directory | Merge into `src/lib/` |
+| `src/utils/seo.ts` | Move to `src/lib/seo.ts` |
+| `src/pages/index.static.astro` | Legacy backup, no longer needed |
+| `src/pages/sitemap.xml.ts.bak` | Backup file, restore or delete |
+| `src/components/sections/*Ajax.astro` | 3 Ajax variants — merge into main components |
+| `src/components/DynamicSection.astro` | Standalone file outside subdirectory |
+
+### 32.7. Architecture Principles
+
+| Principle | Rule | Reasoning |
+|-----------|------|-----------|
+| **Single source of truth** | All content from Convex, all UI chrome from `i18n/` | Zero hardcoded text |
+| **Colocation** | Keep related files together (e.g., `resources/heroes/{list,create,edit}.tsx`) | Easier navigation |
+| **Flat when possible** | Don't nest beyond 3 levels deep in `src/` | Simple mental model |
+| **Barrel exports** | Every component subdirectory has `index.ts` | Clean import paths |
+| **Alias everything** | Use `@components/`, `@lib/`, `@i18n/` prefixes | No relative path madness |
+| **Separate builds** | `web/` (Astro SSR) and `admin/` (React SPA) are independent | Independent deployment |
+| **Type safety** | Shared types in `src/types/`, Convex types auto-generated | Catch errors at compile time |
+| **Progressive enhancement** | Astro ships 0 JS; only hydrate forms via `client:visible` | Maximum performance |
+
+---
+
+> **Document Version**: Draft 6 — February 19, 2026
+> **Total Sections**: 32 chapters + 5 appendices
+> **Total Tables Audited**: 22 existing + 4 proposed new (`careers`, `career_benefits`, `pages`, image fields on 5 tables)
+> **Total Pages Projected**: ~370+ programmatic pages
+> **New in Draft 6**: Zero Hardcoded Text audit with 200+ strings mapped (§28), Refine CMS Integration with full resource registry and data provider design (§29), Image SEO Treatment pipeline with WebP/AVIF/srcset blueprint (§30), Advanced Local SEO for Chile with GBP, Schema.org, Ley 21.659 compliance, and link building strategies (§31), File Tree Architecture Blueprint with naming conventions and import aliases (§32)
+
