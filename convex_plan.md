@@ -25,6 +25,14 @@
 17. [Convex Performance Optimization](#17-convex-performance-optimization)
 18. [Advanced Schema.org Implementation](#18-advanced-schemaorg-implementation)
 19. [Data Unification Strategy](#19-data-unification-strategy)
+20. [Execution Plan — Schema Cleanup (Phase 1)](#20-execution-plan--schema-cleanup-phase-1)
+21. [Execution Plan — Frontend (Phase 2)](#21-execution-plan--frontend-phase-2)
+22. [Refine CMS Evaluation](#22-refine-cms-evaluation)
+23. [Thin Content Avoidance Strategy](#23-thin-content-avoidance-strategy)
+24. [Google Local Pack Domination Checklist (2025)](#24-google-local-pack-domination-checklist-2025)
+25. [Design System — Visual DNA](#25-design-system--visual-dna)
+26. [Component Registry — Data Mapping](#26-component-registry--data-mapping)
+27. [Page-by-Page Blueprint](#27-page-by-page-blueprint)
 
 ---
 
@@ -1674,8 +1682,1070 @@ export const seedServiceLocations = mutation({
 
 ---
 
-> **Document Version**: Draft 3 (Final) — February 19, 2026
-> **Total Sections**: 19 chapters + 5 appendices
-> **Total Tables Audited**: 22 (+ 4 proposed new)
+## 20. Execution Plan — Schema Cleanup (Phase 1)
+
+> **Critical**: This is the foundation. No SEO work will succeed if the schema is broken.
+
+### 20.1 The Expand-Migrate-Contract Pattern
+
+Convex doesn't have SQL ALTER TABLE. All schema changes follow this 3-step process:
+
+```
+Step 1: EXPAND   → Add new optional fields, keep old ones
+Step 2: MIGRATE  → Backfill data from old to new fields  
+Step 3: CONTRACT → Remove old fields after migration
+```
+
+### 20.2 Cleanup Execution Order
+
+Execute these in order. Each step is a separate `npx convex deploy`.
+
+#### Step 1: Make Legacy Fields Optional (EXPAND)
+```typescript
+// schema.ts changes — mark for removal but don't break existing data
+solutions: defineTable({
+  id: v.optional(v.string()),           // was required → now optional
+  name: v.optional(v.string()),         // was required → now optional  
+  solutions: v.optional(v.array(v.string())), // confusing self-ref → will rename
+  title: v.string(),                    // NOW REQUIRED (was optional)
+  // ... rest unchanged
+})
+
+services: defineTable({
+  id: v.optional(v.string()),           // was required → now optional
+  // ... rest unchanged
+})
+
+industries: defineTable({
+  id: v.optional(v.string()),           // was required → now optional
+  challenges: v.optional(v.array(v.string())),      // was v.any() → now typed
+  relatedServices: v.optional(v.array(v.string())), // was v.any() → now typed
+  solutions: v.optional(v.array(v.string())),       // was v.any() → now typed
+  // ... rest unchanged
+})
+```
+
+#### Step 2: Backfill Data (MIGRATE)
+```typescript
+// convex/migrations/cleanup_legacy.ts
+import { internalMutation } from './_generated/server';
+
+export const backfillSolutions = internalMutation({
+  handler: async (ctx) => {
+    const solutions = await ctx.db.query('solutions').collect();
+    for (const sol of solutions) {
+      // Copy name → title if title is missing
+      if (!sol.title && sol.name) {
+        await ctx.db.patch(sol._id, { title: sol.name });
+      }
+      // Remove legacy id field
+      if (sol.id !== undefined) {
+        await ctx.db.patch(sol._id, { id: undefined });
+      }
+      // Remove confusing solutions[] field  
+      if (sol.solutions !== undefined) {
+        await ctx.db.patch(sol._id, { solutions: undefined });
+      }
+    }
+    return { migrated: solutions.length };
+  },
+});
+
+export const backfillServices = internalMutation({
+  handler: async (ctx) => {
+    const services = await ctx.db.query('services').collect();
+    for (const svc of services) {
+      if (svc.id !== undefined) {
+        await ctx.db.patch(svc._id, { id: undefined });
+      }
+    }
+    return { migrated: services.length };
+  },
+});
+
+export const backfillIndustries = internalMutation({
+  handler: async (ctx) => {
+    const industries = await ctx.db.query('industries').collect();
+    for (const ind of industries) {
+      const updates: Record<string, unknown> = {};
+      if (ind.id !== undefined) updates.id = undefined;
+      // Ensure typed arrays
+      if (ind.challenges && !Array.isArray(ind.challenges)) {
+        updates.challenges = [];
+      }
+      if (ind.relatedServices && !Array.isArray(ind.relatedServices)) {
+        updates.relatedServices = [];
+      }
+      if (Object.keys(updates).length > 0) {
+        await ctx.db.patch(ind._id, updates);
+      }
+    }
+    return { migrated: industries.length };
+  },
+});
+```
+
+#### Step 3: Remove Legacy Fields (CONTRACT)
+```typescript
+// After confirming all data is migrated, remove fields from schema.ts:
+// DELETE: solutions.id, solutions.name, solutions.solutions
+// DELETE: services.id
+// DELETE: industries.id
+// CHANGE: industries.challenges from v.any() → v.array(v.string())
+// CHANGE: industries.relatedServices from v.any() → v.array(v.string())
+```
+
+### 20.3 Add New Fields to Existing Tables
+
+After cleanup, add the SEO-critical fields:
+
+```typescript
+// communes — add geo and content fields
+communes: defineTable({
+  // ...existing...
+  order: v.optional(v.number()),
+  is_published: v.optional(v.boolean()),
+  latitude: v.optional(v.string()),
+  longitude: v.optional(v.string()),
+  population: v.optional(v.string()),
+  unique_content: v.optional(v.string()),
+}).index('by_slug', ['slug'])
+  .index('by_zone', ['zone'])
+  .index('by_isOtherCity', ['isOtherCity'])
+  .index('by_published', ['is_published']),  // NEW INDEX
+
+// blog_posts — fix author FK
+blog_posts: defineTable({
+  // ...existing, but CHANGE:
+  author_id: v.optional(v.id('authors')),   // Was string → now proper FK
+  seo_title: v.optional(v.string()),         // NEW
+  seo_description: v.optional(v.string()),   // NEW
+}).index('by_slug', ['slug']),
+```
+
+---
+
+## 21. Execution Plan — Frontend (Phase 2)
+
+### 21.1 Enhanced `<SEO>` Component
+
+The existing `BaseLayout.astro` already handles core SEO (title, meta, OG, canonical). Enhance it with a dedicated `<SEO>` component for reuse:
+
+#### `web/src/components/seo/SEO.astro`
+
+```astro
+---
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article' | 'place';
+  noindex?: boolean;
+  schemas?: object[];
+  breadcrumbs?: { name: string; url: string }[];
+  publishedAt?: string;
+  modifiedAt?: string;
+  author?: string;
+}
+
+const {
+  title,
+  description,
+  canonical = Astro.url.href,
+  ogImage = '/og-default.jpg',
+  ogType = 'website',
+  noindex = false,
+  schemas = [],
+  breadcrumbs = [],
+  publishedAt,
+  modifiedAt,
+  author,
+} = Astro.props;
+
+const SITE_URL = 'https://guardman.cl';
+const siteName = 'Guardman Chile';
+const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
+const fullOgImage = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`;
+
+// Auto-generate BreadcrumbList schema
+const breadcrumbSchema = breadcrumbs.length > 0 ? {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  'itemListElement': breadcrumbs.map((b, i) => ({
+    '@type': 'ListItem',
+    'position': i + 1,
+    'name': b.name,
+    'item': b.url.startsWith('http') ? b.url : `${SITE_URL}${b.url}`,
+  })),
+} : null;
+
+const allSchemas = [...schemas, breadcrumbSchema].filter(Boolean);
+---
+
+<!-- Primary Meta -->
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<!-- Canonical -->
+<link rel="canonical" href={canonical} />
+<link rel="alternate" hreflang="es-CL" href={canonical} />
+<link rel="alternate" hreflang="x-default" href={canonical} />
+
+<!-- Open Graph -->
+<meta property="og:type" content={ogType} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={fullOgImage} />
+<meta property="og:url" content={canonical} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content="es_CL" />
+
+<!-- Article dates (for blog posts) -->
+{publishedAt && <meta property="article:published_time" content={publishedAt} />}
+{modifiedAt && <meta property="article:modified_time" content={modifiedAt} />}
+{author && <meta property="article:author" content={author} />}
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={fullOgImage} />
+
+<!-- Schema.org JSON-LD -->
+{allSchemas.map(schema => (
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+))}
+```
+
+#### Integration with `BaseLayout.astro`
+
+```astro
+---
+// Replace the manual <head> tags in BaseLayout with:
+import SEO from '../components/seo/SEO.astro';
+---
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <SEO {...Astro.props} />
+  <!-- fonts, favicon stay here -->
+</head>
+```
+
+### 21.2 Dynamic Sitemap (`sitemap.xml.ts`)
+
+> **Critical**: `@astrojs/sitemap` does NOT work with SSR dynamic routes. A custom endpoint is required.
+
+Create `web/src/pages/sitemap.xml.ts` — the complete code is in **Appendix C** of this document. Key notes:
+
+- Fetches ALL tables with published content from Convex in parallel
+- Generates entries for static pages, services, solutions, communes, service×commune pages, and blog posts
+- Returns `Content-Type: application/xml`
+- Must be paired with `web/public/robots.txt` pointing to `Sitemap: https://guardman.cl/sitemap.xml`
+
+### 21.3 Programmatic Route: `/servicios/[service]/[commune]`
+
+#### File Structure
+```
+web/src/pages/servicios/
+├── index.astro              # /servicios (existing)
+├── [slug].astro             # /servicios/guardias (existing)
+└── [service]/
+    └── [commune].astro      # /servicios/guardias/las-condes (NEW)
+```
+
+#### `web/src/pages/servicios/[service]/[commune].astro`
+
+```astro
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { convexServer } from '@/lib/convex';
+import { api } from '@convex/_generated/api';
+
+const { service: serviceSlug, commune: communeSlug } = Astro.params;
+
+// Parallel data fetching — CRITICAL for SSR performance
+const [serviceLocation, service, commune, allServices, reviews] = await Promise.all([
+  convexServer.query(api.service_locations.getByServiceCommune, {
+    service_slug: serviceSlug!,
+    commune_slug: communeSlug!,
+  }),
+  convexServer.query(api.services.getServiceBySlug, { slug: serviceSlug! }),
+  convexServer.query(api.locations.getCommuneBySlug, { slug: communeSlug! }),
+  convexServer.query(api.services.getAllServices),
+  convexServer.query(api.reviews.getByCommune, { commune_slug: communeSlug! }),
+]);
+
+if (!service || !commune) return Astro.redirect('/404');
+
+// SEO data — prefer service_location overrides, fallback to generated
+const metaTitle = serviceLocation?.meta_title
+  || `${service.title} en ${commune.name} | Guardman Chile`;
+const metaDescription = serviceLocation?.meta_description
+  || `Servicio de ${service.title.toLowerCase()} en ${commune.name}, Región Metropolitana. Cotiza sin compromiso.`;
+
+// Structured data
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': ['LocalBusiness', 'ProfessionalService'],
+  'name': `Guardman Chile - ${commune.name}`,
+  'parentOrganization': { '@id': 'https://guardman.cl/#organization' },
+  'areaServed': { '@type': 'City', 'name': commune.name },
+  'telephone': '+56930000010',
+  'url': `https://guardman.cl/servicios/${serviceSlug}/${communeSlug}`,
+};
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  'name': service.title,
+  'provider': localBusinessSchema,
+  'areaServed': { '@type': 'City', 'name': commune.name },
+};
+
+const breadcrumbs = [
+  { name: 'Inicio', url: '/' },
+  { name: 'Servicios', url: '/servicios' },
+  { name: service.title, url: `/servicios/${serviceSlug}` },
+  { name: commune.name, url: `/servicios/${serviceSlug}/${communeSlug}` },
+];
+---
+
+<BaseLayout
+  title={metaTitle}
+  description={metaDescription}
+  schemas={[localBusinessSchema, serviceSchema]}
+  breadcrumbs={breadcrumbs}
+>
+  <!-- Hero section specific to service+commune -->
+  <section class="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
+    <div class="container mx-auto px-6">
+      <nav class="text-sm text-blue-200 mb-4">
+        <!-- Breadcrumb visual rendering -->
+      </nav>
+      <h1 class="text-4xl font-bold mb-4">
+        {serviceLocation?.hero_title || `${service.title} en ${commune.name}`}
+      </h1>
+      <p class="text-xl text-blue-100 max-w-3xl">
+        {metaDescription}
+      </p>
+    </div>
+  </section>
+
+  <!-- Unique content section (CRITICAL for avoiding thin content) -->
+  <section class="py-16">
+    <div class="container mx-auto px-6">
+      {serviceLocation?.intro_content && (
+        <div class="prose max-w-3xl" set:html={serviceLocation.intro_content} />
+      )}
+      {commune.unique_content && (
+        <div class="prose max-w-3xl mt-8" set:html={commune.unique_content} />
+      )}
+    </div>
+  </section>
+
+  <!-- Service features -->
+  <!-- Testimonials filtered by commune -->
+  <!-- Other services in this commune -->
+  <!-- CTA -->
+</BaseLayout>
+```
+
+---
+
+## 22. Refine CMS Evaluation
+
+### 22.1 What is Refine?
+
+[Refine](https://refine.dev) is an open-source React framework for building admin panels, internal tools, and B2B dashboards. It's "headless" — separating business logic from UI.
+
+### 22.2 Refine vs Current Custom CMS
+
+| Feature | Current Admin (React+Vite) | Refine |
+|---------|--------------------------|--------|
+| **CRUD Generation** | Manual per table (~19 pages hand-written) | Auto-generated from data provider |
+| **Data Provider** | Direct Convex `useQuery`/`useMutation` | Custom data provider wrapping Convex |
+| **Auth** | Custom `AuthGuard` + Convex auth | Built-in `AuthProvider` |
+| **Routing** | Manual `react-router-dom` | Auto-generated from resource config |
+| **Form Handling** | Manual state management | Built-in `useForm` with validation |
+| **Table/List** | Manual table components | Built-in `useTable` with sorting, filtering |
+| **Reordering** | Custom drag-and-drop per table | Requires custom component |
+| **UI Library** | Custom components | Ant Design, Material UI, Chakra, or headless |
+| **Setup Effort** | Already done (~19 pages) | Requires custom Convex data provider |
+| **Learning Curve** | Familiar React | New framework + Refine concepts |
+| **Monorepo Fit** | Already in `admin/` dir | Can replace `admin/` dir |
+
+### 22.3 Custom Convex Data Provider for Refine
+
+No official Refine + Convex integration exists. A custom data provider would need to map Refine's methods to Convex:
+
+```typescript
+// admin/src/lib/refine-convex-provider.ts
+import { DataProvider } from "@refinedev/core";
+import { ConvexClient } from "convex/browser";
+import { api } from "../../convex/_generated/api";
+
+const convex = new ConvexClient(import.meta.env.VITE_CONVEX_URL);
+
+// Mapping of Refine resources to Convex table functions
+const resourceMap = {
+  services: {
+    getList: api.services.getAllServices,
+    getOne: api.services.getServiceBySlug,
+    create: api.services.createService,
+    update: api.services.updateService,
+    delete: api.services.deleteService,
+  },
+  // ... 19 more mappings
+};
+
+export const convexDataProvider: DataProvider = {
+  getList: async ({ resource }) => {
+    const query = resourceMap[resource]?.getList;
+    const data = await convex.query(query);
+    return { data, total: data.length };
+  },
+  getOne: async ({ resource, id }) => {
+    const data = await convex.query(resourceMap[resource].getOne, { id });
+    return { data };
+  },
+  create: async ({ resource, variables }) => {
+    const data = await convex.mutation(resourceMap[resource].create, variables);
+    return { data };
+  },
+  update: async ({ resource, id, variables }) => {
+    await convex.mutation(resourceMap[resource].update, { id, ...variables });
+    return { data: variables };
+  },
+  deleteOne: async ({ resource, id }) => {
+    await convex.mutation(resourceMap[resource].delete, { id });
+    return { data: {} };
+  },
+  getApiUrl: () => import.meta.env.VITE_CONVEX_URL,
+};
+```
+
+### 22.4 Recommendation
+
+> **🟡 HOLD on Refine adoption.** The migration cost outweighs the benefit right now.
+
+**Reasons to HOLD:**
+1. The current CMS already works with ~19 admin pages
+2. No native Convex data provider — must build custom adapter
+3. Convex's query/mutation pattern doesn't fit Refine's REST-centric model cleanly
+4. Refine's pagination expects `total` counts — Convex doesn't return totals by default
+5. Migration effort: rewrite 19 admin pages + build data provider + test
+
+**When to RECONSIDER:**
+- If building a **second project** with Convex → invest in reusable data provider
+- If CMS needs grow significantly (50+ tables, role-based access, workflow approvals)
+- If Refine releases an official Convex adapter
+
+**Alternative**: Keep current CMS, but add the **missing CRUD** for `pages` and `content_blocks` tables.
+
+---
+
+## 23. Thin Content Avoidance Strategy
+
+> **Google's John Mueller**: "Programmatic SEO is often a fancy banner for spam" — unless every page provides unique value.
+
+### 23.1 The 70/30 Rule for Programmatic Pages
+
+| Content Type | % of Page | Source | Unique Per Page? |
+|-------------|-----------|--------|-----------------|
+| **Template chrome** | ~30% | Layout, header, footer, CTA | ❌ Shared |
+| **Service info** | ~20% | `services` table | ❌ Same per service |
+| **Commune-specific data** | ~25% | `communes` + `service_locations` | ✅ **UNIQUE** |
+| **Social proof** | ~15% | `testimonials`, `reviews` filtered by commune | ✅ **UNIQUE** |
+| **Local context** | ~10% | Unique paragraph, stats, safety data | ✅ **UNIQUE** |
+
+> **Goal**: At least **50% of page content** must be unique per {service}×{commune} combination.
+
+### 23.2 Content Differentiation Strategies
+
+#### Strategy 1: `intro_content` per Service×Commune
+Store a unique paragraph (200-400 words) in `service_locations.intro_content`. Example:
+
+> "En Las Condes, uno de los sectores corporativos más importantes de Santiago, la seguridad privada es esencial para las oficinas y edificios empresariales que concentran esta comuna. Guardman Chile ofrece guardias de seguridad OS10 especializados en vigilancia corporativa, control de acceso y protocolo ejecutivo..."
+
+#### Strategy 2: Local Statistics
+```
+"En {commune.name}, los delitos contra la propiedad aumentaron un {stats.crime_percent}% 
+en el último año. Por eso, {stats.guardman_clients}+ empresas confían en Guardman Chile."
+```
+
+#### Strategy 3: Testimonials Filtered by Commune
+Show different testimonials based on commune. If none exist for that specific commune, show zone-level testimonials (same zone).
+
+#### Strategy 4: Related Services in That Commune
+Internal linking sections: "Otros servicios en {commune.name}" — list other service×commune pages.
+
+#### Strategy 5: AI-Assisted Content Generation
+Use batch content generation to create unique `intro_content` for each of the 312 combinations. Store in `service_locations` table so the CMS can edit later.
+
+### 23.3 Content Audit Checklist per Page
+
+Before publishing any service×commune page, verify:
+
+- [ ] `meta_title` is unique (not template-only)
+- [ ] `meta_description` is unique (not template-only)
+- [ ] `intro_content` exists (200+ words)
+- [ ] At least 1 testimonial or review shows
+- [ ] Internal links to ≥3 other pages
+- [ ] Breadcrumb is accurate
+- [ ] Structured data is valid (test at schema.org/validator)
+
+---
+
+## 24. Google Local Pack Domination Checklist (2025)
+
+### 24.1 The 3 Pillars
+
+| Pillar | Factor | Guardman Status | Action |
+|--------|--------|----------------|--------|
+| **Relevance** | GBP categories | ❓ Unknown | Set primary: "Security Guard Service" + secondary categories |
+| **Relevance** | Keyword-rich GBP description | ❓ Unknown | Write 750-char description with service+location keywords |
+| **Relevance** | Website content matches GBP | 🟡 Partial | Unify `site.ts` → `site_config` for NAP consistency |
+| **Distance** | Service area definition | ❓ Unknown | Define all 52 communes as service areas in GBP |
+| **Distance** | Embedded Google Maps | ❌ Missing | Add map embed to commune pages |
+| **Prominence** | Reviews (count + quality + recency) | ❌ Missing | Implement `reviews` table + collection strategy |
+| **Prominence** | Review responses | ❌ Missing | Respond to all GBP reviews |
+| **Prominence** | Citations/NAP consistency | 🟡 Partial | Audit Chilean directories for NAP |
+| **Prominence** | Backlinks from local sources | ❌ Missing | Outreach to Chilean business directories |
+| **Prominence** | Structured data | 🟡 Partial | Enhance with SecurityService type + AggregateRating |
+
+### 24.2 GBP Optimization Checklist
+
+- [ ] Complete all GBP fields (hours, description, categories, photos)
+- [ ] Add all 52 communes as service areas
+- [ ] Post weekly Google Posts (offers, updates, tips)
+- [ ] Upload 50+ high-quality photos (team, equipment, locations)
+- [ ] Enable messaging and Q&A
+- [ ] Create FAQ section on GBP
+- [ ] Implement review collection strategy (QR code, email follow-up)
+
+### 24.3 NAP Consistency Audit
+
+> **NAP** = Name, Address, Phone. Must be IDENTICAL across all platforms.
+
+| Platform | Status | NAP Correct? |
+|----------|--------|-------------|
+| Website (guardman.cl) | ✅ Live | ❓ Audit needed vs GBP |
+| Google Business Profile | ❓ Unknown | ❓ — |
+| Instagram | ✅ Active | ❓ Audit needed |
+| LinkedIn | ❓ Unknown | ❓ — |
+| Chilean Yellow Pages | ❓ Unknown | ❓ — |
+| Mercado Securidad Chile | ❓ Unknown | ❓ — |
+
+---
+
+## 25. Design System — Visual DNA
+
+> This section documents the exact design tokens used across all components, so the app can be rebuilt consistently from scratch.
+
+### 25.1 Color Palette
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `gray-900` | `#111827` | Primary text, headers, buttons (bg), dark sections |
+| `gray-800` | `#1F2937` | Footer backgrounds, secondary dark |
+| `gray-700` | `#374151` | Hover states on dark backgrounds |
+| `gray-600` | `#4B5563` | Secondary text on light |
+| `gray-500` | `#6B7280` | Subtitle text, descriptions |
+| `gray-400` | `#9CA3AF` | Muted labels, micro-labels (uppercase tracking) |
+| `gray-300` | `#D1D5DB` | Dividers on light backgrounds |
+| `gray-200` | `#E5E7EB` | Card borders, input borders |
+| `gray-100` | `#F3F4F6` | Section backgrounds ("gray"), input fills, hover states |
+| `gray-50` | `#F9FAFB` | Form backgrounds, icon background containers |
+| `white` | `#FFFFFF` | Primary cards, page backgrounds |
+| `black` | `#000000` | Hero sections, dark CTA sections |
+| `white/70` | `rgba(255,255,255,0.7)` | Subtitle text in dark hero sections |
+| `white/50` | `rgba(255,255,255,0.5)` | Secondary text in dark sections |
+| `white/40` | `rgba(255,255,255,0.4)` | Accent italic text in hero headings |
+| `white/30` | `rgba(255,255,255,0.3)` | Trust badge text in dark CTA |
+| `white/10` | `rgba(255,255,255,0.1)` | Borders in dark sections, stat dividers |
+| `white/5` | `rgba(255,255,255,0.05)` | Badge backgrounds in hero |
+
+> **Design principle**: Monochromatic grayscale. Inspired by Porsche.com and Ajax Systems. Zero brand colors in the UI. Accent = white on black.
+
+### 25.2 Typography
+
+| Element | Classes | Properties |
+|---------|---------|------------|
+| **H1 (Hero)** | `text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold text-white tracking-tight leading-[1.1]` | Semibold, tight tracking, 1.1 line-height |
+| **H1 (Subpage Hero)** | `text-4xl md:text-6xl lg:text-7xl font-semibold text-white tracking-tight leading-[1.1]` | With accent word in `text-white/40 italic` |
+| **H2 (Section)** | `text-3xl md:text-4xl font-semibold text-gray-900 tracking-tight` | Alternately `md:text-5xl` for emphasis |
+| **H2 (Dark CTA)** | `text-3xl md:text-6xl font-semibold text-white tracking-tight` | With accent word in `italic text-white/40` |
+| **H3 (Card)** | `text-lg font-semibold text-gray-900` | Card titles |
+| **H3 (ServiceCard)** | `text-sm font-bold text-gray-900 uppercase tracking-[0.2em]` | Military-style all-caps |
+| **Body** | `text-lg text-gray-500 leading-relaxed` | Section subtitles/descriptions |
+| **Small body** | `text-sm text-gray-500 leading-relaxed` | Card descriptions |
+| **Micro-label** | `text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em-0.4em]` | Stats labels, trust badges, metadata |
+| **Hero badge** | `text-xs text-white/70 uppercase tracking-widest font-medium` | Hero section badge text |
+| **CTA button** | `text-xs font-bold uppercase tracking-widest` | Premium CTA buttons |
+
+### 25.3 Spacing & Layout
+
+| Element | Classes |
+|---------|---------|
+| **Container** | `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8` |
+| **Section padding** | `py-16 md:py-20` (standard), `py-20 md:py-28` (hero), `py-24` (CTA) |
+| **Section-to-header gap** | `mb-12 md:mb-16` |
+| **Card grid gap** | `gap-6 md:gap-8` |
+| **Card padding** | `p-6` (FeatureCard), `p-8` (ServiceCard), `p-5` (ClientsGrid) |
+
+### 25.4 Component Shapes & Interactions
+
+| Element | Radius | Interaction |
+|---------|--------|------------|
+| **Cards** | `rounded-2xl` (FeatureCard) / `rounded-xl` (ServiceCard, Clients, FAQ) | `hover:border-gray-300` + `hover:shadow-lg` or `hover:border-black` |
+| **Buttons** | `rounded-xl` (primary) / `rounded-lg` (CTA in dark sections) | `hover:bg-gray-100` (accent), `hover:bg-white hover:text-black` (outline) |
+| **Select inputs** | `rounded-xl` | `hover:bg-gray-100 focus:ring-2 focus:ring-gray-300` |
+| **Icon containers** | `rounded-lg` (12px) / `rounded-xl` (ServiceCard) / `rounded-full` (ProcessSection) | `group-hover:bg-black group-hover:text-white` |
+| **Images** | `rounded-2xl` (GuardPod video) / none in FeatureCard header | `group-hover:scale-105 transition-transform duration-500` |
+| **Hero badge** | `rounded-full` | `bg-white/5 border border-white/10 backdrop-blur-sm` |
+
+### 25.5 Static Data Source: `data/site.ts`
+
+The following fields are consumed from the static `data/site.ts` file and should be migrated to Convex `site_config` for unification:
+
+| Field | Value | Used By |
+|-------|-------|---------|
+| `site.name` | `'Guardman Chile'` | Header, Footer, Schema.org |
+| `site.legalName` | `'Grupo Guardman SpA'` | Nosotros page, Schema.org |
+| `site.url` | `'https://guardman.cl'` | Schema.org, canonical URLs |
+| `site.phone` | `'+56 9 3000 0010'` | Header CTA, Footer, CTASection, contacto |
+| `site.whatsapp` | `'+56930000010'` | WhatsApp links across all pages |
+| `site.email` | `'info@guardman.cl'` | Footer, contacto page |
+| `site.address.*` | Street, city, region, postal, country | Footer, Schema.org, contacto |
+| `site.social.*` | Instagram, YouTube, LinkedIn URLs | Footer social links |
+| `site.founded` | `2015` | Nosotros hero badge, Footer experience calc |
+| `site.clients` | `500` | Various stats |
+| `site.guards` | `850` | Various stats |
+| `site.colors.*` | primary, accent, secondary, dark, light | Not currently used in templates |
+
+---
+
+## 26. Component Registry — Data Mapping
+
+> Master registry: every reusable component, its props interface, and the exact Convex table fields it consumes.
+
+### 26.1 Layout Components
+
+#### `Header.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `navItems` | `NavItem[]` | **Hardcoded** (fallback array with Services/Solutions dropdown children) |
+| `siteConfig` | `any` | `site_config.get` (optional, not yet wired) |
+
+**Data consumed**: Static nav links. Logo from `/images/guardman_logo.png`.
+
+#### `Footer.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `siteConfig` | `any` | `site_config.get` → `phone_primary`, `email_contact`, `address_main`, `social_links`, `footer_config.columns` |
+
+**Fallback**: Uses `data/site.ts` when `siteConfig` is null.  
+**Embeds**: `ConvexLeadForm` (client:only="react", source="footer", theme="dark").  
+**Links**: Hardcoded services/solutions/company columns with fallback to `siteConfig.footer_config`.
+
+#### `MobileMenu.tsx` (React)
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `links` | `NavItem[]` | Passed from Header, same hardcoded data |
+
+---
+
+### 26.2 Section Components
+
+#### `Hero.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `title` | `string` | `heroes.getHeroByPage({ page_slug })` → `title` |
+| `subtitle` | `string` | `heroes` → `subtitle` |
+| `data.background_type` | `'youtube' \| 'image'` | `heroes` → `background_type` |
+| `data.youtube_id` | `string` | `heroes` → `youtube_id` |
+| `data.image_url` | `string` | `heroes` → `image_url` |
+| `data.mobile_image_url` | `string` | `heroes` → `mobile_image_url` |
+| `data.primary_cta` | `{text, href}` | `heroes` → `ctas[0]` |
+| `data.secondary_ctas` | `Array<{text, href, variant}>` | `heroes` → `ctas[1:]` |
+| `data.trust_badges` | `Array<{text, icon}>` | `heroes` → `badges[]` |
+
+**Style notes**: Full-viewport black bg, YouTube iframe background on desktop, static image on mobile. Dark overlay `bg-black/70`. Bounce scroll indicator at bottom.
+
+#### `ServiceFinder.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `services` | `Service[]` | `services.getAllServices` → `title`, `slug` |
+| `solutions` | `Solution[]` | `solutions.getAllSolutions` → `title`, `slug` |
+
+**Cities**: **Hardcoded** array of 10 RM communes. Should be migrated to `locations.getAllCommunes`.
+
+#### `ServicesGrid.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `services` | `Service[]` | `services.getAllServices` → `slug`, `title`, `description`, `icon`, `image` |
+| `title` | `string` | Static default: "Nuestros Servicios" |
+| `subtitle` | `string` | Static default |
+| `columns` | `2 \| 3` | Static default: 3 |
+| `showAllLink` | `boolean` | From page prop |
+| `background` | `'white' \| 'gray' \| 'primary' \| 'dark'` | From page prop |
+
+**Sub-component**: Uses `FeatureCard`. Has **hardcoded Unsplash image mapping** by slug. Service `image` field from Convex overrides the hardcoded fallback.
+
+#### `SolutionsGrid.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `solutions` | `Solution[]` | `solutions.getAllSolutions` → `slug`, `title`, `description`, `icon`, `image` |
+| `title` / `subtitle` | `string` | Static defaults |
+| `showAllLink` / `background` | varies | From page prop |
+
+**Sub-component**: Uses `FeatureCard`. **Hardcoded Unsplash image fallbacks** by slug.
+
+#### `GuardPodSection.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `title` | `string` | `content_blocks.getByPage({ page_slug: '/' })` filtered by `type='guardpod_feature'` → `title` |
+| `subtitle` | `string` | Same content_block → `subtitle` |
+| `description` | `string` | Same content_block → `content` |
+| `data.video_id` | `string` | Same content_block → `data.video_id` |
+| `data.features` | `Array<{icon, title, description}>` | Same content_block → `data.features` |
+| `data.stats` | `Array<{value, label}>` | Same content_block → `data.stats` |
+| `data.ctas` | `Array<{text, href, variant}>` | Same content_block → `data.ctas` |
+
+**Style notes**: Full-width black section, 2-col grid (video left, content right), YouTube embed, stats row with `border-y border-white/10`.
+
+#### `ClientsGrid.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `clients` | `Partner[]` | `partners.getAll` filtered by `type='client'` sorted by `order` → `name`, `industry`, `icon`, `quote`, `logo_url` |
+
+**Adapter**: Maps `logo_url` → `image` with fallback, `industry` defaults to `'Empresa'`.
+
+#### `FAQ.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `faqs` | `FAQItem[]` | `faqs.getAllFaqs` → `id`, `question`, `answer`, `category` |
+| `maxItems` | `number` | Static: 6 (on homepage) |
+
+**Features**: Category tab filtering (6 hardcoded tabs), accordion with JS toggle, auto-generates FAQSchema JSON-LD. Contact CTA → WhatsApp link.
+
+#### `ProcessSection.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `steps` | `ProcessStep[]` | `process_steps.getByPage({ page_slug })` → `number`, `title`, `description` |
+| `title` / `subtitle` | `string` | Page static text |
+
+**Style notes**: Horizontal timeline, numbered circles with `:hover → bg-gray-900 text-white`, connecting line on desktop.
+
+#### `IndustryGrid.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `industries` | `Industry[]` | `industries.getActiveIndustries` → `name`, `icon`, `href` |
+| `columns` | `2\|3\|4\|6` | Page static: 6 |
+
+**Sub-component**: Uses `IndustryCard`.
+
+#### `FeaturesSection.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `features` | `string[]` | `services.getServiceBySlug` → `features[]` (array of plain strings) |
+
+**Style notes**: 3-column pill grid with black bullet dots, uppercase tracking-widest text, `gap-px bg-gray-100` border technique.
+
+#### `BenefitsSection.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `benefits` | `Benefit[]` | `services.getServiceBySlug` → `benefits[]` (mapped to `{icon: 'check', title, description: ''}`) |
+| — | — | Or hardcoded on soluciones page |
+
+**Style notes**: 2-column layout (title left, list right), check icons in black circles.
+
+#### `CTASection.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `headline` | `string` | Static from page |
+| `headlineAccent` | `string` | Word rendered as `italic text-white/40` |
+| `subtitle` | `string` | Static from page |
+| `primaryButton` | `{text, href}` | Static from page |
+| `secondaryButton` | `{text, href, variant}` | Static from page (often `site.phone`) |
+| `trustBadges` | `string[]` | Static from page |
+
+**Not data-driven from Convex** — all content is page-static.
+
+#### `CTADual.astro`
+Same as CTASection but with dual-button layout. **Not used on any current page**.
+
+#### `StatsSection.astro`
+Standalone stats display. **Not used on any current page**.
+
+---
+
+### 26.3 UI Primitive Components
+
+#### `FeatureCard.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `title` | `string` | From parent (ServicesGrid/SolutionsGrid) |
+| `description` | `string` | From parent |
+| `image` | `string` | Service/solution `image` or hardcoded Unsplash |
+| `imageAlt` | `string` | Same as title or custom |
+| `icon` | `string` | Service/solution `icon` |
+| `href` | `string` | Constructed: `/servicios/${slug}` or `/soluciones/${slug}` |
+| `badge` | `string` | `'Exclusivo'` for guardpod service |
+| `linkText` | `string` | `'Conocer servicio'` or `'Ver soluciones'` |
+
+**Style**: `rounded-2xl`, image header (h-48) with gradient overlay, icon in white rounded-xl corner, hover shadow-lg + scale-105 on image.
+
+#### `ServiceCard.astro`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `title` | `string` | From parent |
+| `description` | `string` | From parent |
+| `icon` | `string` | From parent |
+| `href` | `string` | From parent |
+
+**Style**: No image. White card with icon in `rounded-lg bg-gray-50` container, `hover:border-black`, uppercase military typography (`tracking-[0.2em]`), CTA: "Explorar Configuración".
+
+#### `Card.astro`
+Generic card component. **Not used directly by any section** — replaced by FeatureCard/ServiceCard.
+
+#### `Badge.astro`
+| Prop | Type |
+|------|------|
+| `text` | `string` |
+| `variant` | `'default' \| 'success' \| 'warning'` |
+
+#### `Button.astro`
+| Prop | Type |
+|------|------|
+| `href` | `string` |
+| `variant` | `'primary' \| 'secondary' \| 'outline' \| 'accent'` |
+| `size` | `'sm' \| 'md' \| 'lg'` |
+| `class` | `string` (override) |
+
+#### `Breadcrumbs.astro`
+| Prop | Type |
+|------|------|
+| `items` | `Array<{name, url?}>` |
+
+#### `Icon.astro`
+| Prop | Type |
+|------|------|
+| `name` | `string` (Heroicons-mapped) |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg'` |
+| `color` | `'white' \| 'gray' \| 'dark'` |
+
+**Contains**: 20+ inline SVG paths for shield-check, car, bell, building, airplane, key, home, mountain, shopping-bag, hard-hat, bed, map-pin, users, clock, signal, check, chevron-down, arrow-right, chat-bubble-left, magnifying, badge-check, bell-alert.
+
+#### `Container.astro`
+Wrapper with `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`. Optional `size` prop.
+
+#### `Section.astro`
+Wrapper with section padding and background color system: `white`, `gray` (`bg-gray-50`), `primary`, `dark` (`bg-gray-900`).
+
+---
+
+### 26.4 Form Components
+
+#### `ConvexContactForm.tsx` → wraps `ContactForm.tsx`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `servicio` | `string?` | URL param or manual |
+
+**Writes to**: `contacts` table (via Convex mutation).
+
+#### `ConvexLeadForm.tsx` → wraps `LeadForm.tsx`
+| Prop | Type | Convex Source |
+|------|------|---------------|
+| `servicio` | `string?` | URL param |
+| `source` | `string` | Page identifier: `'footer'`, `'cotizar'` |
+| `theme` | `'light' \| 'dark'` | Styling variant |
+| `compact` | `boolean` | Reduced fields mode |
+
+**Writes to**: `leads` table (via Convex mutation).
+
+---
+
+### 26.5 SEO Components
+
+#### `OrganizationSchema.astro`
+Generates Schema.org `Organization` JSON-LD. Props: name, url, description, email, telephone, address.
+
+#### `FAQSchema.astro`
+Generates Schema.org `FAQPage` JSON-LD. Props: `faqs: Array<{question, answer}>`.
+
+#### `ServiceSchema.astro`
+Generates Schema.org `Service` JSON-LD. Props: `service: {name, description}`.
+
+---
+
+## 27. Page-by-Page Blueprint
+
+> For each page: exact section order, component used, and the Convex query that feeds it.
+
+### 27.1 Homepage (`/`)
+
+| # | Section | Component | Convex Query | Fields Used |
+|---|---------|-----------|-------------|-------------|
+| 0 | Schema.org | `OrganizationSchema` | — | Static from `data/site.ts` |
+| 0 | Schema.org | `FAQSchema` | `faqs.getAllFaqs` | `question`, `answer` |
+| 1 | **Hero** | `Hero.astro` | `heroes.getHeroByPage({ page_slug: 'home' })` | `title`, `subtitle`, `background_type`, `youtube_id`, `image_url`, `mobile_image_url`, `ctas[]`, `badges[]` |
+| 2 | **Service Finder** | `ServiceFinder.astro` | `services.getAllServices` + `solutions.getAllSolutions` | `title`, `slug` (+ hardcoded cities) |
+| 3 | **Services Grid** | `ServicesGrid.astro` → `FeatureCard` | `services.getAllServices` | `slug`, `title`, `description`, `icon`, `image` |
+| 4 | **GuardPod** | `GuardPodSection.astro` | `content_blocks.getByPage({ page_slug: '/' })` | `title`, `subtitle`, `content`, `data.{video_id, features, stats, ctas}` |
+| 5 | **Solutions Grid** | `SolutionsGrid.astro` → `FeatureCard` | `solutions.getAllSolutions` | `slug`, `title`, `description`, `icon`, `image` |
+| 6 | **Clients** | `ClientsGrid.astro` | `partners.getAll` | `name`, `industry`, `icon`, `quote`, `logo_url`, `order` (filtered: `type='client'`) |
+| 7 | **FAQ** | `FAQ.astro` | `faqs.getAllFaqs` | `id`, `question`, `answer`, `category` (max 6) |
+
+**Total Convex queries on homepage**: 7 (via `Promise.all`).
+
+---
+
+### 27.2 Services Hub (`/servicios`)
+
+| # | Section | Component | Convex Query | Fields Used |
+|---|---------|-----------|-------------|-------------|
+| 1 | **Hero** | Inline (hardcoded bg image, stats) | — | All static |
+| 2 | **Services Grid** | `ServiceCard` ×N | `services.getAllServices` | `title`, `description`, `icon`, `slug` |
+| 3 | **Process** | `ProcessSection.astro` | `process_steps.getByPage({ page_slug: 'servicios' })` | `number`, `title`, `description` |
+| 4 | **Industries** | `IndustryGrid.astro` → `IndustryCard` | `industries.getActiveIndustries` | `name`, `icon`, `href` |
+| 5 | **CTA** | `CTASection.astro` | — | All static (headline, buttons, trust badges) |
+
+---
+
+### 27.3 Service Detail (`/servicios/[slug]`)
+
+| # | Section | Component | Convex Query | Fields Used |
+|---|---------|-----------|-------------|-------------|
+| 0 | Schema.org | `ServiceSchema` | — | `service.title`, `service.description` |
+| 1 | **Hero** | Inline (slug-driven bg) | `services.getServiceBySlug({ slug })` | `title`, `description`, `tagline`, `image`, `meta_title`, `meta_description`, `og_image`, `cta` |
+| 2 | **Features** | `FeaturesSection.astro` | Same service | `features[]` (string array) |
+| 3 | **Benefits** | `BenefitsSection.astro` | Same service | `benefits[]` (string array → mapped to objects) |
+| 4 | **CTA** | `CTASection.astro` | — | Static text + `service.title` interpolation |
+
+---
+
+### 27.4 Solutions Hub (`/soluciones`)
+
+| # | Section | Component | Convex Query | Fields Used |
+|---|---------|-----------|-------------|-------------|
+| 1 | **Hero** | Inline (hardcoded bg, dynamic stats) | — | Count from `solutions.length` |
+| 2 | **Solutions Grid** | `ServiceCard` ×N | `solutions.getAllSolutions` | `name`, `description`, `icon`, `slug` |
+| 3 | **Benefits** | `BenefitsSection.astro` | — | Hardcoded 3 benefits |
+| 4 | **CTA** | `CTASection.astro` | — | Static |
+
+> ⚠️ **Bug**: Solutions grid reads `solution.name` but service card expects `title`. The `solutions` table uses `name` not `title`.
+
+---
+
+### 27.5 Coverage Hub (`/cobertura`)
+
+| # | Section | Component | Convex Query | Fields Used |
+|---|---------|-----------|-------------|-------------|
+| 1 | **Hero** | Inline (stats, breadcrumbs) | — | `communes.length` for stat |
+| 2 | **Zones Grid** | Inline (nested loops) | `locations.getAllCommunes` | `name`, `slug`, `zone` (grouped by zone: norte/centro/oriente/poniente/sur) |
+| 3 | **CTA** | Inline dark section | — | Static + `site.phone` |
+
+**Links**: Each commune → `/cobertura/${commune.slug}`.
+
+---
+
+### 27.6 Blog Index (`/blog`)
+
+| # | Section | Component | Convex Query | Fields Used |
+|---|---------|-----------|-------------|-------------|
+| 1 | **Header** | Inline | — | Static page metadata |
+| 2 | **Posts Grid** | Inline cards ×N | `blog_posts.getPublishedPosts` | `slug`, `title`, `excerpt`, `cover_image`, `published_at`, `author` |
+
+**Empty state**: "Próximamente" message with icon when no posts.
+
+---
+
+### 27.7 About Us (`/nosotros`)
+
+| # | Section | Component | Convex Query | Fields Used |
+|---|---------|-----------|-------------|-------------|
+| 1 | **Hero** | Inline (stats from Convex) | `stats.getStatsByPage({ page_slug: 'nosotros' })` | `value`, `label` |
+| 2 | **History** | Inline prose | — | Static text + `site.legalName` |
+| 3 | **Values** | Inline grid | `company_values.getAllCompanyValues` | `title`, `icon`, `description` |
+| 4 | **Team** | Inline grid | `team_members.getAllTeamMembers` | `name`, `role`, `avatar_url` |
+| 5 | **Stats Banner** | Inline dark section | Same stats query | `value`, `label` |
+| 6 | **CTA** | Inline | — | Static + `getWhatsAppUrl()` |
+
+---
+
+### 27.8 Contact (`/contacto`)
+
+| # | Section | Component | Convex Query | Fields Used |
+|---|---------|-----------|-------------|-------------|
+| 0 | Schema.org | Inline ContactPage | — | Static from `data/site.ts` |
+| 1 | **Hero** | Inline | `heroes.getHeroByPage({ page_slug: 'contacto' })` | `title`, `subtitle`, `image_url`, `badges[]` |
+| 2 | **Form** | `ConvexContactForm` (React island) | **Writes** `contacts` | `name`, `email`, `phone`, `service`, `message` |
+| 2 | **Info** | Inline | — | Static from `data/site.ts` (phone, email, address, hours) |
+| 3 | **CTA** | Inline dark section | `ctas.getCtaByPage({ page_slug: 'contacto' })` | `headline`, `subheadline`, `buttons[]`, `background_type`, `background_value` |
+
+---
+
+### 27.9 Quote Page (`/cotizar`)
+
+| # | Section | Component | Convex Query | Fields Used |
+|---|---------|-----------|-------------|-------------|
+| 0 | Schema.org | Inline Service | — | Static |
+| 1 | **Hero** | Inline | — | All static (no Convex data) |
+| 2 | **Form** | `ConvexLeadForm` (React island) | **Writes** `leads` | `name`, `email`, `phone`, `service`, `commune`, `message`, `source='cotizar'` |
+
+---
+
+### 27.10 Complete Convex Query Map
+
+Summary of every Convex API endpoint consumed by the frontend:
+
+| API Endpoint | Used By Pages | Table | Read/Write |
+|-------------|---------------|-------|------------|
+| `services.getAllServices` | Home, /servicios | `services` | Read |
+| `services.getServiceBySlug` | /servicios/[slug] | `services` | Read |
+| `solutions.getAllSolutions` | Home, /soluciones | `solutions` | Read |
+| `faqs.getAllFaqs` | Home | `faqs` | Read |
+| `site_config.get` | Home (→Footer) | `site_config` | Read |
+| `heroes.getHeroByPage` | Home, /contacto | `heroes` | Read |
+| `content_blocks.getByPage` | Home (GuardPod) | `content_blocks` | Read |
+| `partners.getAll` | Home (clients) | `partners` | Read |
+| `blog_posts.getPublishedPosts` | /blog | `blog_posts` | Read |
+| `locations.getAllCommunes` | /cobertura | `communes` | Read |
+| `team_members.getAllTeamMembers` | /nosotros | `team_members` | Read |
+| `company_values.getAllCompanyValues` | /nosotros | `company_values` | Read |
+| `stats.getStatsByPage` | /nosotros | `stats` | Read |
+| `process_steps.getByPage` | /servicios | `process_steps` | Read |
+| `industries.getActiveIndustries` | /servicios | `industries` | Read |
+| `ctas.getCtaByPage` | /contacto | `ctas` | Read |
+| `contacts.create` (mutation) | /contacto | `contacts` | Write |
+| `leads.create` (mutation) | /cotizar, Footer | `leads` | Write |
+
+---
+
+### 27.11 Identified Issues & Gaps
+
+| # | Issue | Impact | Fix |
+|---|-------|--------|-----|
+| 1 | **ServiceFinder cities are hardcoded** | Cannot update coverage without deploy | Migrate to `locations.getAllCommunes` |
+| 2 | **Service/Solution images are hardcoded Unsplash** | Cannot manage from CMS | Add `image` field to services/solutions in Convex |
+| 3 | **Header nav is hardcoded** | Cannot add/remove services without deploy | Wire to `site_config.nav_items` or generate from `services`/`solutions` |
+| 4 | **Footer links are hardcoded** | Same as above | Wire to `site_config.footer_config` (already partially supported) |
+| 5 | **CTASection content is all static** | Cannot A/B test CTAs | Connect to `ctas` table (pattern exists in contacto page) |
+| 6 | **FAQ categories are hardcoded** | Cannot add new categories | Derive from `faqs` data or store in `faq_categories` table |
+| 7 | **`solutions` table uses `name`** not `title` | Inconsistency with `services` table | Rename via schema migration |
+| 8 | **Dual data source** | `data/site.ts` ≠ `site_config` in Convex | Migrate all static data to Convex |
+| 9 | **No `/cobertura/[slug]` page** | Commune detail pages return 404 | Create dynamic route |
+| 10 | **No `/soluciones/[slug]` page** | Solution detail pages return 404 | Create dynamic route |
+| 11 | **No `/blog/[slug]` page** | Blog post pages return 404 | Create dynamic route |
+
+---
+
+> **Document Version**: Draft 5 — February 19, 2026
+> **Total Sections**: 27 chapters + 5 appendices
+> **Total Tables Audited**: 22 existing + 4 proposed new
 > **Total Pages Projected**: ~395 (from current ~83)
-> **Key Recommendations**: Programmatic SEO (312 service×commune pages), AggregateRating schema, data source unification, CRUD completion for pages/content_blocks
+> **New in Draft 5**: Complete Design System tokens (§25), Master Component Registry with exact Convex field mapping for all 37 components (§26), Page-by-Page Blueprint for all 9+ page types with section-level data flow (§27), 11 identified gaps with fixes
