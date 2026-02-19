@@ -1,5 +1,5 @@
 import { ConvexProvider } from 'convex/react';
-import { convex } from '../../lib/convex';
+import { getConvexClient } from '../../lib/convex';
 import LeadForm from './LeadForm';
 
 interface ConvexLeadFormProps {
@@ -17,7 +17,7 @@ interface ConvexLeadFormProps {
  */
 export default function ConvexLeadForm(props: ConvexLeadFormProps) {
   return (
-    <ConvexProvider client={convex}>
+    <ConvexProvider client={getConvexClient()}>
       <LeadForm {...props} />
     </ConvexProvider>
   );

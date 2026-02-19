@@ -1,10 +1,10 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import TestimonialsList from '../../components/admin/TestimonialsList';
+import ConvexTestimonialsList from '../../components/admin/ConvexTestimonialsList';
 ---
 
 <AdminLayout title="Testimonios">
   <div class="space-y-6">
-    <TestimonialsList client:load />
+    <ConvexTestimonialsList client:only="react" />
   </div>
 </AdminLayout>

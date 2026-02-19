@@ -1,2 +1,0 @@
---- TypeScript Check for task-0.3-faq-types.txt ---
-src/components/forms/LeadForm.tsx(3,21): error TS2307: Cannot find module '../../../convex/_generated/api' or its corresponding type declarations.

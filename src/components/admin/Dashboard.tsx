@@ -207,10 +207,10 @@ export default function Dashboard() {
             description="Contactos recibidos"
           />
           <QuickLinkCard
-            title="Ubicaciones"
-            href="/admin/locations"
-            icon="map"
-            description="Oficinas"
+            title="Comunas"
+            href="/admin/communes"
+            icon="location"
+            description="SEO por zona"
           />
           <QuickLinkCard
             title="Configuración"

@@ -1,0 +1,10 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ConvexStatsList from '../../components/admin/ConvexStatsList';
+---
+
+<AdminLayout title="Estadísticas">
+  <div class="space-y-6">
+    <ConvexStatsList client:only="react" />
+  </div>
+</AdminLayout>

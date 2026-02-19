@@ -1,3 +1,0 @@
-=== style= attributes with hex colors ===
-
-=== backgroundColor or color: in JS/TS ===

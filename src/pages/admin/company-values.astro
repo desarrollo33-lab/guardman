@@ -1,0 +1,10 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ConvexCompanyValuesList from '../../components/admin/ConvexCompanyValuesList';
+---
+
+<AdminLayout title="Valores de Empresa">
+  <div class="space-y-6">
+    <ConvexCompanyValuesList client:only="react" />
+  </div>
+</AdminLayout>
