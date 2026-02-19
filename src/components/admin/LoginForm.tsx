@@ -2,15 +2,18 @@ import { useState } from 'react';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth } from 'convex/react';
 
+type AuthFlow = 'signIn' | 'signUp';
+
 /**
  * Login form component using Convex Auth.
- * Handles sign in with email/password.
+ * Handles sign in and sign up with email/password.
  */
 export default function LoginForm() {
   const { signIn } = useAuthActions();
   const { isLoading, isAuthenticated } = useConvexAuth();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [flow, setFlow] = useState<AuthFlow>('signIn');
 
   // Redirect if already authenticated
   if (!isLoading && isAuthenticated) {
@@ -24,14 +27,19 @@ export default function LoginForm() {
     setIsSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
+    formData.set('flow', flow);
 
     try {
       await signIn('password', formData);
       // On success, redirect to admin
       window.location.href = '/admin';
     } catch (err) {
-      console.error('Login error:', err);
-      setError('Credenciales incorrectas. Intenta nuevamente.');
+      console.error('Auth error:', err);
+      setError(
+        flow === 'signIn'
+          ? 'Credenciales incorrectas. Intenta nuevamente.'
+          : 'Error al registrar. Si ya tienes cuenta, intenta iniciar sesión.'
+      );
       setIsSubmitting(false);
     }
   }
@@ -100,19 +108,40 @@ export default function LoginForm() {
             />
           </div>
 
-          {/* Hidden flow field for sign in */}
-          <input type="hidden" name="flow" value="signIn" />
+          {/* Hidden flow field for sign in/sign up */}
+          <input type="hidden" name="flow" value={flow} />
 
           <button
             type="submit"
             disabled={isSubmitting}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
           >
-            {isSubmitting ? 'Ingresando...' : 'Ingresar'}
+            {isSubmitting
+              ? flow === 'signIn'
+                ? 'Ingresando...'
+                : 'Registrando...'
+              : flow === 'signIn'
+                ? 'Ingresar'
+                : 'Registrarse'}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={() => {
+              setFlow(flow === 'signIn' ? 'signUp' : 'signIn');
+              setError(null);
+            }}
+            className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+          >
+            {flow === 'signIn'
+              ? '¿No tienes cuenta? Regístrate'
+              : '¿Ya tienes cuenta? Inicia sesión'}
+          </button>
+        </div>
+
+        <div className="mt-4 text-center">
           <a
             href="/"
             className="text-gray-400 hover:text-gray-300 text-sm transition-colors"
