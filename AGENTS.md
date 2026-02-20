@@ -497,15 +497,25 @@ v.record(v.string(), v.boolean());
 
 This project (`guardman`) has the following Convex tables:
 
-- `pages` - Site pages
-- `services` - Security services offered
-- `solutions` - Security solutions
-- `partners` - Business partners
-- `content_blocks` - Reusable content blocks
-- `site_config` - Site configuration
-- `communes` - Chilean communes/locations
-- `locations` - Office locations
-- `faqs` - Frequently asked questions
+- `users` - Authenticated users (admin)
 - `leads` - Contact form submissions
+- `services` - Security services offered
+- `solutions` - Security solutions by industry
+- `communes` - Chilean communes/locations (managed via `locations.ts`)
+- `pages` - Site pages metadata
+- `content_blocks` - Reusable content blocks per page
+- `site_config` - Site configuration (singleton)
+- `faqs` - Frequently asked questions
+- `heroes` - Hero banner configurations
+- `blog_posts` - Blog articles
+- `authors` - Blog post authors
+- `partners` - Clients, certifications, tech partners
+- `stats` - Statistics per page
+- `ctas` - Call-to-action configurations
+- `industries` - Industry sectors
+- `company_values` - Company values (about page)
+- `team_members` - Team member profiles
+- `process_steps` - Process steps per page
+- `testimonials` - Client testimonials
 
 When adding new functionality, follow the patterns established in existing files.

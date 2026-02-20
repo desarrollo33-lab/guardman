@@ -9,6 +9,13 @@ export const getAllIndustries = query({
   },
 });
 
+export const getIndustryById = query({
+  args: { id: v.id('industries') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const getActiveIndustries = query({
   handler: async (ctx) => {
     const all = await ctx.db.query('industries').collect();

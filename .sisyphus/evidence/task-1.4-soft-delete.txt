@@ -1,0 +1,236 @@
+# Task 1.4: Soft Delete Pattern Analysis
+# Date: 2026-02-19
+# Status: ANALYSIS COMPLETE
+
+================================================================================
+## 1. CURRENT STATE SUMMARY
+================================================================================
+
+### Tables WITH `is_active` field:
+| Table          | Field Type              | Default on Create |
+|----------------|------------------------|-------------------|
+| services       | v.optional(v.boolean()) | true (via ??)     |
+| solutions      | v.optional(v.boolean()) | true (via ??)     |
+| heroes         | v.optional(v.boolean()) | true (via ??)     |
+| team_members   | v.optional(v.boolean()) | NO default set    |
+| industries     | v.optional(v.boolean()) | true (via ??)     |
+| site_config    | v.boolean() (required)  | true (singleton)  |
+
+### Tables WITHOUT `is_active` field:
+| Table           | Current Delete Method |
+|-----------------|----------------------|
+| leads           | Hard delete (none)   |
+| communes        | Hard delete (none)   |
+| faqs            | ctx.db.delete()      |
+| pages           | Hard delete (none)   |
+| content_blocks  | Hard delete (none)   |
+| testimonials    | ctx.db.delete()      |
+| partners        | ctx.db.delete()      |
+| blog_posts      | ctx.db.delete() (has is_published) |
+| files           | Hard delete (none)   |
+| company_values  | Hard delete (none)   |
+| process_steps   | Hard delete (none)   |
+| stats           | Hard delete (none)   |
+| ctas            | Hard delete (none)   |
+| authors         | Hard delete (none)   |
+
+================================================================================
+## 2. QUERY FILTERING ANALYSIS
+================================================================================
+
+### Tables with SOFT DELETE implemented (is_active filtering):
+
+**services.ts:**
+- getAllServices: NO FILTER (returns all)
+- getServiceBySlug: NO FILTER
+- getServicesBySolution: NO FILTER
+- deleteService: SOFT DELETE (sets is_active = false)
+
+**solutions.ts:**
+- getAllSolutions: NO FILTER (returns all)
+- getSolutionBySlug: NO FILTER
+- deleteSolution: SOFT DELETE (sets is_active = false)
+
+**heroes.ts:**
+- getAllHeroes: NO FILTER
+- getHeroByPage: FILTERED (is_active === true)
+- getActiveHeroes: FILTERED (is_active === true)
+- deleteHero: HARD DELETE (ctx.db.delete)
+
+**industries.ts:**
+- getAllIndustries: NO FILTER
+- getActiveIndustries: FILTERED (is_active !== false)
+- getIndustryBySlug: NO FILTER
+- deleteIndustry: HARD DELETE (ctx.db.delete)
+
+**team_members.ts:**
+- getAllTeamMembers: NO FILTER
+- deleteTeamMember: HARD DELETE (ctx.db.delete)
+
+### Tables with PUBLISH STATUS (different pattern):
+
+**blog_posts.ts:**
+- Uses `is_published` instead of `is_active`
+- getPublishedPosts: FILTERED (is_published === true)
+- getFeaturedPosts: FILTERED (is_published && is_featured)
+- deletePost: HARD DELETE
+- publishPost/unpublishPost: Toggle is_published
+
+**pages.ts:**
+- Uses `is_published` instead of `is_active`
+- No delete mutation visible in analysis
+
+================================================================================
+## 3. INCONSISTENCIES FOUND
+================================================================================
+
+### A. Field Naming:
+- Most tables use `is_active`
+- blog_posts and pages use `is_published`
+- This is acceptable as they serve different purposes:
+  - is_active = soft delete status
+  - is_published = content workflow status
+
+### B. Delete Implementation:
+- services, solutions: SOFT DELETE (correct)
+- heroes, industries: is_active field EXISTS but HARD DELETE used (inconsistent)
+- team_members: is_active field EXISTS but HARD DELETE used (inconsistent)
+
+### C. Query Filtering:
+- Only heroes and industries have "getActive" variants
+- services and solutions have is_active but NO filtering queries
+- Frontend may be receiving deleted items
+
+### D. Default Values:
+- services, solutions, heroes, industries: Defaults to `true` on create
+- team_members: NO DEFAULT (undefined if not passed)
+
+================================================================================
+## 4. STANDARDIZATION PLAN
+================================================================================
+
+### Phase 1: Add Missing Fields (Migration Required)
+
+Tables needing `is_active` field added:
+1. leads
+2. communes
+3. faqs
+4. pages
+5. content_blocks
+6. testimonials
+7. partners
+8. files
+9. company_values
+10. process_steps
+11. stats
+12. ctas
+13. authors
+
+### Phase 2: Fix Inconsistent Deletes
+
+Tables with is_active but using hard delete:
+1. heroes.ts - change deleteHero to soft delete
+2. industries.ts - change deleteIndustry to soft delete
+3. team_members.ts - change deleteTeamMember to soft delete
+
+### Phase 3: Add Filtering Queries
+
+For all tables with is_active, add:
+- `getActive[Table]` query that filters is_active !== false
+- Update existing queries to include active-only variants
+
+### Phase 4: Add Defaults
+
+Ensure all create mutations include:
+```typescript
+is_active: args.is_active ?? true
+```
+
+================================================================================
+## 5. RECOMMENDED STANDARD PATTERN
+================================================================================
+
+### Schema:
+```typescript
+defineTable({
+  // ... other fields
+  is_active: v.optional(v.boolean()),
+})
+```
+
+### Create Mutation:
+```typescript
+return await ctx.db.insert('table', {
+  ...args,
+  is_active: args.is_active ?? true,
+});
+```
+
+### Delete Mutation (Soft):
+```typescript
+export const deleteItem = mutation({
+  args: { id: v.id('table') },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { is_active: false });
+  },
+});
+```
+
+### Query Pattern (Active Only):
+```typescript
+export const getActiveItems = query({
+  handler: async (ctx) => {
+    const all = await ctx.db.query('table').collect();
+    return all.filter((item) => item.is_active !== false);
+  },
+});
+```
+
+### Query Pattern (Including Deleted - Admin):
+```typescript
+export const getAllItems = query({
+  handler: async (ctx) => {
+    return await ctx.db.query('table').collect();
+  },
+});
+```
+
+================================================================================
+## 6. PRIORITY RECOMMENDATIONS
+================================================================================
+
+HIGH PRIORITY (Content managed via admin):
+1. faqs - Add is_active, soft delete
+2. testimonials - Add is_active, soft delete
+3. partners - Add is_active, soft delete
+4. team_members - Fix delete to soft delete, add default
+
+MEDIUM PRIORITY (CMS content):
+5. heroes - Fix delete to soft delete
+6. industries - Fix delete to soft delete
+7. content_blocks - Add is_active, soft delete
+8. company_values - Add is_active, soft delete
+
+LOW PRIORITY (Configuration/Meta):
+9. leads - Add is_active for archiving (not deleting inquiries)
+10. communes - Add is_active
+11. pages - Consider adding is_active
+12. stats - Add is_active
+13. ctas - Add is_active
+14. authors - Add is_active
+15. files - Add is_active
+16. process_steps - Add is_active
+
+================================================================================
+## 7. ACCEPTANCE CHECKLIST
+================================================================================
+
+- [x] Current soft delete patterns documented
+- [x] Missing is_active fields identified (13 tables)
+- [x] Queries that need soft-delete filtering documented
+- [x] Standardization plan ready
+- [x] Evidence file created
+
+================================================================================
+## END OF ANALYSIS
+================================================================================

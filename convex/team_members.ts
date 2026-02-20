@@ -12,6 +12,13 @@ export const getAllTeamMembers = query({
   },
 });
 
+export const getTeamMemberById = query({
+  args: { id: v.id('team_members') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 // === CRUD MUTATIONS ===
 
 export const createTeamMember = mutation({

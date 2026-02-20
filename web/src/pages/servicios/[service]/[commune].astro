@@ -1,0 +1,205 @@
+---
+import { getConvexServer } from "../../../lib/convex";
+
+export const prerender = false;
+
+// Get params from URL
+const { service: serviceSlug, commune: communeSlug } = Astro.params;
+
+// Validate params exist
+if (!serviceSlug || !communeSlug) {
+  return Astro.redirect("/404");
+}
+
+// Get Convex client
+const convex = await getConvexServer();
+if (!convex) {
+  return Astro.redirect("/404");
+}
+
+// Fetch data from Convex (server-side)
+let service = null;
+let commune = null;
+let serviceLocation = null;
+
+try {
+  // Get service by slug
+  const services = await convex.query("services:getAllServices", {});
+  service = services?.find((s: any) => s.slug === serviceSlug);
+  
+  // Get commune by slug
+  const communes = await convex.query("locations:getAllCommunes", {});
+  commune = communes?.find((c: any) => c.slug === communeSlug);
+  
+  // Try to get service_location if it exists
+  try {
+    const locations = await convex.query("service_locations:getServiceLocations", { serviceSlug, communeSlug });
+    serviceLocation = locations?.[0] || null;
+  } catch (e) {
+    // service_locations might not exist yet
+    serviceLocation = null;
+  }
+} catch (error) {
+  console.error("Error fetching SEO data:", error);
+}
+
+// 404 if not found
+if (!service || !commune) {
+  return Astro.redirect("/404");
+}
+
+// Generate meta tags
+const metaTitle = serviceLocation?.meta_title || `${service.title} en ${commune.name} | Guardman Chile`;
+const metaDescription = serviceLocation?.meta_description || `Contrata ${service.title.toLowerCase()} en ${commune.name}. ${service.description?.slice(0, 100)}...`;
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- SEO Meta Tags -->
+    <title>{metaTitle}</title>
+    <meta name="description" content={metaDescription} />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content={metaTitle} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CL" />
+    
+    <!-- Canonical -->
+    <link rel="canonical" href={`https://guardman.cl/servicios/${serviceSlug}/${communeSlug}`} />
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": `${service.title} en ${commune.name}`,
+      "description": service.description,
+      "provider": {
+        "@type": "Organization",
+        "name": "Guardman Chile",
+        "url": "https://guardman.cl"
+      },
+      "areaServed": {
+        "@type": "Place",
+        "name": commune.name,
+        "@id": `https://guardman.cl/comunas/${communeSlug}`
+      },
+      "serviceType": service.title,
+      "url": `https://guardman.cl/servicios/${serviceSlug}/${communeSlug}`
+    })} />
+  </head>
+  <body class="bg-gray-50">
+    <!-- Breadcrumb -->
+    <nav class="bg-white border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ol class="flex items-center space-x-2 py-3 text-sm">
+          <li>
+            <a href="/" class="text-gray-500 hover:text-gray-700">Inicio</a>
+          </li>
+          <li class="text-gray-400">/</li>
+          <li>
+            <a href="/servicios" class="text-gray-500 hover:text-gray-700">Servicios</a>
+          </li>
+          <li class="text-gray-400">/</li>
+          <li>
+            <a href={`/servicios/${serviceSlug}`} class="text-gray-500 hover:text-gray-700">{service.title}</a>
+          </li>
+          <li class="text-gray-400">/</li>
+          <li class="text-gray-900 font-medium">{commune.name}</li>
+        </ol>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-green-900 to-green-700 text-white py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
+          {service.title} en {commune.name}
+        </h1>
+        {service.tagline && (
+          <p class="text-xl text-green-100 mb-6">{service.tagline}</p>
+        )}
+        <p class="text-lg text-green-50 max-w-3xl">
+          {service.description}
+        </p>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold mb-8 text-center">¿Qué incluye nuestro servicio?</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {service.features?.map((feature: string) => (
+            <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <svg class="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span class="text-gray-700">{feature}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="py-16 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold mb-8 text-center">Beneficios de contratar en {commune.name}</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+          {service.benefits?.map((benefit: string) => (
+            <div class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-sm">
+              <svg class="w-8 h-8 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-lg text-gray-700">{benefit}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Local Content Section (from service_location) -->
+    {serviceLocation?.intro_content && (
+      <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="prose max-w-3xl mx-auto">
+            <h2 class="text-2xl font-bold mb-6">Servicio de seguridad en {commune.name}</h2>
+            <div set:html={serviceLocation.intro_content} />
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-green-600">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold text-white mb-4">
+          ¿Necesitas {service.title} en {commune.name}?
+        </h2>
+        <p class="text-xl text-green-100 mb-8">
+          Contáctanos hoy y recibe una cotización personalizada
+        </p>
+        <a 
+          href="/contacto"
+          class="inline-block bg-white text-green-700 font-semibold px-8 py-4 rounded-lg hover:bg-gray-100 transition"
+        >
+          Solicitar Cotización
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <p>&copy; 2024 Guardman Chile. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+  </body>
+</html>

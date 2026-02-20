@@ -262,6 +262,13 @@ export const getSolutionBySlug = query({
   },
 });
 
+export const getSolutionById = query({
+  args: { id: v.id('solutions') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 // === CRUD MUTATIONS ===
 
 export const createSolution = mutation({

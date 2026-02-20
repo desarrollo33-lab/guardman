@@ -9,6 +9,13 @@ export const getAllHeroes = query({
   },
 });
 
+export const getHeroById = query({
+  args: { id: v.id('heroes') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const getHeroByPage = query({
   args: { page_slug: v.string() },
   handler: async (ctx, args) => {

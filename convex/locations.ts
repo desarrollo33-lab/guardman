@@ -88,6 +88,16 @@ export const getAllCommunes = query({
 });
 
 /**
+ * Obtener una comuna por su ID
+ */
+export const getCommuneById = query({
+  args: { id: v.id('communes') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
+/**
  * Obtener una comuna por su slug
  */
 export const getCommuneBySlug = query({

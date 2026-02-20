@@ -1,0 +1,104 @@
+================================================================================
+SLUG FIELD ANALYSIS - Task 1.1
+Generated: 2026-02-19
+================================================================================
+
+SUMMARY: NO MIGRATION NEEDED - Schema is already consistent.
+All URL-addressable entities use `slug` as the field name.
+
+================================================================================
+TABLES WITH SLUG FIELDS (Consistent Pattern)
+================================================================================
+
+| Table        | Field Name | Index         | Status |
+|--------------|------------|---------------|--------|
+| services     | slug       | by_slug       | OK     |
+| solutions    | slug       | by_slug       | OK     |
+| communes     | slug       | by_slug       | OK     |
+| industries   | slug       | by_slug       | OK     |
+| blog_posts   | slug       | by_slug       | OK     |
+| pages        | slug       | by_slug       | OK     |
+| authors      | slug       | by_slug       | OK     |
+
+All slug fields:
+- Named consistently as `slug` (not `key`, `code`, or `identifier`)
+- Have proper `by_slug` indexes for efficient lookups
+- Used in queries via `.withIndex('by_slug', ...)`
+
+================================================================================
+TABLES WITH PAGE_SLUG (Foreign Key Pattern)
+================================================================================
+
+These tables use `page_slug` to reference pages.slug - this is CORRECT:
+- content_blocks (index: by_page_order)
+- heroes (index: by_page_slug)
+- process_steps (index: by_page_slug)
+- stats (index: by_page_slug)
+- ctas (index: by_page_slug)
+
+================================================================================
+TABLES WITHOUT SLUG (Correct - No Public URLs Needed)
+================================================================================
+
+| Table          | Reason                                          |
+|----------------|-------------------------------------------------|
+| users          | Uses email as unique identifier                 |
+| leads          | Transient data, no public URLs                  |
+| faqs           | Accessed by category, not individually by URL   |
+| site_config    | Singleton configuration                         |
+| testimonials   | Displayed in groups, no individual URLs         |
+| partners       | Displayed in groups, no individual URLs         |
+| files          | Internal storage references                     |
+| team_members   | Displayed in groups, no individual URLs         |
+| company_values | Displayed in groups, no individual URLs         |
+
+================================================================================
+POTENTIAL CONCERNS (Investigated)
+================================================================================
+
+1. faqs table has `id` field in seed data:
+   - Schema: id: v.optional(v.string())
+   - Usage: Idempotent seeding only
+   - Verdict: NOT a slug field - FAQs are accessed by category
+   
+2. No `key` or `code` fields found used as identifiers:
+   - services.ts has icon: 'key' but that's an icon name, not a field
+   
+================================================================================
+CODE USAGE PATTERNS (Verified Consistent)
+================================================================================
+
+All slug queries follow the same pattern:
+
+```typescript
+// Query by slug
+.withIndex('by_slug', (q) => q.eq('slug', args.slug))
+
+// Create with slug check
+.withIndex('by_slug', (q) => q.eq('slug', args.slug))
+if (existing) throw new Error('X with this slug already exists');
+```
+
+Files verified:
+- convex/services.ts (lines 198-203, 266-288)
+- convex/solutions.ts (lines 256-260, 269-294)
+- convex/industries.ts (lines 23-28, 38-51)
+- convex/blog_posts.ts (lines 21-26, 44-73)
+- convex/authors.ts (lines 14-18, 28-41)
+- convex/communes/locations.ts (lines 95-100)
+- convex/pages.ts (referenced via page_slug in other tables)
+
+================================================================================
+CONCLUSION
+================================================================================
+
+Status: NO ACTION REQUIRED
+
+The schema already follows consistent naming conventions:
+- All URL-addressable entities use `slug` field
+- All slug fields have `by_slug` indexes
+- No inconsistent naming (no `key`, `code`, or alternative identifiers)
+
+No migration script needed.
+
+================================================================================

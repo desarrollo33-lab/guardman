@@ -1,133 +1,128 @@
 ---
-/**
- * Blog Index Page - Guardman Chile
- * Lists all blog articles with title, description, date, and image.
- * Data fetched from Convex database.
- */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getConvexServer } from "../../lib/convex";
 
-import BaseLayout from '@/layouts/BaseLayout.astro';
-import Container from '@/components/ui/Container.astro';
-import Section from '@/components/ui/Section.astro';
-import Icon from '@/components/ui/Icon.astro';
-import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
-import { convexServer } from '@/lib/convex';
-import { api } from '@convex/_generated/api';
+export const prerender = false;
 
-// Fetch published blog posts from Convex and sort by published_at descending
-const posts = (await convexServer.query(api.blog_posts.getPublishedPosts))
-  .sort((a, b) => b.published_at - a.published_at);
+// Get Convex client
+const convex = await getConvexServer();
+let posts = [];
+let error = null;
 
-// Page metadata
-const pageTitle = 'Blog de Seguridad Privada en Chile | Guardman';
-const pageDescription = 'Artículos y noticias sobre seguridad privada en Santiago, tecnología de protección, alarmas Ajax y consejos de seguridad para empresas y condominios.';
+if (convex) {
+  try {
+    posts = await convex.query("blog_posts:getPublishedPosts", {});
+  } catch (e: any) {
+    console.error("Error fetching posts:", e);
+    error = e.message;
+  }
+} else {
+  error = "Convex client not available";
+}
 
-// Format date to Spanish locale (accepts timestamp number)
-function formatDate(timestamp: number): string {
+// Format date
+const formatDate = (timestamp: number) => {
+  if (!timestamp) return '';
   return new Date(timestamp).toLocaleDateString('es-CL', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric',
+    day: 'numeric'
   });
-}
+};
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription}>
-  <Section id="blog" background="white">
-    <Container class="relative z-20">
-      <Breadcrumbs items={[{ name: 'Blog' }]} />
+<BaseLayout
+  title="Blog de Seguridad | Guardman Chile"
+  description="Noticias, consejos y artículos sobre seguridad privada en Chile."
+>
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-br from-slate-900 to-slate-700 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">
+        Blog de Seguridad
+      </h1>
+      <p class="text-xl text-slate-200 max-w-3xl">
+        Noticias, consejos y buenas prácticas en seguridad privada. 
+        Mantente informado con las últimas tendencias del sector.
+      </p>
+    </div>
+  </section>
 
-      <div class="max-w-4xl">
-        {/* Page Header */}
-        <div class="text-center mb-12 md:mb-16">
-          <span class="inline-block px-4 py-1.5 rounded-full bg-gray-900/10 text-gray-900 text-sm font-semibold mb-4">
-            Blog
-          </span>
-          <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Noticias y Artículos
-          </h1>
-          <p class="text-gray-600 max-w-2xl mx-auto text-lg">
-            Mantente informado sobre seguridad privada, tecnología y mejores prácticas de protección
-          </p>
-        </div>
-      </div>
+  {error && (
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 mx-auto max-w-7xl my-8">
+      <p>Error cargando artículos: {error}</p>
+    </div>
+  )}
 
-      {/* Posts Grid */}
+  {/* Blog Grid */}
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {posts.length > 0 ? (
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post) => (
-            <a
+            <a 
               href={`/blog/${post.slug}`}
-              class="group bg-white rounded-2xl border border-gray-200 hover:border-gray-900/30 overflow-hidden transition-all duration-300 hover:shadow-elevated hover:-translate-y-1"
+              class="block bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden group"
             >
-              {/* Image */}
-              {post.cover_image ? (
-                <div class="aspect-video bg-gray-100 overflow-hidden">
-                  <img
-                    src={post.cover_image}
+              {post.cover_image && (
+                <div class="aspect-video overflow-hidden">
+                  <img 
+                    src={post.cover_image} 
                     alt={post.title}
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
+                    class="w-full h-full object-cover group-hover:scale-105 transition"
                   />
                 </div>
-              ) : (
-                <div class="aspect-video bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
-                  <svg class="w-16 h-16 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                  </svg>
-                </div>
               )}
-
-              {/* Content */}
               <div class="p-6">
-                {/* Date */}
-                <time class="text-sm text-gray-500 mb-2 block">
-                  {formatDate(post.published_at)}
-                </time>
-
-                {/* Title */}
-                <h2 class="text-xl font-bold text-gray-900 group-hover:text-gray-600 transition-colors mb-3 line-clamp-2">
+                {/* Tags */}
+                {post.tags && post.tags.length > 0 && (
+                  <div class="flex flex-wrap gap-2 mb-3">
+                    {post.tags.slice(0, 2).map((tag) => (
+                      <span class="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition">
                   {post.title}
-                </h2>
-
-                {/* Description */}
-                <p class="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
-                  {post.excerpt}
-                </p>
-
-                {/* Author */}
-                <div class="flex items-center gap-2 text-sm text-gray-500">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                  </svg>
-                  <span>{post.author}</span>
-                </div>
-
-                {/* Read More */}
-                <div class="flex items-center gap-2 text-gray-900 font-semibold text-sm mt-4 group-hover:gap-3 transition-all">
-                  <span>Leer más</span>
-                  <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
-                  </svg>
+                </h3>
+                {post.excerpt && (
+                  <p class="text-gray-500 text-sm mb-4 line-clamp-3">
+                    {post.excerpt}
+                  </p>
+                )}
+                <div class="flex items-center justify-between text-sm text-gray-400">
+                  <span>{post.published_at ? formatDate(post.published_at) : ''}</span>
+                  {post.read_time && <span>{post.read_time} min lectura</span>}
                 </div>
               </div>
             </a>
           ))}
         </div>
       ) : (
-        <div class="text-center py-16">
-          <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
-            <svg class="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-            </svg>
-          </div>
-          <h2 class="text-xl font-semibold text-gray-900 mb-2">
-            Próximamente
-          </h2>
-          <p class="text-gray-600 max-w-md mx-auto">
-            Estamos preparando artículos interesantes sobre seguridad y tecnología. Vuelve pronto.
-          </p>
+        <div class="text-center py-12">
+          <p class="text-gray-500">No hay artículos disponibles en este momento.</p>
         </div>
       )}
-    </Container>
-  </Section>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-16 bg-green-600">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-white mb-4">
+        ¿Necesitas servicios de seguridad?
+      </h2>
+      <p class="text-xl text-green-100 mb-8">
+        Contáctanos hoy y recibe una cotización personalizada
+      </p>
+      <a 
+        href="/contacto"
+        class="inline-block bg-white text-green-700 font-semibold px-8 py-4 rounded-lg hover:bg-gray-100 transition"
+      >
+        Solicitar Cotización
+      </a>
+    </div>
+  </section>
 </BaseLayout>

@@ -1,0 +1,41 @@
+# Cloudflare Wrangler Configuration
+# https://developers.cloudflare.com/workers/wrangler/configuration/
+
+name = "guardman"
+compatibility_date = "2024-01-01"
+
+# Configuración de Workers
+# [[workers]]
+#   name = "guardman-worker"
+#   route = "api.guardman.cl/*"
+#   kv_namespaces = []
+#   d1_databases = []
+#   r2_buckets = []
+
+# Configuración de D1 (Base de datos)
+# [[d1_databases]]
+#   binding = "DB"
+#   database_name = "guardman-db"
+#   database_id = "your-database-id"
+
+# Configuración de R2 (Storage)
+# [[r2_buckets]]
+#   binding = "ASSETS"
+#   bucket_name = "guardman-assets"
+
+# Configuración de KV (Key-Value)
+# [[kv_namespaces]]
+#   binding = "CACHE"
+#   id = "your-kv-namespace-id"
+
+# Configuración de Pages
+# [pages]
+#   bucket = "./dist"
+#   branch = "main"
+
+# Variables de entorno (no incluir secretos)
+# [vars]
+#   ENVIRONMENT = "production"
+
+# Secrets (usar `npx wrangler secret put KEY`)
+# Los secretos se configuran via CLI: npx wrangler secret put API_KEY

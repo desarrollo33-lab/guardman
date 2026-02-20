@@ -9,6 +9,13 @@ export const getAllStats = query({
   },
 });
 
+export const getStatById = query({
+  args: { id: v.id('stats') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const getStatsByPage = query({
   args: { page_slug: v.string() },
   handler: async (ctx, args) => {

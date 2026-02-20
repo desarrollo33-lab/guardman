@@ -93,6 +93,13 @@ export const getAllFaqs = query({
   },
 });
 
+export const getFaqById = query({
+  args: { id: v.id('faqs') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const getFaqsByCategory = query({
   args: { category: v.string() },
   handler: async (ctx, args) => {

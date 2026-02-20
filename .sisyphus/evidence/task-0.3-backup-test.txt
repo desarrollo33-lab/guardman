@@ -1,0 +1,152 @@
+# Task 0.3: Backup Strategy Test Results
+
+**Date:** 2026-02-19
+**Task:** Document current production data and test backup/restore procedures
+
+---
+
+## Test Summary
+
+| Test | Result | Notes |
+|------|--------|-------|
+| MCP table listing (prod) | PASS | 26 tables identified |
+| MCP record count (dev) | PASS | 154 records across business tables |
+| MCP record count (prod) | BLOCKED | Read-only PII protection |
+| CLI export (dev) | BLOCKED | Requires CLI authentication |
+| Dashboard access | PASS | Both deployments accessible |
+
+---
+
+## Dev Deployment Record Counts
+
+Queried via MCP runOneoffQuery:
+
+```
+Business Tables (Core Content):
+- blog_posts: 11
+- communes: 58
+- content_blocks: 9
+- faqs: 10
+- industries: 8
+- pages: 3
+- partners: 6
+- process_steps: 4
+- services: 6
+- site_config: 1
+- solutions: 8
+- users: 3
+
+Empty Tables:
+- authors: 0
+- company_values: 0
+- ctas: 0
+- files: 0
+- heroes: 0
+- leads: 0
+- stats: 0
+- team_members: 0
+- testimonials: 0
+
+Auth Tables:
+- authAccounts: 2
+- authSessions: 4
+- authRefreshTokens: 21
+- authRateLimits: 0
+- authVerificationCodes: 0
+- authVerifiers: 0
+```
+
+---
+
+## CLI Export Test
+
+### Attempt 1: From root directory
+```bash
+npx convex export --path .sisyphus/evidence/backup-test-dev.zip
+```
+**Result:** `In order to export, add convex to your package.json dependencies`
+
+### Attempt 2: With --env-file
+```bash
+npx convex export --env-file .env.local --path .sisyphus/evidence/backup-test-dev.zip
+```
+**Result:** Same error - convex not in root package.json
+
+### Attempt 3: From admin directory
+```bash
+cd admin && npx convex export --path ../.sisyphus/evidence/backup-test-dev.zip
+```
+**Result:** `No CONVEX_DEPLOYMENT set`
+
+### Attempt 4: From admin with env-file
+```bash
+cd admin && npx convex export --env-file ../.env.local --path ../.sisyphus/evidence/backup-test-dev.zip
+```
+**Result:** `401 Unauthorized: MissingAccessToken: An access token is required`
+
+### Root Cause
+CLI requires:
+1. `convex` package in local package.json
+2. Authentication via `npx convex login` or `npx convex dev`
+3. Proper CONVEX_DEPLOYMENT environment variable
+
+---
+
+## Dashboard Backup Verification
+
+### Dev Deployment
+- URL: https://dashboard.convex.dev/d/opulent-cod-610
+- Backup Page: https://dashboard.convex.dev/d/opulent-cod-610/settings/backups
+- Status: Accessible
+
+### Production Deployment
+- URL: https://dashboard.convex.dev/d/brazen-meerkat-768
+- Backup Page: https://dashboard.convex.dev/d/brazen-meerkat-768/settings/backups
+- Status: Accessible
+
+### Dashboard Capabilities
+- "Backup Now" button for immediate backup
+- "Backup automatically" for scheduled backups (Pro plan)
+- Download backup as ZIP
+- Restore from backup
+- Cross-deployment restore (prod → dev, dev → prod)
+
+---
+
+## Recommendations
+
+1. **Primary Method:** Use Convex Dashboard for backups
+   - No CLI setup required
+   - Visual confirmation
+   - Scheduled backups available
+
+2. **CLI Setup (Optional):** If automation needed
+   ```bash
+   # Add convex to root package.json
+   npm install convex --save-dev
+   
+   # Authenticate
+   npx convex login
+   
+   # Then export will work
+   npx convex export --path backups/backup.zip
+   ```
+
+3. **Before Schema Changes:**
+   - Create backup via Dashboard
+   - Download backup ZIP
+   - Store in `.sisyphus/backups/` directory
+   - Document backup date and purpose
+
+---
+
+## Conclusion
+
+Backup strategy documented in `.sisyphus/drafts/backup-strategy.md` with:
+- Complete table inventory
+- Dashboard backup procedure (primary method)
+- CLI backup procedure (secondary method)
+- Restore procedures
+- Rollback plan for schema migrations
+
+Dashboard method is RECOMMENDED for ease of use and no setup required.

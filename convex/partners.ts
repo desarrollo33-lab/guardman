@@ -12,6 +12,13 @@ export const getAll = query({
   },
 });
 
+export const getPartnerById = query({
+  args: { id: v.id('partners') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const getByType = query({
   args: { type: v.string() },
   handler: async (ctx, args) => {

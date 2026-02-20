@@ -3732,9 +3732,1715 @@ export { default as Section } from './Section.astro';
 
 ---
 
-> **Document Version**: Draft 6 — February 19, 2026
-> **Total Sections**: 32 chapters + 5 appendices
-> **Total Tables Audited**: 22 existing + 4 proposed new (`careers`, `career_benefits`, `pages`, image fields on 5 tables)
-> **Total Pages Projected**: ~370+ programmatic pages
-> **New in Draft 6**: Zero Hardcoded Text audit with 200+ strings mapped (§28), Refine CMS Integration with full resource registry and data provider design (§29), Image SEO Treatment pipeline with WebP/AVIF/srcset blueprint (§30), Advanced Local SEO for Chile with GBP, Schema.org, Ley 21.659 compliance, and link building strategies (§31), File Tree Architecture Blueprint with naming conventions and import aliases (§32)
+## 33. Master Package Registry — Complete Dependency Map
+
+> **Goal**: Every npm package required for the entire monorepo documented with exact versions, workspace, and install commands. No guessing — copy-paste and run.
+
+### 33.1. Root Monorepo (`/package.json`)
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `turbo` | `^2.3.0` | Monorepo task runner (dev, build, lint) |
+| `convex` | `^1.12.0` | Convex CLI (`npx convex dev`, `npx convex deploy`) |
+
+```bash
+# Already installed. Root manages workspaces: ["web", "admin"]
+npm install -D turbo@^2.3.0
+npm install convex@^1.12.0
+```
+
+### 33.2. Web Frontend (`/web/package.json`)
+
+#### Existing Dependencies (keep)
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `astro` | `^5.1.0` | SSR framework |
+| `@astrojs/react` | `^4.1.0` | React islands in Astro |
+| `@astrojs/sitemap` | `^3.2.0` | Static sitemap generation (limited — custom endpoint also needed) |
+| `@astrojs/tailwind` | `^6.0.0` | Tailwind CSS integration |
+| `@astrojs/vercel` | `^8.0.0` | Vercel adapter for SSR |
+| `convex` | `^1.12.0` | Convex client (ConvexHttpClient for SSR) |
+| `react` | `^18.3.1` | React runtime (for islands) |
+| `react-dom` | `^18.3.1` | React DOM |
+| `marked` | `^17.0.3` | Markdown → HTML rendering |
+| `satori` | `^0.19.2` | OG image generation (SVG → PNG) |
+| `@resvg/resvg-js` | `^2.6.2` | SVG → PNG conversion (for satori) |
+| `tailwindcss` | `^3.4.17` | Utility-first CSS |
+
+#### New Dependencies (add in Phase 2)
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `slugify` | `^1.6.6` | URL slug generation from titles |
+
+```bash
+cd web
+npm install slugify@^1.6.6
+```
+
+#### Dev Dependencies (existing — keep)
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `@astrojs/check` | `^0.9.6` | Astro type checking |
+| `@types/react` | `^18.3.18` | React types |
+| `@types/react-dom` | `^18.3.5` | React DOM types |
+| `typescript` | `^5.9.3` | TypeScript compiler |
+| `prettier` | `^3.4.2` | Code formatting |
+| `prettier-plugin-astro` | `^0.14.1` | Astro formatting |
+| `vitest` | `^4.0.18` | Unit testing |
+| `@vitest/coverage-v8` | `^4.0.18` | Test coverage |
+
+### 33.3. Admin CMS (`/admin/package.json`)
+
+#### Existing Dependencies (keep)
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `convex` | `^1.12.0` | Convex client |
+| `@convex-dev/auth` | `^0.0.90` | Admin authentication (password-based) |
+| `react` | `^18.3.1` | React runtime |
+| `react-dom` | `^18.3.1` | React DOM |
+| `react-router-dom` | `^6.28.0` | Client-side routing |
+| `@tanstack/react-query` | `^5.0.0` | Data fetching/cache |
+| `lucide-react` | `^0.468.0` | Icon library |
+
+#### New Dependencies (add in Phase 4 — CMS rebuild)
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `@refinedev/core` | `^5.0.9` | Refine headless CRUD framework |
+| `@refinedev/antd` | `^6.0.3` | Refine + Ant Design UI integration |
+| `@refinedev/react-router` | `^1.0.0` | Refine routing for React Router |
+| `antd` | `^6.3.0` | Ant Design component library |
+| `@ant-design/icons` | `^6.0.0` | Ant Design icon set |
+| `@dnd-kit/core` | `^6.3.1` | Drag-and-drop core |
+| `@dnd-kit/sortable` | `^10.0.0` | Sortable list for reorder UX |
+| `@uiw/react-md-editor` | `^4.0.11` | Markdown WYSIWYG editor |
+| `slugify` | `^1.6.6` | Slug auto-generation in forms |
+
+```bash
+cd admin
+npm install @refinedev/core@^5.0.9 @refinedev/antd@^6.0.3 @refinedev/react-router@^1.0.0
+npm install antd@^6.3.0 @ant-design/icons@^6.0.0
+npm install @dnd-kit/core@^6.3.1 @dnd-kit/sortable@^10.0.0
+npm install @uiw/react-md-editor@^4.0.11 slugify@^1.6.6
+```
+
+#### Existing Dev Dependencies (keep)
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `vite` | `^6.0.5` | Build tool |
+| `@vitejs/plugin-react` | `^4.3.4` | React plugin for Vite |
+| `tailwindcss` | `^3.4.17` | CSS utilities |
+| `typescript` | `~5.6.2` | TypeScript compiler |
+| `eslint` | `^9.17.0` | Linting |
+
+### 33.4. Convex Backend (`/convex/`)
+
+No separate `package.json` — Convex functions use the root `convex` package. Relevant helpers:
+
+| Package | Version | Purpose | Install Location |
+|---------|---------|---------|-----------------|
+| `convex` | `^1.12.0` | Core Convex SDK | Root |
+| `convex-helpers` | `^0.1.108` | Community helpers (validators, triggers) | Root |
+| `@convex-dev/auth` | `^0.0.90` | Auth system | Admin |
+
+```bash
+# From root
+npm install convex-helpers@^0.1.108
+```
+
+### 33.5. Environment Variables
+
+| Variable | Location | Value Pattern |
+|----------|----------|---------------|
+| `CONVEX_DEPLOYMENT` | Root `.env.local` | `dev:your-deployment-name` |
+| `VITE_CONVEX_URL` | `admin/.env.local` | `https://your-deployment.convex.cloud` |
+| `CONVEX_URL` | `web/.env` | `https://your-deployment.convex.cloud` |
+| `AUTH_SECRET` | Convex Dashboard | 32-char random string for auth tokens |
+
+### 33.6. Complete Install Script (from scratch)
+
+```bash
+# 1. Clone and enter project
+git clone <repo-url> guardman && cd guardman
+
+# 2. Install root dependencies (turbo, convex)
+npm install
+
+# 3. Install web dependencies
+cd web && npm install && cd ..
+
+# 4. Install admin dependencies (existing)
+cd admin && npm install && cd ..
+
+# 5. Install NEW admin packages (Phase 4)
+cd admin
+npm install @refinedev/core@^5.0.9 @refinedev/antd@^6.0.3 @refinedev/react-router@^1.0.0
+npm install antd@^6.3.0 @ant-design/icons@^6.0.0
+npm install @dnd-kit/core@^6.3.1 @dnd-kit/sortable@^10.0.0
+npm install @uiw/react-md-editor@^4.0.11 slugify@^1.6.6
+cd ..
+
+# 6. Install web NEW packages
+cd web && npm install slugify@^1.6.6 && cd ..
+
+# 7. Install convex helpers at root
+npm install convex-helpers@^0.1.108
+
+# 8. Start Convex backend
+npx convex dev
+
+# 9. Start web (in new terminal)
+npm run dev:web
+
+# 10. Start admin (in new terminal)
+npm run dev:admin
+```
+
+---
+
+## 34. Phased Development Roadmap — From Zero to Production
+
+> **Goal**: 8 modular phases, each independently testable and deployable. Every phase has explicit entry criteria, steps, install commands, file creation, and exit criteria (verification).
+
+### 34.0. Phase Map — Overview
+
+| Phase | Name | Duration | Dependencies | Key Deliverables |
+|-------|------|----------|-------------|-----------------|
+| **0** | Project Scaffolding & Environment | 1 day | None | Monorepo boots, Convex connected, Vercel env set |
+| **1** | Convex Backend — Schema Expansion | 2 days | Phase 0 | 24 tables, all CRUD, indexes, seed data |
+| **2** | Frontend — Content Externalization & i18n | 2 days | Phase 1 | Zero hardcoded text, i18n dictionary, all pages wired |
+| **3** | Frontend — Dynamic Routes & Pages | 2 days | Phase 2 | [slug] pages, programmatic SEO, 370+ pages |
+| **4** | Admin CMS — Refine Integration | 3 days | Phase 1 | 17 CRUD resources, image upload, markdown editor |
+| **5** | Image SEO & Performance | 1 day | Phase 3 | Astro `<Image>`, WebP/AVIF, image sitemap |
+| **6** | Advanced Local SEO | 1 day | Phase 3, 5 | Schema.org, sitemap, robots, structured data |
+| **7** | Testing, QA & Production Deploy | 2 days | All | Build passes, Lighthouse ≥90, deploy to Vercel |
+
+```
+Phase 0 ──→ Phase 1 ──→ Phase 2 ──→ Phase 3 ──→ Phase 5 ──→ Phase 6 ──→ Phase 7
+                │                                    ↑
+                └──→ Phase 4 (CMS) ──────────────────┘
+```
+
+> Phases 2-3 (frontend) and Phase 4 (admin CMS) can progress in parallel after Phase 1 completes.
+
+---
+
+### 34.1. Phase 0 — Project Scaffolding & Environment
+
+#### Entry Criteria
+- Git repository exists with current codebase
+- Node.js ≥20 installed
+- Convex account with project created
+- Vercel account linked to repository
+
+#### Step 0.1 — Verify Monorepo Structure
+
+```bash
+# Confirm turbo workspaces
+cat package.json | grep -A3 "workspaces"
+# Expected: ["web", "admin"]
+
+# Verify all packages install cleanly
+npm install
+npm run build
+```
+
+**✓ Checkpoint**: `npm run build` exits 0 for both web and admin.
+
+#### Step 0.2 — Verify Environment Variables
+
+```bash
+# Root — Convex deployment
+cat .env.local
+# Must contain: CONVEX_DEPLOYMENT=dev:your-deployment
+
+# Web — Convex URL for SSR
+cat web/.env
+# Must contain: CONVEX_URL=https://your-deployment.convex.cloud
+
+# Admin — Convex URL for client
+cat admin/.env.local
+# Must contain: VITE_CONVEX_URL=https://your-deployment.convex.cloud
+```
+
+#### Step 0.3 — Verify File Tree (create missing directories)
+
+```bash
+# From web/src/
+mkdir -p assets/heroes assets/services assets/solutions assets/team
+mkdir -p i18n
+mkdir -p types
+mkdir -p lib
+```
+
+**Files to create**:
+| File | Content |
+|------|---------|
+| `web/src/types/convex.ts` | Shared Convex response type interfaces |
+| `web/src/types/components.ts` | Component prop type interfaces |
+| `web/src/types/seo.ts` | SEO/Schema.org type interfaces |
+| `web/src/lib/image.ts` | Image helper functions (`getOptimizedAlt`, `getImageUrl`) |
+
+#### Step 0.4 — Verify Convex Connection
+
+```bash
+# Start Convex dev server
+npx convex dev
+
+# In another terminal — check tables exist
+npx convex data services
+npx convex data heroes
+npx convex data faqs
+```
+
+**✓ Checkpoint**: All 22 existing tables return data or empty arrays (no errors).
+
+#### Step 0.5 — Verify Vercel Deployment
+
+```bash
+# Build locally first
+npm run build:web
+npm run build:admin
+
+# Push to trigger Vercel deploy
+git add -A && git commit -m "phase-0: verify scaffolding" && git push
+```
+
+**✓ Checkpoint**: Vercel deploy succeeds, site loads at production URL.
+
+#### Phase 0 Exit Criteria
+| Criteria | Test |
+|----------|------|
+| Monorepo boots | `npm install` → exit 0 |
+| Web builds | `npm run build:web` → exit 0 |
+| Admin builds | `npm run build:admin` → exit 0 |
+| Convex connected | `npx convex dev` → syncs schema |
+| New directories exist | `i18n/`, `types/`, `assets/` created |
+| Vercel deploys | Push → Vercel auto-deploy succeeds |
+
+---
+
+### 34.2. Phase 1 — Convex Backend: Schema Expansion & Complete CRUD
+
+#### Entry Criteria
+- Phase 0 complete (monorepo boots, Convex connected)
+
+#### Step 1.1 — Add New Tables to Schema
+
+Edit `convex/schema.ts` to add the 4 new tables:
+
+```typescript
+// ADD to convex/schema.ts
+
+// Table: careers
+careers: defineTable({
+  title: v.string(),
+  slug: v.string(),
+  type: v.string(),            // "Tiempo Completo", "Part-time"
+  location: v.string(),        // "Santiago, RM"
+  description: v.string(),
+  requirements: v.array(v.string()),
+  is_active: v.boolean(),
+  sort_order: v.number(),
+  image: v.optional(v.string()),
+  image_alt: v.optional(v.string()),
+  image_storage_id: v.optional(v.string()),
+}).index("by_slug", ["slug"])
+  .index("by_active", ["is_active"])
+  .index("by_order", ["sort_order"]),
+
+// Table: career_benefits
+career_benefits: defineTable({
+  title: v.string(),
+  description: v.string(),
+  icon: v.string(),
+  sort_order: v.number(),
+}).index("by_order", ["sort_order"]),
+
+// Table: pages
+pages: defineTable({
+  title: v.string(),
+  slug: v.string(),
+  type: v.union(v.literal("legal"), v.literal("info"), v.literal("landing")),
+  body_md: v.string(),
+  meta_title: v.optional(v.string()),
+  meta_description: v.optional(v.string()),
+  last_updated: v.string(),
+  is_published: v.boolean(),
+}).index("by_slug", ["slug"])
+  .index("by_type", ["type"])
+  .index("by_published", ["is_published"]),
+
+// Table: service_locations (SEO cross-reference)
+service_locations: defineTable({
+  service_slug: v.string(),
+  commune_slug: v.string(),
+  meta_title: v.optional(v.string()),
+  meta_description: v.optional(v.string()),
+  hero_title: v.optional(v.string()),
+  intro_paragraph: v.optional(v.string()),
+  local_benefits: v.optional(v.array(v.object({
+    title: v.string(),
+    description: v.string(),
+  }))),
+  is_active: v.boolean(),
+}).index("by_service", ["service_slug"])
+  .index("by_commune", ["commune_slug"])
+  .index("by_pair", ["service_slug", "commune_slug"]),
+```
+
+#### Step 1.2 — Add image fields to existing tables
+
+```typescript
+// MODIFY these existing tables in schema.ts — add image SEO fields:
+
+// services table — add:
+image_alt: v.optional(v.string()),
+image_storage_id: v.optional(v.string()),
+
+// solutions table — add:
+image: v.optional(v.string()),
+image_alt: v.optional(v.string()),
+image_storage_id: v.optional(v.string()),
+
+// industries table — add:
+image_alt: v.optional(v.string()),
+
+// team_members table — add:
+image_alt: v.optional(v.string()),
+image_storage_id: v.optional(v.string()),
+
+// blog_posts table — add:
+cover_image_alt: v.optional(v.string()),
+cover_image_storage_id: v.optional(v.string()),
+```
+
+#### Step 1.3 — Create CRUD functions for new tables
+
+**File**: `convex/careers.ts`
+```typescript
+import { query, mutation } from "./_generated/server";
+import { v } from "convex/values";
+
+export const getAll = query({ handler: async (ctx) => {
+  return await ctx.db.query("careers").withIndex("by_order").collect();
+}});
+
+export const getActive = query({ handler: async (ctx) => {
+  return await ctx.db.query("careers").withIndex("by_active")
+    .filter(q => q.eq(q.field("is_active"), true)).collect();
+}});
+
+export const getBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) => {
+    return await ctx.db.query("careers").withIndex("by_slug")
+      .filter(q => q.eq(q.field("slug"), slug)).first();
+  },
+});
+
+export const getById = query({
+  args: { id: v.id("careers") },
+  handler: async (ctx, { id }) => await ctx.db.get(id),
+});
+
+export const create = mutation({
+  args: { title: v.string(), slug: v.string(), type: v.string(),
+    location: v.string(), description: v.string(),
+    requirements: v.array(v.string()), is_active: v.boolean(),
+    sort_order: v.number(),
+    image: v.optional(v.string()), image_alt: v.optional(v.string()),
+    image_storage_id: v.optional(v.string()) },
+  handler: async (ctx, args) => await ctx.db.insert("careers", args),
+});
+
+export const update = mutation({
+  args: { id: v.id("careers"), title: v.optional(v.string()),
+    slug: v.optional(v.string()), type: v.optional(v.string()),
+    location: v.optional(v.string()), description: v.optional(v.string()),
+    requirements: v.optional(v.array(v.string())),
+    is_active: v.optional(v.boolean()), sort_order: v.optional(v.number()),
+    image: v.optional(v.string()), image_alt: v.optional(v.string()),
+    image_storage_id: v.optional(v.string()) },
+  handler: async (ctx, { id, ...fields }) => {
+    const clean = Object.fromEntries(Object.entries(fields).filter(([,v]) => v !== undefined));
+    await ctx.db.patch(id, clean);
+  },
+});
+
+export const remove = mutation({
+  args: { id: v.id("careers") },
+  handler: async (ctx, { id }) => await ctx.db.delete(id),
+});
+```
+
+**File**: `convex/pages.ts`
+```typescript
+import { query, mutation } from "./_generated/server";
+import { v } from "convex/values";
+
+export const getAll = query({ handler: async (ctx) =>
+  await ctx.db.query("pages").collect()
+});
+
+export const getPublished = query({ handler: async (ctx) =>
+  await ctx.db.query("pages").withIndex("by_published")
+    .filter(q => q.eq(q.field("is_published"), true)).collect()
+});
+
+export const getBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, { slug }) =>
+    await ctx.db.query("pages").withIndex("by_slug")
+      .filter(q => q.eq(q.field("slug"), slug)).first(),
+});
+
+export const getById = query({
+  args: { id: v.id("pages") },
+  handler: async (ctx, { id }) => await ctx.db.get(id),
+});
+
+export const create = mutation({
+  args: { title: v.string(), slug: v.string(),
+    type: v.union(v.literal("legal"), v.literal("info"), v.literal("landing")),
+    body_md: v.string(), meta_title: v.optional(v.string()),
+    meta_description: v.optional(v.string()), last_updated: v.string(),
+    is_published: v.boolean() },
+  handler: async (ctx, args) => await ctx.db.insert("pages", args),
+});
+
+export const update = mutation({
+  args: { id: v.id("pages"), title: v.optional(v.string()),
+    slug: v.optional(v.string()),
+    type: v.optional(v.union(v.literal("legal"), v.literal("info"), v.literal("landing"))),
+    body_md: v.optional(v.string()), meta_title: v.optional(v.string()),
+    meta_description: v.optional(v.string()), last_updated: v.optional(v.string()),
+    is_published: v.optional(v.boolean()) },
+  handler: async (ctx, { id, ...fields }) => {
+    const clean = Object.fromEntries(Object.entries(fields).filter(([,v]) => v !== undefined));
+    await ctx.db.patch(id, clean);
+  },
+});
+
+export const remove = mutation({
+  args: { id: v.id("pages") },
+  handler: async (ctx, { id }) => await ctx.db.delete(id),
+});
+```
+
+**File**: `convex/service_locations.ts`
+```typescript
+import { query, mutation } from "./_generated/server";
+import { v } from "convex/values";
+
+export const getAll = query({ handler: async (ctx) =>
+  await ctx.db.query("service_locations").collect()
+});
+
+export const getByCommune = query({
+  args: { commune_slug: v.string() },
+  handler: async (ctx, { commune_slug }) =>
+    await ctx.db.query("service_locations").withIndex("by_commune")
+      .filter(q => q.eq(q.field("commune_slug"), commune_slug)).collect(),
+});
+
+export const getByService = query({
+  args: { service_slug: v.string() },
+  handler: async (ctx, { service_slug }) =>
+    await ctx.db.query("service_locations").withIndex("by_service")
+      .filter(q => q.eq(q.field("service_slug"), service_slug)).collect(),
+});
+
+export const getByPair = query({
+  args: { service_slug: v.string(), commune_slug: v.string() },
+  handler: async (ctx, args) =>
+    await ctx.db.query("service_locations").withIndex("by_pair")
+      .filter(q => q.and(
+        q.eq(q.field("service_slug"), args.service_slug),
+        q.eq(q.field("commune_slug"), args.commune_slug)
+      )).first(),
+});
+
+export const getById = query({
+  args: { id: v.id("service_locations") },
+  handler: async (ctx, { id }) => await ctx.db.get(id),
+});
+
+export const create = mutation({
+  args: { service_slug: v.string(), commune_slug: v.string(),
+    meta_title: v.optional(v.string()), meta_description: v.optional(v.string()),
+    hero_title: v.optional(v.string()), intro_paragraph: v.optional(v.string()),
+    local_benefits: v.optional(v.array(v.object({ title: v.string(), description: v.string() }))),
+    is_active: v.boolean() },
+  handler: async (ctx, args) => await ctx.db.insert("service_locations", args),
+});
+
+export const update = mutation({
+  args: { id: v.id("service_locations"), service_slug: v.optional(v.string()),
+    commune_slug: v.optional(v.string()), meta_title: v.optional(v.string()),
+    meta_description: v.optional(v.string()), hero_title: v.optional(v.string()),
+    intro_paragraph: v.optional(v.string()),
+    local_benefits: v.optional(v.array(v.object({ title: v.string(), description: v.string() }))),
+    is_active: v.optional(v.boolean()) },
+  handler: async (ctx, { id, ...fields }) => {
+    const clean = Object.fromEntries(Object.entries(fields).filter(([,v]) => v !== undefined));
+    await ctx.db.patch(id, clean);
+  },
+});
+
+export const remove = mutation({
+  args: { id: v.id("service_locations") },
+  handler: async (ctx, { id }) => await ctx.db.delete(id),
+});
+```
+
+#### Step 1.4 — Audit existing CRUD for missing `getAll` and `getById`
+
+Ensure EVERY existing table has these 5 standard functions:
+
+| Function | Signature | Purpose |
+|----------|----------|---------|
+| `getAll` | `query({})` | List all records (for CMS) |
+| `getById` | `query({ id })` | Single record by ID (for CMS edit) |
+| `create` | `mutation({ ...fields })` | Insert new record |
+| `update` | `mutation({ id, ...fields })` | Patch existing record |
+| `remove` | `mutation({ id })` | Delete record |
+
+**Tables missing standard CRUD** (add these functions):
+- `heroes` — missing `getAll`, `getById`, `update`, `remove`
+- `content_blocks` — missing `getAll`, `getById`, `create`, `update`, `remove`
+- `ctas` — missing `getAll`, `getById`, `create`, `update`, `remove`
+- `stats` — missing `getAll`, `getById`, `create`, `update`, `remove`
+- `process_steps` — missing `getAll`, `getById`, `create`, `update`, `remove`
+- `company_values` — missing `getAll`, `getById`, `update`, `remove`
+- `partners` — missing `getAll`, `getById`, `create`, `update`, `remove`
+
+#### Step 1.5 — Seed Data for New Tables
+
+```typescript
+// convex/seed.ts — one-time mutation to populate careers + pages
+export const seedCareers = mutation({
+  handler: async (ctx) => {
+    const careers = [
+      { title: "Guardia de Seguridad OS10", slug: "guardia-os10",
+        type: "Tiempo Completo", location: "Santiago, RM",
+        description: "Despliegue táctico en puntos estratégicos...",
+        requirements: ["Licencia OS10 vigente", "Educación media completa",
+          "Sin antecedentes penales", "Exámenes psicológicos y médicos al día"],
+        is_active: true, sort_order: 1 },
+      // ... 3 more career listings
+    ];
+    for (const c of careers) await ctx.db.insert("careers", c);
+  },
+});
+
+export const seedPages = mutation({
+  handler: async (ctx) => {
+    await ctx.db.insert("pages", {
+      title: "Política de Privacidad", slug: "privacidad", type: "legal",
+      body_md: "## 1. Información General\n\nGuardman Chile...",
+      meta_title: "Política de Privacidad | Guardman Chile",
+      meta_description: "Conozca cómo protegemos sus datos personales...",
+      last_updated: "19 de Febrero, 2026", is_published: true,
+    });
+    await ctx.db.insert("pages", {
+      title: "Términos de Servicio", slug: "terminos", type: "legal",
+      body_md: "## 1. Aceptación\n\nAl utilizar los servicios de Guardman...",
+      meta_title: "Términos de Servicio | Guardman Chile",
+      meta_description: "Términos y condiciones de servicios de seguridad...",
+      last_updated: "19 de Febrero, 2026", is_published: true,
+    });
+  },
+});
+```
+
+#### Step 1.6 — Verification
+
+```bash
+# 1. Push schema changes
+npx convex dev
+# Expected: "Schema validated. ✓ 4 new tables created"
+
+# 2. Test CRUD via Convex Dashboard
+# Navigate to dashboard.convex.dev → your project → Functions
+# Run: careers.getAll → should return []
+# Run: careers.create with test data → should return new ID
+# Run: careers.getAll → should return [test record]
+# Run: careers.remove with that ID → should succeed
+
+# 3. Run seeds
+# In Convex Dashboard → Functions → seed.seedCareers → Run
+# In Convex Dashboard → Functions → seed.seedPages → Run
+
+# 4. Verify all tables have data
+npx convex data careers
+npx convex data pages
+```
+
+#### Phase 1 Exit Criteria
+| Criteria | Test |
+|----------|------|
+| Schema syncs | `npx convex dev` → no errors |
+| 4 new tables exist | Dashboard shows careers, career_benefits, pages, service_locations |
+| Image fields added | services, solutions, industries, team_members, blog_posts have `image_alt` |
+| All 24 tables have standard CRUD | Every table has getAll/getById/create/update/remove |
+| Seed data exists | careers and pages tables have initial records |
+
+---
+
+### 34.3. Phase 2 — Frontend: Content Externalization & i18n
+
+#### Entry Criteria
+- Phase 1 complete (all 24 tables with CRUD, seed data loaded)
+
+#### Step 2.1 — Create i18n Dictionary
+
+**Create file**: `web/src/i18n/es.ts`
+```typescript
+export const ui = {
+  nav: {
+    home: 'Inicio', services: 'Servicios', solutions: 'Soluciones',
+    coverage: 'Cobertura', about: 'Nosotros', contact: 'Contacto',
+    blog: 'Blog', careers: 'Carreras', quote: 'Cotizar Ahora',
+  },
+  footer: {
+    copyright: '© {year} Guardman Chile. Todos los derechos reservados.',
+    privacy: 'Política de Privacidad', terms: 'Términos de Servicio',
+    phone_label: 'Teléfono', email_label: 'Email',
+    location_label: 'Ubicación', schedule_label: 'Horario de Operaciones',
+    schedule_weekday: 'Lun-Vie: 08:00 - 18:00', schedule_emergency: 'Emergencias: 24/7',
+    cta_title: '¿Listo para proteger lo que importa?',
+    cta_subtitle: 'Solicite una cotización sin compromiso',
+    cta_button: 'Solicitar cotización',
+  },
+  forms: {
+    name: 'Nombre Completo', email: 'Correo Electrónico', phone: 'Teléfono',
+    company: 'Empresa', message: 'Mensaje', service: 'Servicio',
+    commune: 'Comuna', city: 'Ciudad', submit: 'Enviar',
+    submitting: 'Enviando...', success: '¡Mensaje enviado correctamente!',
+    error: 'Error al enviar. Intente nuevamente.',
+    required: 'Este campo es obligatorio',
+    invalid_email: 'Ingrese un correo electrónico válido',
+    invalid_phone: 'Ingrese un número de teléfono válido',
+  },
+  sections: {
+    read_more: 'Ver más', view_all: 'Ver todos', back: 'Volver',
+    loading: 'Cargando...', empty: 'No hay contenido disponible.',
+    explore: 'Explorar', learn_more: 'Conocer más',
+    contact_service: 'Conocer servicio', view_solutions: 'Ver soluciones',
+    explore_config: 'Explorar Configuración',
+  },
+  breadcrumbs: { home: 'Inicio' },
+  trust: {
+    response_24h: 'Respuesta <24h', no_commitment: 'Sin Compromiso',
+    dedicated_advisor: 'Asesor Dedicado', os10_certified: 'Certificados OS10',
+  },
+  careers: {
+    badge: 'Oportunidades de Despliegue', hero_title: 'Evolucione con Nosotros',
+    standard_title: 'Estándar Operativo', positions_title: 'Células Disponibles',
+    no_position: '¿No encuentra la posición ideal?',
+    apply: 'Aplicar Despliegue', send_cv: 'Enviar CV',
+    whatsapp: 'Consulta WhatsApp', view_positions: 'Ver Vacantes',
+  },
+  faq: {
+    all: 'Todas', general: 'General', services: 'Servicios',
+    coverage: 'Cobertura', pricing: 'Precios', technology: 'Tecnología',
+    contact_prompt: '¿Tienes otra pregunta?',
+  },
+  meta: {
+    site_name: 'Guardman Chile', separator: ' | ',
+    default_description: 'Empresa de seguridad privada en Chile. Guardias OS10, alarmas Ajax, CCTV y patrullaje preventivo en toda la Región Metropolitana.',
+  },
+} as const;
+```
+
+**Create file**: `web/src/i18n/templates.ts`
+```typescript
+export const templates = {
+  commune: {
+    hero_title: (name: string) => `Seguridad en\n${name}`,
+    hero_subtitle: (name: string) =>
+      `Operación táctica y protección integral para empresas y condominios en ${name}. Personal certificado OS10 con presencia local permanente.`,
+    intro: (name: string) =>
+      `Guardman ofrece soluciones integrales de seguridad privada en ${name} y toda la Región Metropolitana.`,
+    cta_title: (name: string) => `Asegure su propiedad en ${name}`,
+    meta_title: (name: string) => `Seguridad Privada en ${name} | Guardman Chile`,
+    meta_desc: (name: string) =>
+      `Servicios de seguridad privada en ${name}: guardias OS10, alarmas, CCTV y patrullaje para empresas y condominios.`,
+    zone_coverage: (commune: string, zone: string) =>
+      `Además de ${commune}, operamos en otras comunas de la ${zone}.`,
+  },
+  service_commune: {
+    meta_title: (service: string, commune: string) => `${service} en ${commune} | Guardman Chile`,
+    meta_desc: (service: string, commune: string) =>
+      `${service} en ${commune}: servicio profesional con personal certificado OS10 y cobertura 24/7.`,
+    hero_title: (service: string, commune: string) => `${service} en ${commune}`,
+  },
+  careers: {
+    count: (n: number) => `${n} posiciones abiertas para despliegue inmediato.`,
+  },
+  blog: {
+    meta_title: (title: string) => `${title} | Blog Guardman Chile`,
+  },
+} as const;
+```
+
+#### Step 2.2 — Wire Header/Footer from Convex `site_config`
+
+**Modify**: `web/src/components/layout/Header.astro`
+- Replace hardcoded nav labels with `site_config.nav_items[]` from Convex
+- Import `ui` from `@i18n/es` for fallback labels
+- Fetch: `const config = await convex.query(api.site_config.get, { key: 'nav_items' });`
+
+**Modify**: `web/src/components/layout/Footer.astro`
+- Replace hardcoded service/solution/company links with Convex data
+- Replace hardcoded contact info strings with `ui.footer.*`
+- Replace hardcoded CTA section text with `ui.footer.cta_title` / `ctas` table
+
+**Modify**: `web/src/components/layout/MobileMenu.tsx`
+- Receive nav items as prop from Header (already partially done)
+- Replace remaining hardcoded labels with `ui.nav.*`
+
+#### Step 2.3 — Wire remaining pages to Convex
+
+| Page | Action | Source |
+|------|--------|--------|
+| `carreras.astro` | Fetch from `careers.getActive` + `career_benefits.getAll` | 100% dynamic |
+| `privacidad.astro` | Fetch from `pages.getBySlug({ slug: 'privacidad' })` | markdown rendered |
+| `terminos.astro` | Fetch from `pages.getBySlug({ slug: 'terminos' })` | markdown rendered |
+| `cotizar.astro` | Wire hero from `heroes.getByPage({ page_slug: 'cotizar' })` | hero dynamic |
+| `nosotros.astro` | Wire history from `content_blocks` + existing queries | history paragraphs |
+| `servicios/index.astro` | Wire CTA from `ctas.getCtaByPage` | CTA dynamic |
+| `soluciones/index.astro` | Wire hero stats, CTA from Convex | stats, CTA |
+| `cobertura/index.astro` | Wire hero from `heroes`, CTA from `ctas` | hero, CTA |
+| `blog/index.astro` | Wire empty state text from `ui.sections.empty` | i18n |
+| `index.astro` | Wire OG/meta from `heroes.getByPage('home')` | meta dynamic |
+
+#### Step 2.4 — Wire CTAs from `ctas` table
+
+Replace all hardcoded `CTASection` props across every page:
+
+```astro
+---
+// Before (hardcoded):
+// <CTASection headline="¿Listo para proteger..." />
+
+// After (dynamic):
+const cta = await convex.query(api.ctas.getCtaByPage, { page_slug: 'servicios' });
+---
+<CTASection
+  headline={cta?.headline}
+  subtitle={cta?.subheadline}
+  primaryButton={{ text: cta?.buttons?.[0]?.text, href: cta?.buttons?.[0]?.href }}
+  secondaryButton={{ text: cta?.buttons?.[1]?.text, href: cta?.buttons?.[1]?.href }}
+/>
+```
+
+#### Step 2.5 — Wire ServiceFinder cities from Convex
+
+```astro
+---
+// web/src/components/sections/ServiceFinder.astro
+import { convex } from '@lib/convex';
+import { api } from '@convex/_generated/api';
+
+const communes = await convex.query(api.locations.getAllCommunes);
+const communeNames = communes.map(c => c.name).sort();
+---
+<!-- Replace hardcoded <option> elements with dynamic loop -->
+{communeNames.map(name => <option value={name}>{name}</option>)}
+```
+
+#### Step 2.6 — Delete `data/site.ts`
+
+Migrate all data from `data/site.ts` to `site_config` records in Convex, then delete the file:
+
+| `site.ts` Key | Convex `site_config` Record |
+|--------------|---------------------------|
+| `name` | `{ key: 'site_name', value: 'Guardman Chile' }` |
+| `legalName` | `{ key: 'legal_name', value: 'Guardman SpA' }` |
+| `phone` | `{ key: 'phone', value: '+56 9 3000 0010' }` |
+| `email` | `{ key: 'email', value: 'contacto@guardman.cl' }` |
+| `address` | `{ key: 'address', value: 'Región Metropolitana, Chile' }` |
+| `social` | `{ key: 'social', value: { ... } }` |
+
+```bash
+# After migration is complete:
+rm web/src/data/site.ts
+rmdir web/src/data
+```
+
+#### Step 2.7 — Verification
+
+```bash
+# 1. Build must pass
+npm run build:web
+
+# 2. Manual checks — open each page and verify:
+# - Header: nav labels load from Convex (or i18n fallback)
+# - Footer: links, contact info, CTA all load from Convex
+# - /carreras: job listings from Convex
+# - /privacidad: legal content from Convex markdown
+# - /terminos: legal content from Convex markdown
+
+# 3. Hardcoded text grep (should return ZERO results for UI strings)
+grep -r "Cotizar Ahora" web/src/components/ --include="*.astro"
+grep -r "Política de Privacidad" web/src/components/ --include="*.astro"
+# Expected: 0 matches (now from i18n or Convex)
+```
+
+#### Phase 2 Exit Criteria
+| Criteria | Test |
+|----------|------|
+| i18n dictionary exists | `web/src/i18n/es.ts` has 60+ strings |
+| Templates exist | `web/src/i18n/templates.ts` has commune/service patterns |
+| Header/Footer dynamic | Nav items load from Convex `site_config` |
+| `data/site.ts` deleted | No static data source |
+| Careers page dynamic | `/carreras` renders from Convex `careers` table |
+| Legal pages dynamic | `/privacidad`, `/terminos` render from `pages` table |
+| All CTAs dynamic | Every CTASection reads from `ctas` table |
+| ServiceFinder dynamic | City dropdown populated from `locations` |
+| Build passes | `npm run build:web` → exit 0 |
+
+---
+
+### 34.4. Phase 3 — Frontend: Dynamic Routes & Programmatic SEO
+
+#### Entry Criteria
+- Phase 2 complete (all content externalized, i18n ready)
+
+#### Step 3.1 — Create `/soluciones/[slug].astro`
+
+```astro
+---
+// web/src/pages/soluciones/[slug].astro
+import { convex } from '@lib/convex';
+import { api } from '@convex/_generated/api';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import BenefitsSection from '@sections/BenefitsSection.astro';
+import CTASection from '@sections/CTASection.astro';
+import ServiceSchema from '@components/seo/ServiceSchema.astro';
+import Breadcrumbs from '@ui/Breadcrumbs.astro';
+
+export async function getStaticPaths() {
+  const solutions = await convex.query(api.solutions.getAllSolutions);
+  return solutions.map(s => ({
+    params: { slug: s.slug },
+    props: { solution: s },
+  }));
+}
+
+const { solution } = Astro.props;
+const cta = await convex.query(api.ctas.getCtaByPage, { page_slug: 'soluciones' });
+---
+<BaseLayout title={solution.meta_title || `${solution.name} | Guardman Chile`}
+  description={solution.meta_description || solution.description}>
+  <ServiceSchema service={{ name: solution.name, description: solution.description }} />
+  <Breadcrumbs items={[
+    { name: 'Inicio', url: '/' },
+    { name: 'Soluciones', url: '/soluciones' },
+    { name: solution.name },
+  ]} />
+  <!-- Hero, Features, Benefits, CTA sections -->
+</BaseLayout>
+```
+
+#### Step 3.2 — Create `/blog/[slug].astro`
+
+```astro
+---
+// web/src/pages/blog/[slug].astro
+import { convex } from '@lib/convex';
+import { api } from '@convex/_generated/api';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { marked } from 'marked';
+import { templates } from '@i18n/templates';
+
+export async function getStaticPaths() {
+  const posts = await convex.query(api.blog_posts.getPublishedPosts);
+  return posts.map(p => ({
+    params: { slug: p.slug },
+    props: { post: p },
+  }));
+}
+
+const { post } = Astro.props;
+const htmlContent = marked.parse(post.content || '');
+---
+<BaseLayout title={templates.blog.meta_title(post.title)}
+  description={post.excerpt}>
+  <article>
+    <h1>{post.title}</h1>
+    <time datetime={post.published_at}>{post.published_at}</time>
+    <div set:html={htmlContent} />
+  </article>
+</BaseLayout>
+```
+
+#### Step 3.3 — Create `/servicios/[service]/[comuna].astro` (Programmatic SEO)
+
+```astro
+---
+// web/src/pages/servicios/[service]/[comuna].astro
+import { convex } from '@lib/convex';
+import { api } from '@convex/_generated/api';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { templates } from '@i18n/templates';
+import LocalBusinessSchema from '@components/seo/LocalBusinessSchema.astro';
+import BreadcrumbSchema from '@components/seo/BreadcrumbSchema.astro';
+
+export async function getStaticPaths() {
+  const services = await convex.query(api.services.getAllServices);
+  const communes = await convex.query(api.locations.getAllCommunes);
+
+  const paths = [];
+  for (const service of services) {
+    for (const commune of communes) {
+      // Check for custom content in service_locations
+      const custom = await convex.query(api.service_locations.getByPair, {
+        service_slug: service.slug, commune_slug: commune.slug,
+      });
+      paths.push({
+        params: { service: service.slug, comuna: commune.slug },
+        props: { service, commune, custom },
+      });
+    }
+  }
+  return paths;
+}
+
+const { service, commune, custom } = Astro.props;
+const title = custom?.meta_title || templates.service_commune.meta_title(service.title, commune.name);
+const description = custom?.meta_description || templates.service_commune.meta_desc(service.title, commune.name);
+---
+<BaseLayout title={title} description={description}>
+  <LocalBusinessSchema commune={commune} service={service} />
+  <BreadcrumbSchema items={[
+    { name: 'Inicio', url: '/' },
+    { name: 'Servicios', url: '/servicios' },
+    { name: service.title, url: `/servicios/${service.slug}` },
+    { name: commune.name },
+  ]} />
+  <!-- Dynamic content: hero, intro, features, local benefits, zone coverage, CTA -->
+</BaseLayout>
+```
+
+**Page count**: 6 services × 52 communes = **312 programmatic pages**
+
+#### Step 3.4 — Update Astro Config for Dynamic Routes
+
+```javascript
+// astro.config.mjs — ensure hybrid mode supports getStaticPaths
+export default defineConfig({
+  output: 'hybrid',  // or 'static' for full SSG
+  adapter: vercel(),
+  integrations: [react(), tailwind(), sitemap()],
+});
+```
+
+#### Step 3.5 — Verification
+
+```bash
+# 1. Build must pass with all dynamic routes
+npm run build:web
+# Expected: "generating ... pages" — should show 370+ pages
+
+# 2. Verify generated pages
+ls -la web/dist/soluciones/
+# Expected: folders for each solution slug
+
+ls -la web/dist/servicios/guardias-seguridad/
+# Expected: folders for each commune
+
+ls -la web/dist/blog/
+# Expected: folders for each blog post
+
+# 3. Verify no 404s
+npm run preview
+# Navigate to /soluciones/seguridad-condominios → content loads
+# Navigate to /blog/test-post → content loads
+# Navigate to /servicios/guardias-seguridad/las-condes → content loads
+
+# 4. Check page count
+find web/dist -name "index.html" | wc -l
+# Expected: ≥370
+```
+
+#### Phase 3 Exit Criteria
+| Criteria | Test |
+|----------|------|
+| Solution detail pages exist | `/soluciones/[slug]` resolves for all solutions |
+| Blog detail pages exist | `/blog/[slug]` resolves for published posts |
+| Service×Commune pages exist | `/servicios/[service]/[comuna]` → 312 pages |
+| Unique meta per page | grep for `<title>` shows unique titles per page |
+| 370+ pages generated | `find dist -name "index.html" \| wc -l` ≥ 370 |
+| Build passes | `npm run build:web` → exit 0 |
+
+---
+
+### 34.5. Phase 4 — Admin CMS: Refine Integration
+
+> **Can run in parallel with Phases 2-3** (only depends on Phase 1)
+
+#### Entry Criteria
+- Phase 1 complete (all 24 tables with standard CRUD)
+- Convex backend accessible from admin
+
+#### Step 4.1 — Install Refine + Ant Design Packages
+
+```bash
+cd admin
+npm install @refinedev/core@^5.0.9 @refinedev/antd@^6.0.3 @refinedev/react-router@^1.0.0
+npm install antd@^6.3.0 @ant-design/icons@^6.0.0
+npm install @dnd-kit/core@^6.3.1 @dnd-kit/sortable@^10.0.0
+npm install @uiw/react-md-editor@^4.0.11 slugify@^1.6.6
+
+# Verify install
+npm ls @refinedev/core antd
+```
+
+**✓ Checkpoint**: `npm ls` shows all packages resolved without peer dependency errors.
+
+#### Step 4.2 — Create Convex Data Provider
+
+**Create file**: `admin/src/providers/convexDataProvider.ts`
+
+Implementation from §29.2 — maps Refine CRUD operations to Convex queries/mutations:
+- `getList` → maps resource name to `api[resource].getAll`, applies client-side pagination/sorting
+- `getOne` → calls `api[resource].getById`
+- `create` → calls `api[resource].create`
+- `update` → calls `api[resource].update` (patches only changed fields)
+- `deleteOne` → calls `api[resource].remove`
+
+Key implementation note: Use `ConvexHttpClient` (not reactive client) for Refine's request/response model.
+
+#### Step 4.3 — Register All 17 CMS Resources
+
+**Modify**: `admin/src/App.tsx`
+
+```tsx
+import { Refine } from "@refinedev/core";
+import { ThemedLayoutV2, notificationProvider } from "@refinedev/antd";
+import routerProvider from "@refinedev/react-router";
+import { convexDataProvider } from "./providers/convexDataProvider";
+import { authProvider } from "./providers/authProvider";
+
+// Resource imports...
+import { HeroesList, HeroesEdit, HeroesCreate } from "./resources/heroes";
+// ... 16 more resources
+
+function App() {
+  return (
+    <Refine
+      dataProvider={convexDataProvider}
+      authProvider={authProvider}
+      routerProvider={routerProvider}
+      notificationProvider={notificationProvider}
+      resources={[
+        { name: "heroes", list: "/heroes", edit: "/heroes/:id", create: "/heroes/create",
+          meta: { label: "Heroes", icon: <StarOutlined /> } },
+        { name: "services", list: "/services", edit: "/services/:id", create: "/services/create",
+          meta: { label: "Servicios", icon: <ShieldOutlined /> } },
+        { name: "solutions", list: "/solutions", edit: "/solutions/:id", create: "/solutions/create" },
+        { name: "faqs", list: "/faqs", edit: "/faqs/:id", create: "/faqs/create" },
+        { name: "blog_posts", list: "/blog-posts", edit: "/blog-posts/:id", create: "/blog-posts/create" },
+        { name: "team_members", list: "/team", edit: "/team/:id", create: "/team/create" },
+        { name: "company_values", list: "/values", edit: "/values/:id", create: "/values/create" },
+        { name: "stats", list: "/stats", edit: "/stats/:id", create: "/stats/create" },
+        { name: "process_steps", list: "/steps", edit: "/steps/:id", create: "/steps/create" },
+        { name: "industries", list: "/industries", edit: "/industries/:id", create: "/industries/create" },
+        { name: "locations", list: "/locations", edit: "/locations/:id", create: "/locations/create" },
+        { name: "partners", list: "/partners", edit: "/partners/:id", create: "/partners/create" },
+        { name: "ctas", list: "/ctas", edit: "/ctas/:id", create: "/ctas/create" },
+        { name: "content_blocks", list: "/blocks", edit: "/blocks/:id", create: "/blocks/create" },
+        { name: "site_config", list: "/config", edit: "/config/:id" },
+        { name: "careers", list: "/careers", edit: "/careers/:id", create: "/careers/create" },
+        { name: "pages", list: "/pages", edit: "/pages/:id", create: "/pages/create" },
+      ]}
+    >
+      <ThemedLayoutV2>
+        {/* Routes */}
+      </ThemedLayoutV2>
+    </Refine>
+  );
+}
+```
+
+#### Step 4.4 — Create Resource CRUD Pages (pattern for each)
+
+Each resource needs 3 files: `list.tsx`, `create.tsx`, `edit.tsx`.
+
+**Example**: `admin/src/resources/services/list.tsx`
+```tsx
+import { List, useTable, EditButton, DeleteButton } from "@refinedev/antd";
+import { Table, Tag } from "antd";
+
+export const ServicesList = () => {
+  const { tableProps } = useTable({ resource: "services", sorters: { initial: [{ field: "sort_order", order: "asc" }] } });
+  return (
+    <List>
+      <Table {...tableProps} rowKey="_id">
+        <Table.Column dataIndex="title" title="Título" sorter />
+        <Table.Column dataIndex="slug" title="Slug" />
+        <Table.Column dataIndex="is_active" title="Activo" render={(v) => <Tag color={v ? "green" : "red"}>{v ? "Sí" : "No"}</Tag>} />
+        <Table.Column title="Acciones" render={(_, record) => (<><EditButton recordItemId={record._id} /><DeleteButton recordItemId={record._id} /></>)} />
+      </Table>
+    </List>
+  );
+};
+```
+
+**Example**: `admin/src/resources/services/edit.tsx`
+```tsx
+import { Edit, useForm } from "@refinedev/antd";
+import { Form, Input, Switch, InputNumber, Select } from "antd";
+import MarkdownEditor from "@uiw/react-md-editor";
+import { SlugField } from "../../components/SlugField";
+import { ImageUpload } from "../../components/ImageUpload";
+
+export const ServicesEdit = () => {
+  const { formProps, saveButtonProps } = useForm({ resource: "services" });
+  return (
+    <Edit saveButtonProps={saveButtonProps}>
+      <Form {...formProps} layout="vertical">
+        <Form.Item label="Título" name="title" rules={[{ required: true }]}><Input /></Form.Item>
+        <SlugField sourceField="title" />
+        <Form.Item label="Tagline" name="tagline"><Input /></Form.Item>
+        <Form.Item label="Descripción" name="description"><Input.TextArea rows={4} /></Form.Item>
+        <Form.Item label="Imagen" name="image"><ImageUpload /></Form.Item>
+        <Form.Item label="Alt Text" name="image_alt"><Input /></Form.Item>
+        <Form.Item label="Activo" name="is_active" valuePropName="checked"><Switch /></Form.Item>
+        <Form.Item label="Orden" name="sort_order"><InputNumber /></Form.Item>
+      </Form>
+    </Edit>
+  );
+};
+```
+
+**Repeat this pattern for all 17 resources** with appropriate form fields per resource (see §29.3 for field registry).
+
+#### Step 4.5 — Create Shared CMS Components
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| `SlugField` | `admin/src/components/SlugField.tsx` | Auto-generates slug from title using `slugify` |
+| `ImageUpload` | `admin/src/components/ImageUpload.tsx` | Uploads to Convex file storage, returns URL |
+| `MarkdownField` | `admin/src/components/MarkdownField.tsx` | Wraps `@uiw/react-md-editor` for form integration |
+| `SeoPreview` | `admin/src/components/SeoPreview.tsx` | Google SERP preview (title 60ch + description 155ch) |
+| `IconSelector` | `admin/src/components/IconSelector.tsx` | Grid of available icons from Icon.astro's SVG set |
+| `SortableList` | `admin/src/components/SortableList.tsx` | `@dnd-kit/sortable` wrapper for reorder UX |
+
+#### Step 4.6 — Verification
+
+```bash
+# 1. Build CMS
+cd admin && npm run build
+# Expected: exit 0
+
+# 2. Start CMS locally
+npm run dev
+# Expected: opens at http://localhost:3001
+
+# 3. Test CRUD operations:
+# - Navigate to Services → List → should show all services
+# - Click Edit → form populated with data
+# - Change title → Save → verify in Convex Dashboard
+# - Click Create → fill form → Save → appears in list
+# - Click Delete → confirm → removed from list
+
+# 4. Test image upload:
+# - Edit a service → click image upload
+# - Select image → should upload to Convex storage
+# - URL stored in service record
+
+# 5. Test markdown editor:
+# - Edit a blog post → markdown field shows WYSIWYG editor
+# - Type markdown → preview renders in real time
+```
+
+#### Phase 4 Exit Criteria
+| Criteria | Test |
+|----------|------|
+| Packages installed | `npm ls @refinedev/core antd` → resolved |
+| CMS builds | `npm run build` → exit 0 |
+| Data provider works | getList/getOne/create/update/delete all succeed |
+| 17 resources registered | All resources navigable in sidebar |
+| List views work | Each resource list shows table with data |
+| Edit views work | Form populates, save patches Convex record |
+| Create views work | New records appear in Convex |
+| Delete works | Records removed from Convex |
+| Image upload works | Images stored in Convex file storage |
+| Markdown editor works | Blog post editing with preview |
+
+---
+
+### 34.6. Phase 5 — Image SEO & Performance Optimization
+
+#### Entry Criteria
+- Phase 3 complete (all pages exist, content rendering)
+
+#### Step 5.1 — Replace all `<img>` with Astro `<Image>` / `<Picture>`
+
+| Component | Current | Change To |
+|-----------|---------|-----------|
+| `FeatureCard.astro` | `<img src={image}>` | `<Image src={image} alt={imageAlt} width={800} height={600} format="webp" loading="lazy" />` |
+| `Hero.astro` (background) | `style="background-image: url(...)"` | `<Picture src={bg} formats={['avif','webp']} widths={[400,800,1200,1920]} loading="eager" />` |
+| `ClientsGrid.astro` (logos) | `<img src={logo}>` | `<Image src={logo} alt={'Logo de ' + name} width={200} height={100} format="webp" />` |
+| `IndustryCard.astro` | `<img src={image}>` | `<Image src={image} alt={name} width={400} height={300} format="webp" />` |
+| Blog cover images | `<img src={cover}>` | `<Image src={cover} alt={title} width={1200} height={630} format="webp" />` |
+| Team member photos | `<img src={avatar}>` | `<Image src={avatar} alt={name + ', ' + role} width={300} height={300} format="webp" />` |
+
+#### Step 5.2 — Add Hero Image Preloading
+
+```astro
+<!-- In BaseLayout.astro <head> -->
+{heroImage && (
+  <link rel="preload" as="image" href={heroImage} type="image/webp"
+    imagesrcset={`${heroImage}?w=400 400w, ${heroImage}?w=800 800w, ${heroImage}?w=1200 1200w`}
+    imagesizes="100vw" />
+)}
+```
+
+#### Step 5.3 — Create Image Sitemap
+
+**Create file**: `web/src/pages/sitemap-images.xml.ts`
+
+```typescript
+import type { APIRoute } from 'astro';
+import { convex } from '@lib/convex';
+import { api } from '@convex/_generated/api';
+
+export const GET: APIRoute = async () => {
+  const services = await convex.query(api.services.getAllServices);
+  const solutions = await convex.query(api.solutions.getAllSolutions);
+  const posts = await convex.query(api.blog_posts.getPublishedPosts);
+
+  const entries = [
+    ...services.filter(s => s.image).map(s => ({
+      loc: `https://guardman.cl/servicios/${s.slug}`,
+      image: s.image, caption: s.image_alt || s.title,
+    })),
+    ...solutions.filter(s => s.image).map(s => ({
+      loc: `https://guardman.cl/soluciones/${s.slug}`,
+      image: s.image, caption: s.image_alt || s.name,
+    })),
+    ...posts.filter(p => p.cover_image).map(p => ({
+      loc: `https://guardman.cl/blog/${p.slug}`,
+      image: p.cover_image, caption: p.cover_image_alt || p.title,
+    })),
+  ];
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${entries.map(e => `  <url>
+    <loc>${e.loc}</loc>
+    <image:image>
+      <image:loc>${e.image}</image:loc>
+      <image:caption>${e.caption}</image:caption>
+    </image:image>
+  </url>`).join('\n')}
+</urlset>`;
+
+  return new Response(xml, { headers: { 'Content-Type': 'application/xml' } });
+};
+```
+
+#### Step 5.4 — Create `lib/image.ts` Helper
+
+```typescript
+// web/src/lib/image.ts
+export function getOptimizedAlt(type: string, data: Record<string, string>): string {
+  const patterns: Record<string, (d: Record<string, string>) => string> = {
+    service: (d) => `${d.title} en ${d.commune || 'Santiago'} - Guardman Chile`,
+    solution: (d) => `${d.name} - seguridad privada`,
+    team: (d) => `${d.name}, ${d.role} en Guardman`,
+    client: (d) => `Logo de ${d.name}`,
+    blog: (d) => d.title,
+    hero: () => 'Servicios de seguridad Guardman Chile',
+    commune: (d) => `Seguridad privada en ${d.name}`,
+  };
+  return patterns[type]?.(data) || 'Guardman Chile';
+}
+```
+
+#### Step 5.5 — Verification
+
+```bash
+# 1. Build
+npm run build:web
+
+# 2. Check generated images
+find web/dist/_astro -name "*.webp" | wc -l
+# Expected: > 0 (Astro auto-converts images to WebP)
+
+# 3. Lighthouse test (requires preview server)
+npm run preview
+# Open Chrome → DevTools → Lighthouse → run audit
+# Expected: Performance ≥ 90, all images optimized
+
+# 4. Check image sitemap
+curl http://localhost:4321/sitemap-images.xml
+# Expected: valid XML with image entries
+
+# 5. Check CLS (no layout shift from images)
+# Lighthouse → Performance → Cumulative Layout Shift
+# Expected: CLS < 0.1
+```
+
+#### Phase 5 Exit Criteria
+| Criteria | Test |
+|----------|------|
+| All `<img>` replaced | grep for `<img ` in components returns 0 (only `<Image>` or `<Picture>`) |
+| Hero images preloaded | `<link rel="preload">` in `<head>` for above-fold images |
+| Image sitemap exists | `/sitemap-images.xml` returns valid XML |
+| Alt text on all images | grep for `alt=""` returns 0 empty alt attrs |
+| WebP generated | dist folder contains `.webp` files |
+| LCP < 2.5s | Lighthouse Performance audit |
+| CLS < 0.1 | Lighthouse Performance audit |
+
+---
+
+### 34.7. Phase 6 — Advanced Local SEO Implementation
+
+#### Entry Criteria
+- Phase 3 and Phase 5 complete (all pages exist, images optimized)
+
+#### Step 6.1 — Create `LocalBusinessSchema.astro`
+
+**Create file**: `web/src/components/seo/LocalBusinessSchema.astro`
+
+```astro
+---
+interface Props { commune: { name: string; slug: string; zone: string }; service?: any; }
+const { commune, service } = Astro.props;
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "SecurityCompany",
+  "name": `Guardman Chile - Seguridad en ${commune.name}`,
+  "url": `https://guardman.cl/cobertura/${commune.slug}`,
+  "telephone": "+56930000010",
+  "areaServed": {
+    "@type": "City", "name": commune.name,
+    "containedInPlace": { "@type": "AdministrativeArea", "name": "Región Metropolitana de Santiago" }
+  },
+  ...(service && {
+    "hasOfferCatalog": { "@type": "OfferCatalog", "name": "Servicios de Seguridad",
+      "itemListElement": [{ "@type": "Offer", "itemOffered": {
+        "@type": "Service", "name": service.title,
+        "url": `https://guardman.cl/servicios/${service.slug}`
+      }}]
+    }
+  }),
+  "knowsAbout": ["Ley 21.659", "OS10", "Seguridad Privada Chile"],
+};
+---
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+```
+
+#### Step 6.2 — Create `BreadcrumbSchema.astro`
+
+**Create file**: `web/src/components/seo/BreadcrumbSchema.astro`
+
+```astro
+---
+interface Props { items: Array<{ name: string; url?: string }>; }
+const { items } = Astro.props;
+const schema = {
+  "@context": "https://schema.org", "@type": "BreadcrumbList",
+  "itemListElement": items.map((item, i) => ({
+    "@type": "ListItem", "position": i + 1, "name": item.name,
+    ...(item.url && { "item": `https://guardman.cl${item.url}` }),
+  })),
+};
+---
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+```
+
+#### Step 6.3 — Create Comprehensive Sitemap
+
+**Modify**: `web/src/pages/sitemap.xml.ts`
+
+```typescript
+import type { APIRoute } from 'astro';
+import { convex } from '@lib/convex';
+import { api } from '@convex/_generated/api';
+
+export const GET: APIRoute = async () => {
+  const [services, solutions, communes, posts, pages] = await Promise.all([
+    convex.query(api.services.getAllServices),
+    convex.query(api.solutions.getAllSolutions),
+    convex.query(api.locations.getAllCommunes),
+    convex.query(api.blog_posts.getPublishedPosts),
+    convex.query(api.pages.getPublished),
+  ]);
+
+  const staticPages = [
+    { url: '/', priority: '1.0', freq: 'weekly' },
+    { url: '/servicios', priority: '0.9', freq: 'weekly' },
+    { url: '/soluciones', priority: '0.9', freq: 'weekly' },
+    { url: '/cobertura', priority: '0.9', freq: 'monthly' },
+    { url: '/contacto', priority: '0.8', freq: 'monthly' },
+    { url: '/cotizar', priority: '0.8', freq: 'monthly' },
+    { url: '/nosotros', priority: '0.7', freq: 'monthly' },
+    { url: '/carreras', priority: '0.6', freq: 'weekly' },
+    { url: '/blog', priority: '0.7', freq: 'daily' },
+  ];
+
+  const dynamicPages = [
+    ...services.map(s => ({ url: `/servicios/${s.slug}`, priority: '0.8', freq: 'weekly' })),
+    ...solutions.map(s => ({ url: `/soluciones/${s.slug}`, priority: '0.8', freq: 'weekly' })),
+    ...communes.map(c => ({ url: `/cobertura/${c.slug}`, priority: '0.7', freq: 'monthly' })),
+    ...posts.map(p => ({ url: `/blog/${p.slug}`, priority: '0.6', freq: 'monthly' })),
+    ...pages.map(p => ({ url: `/${p.slug}`, priority: '0.4', freq: 'yearly' })),
+    // Service × Commune matrix
+    ...services.flatMap(s => communes.map(c => ({
+      url: `/servicios/${s.slug}/${c.slug}`, priority: '0.5', freq: 'monthly',
+    }))),
+  ];
+
+  const allPages = [...staticPages, ...dynamicPages];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${allPages.map(p => `  <url>
+    <loc>https://guardman.cl${p.url}</loc>
+    <changefreq>${p.freq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+
+  return new Response(xml, { headers: { 'Content-Type': 'application/xml' } });
+};
+```
+
+#### Step 6.4 — Update robots.txt
+
+```
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+Sitemap: https://guardman.cl/sitemap.xml
+Sitemap: https://guardman.cl/sitemap-images.xml
+```
+
+#### Step 6.5 — Add Cookie Consent Banner (Ley 21.719 compliance)
+
+Create a lightweight consent banner component:
+- Shown on first visit only (check `localStorage`)
+- Options: "Aceptar" and "Configurar"
+- Stores consent preference in `localStorage`
+- No external dependency needed — plain Astro + JS
+
+#### Step 6.6 — Implement Schema.org on All Pages
+
+| Page Type | Schema Types | Source |
+|-----------|-------------|--------|
+| Homepage | `Organization`, `FAQPage`, `WebSite` | site_config, faqs |
+| Service detail | `Service`, `BreadcrumbList` | services |
+| Solution detail | `Service`, `BreadcrumbList` | solutions |
+| Commune page | `SecurityCompany`, `BreadcrumbList` | locations |
+| Service×Commune | `SecurityCompany`, `Service`, `BreadcrumbList` | service_locations |
+| Blog post | `Article`, `BreadcrumbList` | blog_posts |
+| About | `Organization`, `BreadcrumbList` | team_members |
+| Contact | `ContactPage`, `Organization` | site_config |
+
+#### Step 6.7 — Verification
+
+```bash
+# 1. Build
+npm run build:web
+
+# 2. Validate sitemap
+curl https://guardman.cl/sitemap.xml | xmllint --noout -
+# Expected: valid XML
+
+# 3. Count sitemap URLs
+curl -s https://guardman.cl/sitemap.xml | grep -c "<loc>"
+# Expected: ≥ 380 URLs
+
+# 4. Validate structured data
+# Google Rich Results Test: https://search.google.com/test/rich-results
+# Test: homepage, a service page, a commune page, a service×commune page
+# Expected: all pass with valid schemas
+
+# 5. Check robots.txt
+curl https://guardman.cl/robots.txt
+# Expected: shows correct sitemaps and disallow rules
+
+# 6. Test Schema.org output
+curl -s https://guardman.cl | grep "application/ld+json" | wc -l
+# Expected: ≥ 2 (Organization + FAQPage on homepage)
+```
+
+#### Phase 6 Exit Criteria
+| Criteria | Test |
+|----------|------|
+| LocalBusinessSchema works | Each commune page has unique Schema.org |
+| BreadcrumbSchema works | Every page has BreadcrumbList |
+| Comprehensive sitemap | `/sitemap.xml` has 380+ URLs |
+| Image sitemap | `/sitemap-images.xml` returns valid XML |
+| robots.txt correct | Sitemaps listed, admin blocked |
+| Cookie consent | Banner shown on first visit |
+| Rich Results pass | Google test validates schemas |
+
+---
+
+### 34.8. Phase 7 — Testing, QA & Production Deploy
+
+#### Entry Criteria
+- All phases 0-6 complete
+
+#### Step 7.1 — Full Build Verification
+
+```bash
+# Clean build from scratch
+rm -rf web/dist admin/dist node_modules/.cache
+
+# Install all dependencies fresh
+npm install
+cd web && npm install && cd ..
+cd admin && npm install && cd ..
+
+# Build everything
+npm run build
+
+# Expected: exit 0 for both web and admin
+# Expected: web generates 370+ pages
+# Expected: admin generates single-page app
+```
+
+#### Step 7.2 — Lighthouse Audit (all page types)
+
+Run Lighthouse on representative pages:
+
+| Page | Performance | Accessibility | Best Practices | SEO |
+|------|------------|---------------|----------------|-----|
+| Homepage `/` | ≥ 90 | ≥ 95 | ≥ 90 | ≥ 95 |
+| Service `/servicios/guardias-seguridad` | ≥ 90 | ≥ 95 | ≥ 90 | ≥ 95 |
+| Commune `/cobertura/las-condes` | ≥ 90 | ≥ 95 | ≥ 90 | ≥ 95 |
+| Service×Commune `/servicios/guardias-seguridad/las-condes` | ≥ 85 | ≥ 95 | ≥ 90 | ≥ 95 |
+| Blog `/blog` | ≥ 90 | ≥ 95 | ≥ 90 | ≥ 95 |
+| Contact `/contacto` | ≥ 90 | ≥ 95 | ≥ 90 | ≥ 95 |
+
+```bash
+# Automated Lighthouse via CLI
+npm install -g lighthouse
+
+lighthouse http://localhost:4321/ --output json --output-path ./reports/home.json
+lighthouse http://localhost:4321/servicios/guardias-seguridad --output json --output-path ./reports/service.json
+lighthouse http://localhost:4321/cobertura/las-condes --output json --output-path ./reports/commune.json
+```
+
+#### Step 7.3 — Core Web Vitals Check
+
+| Metric | Target | How to Verify |
+|--------|--------|--------------|
+| LCP | < 2.5s | Lighthouse → Performance → Largest Contentful Paint |
+| FID/INP | < 200ms | Lighthouse → Performance → Interaction to Next Paint |
+| CLS | < 0.1 | Lighthouse → Performance → Cumulative Layout Shift |
+| TTFB | < 800ms | Chrome DevTools → Network → first request timing |
+| TBT | < 200ms | Lighthouse → Performance → Total Blocking Time |
+
+#### Step 7.4 — SEO Validation Checklist
+
+```bash
+# 1. Unique <title> per page
+find web/dist -name "index.html" -exec grep -l "<title>" {} \; | \
+  xargs -I{} grep -oP "<title>[^<]+" {} | sort | uniq -d
+# Expected: 0 duplicates
+
+# 2. Unique <meta name="description"> per page
+find web/dist -name "index.html" -exec grep -oP 'content="[^"]+' {} \; | sort | uniq -d
+# Expected: 0 duplicates (or very few)
+
+# 3. Single <h1> per page
+find web/dist -name "index.html" -exec sh -c 'grep -c "<h1" "$1"' _ {} \; | sort | uniq -c
+# Expected: all pages show "1"
+
+# 4. No empty alt attributes
+grep -r 'alt=""' web/dist/ --include="*.html" | wc -l
+# Expected: 0
+
+# 5. Schema.org validation
+# Run each page type through https://validator.schema.org/
+```
+
+#### Step 7.5 — Admin CMS Verification
+
+| Test | Action | Expected |
+|------|--------|----------|
+| Login | Navigate to `/admin` → enter credentials | Dashboard loads |
+| List all resources | Click each sidebar item | Table with data appears |
+| Create record | Create a new FAQ | Appears in Convex Dashboard and web frontend |
+| Edit record | Change a service title | Title updates on web after rebuild |
+| Delete record | Remove a test record | Disappears from Convex |
+| Image upload | Upload image to a service | URL stored, image loads on web |
+| Markdown editor | Edit blog post content | Preview renders correctly |
+| Reorder | Drag-and-drop services | Sort order updates in Convex |
+
+#### Step 7.6 — Production Deploy
+
+```bash
+# 1. Ensure .env.production has correct values
+# web/.env → CONVEX_URL=https://production-deployment.convex.cloud
+# admin/.env → VITE_CONVEX_URL=https://production-deployment.convex.cloud
+
+# 2. Deploy Convex to production
+npx convex deploy
+
+# 3. Commit all changes
+git add -A
+git commit -m "v2.0.0: complete rebuild with Convex CMS, local SEO, 370+ pages"
+
+# 4. Push to trigger Vercel deploy
+git push origin main
+
+# 5. Verify production deployment
+# - https://guardman.cl/ → homepage loads
+# - https://guardman.cl/servicios/guardias-seguridad → service page loads
+# - https://guardman.cl/cobertura/las-condes → commune page loads
+# - https://guardman.cl/admin → CMS login page loads
+# - https://guardman.cl/sitemap.xml → valid sitemap with 380+ URLs
+# - https://guardman.cl/robots.txt → correct content
+
+# 6. Submit sitemap to Google Search Console
+# Navigate to https://search.google.com/search-console
+# Add property → guardman.cl
+# Sitemaps → Add → /sitemap.xml and /sitemap-images.xml
+```
+
+#### Step 7.7 — Post-Deploy Monitoring
+
+| Check | Frequency | Tool |
+|-------|-----------|------|
+| Google Search Console indexing | Daily (first week) | GSC |
+| Core Web Vitals (field data) | Weekly | PageSpeed Insights |
+| 404 errors | Weekly | GSC → Coverage report |
+| Convex function errors | Daily | Convex Dashboard → Logs |
+| Uptime | Continuous | Vercel Analytics or UptimeRobot |
+
+#### Phase 7 Exit Criteria
+| Criteria | Test |
+|----------|------|
+| Full build passes | `npm run build` → exit 0 |
+| 370+ pages generated | `find dist -name "index.html" \| wc -l` ≥ 370 |
+| Lighthouse Performance ≥ 90 | All representative pages pass |
+| Lighthouse SEO ≥ 95 | All pages pass |
+| No duplicate titles | Validation script shows 0 dupes |
+| No empty alt text | grep returns 0 matches |
+| Schema.org validates | Google Rich Results Test passes |
+| CMS functional | All 17 CRUD resources work end-to-end |
+| Sitemap submitted | Google Search Console shows "Success" |
+| Production live | guardman.cl loads all pages correctly |
+
+---
+
+> **Document Version**: Draft 7 — February 19, 2026
+> **Total Sections**: 34 chapters + 5 appendices
+> **Total Tables**: 22 existing + 4 new = 26 Convex tables
+> **Total Packages**: 35+ npm packages with exact versions (§33)
+> **Total Pages Projected**: ~380+ (52 communes + 6 services + 312 service×commune + 10 static + blog)
+> **Development Phases**: 8 phases (Phase 0-7) with entry/exit criteria and verification steps (§34)
+> **New in Draft 7**: Master Package Registry with exact versions and install scripts (§33), 8-phase modular development roadmap from scaffolding to production deploy, including i18n dictionary, complete CRUD code for 4 new Convex tables, Refine CMS integration with 17 resources, Astro image pipeline, comprehensive sitemap/Schema.org, Lighthouse targets, and deploy checklist (§34)
 

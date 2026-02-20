@@ -1,0 +1,16 @@
+comuna,slug,zone,keywords,priority,search_volume
+Las Condes,las-condes,Oriente,"seguridad privada las condes, servicios de seguridad las condes, guardias de seguridad las condes, empresas de seguridad las condes",high,high
+Santiago Centro,santiago-centro,Centro,"seguridad privada santiago, servicios de seguridad santiago centro, guardias santiago",high,high
+Providencia,providencia,Centro,"seguridad privada providencia, servicios de seguridad providencia, guardias providencia",high,high
+La Florida,la-florida,Sur,"seguridad privada la florida, servicios de seguridad la florida, guardias la florida",high,medium
+Maipú,maipú,Sur,"seguridad privada maipú, servicios de seguridad maipú, guardias maipú",high,medium
+Ñuñoa,ñuñoa,Centro,"seguridad privada ñuñoa, servicios de seguridad ñuñoa, guardias ñuñoa",medium,medium
+Vitacura,vitacura,Oriente,"seguridad privada vitacura, servicios de seguridad vitacura, guardias vitacura",medium,medium
+San Bernardo,san-bernardo,Sur,"seguridad privada san bernardo, servicios de seguridad san bernardo, guardias san bernardo",medium,low
+Peñalolén,peñalolén,Oriente,"seguridad privada peatralolén, servicios de seguridad peatralolén",medium,low
+Pudahuel,pudahuel,Norte,"seguridad privada pudahuel, servicios de seguridad pudahuel",medium,low
+Quilicura,quilicura,Norte,"seguridad privada quilicura, servicios de seguridad quilicura",medium,low
+Quinde,quinde,Oriente,"seguridad privada quinde, servicios de seguridad quinde",medium,low
+San Miguel,san-miguel,Sur,"seguridad privada san miguel, servicios de seguridad san miguel",medium,low
+La Reina,la-reina,Oriente,"seguridad privada la reina, servicios de seguridad la reina",medium,low
+Cerro Navia,cerro-navia,Norte,"seguridad privada cerro navia, servicios de seguridad cerro navia",low,low

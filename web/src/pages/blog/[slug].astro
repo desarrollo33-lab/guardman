@@ -1,138 +1,228 @@
 ---
-/**
- * Blog Post Detail Page - Guardman Chile
- * Individual blog post page with content from Convex database.
- */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getConvexServer } from "../../lib/convex";
 
-import { marked } from 'marked';
-import BaseLayout from '@/layouts/BaseLayout.astro';
-import Container from '@/components/ui/Container.astro';
-import Icon from '@/components/ui/Icon.astro';
-import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
-import { convexServer } from '@/lib/convex';
-import { api } from '@convex/_generated/api';
-import { site } from '@/data/site';
+export const prerender = false;
 
-// Generate static paths for all published posts
-export async function getStaticPaths() {
-  const posts = await convexServer.query(api.blog_posts.getPublishedPosts);
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
+// Get params from URL
+const { slug } = Astro.params;
+
+// Validate params exist
+if (!slug) {
+  return Astro.redirect("/404");
 }
 
-const { post } = Astro.props;
+// Get Convex client
+const convex = await getConvexServer();
+if (!convex) {
+  return Astro.redirect("/404");
+}
 
-// Extract markdown content from content array
-const markdownContent = post.content
-  .filter((block: any) => block.type === 'markdown')
-  .map((block: any) => block.content)
-  .join('\n\n');
+// Fetch post by slug from Convex
+let post = null;
+try {
+  post = await convex.query("blog_posts:getPostBySlug", { slug });
+} catch (error) {
+  console.error("Error fetching post:", error);
+}
 
-// Render markdown to HTML
-const { html: contentHtml } = await marked(markdownContent);
+// 404 if not found
+if (!post) {
+  return Astro.redirect("/404");
+}
 
-const title = `${post.title} | ${site.name}`;
-const description = post.excerpt;
-const ogImage = post.cover_image || '/og-default.jpg';
-const publishedDate = new Date(post.published_at).toISOString();
+// Fetch author info if author_id exists
+let author = null;
+if (post.author_id) {
+  try {
+    author = await convex.query("authors:getAuthorById", { id: post.author_id });
+  } catch (error) {
+    console.error("Error fetching author:", error);
+  }
+}
 
-const articleSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Article',
-  headline: post.title,
-  description: post.excerpt,
-  author: {
-    '@type': 'Person',
-    name: post.author,
-  },
-  publisher: {
-    '@type': 'Organization',
-    name: site.name,
-    logo: {
-      '@type': 'ImageObject',
-      url: new URL('/favicon.svg', site.url).href,
-    },
-  },
-  datePublished: publishedDate,
-  mainEntityOfPage: {
-    '@type': 'WebPage',
-    '@id': Astro.url.href,
-  },
-  ...(post.cover_image && {
-    image: new URL(post.cover_image, site.url).href,
-  }),
-};
-
-function formatDate(timestamp: number): string {
+// Format date
+const formatDate = (timestamp: number) => {
   return new Date(timestamp).toLocaleDateString('es-CL', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric',
+    day: 'numeric'
   });
-}
+};
+
+// Generate meta tags
+const metaTitle = post.meta_title || `${post.title} | Guardman Blog`;
+const metaDescription = post.excerpt || post.title;
+const coverImage = post.cover_image || undefined;
 ---
 
-<BaseLayout title={title} description={description} ogImage={ogImage} schema={articleSchema}>
-  <article>
-    <header class="bg-gradient-to-br from-gray-800 to-gray-900 py-12 md:py-20">
-      <Container class="relative z-20 text-white">
-      <Breadcrumbs items={[
-        { name: 'Blog', url: '/blog' },
-        { name: post.title }
-      ]} />
+<BaseLayout
+  title={metaTitle}
+  description={metaDescription}
+  image={coverImage}
+  article={true}
+  publishedTime={post.published_at ? new Date(post.published_at).toISOString() : undefined}
+  author={author?.name || post.author}
+>
+  <!-- Breadcrumb -->
+  <nav class="bg-white border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <ol class="flex items-center space-x-2 py-3 text-sm">
+        <li>
+          <a href="/" class="text-gray-500 hover:text-gray-700">Inicio</a>
+        </li>
+        <li class="text-gray-400">/</li>
+        <li>
+          <a href="/blog" class="text-gray-500 hover:text-gray-700">Blog</a>
+        </li>
+        <li class="text-gray-400">/</li>
+        <li class="text-gray-900 font-medium truncate max-w-xs">{post.title}</li>
+      </ol>
+    </div>
+  </nav>
 
-        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-          {post.title}
-        </h1>
-        <p class="text-xl text-white/80 mb-6 max-w-3xl">
-          {post.excerpt}
-        </p>
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-br from-slate-900 to-slate-700 text-white py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Tags -->
+      {post.tags && post.tags.length > 0 && (
+        <div class="flex flex-wrap gap-2 mb-6">
+          {post.tags.map((tag: string) => (
+            <span class="px-3 py-1 bg-green-600 text-white text-sm font-medium rounded-full">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+      
+      <h1 class="text-4xl md:text-5xl font-bold mb-6">
+        {post.title}
+      </h1>
+      
+      {post.excerpt && (
+        <p class="text-xl text-slate-200 mb-8">{post.excerpt}</p>
+      )}
 
-        <div class="flex flex-wrap items-center gap-4 text-white/70 text-sm">
-          <span class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            {post.author}
-          </span>
-          <span class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <time datetime={publishedDate}>{formatDate(post.published_at)}</time>
+      <!-- Author & Meta -->
+      <div class="flex flex-wrap items-center gap-6 text-slate-300">
+        <!-- Author -->
+        <div class="flex items-center gap-3">
+          {author?.avatar_url ? (
+            <img 
+              src={author.avatar_url} 
+              alt={author.name}
+              class="w-10 h-10 rounded-full object-cover"
+            />
+          ) : (
+            <div class="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center">
+              <span class="text-white font-medium">
+                {(author?.name || post.author || 'G').charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
+          <span class="text-white font-medium">
+            {author?.name || post.author || 'Guardman'}
           </span>
         </div>
-
-        {post.tags.length > 0 && (
-          <div class="flex flex-wrap gap-2 mt-6">
-            {post.tags.map((tag: string) => (
-              <span class="px-3 py-1 rounded-full bg-white/20 text-white text-sm">
-                {tag}
-              </span>
-            ))}
+        
+        <!-- Date -->
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>{post.published_at ? formatDate(post.published_at) : 'Fecha no disponible'}</span>
+        </div>
+        
+        <!-- Reading Time -->
+        {post.read_time && (
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{post.read_time} min de lectura</span>
           </div>
         )}
-      </Container>
-    </header>
-
-    <div class="py-12 md:py-16">
-      <Container size="md">
-        <div class="prose prose-lg prose-gray max-w-none
-          prose-headings:text-gray-900 prose-headings:font-bold
-          prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
-          prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-          prose-p:text-gray-700 prose-p:leading-relaxed
-          prose-a:text-gray-900 prose-a:no-underline hover:prose-a:underline
-          prose-strong:text-gray-900
-          prose-ul:my-4 prose-ol:my-4
-          prose-li:my-1
-          prose-blockquote:border-l-gray-400 prose-blockquote:bg-gray-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:not-italic
-          prose-img:rounded-lg prose-img:shadow-md"
-          set:html={contentHtml}
-        />
-      </Container>
+      </div>
     </div>
+  </section>
+
+  <!-- Cover Image -->
+  {post.cover_image && (
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 mb-12">
+      <img 
+        src={post.cover_image} 
+        alt={post.title}
+        class="w-full h-64 md:h-96 object-cover rounded-xl shadow-2xl"
+      />
+    </div>
+  )}
+
+  <!-- Content -->
+  <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+    {post.content && post.content.length > 0 ? (
+      <div class="prose prose-lg max-w-none">
+        {post.content.map((block: { type: string; content: string; alt?: string; caption?: string; items?: string[] }) => {
+          switch (block.type) {
+            case 'paragraph':
+              return <p class="text-gray-700 mb-6 leading-relaxed" set:html={block.content} />;
+            case 'heading':
+              return <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4" set:html={block.content} />;
+            case 'subheading':
+              return <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-3" set:html={block.content} />;
+            case 'image':
+              return (
+                <figure class="my-8">
+                  <img 
+                    src={block.content} 
+                    alt={block.alt || ''}
+                    class="w-full rounded-lg shadow-md"
+                  />
+                  {block.caption && (
+                    <figcaption class="text-center text-gray-500 mt-2 text-sm">
+                      {block.caption}
+                    </figcaption>
+                  )}
+                </figure>
+              );
+            case 'list':
+              return (
+                <ul class="list-disc list-inside space-y-2 mb-6 text-gray-700">
+                  {block.items?.map((item: string) => (
+                    <li set:html={item} />
+                  ))}
+                </ul>
+              );
+            case 'quote':
+              return (
+                <blockquote class="border-l-4 border-green-500 pl-6 my-8 italic text-gray-600">
+                  {block.content}
+                </blockquote>
+              );
+            default:
+              return <p class="text-gray-700 mb-4" set:html={block.content} />;
+          }
+        })}
+      </div>
+    ) : (
+      <p class="text-gray-600 text-center py-12">Contenido no disponible</p>
+    )}
   </article>
+
+  <!-- CTA Section -->
+  <section class="py-16 bg-green-600">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-white mb-4">
+        ¿Necesitas servicios de seguridad?
+      </h2>
+      <p class="text-xl text-green-100 mb-8">
+        Contáctanos hoy y recibe una cotización personalizada
+      </p>
+      <a 
+        href="/contacto"
+        class="inline-block bg-white text-green-700 font-semibold px-8 py-4 rounded-lg hover:bg-gray-100 transition"
+      >
+        Solicitar Cotización
+      </a>
+    </div>
+  </section>
 </BaseLayout>

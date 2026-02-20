@@ -205,6 +205,14 @@ export const getServiceBySlug = query({
   },
 });
 
+// === SPIKE: Required for Refine DataProvider getOne ===
+export const getServiceById = query({
+  args: { id: v.id('services') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const getServicesBySolution = query({
   args: {
     solution: v.string(),

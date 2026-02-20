@@ -14,6 +14,13 @@ export const getAll = query({
   },
 });
 
+export const getTestimonialById = query({
+  args: { id: v.id('testimonials') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 // === CRUD MUTATIONS ===
 
 export const createTestimonial = mutation({

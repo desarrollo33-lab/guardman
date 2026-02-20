@@ -23,3 +23,13 @@ npm-debug.log*
 yarn-debug.log*
 
 .vercel
+
+# Debug outputs
+check_output_restore.txt
+schema-validation-evidence.txt
+
+# MCP configs (may contain API keys)
+stitch_mcp_config.json
+
+# Backup files
+*.bak

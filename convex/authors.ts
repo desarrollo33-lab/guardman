@@ -10,6 +10,13 @@ export const getAllAuthors = query({
   },
 });
 
+export const getAuthorById = query({
+  args: { id: v.id('authors') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const getAuthorBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, args) => {

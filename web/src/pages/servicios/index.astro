@@ -1,156 +1,107 @@
 ---
-/**
- * Services Page - Lists all security services
- * Hub page for all Guardman services
- * REDESIGNED with new reusable components
- */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getConvexServer } from "../../lib/convex";
 
-import BaseLayout from '@/layouts/BaseLayout.astro';
-import Container from '@/components/ui/Container.astro';
-import Section from '@/components/ui/Section.astro';
-import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
-import ServiceCard from '@/components/ui/ServiceCard.astro';
-import ProcessSection from '@/components/sections/ProcessSection.astro';
-import IndustryGrid from '@/components/sections/IndustryGrid.astro';
-import CTASection from '@/components/sections/CTASection.astro';
-import { convexServer } from '@/lib/convex';
-import { api } from '@convex/_generated/api';
-import { site } from '@/data/site';
-import { generateBreadcrumbSchema } from '@/utils/seo';
+export const prerender = false;
 
-const services = await convexServer.query(api.services.getAllServices);
-const industries = await convexServer.query(api.industries.getActiveIndustries);
-const processSteps = await convexServer.query(api.process_steps.getByPage, { page_slug: 'servicios' });
+// Get Convex client
+const convex = await getConvexServer();
+let services = [];
+let error = null;
 
-const title = 'Servicios de Seguridad Privada en Santiago | Guardman Chile';
-const description =
-  'Guardias OS10, alarmas Ajax, patrullaje y control de acceso ✓ 10+ años experiencia ✓ Sin contratos forzosos ✓ Cotiza hoy';
-
-const breadcrumbSchema = generateBreadcrumbSchema([
-  { name: 'Inicio', url: '/' },
-  { name: 'Servicios', url: '/servicios' },
-]);
+if (convex) {
+  try {
+    services = await convex.query("services:getAllServices", {});
+  } catch (e: any) {
+    console.error("Error fetching services:", e);
+    error = e.message;
+  }
+} else {
+  error = "Convex client not available";
+}
 ---
 
-<BaseLayout title={title} description={description} schema={breadcrumbSchema}>
+<BaseLayout
+  title="Servicios de Seguridad | Guardman Chile"
+  description="Servicios profesionales de seguridad privada en Chile. Guardia de seguridad, electrónico, corporativo y más."
+>
   <!-- Hero Section -->
-  <section class="relative overflow-hidden bg-black py-20 md:py-32">
-    <!-- Background layer -->
-    <div class="absolute inset-0 z-0">
-      <div class="absolute inset-0 bg-black/80 z-10"></div>
-      <img 
-        src="https://images.unsplash.com/photo-1454165833767-027ffea9e778?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
-        alt="Centro de Operaciones"
-        class="w-full h-full object-cover grayscale opacity-30"
-      />
+  <section class="bg-gradient-to-br from-green-900 to-green-700 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">
+        Nuestros Servicios de Seguridad
+      </h1>
+      <p class="text-xl text-green-100 max-w-3xl">
+        Ofrecemos soluciones integrales de seguridad adaptadas a tus necesidades. 
+        Profesionales capacitados y tecnología de vanguardia.
+      </p>
     </div>
-    
-    <Container class="relative z-20">
-      <Breadcrumbs items={[{ name: 'Servicios' }]} />
-
-      <div class="max-w-4xl">
-        
-        <!-- Badge -->
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8">
-          <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-          <span class="text-xs text-white/70 uppercase tracking-widest font-medium">Ecosistema de Protección</span>
-        </div>
-        
-        <h1 class="text-4xl md:text-6xl lg:text-7xl font-semibold text-white mb-6 tracking-tight leading-[1.1]">
-          Despliegue de<br/>
-          <span class="text-white/40 italic">Servicios</span>
-        </h1>
-
-        <p class="text-lg md:text-xl text-white/60 mb-10 max-w-2xl leading-relaxed">
-          Sistemas operativos de alta fidelidad para la gestión de <span class="text-white font-medium">riesgos críticos</span> y protección patrimonial.
-        </p>
-
-        <!-- Quick Stats -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 pt-12 border-t border-white/10 overflow-hidden">
-          {['24/7', 'OS10', '+10', 'RM'].map((stat, i) => (
-            <div class="group">
-              <div class="text-3xl md:text-4xl font-semibold text-white mb-1 tabular-nums tracking-tighter">
-                {stat === '24/7' ? '24/7' : stat === 'OS10' ? 'OS10' : stat === '+10' ? '+10' : 'RM'}
-              </div>
-              <div class="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold">
-                {i === 0 ? 'Operativo' : i === 1 ? 'Certificado' : i === 2 ? 'Años' : 'Alcance'}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </Container>
   </section>
 
-  <!-- Services Grid -->
-  <Section background="gray">
-    <Container>
-      <div class="mb-16">
-        <h2 class="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight">Capacidades Operativas</h2>
-        <p class="text-gray-500 text-lg max-w-2xl leading-relaxed">
-          Ingeniería de protección adaptada a ecosistemas críticos y entornos corporativos.
-        </p>
-      </div>
+  {error && (
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 mx-auto max-w-7xl my-8">
+      <p>Error cargando servicios: {error}</p>
+    </div>
+  )}
 
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {services.map((service) => (
-          <ServiceCard
-            title={service.title}
-            description={service.description}
-            icon={service.icon}
-            href={`/servicios/${service.slug}`}
-          />
-        ))}
-      </div>
-    </Container>
-  </Section>
-
-  <!-- Process Section -->
-  <ProcessSection
-    title="Nuestra Metodología"
-    subtitle="Un proceso estructurado para garantizar la máxima efectividad en su solución de seguridad."
-    steps={processSteps}
-    background="white"
-  />
-
-  <!-- Industry Grid -->
-  <IndustryGrid
-    title="Sectores de Activación"
-    subtitle="Protocolos diseñados para la interoperabilidad en múltiples industrias y entornos urbanos."
-    industries={industries}
-    background="gray"
-    columns={6}
-  />
+  {/* Services Grid */}
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {services.length > 0 ? (
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {services.map((service) => (
+            <a 
+              href={`/servicios/${service.slug}`}
+              class="block bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden group"
+            >
+              {service.icon && (
+                <div class="bg-green-50 p-6 text-center">
+                  <span class="text-5xl">{service.icon}</span>
+                </div>
+              )}
+              <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition">
+                  {service.title}
+                </h3>
+                {service.tagline && (
+                  <p class="text-gray-600 mb-4">{service.tagline}</p>
+                )}
+                <p class="text-gray-500 text-sm line-clamp-3">
+                  {service.description}
+                </p>
+                <div class="mt-4 text-green-600 font-medium flex items-center gap-1">
+                  Ver más 
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-gray-500">No hay servicios disponibles en este momento.</p>
+        </div>
+      )}
+    </div>
+  </section>
 
   <!-- CTA Section -->
-  <CTASection
-    headline="Asegure sus activos hoy"
-    headlineAccent="activos"
-    subtitle="Inicie el despliegue de su solución de seguridad personalizada. Ingeniería táctica aplicada a su tranquilidad."
-    primaryButton={{ text: 'Solicitar Auditoría', href: '/contacto' }}
-    secondaryButton={{ text: `Línea Directa: ${site.phone}`, href: `tel:${site.phone.replace(/\s/g, '')}` }}
-    trustBadges={['Operativo 24/7', 'Certificación OS10', 'Estándar ISO']}
-  />
+  <section class="py-16 bg-green-600">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-white mb-4">
+        ¿Necesitas un servicio de seguridad?
+      </h2>
+      <p class="text-xl text-green-100 mb-8">
+        Contáctanos hoy y recibe una cotización personalizada
+      </p>
+      <a 
+        href="/contacto"
+        class="inline-block bg-white text-green-700 font-semibold px-8 py-4 rounded-lg hover:bg-gray-100 transition"
+      >
+        Solicitar Cotización
+      </a>
+    </div>
+  </section>
 </BaseLayout>
-
-<style>
-  /* Smooth scroll behavior */
-  html {
-    scroll-behavior: smooth;
-  }
-  
-  /* Custom focus states */
-  a:focus-visible {
-    outline: 2px solid #10B981;
-    outline-offset: 2px;
-    border-radius: 0.5rem;
-  }
-  
-  /* Line clamp utility */
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-</style>

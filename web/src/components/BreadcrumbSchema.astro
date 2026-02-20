@@ -1,0 +1,30 @@
+---
+interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+}
+
+const { items } = Astro.props;
+
+// Build the BreadcrumbList schema
+const breadcrumbSchema = items.length > 0 ? {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: items.map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.name,
+    item: item.url,
+  })),
+} : null;
+
+const schemaString = breadcrumbSchema ? JSON.stringify(breadcrumbSchema) : '';
+---
+
+{breadcrumbSchema && (
+  <script type="application/ld+json" set:html={schemaString} />
+)}

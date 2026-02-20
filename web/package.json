@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build && node copy-admin.js",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint src/",
@@ -26,11 +26,10 @@
     "@astrojs/vercel": "^8.0.0",
     "@resvg/resvg-js": "^2.6.2",
     "astro": "^5.1.0",
-    "convex": "^1.12.0",
+    "convex": "^1.32.0",
     "marked": "^17.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "satori": "^0.19.2",
     "tailwindcss": "^3.4.17"
   },
   "devDependencies": {

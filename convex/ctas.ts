@@ -9,6 +9,13 @@ export const getAllCtas = query({
   },
 });
 
+export const getCtaById = query({
+  args: { id: v.id('ctas') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const getCtaByPage = query({
   args: { page_slug: v.string() },
   handler: async (ctx, args) => {

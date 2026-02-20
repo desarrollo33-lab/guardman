@@ -1,0 +1,180 @@
+# Task 1.3: Unused Schema Fields Analysis
+
+## Date: 2026-02-19
+
+## Analysis Summary
+
+This document identifies schema fields that are defined but never used in queries, mutations, or frontend code.
+
+---
+
+## UNUSED FIELDS (SAFE TO REMOVE)
+
+### 1. solutions.name
+- **Location**: `convex/schema.ts` line 69
+- **Schema Definition**: `name: v.optional(v.string())` - marked as "Legacy field"
+- **Usage in Code**: NONE
+- **Usage in Frontend**: NONE (searched web/ and admin/)
+- **Replacement**: `title` field is used instead
+- **Risk**: LOW - optional field, explicitly marked legacy
+
+### 2. site_config.navbar_items[].path
+- **Location**: `convex/schema.ts` line 119
+- **Schema Definition**: `path: v.optional(v.string())` - marked as "Legacy field"
+- **Usage in Code**: NONE (site_config.ts update mutation uses `href`)
+- **Usage in Frontend**: NONE
+- **Replacement**: `href` field is used instead
+- **Risk**: LOW - optional field, explicitly marked legacy
+
+### 3. site_config.footer_config
+- **Location**: `convex/schema.ts` line 131
+- **Schema Definition**: `footer_config: v.optional(v.any())`
+- **Usage in Code**: NONE - not in site_config.ts update mutation
+- **Usage in Frontend**: NONE
+- **Risk**: LOW - optional field, never implemented
+
+### 4. industries.id
+- **Location**: `convex/schema.ts` line 282
+- **Schema Definition**: `id: v.optional(v.string())` - marked as legacy
+- **Usage in Code**: NONE - industries.ts uses `_id` and `slug`
+- **Usage in Frontend**: NONE
+- **Risk**: LOW - optional field, marked legacy
+
+### 5. industries.challenges
+- **Location**: `convex/schema.ts` line 283
+- **Schema Definition**: `challenges: v.optional(v.any())` - marked as legacy
+- **Usage in Code**: NONE
+- **Usage in Frontend**: NONE
+- **Risk**: LOW - optional field, marked legacy
+
+### 6. industries.relatedServices
+- **Location**: `convex/schema.ts` line 286
+- **Schema Definition**: `relatedServices: v.optional(v.any())` - marked as legacy
+- **Usage in Code**: NONE
+- **Usage in Frontend**: NONE
+- **Risk**: LOW - optional field, marked legacy
+
+### 7. industries.solutions
+- **Location**: `convex/schema.ts` line 287
+- **Schema Definition**: `solutions: v.optional(v.any())` - marked as legacy
+- **Usage in Code**: NONE
+- **Usage in Frontend**: NONE
+- **Risk**: LOW - optional field, marked legacy
+
+### 8. industries.meta_title
+- **Location**: `convex/schema.ts` line 284
+- **Schema Definition**: `meta_title: v.optional(v.string())` - marked as legacy
+- **Usage in Code**: NONE
+- **Usage in Frontend**: NONE
+- **Risk**: LOW - optional field, marked legacy
+
+### 9. industries.meta_description
+- **Location**: `convex/schema.ts` line 285
+- **Schema Definition**: `meta_description: v.optional(v.string())` - marked as legacy
+- **Usage in Code**: NONE
+- **Usage in Frontend**: NONE
+- **Risk**: LOW - optional field, marked legacy
+
+### 10. services.id
+- **Location**: `convex/schema.ts` line 32
+- **Schema Definition**: `id: v.optional(v.string())`
+- **Usage in Code**: Only in seed data, not in CRUD mutations
+- **Usage in Frontend**: NONE
+- **Note**: `slug` is used for lookups instead
+- **Risk**: LOW - optional field
+
+### 11. solutions.id
+- **Location**: `convex/schema.ts` line 66
+- **Schema Definition**: `id: v.optional(v.string())`
+- **Usage in Code**: Only in seed data, not in CRUD mutations
+- **Usage in Frontend**: NONE
+- **Note**: `slug` is used for lookups instead
+- **Risk**: LOW - optional field
+
+### 12. faqs.id
+- **Location**: `convex/schema.ts` line 90
+- **Schema Definition**: `id: v.optional(v.string())`
+- **Usage in Code**: Only in seed.ts for filter lookup (not indexed)
+- **Usage in Frontend**: NONE
+- **Note**: CRUD mutations don't use this field
+- **Risk**: MEDIUM - used in seed, consider keeping for idempotency
+
+---
+
+## FIELDS VERIFIED AS USED (NOT REMOVABLE)
+
+### solutions table:
+- slug, title, description, icon, features, benefits, cta, industries, 
+  meta_title, meta_description, og_image, solutions, image, challenges, 
+  relatedServices, is_active, order - ALL USED
+
+### services table:
+- slug, title, description, tagline, icon, features, benefits, cta, solutions,
+  image, meta_title, meta_description, is_active, order - ALL USED
+
+### site_config table:
+- is_active, brand_name, phone_primary, phone_secondary, whatsapp_number,
+  email_contact, address_main, social_links, navbar_items - ALL USED
+
+### industries table:
+- name, slug, icon, description, order, is_active - ALL USED
+
+---
+
+## REMOVAL PLAN
+
+### Phase 1: Remove Unused Fields (Safe - Low Risk)
+
+1. Remove `solutions.name` (line 69)
+2. Remove `site_config.navbar_items[].path` (line 119)
+3. Remove `site_config.footer_config` (line 131)
+4. Remove 6 legacy fields from `industries` table:
+   - id (line 282)
+   - challenges (line 283)
+   - meta_title (line 284)
+   - meta_description (line 285)
+   - relatedServices (line 286)
+   - solutions (line 287)
+
+### Phase 2: Evaluate Seed-Only Fields (Medium Risk)
+
+5. `services.id` - Consider keeping for seed idempotency
+6. `solutions.id` - Consider keeping for seed idempotency
+7. `faqs.id` - Consider keeping for seed idempotency
+
+### Recommendation:
+- Phase 1 fields can be safely removed
+- Phase 2 fields should be evaluated - if seed uses slug for idempotency,
+  these id fields are not needed
+
+---
+
+## VERIFICATION METHOD
+
+1. Grep search for each field in `convex/*.ts`
+2. Grep search for each field in `web/src/**/*`
+3. Grep search for each field in `admin/src/**/*`
+4. Manual review of mutation/query arguments
+
+---
+
+## INDEXES TO CHECK
+
+After field removal, verify these indexes are still valid:
+
+1. `solutions.by_solutions` - uses `solutions` field (active)
+2. `industries.by_slug` - uses `slug` field (active)
+3. `industries.by_order` - uses `order` field (active)
+
+No indexes reference the unused fields being removed.
+
+---
+
+## CONCLUSION
+
+**Total Unused Fields Identified: 12**
+**Safe to Remove Immediately: 9** (explicitly marked legacy)
+**Requires Further Evaluation: 3** (used in seed only)
+
+All identified fields are `v.optional()` which means removal is non-breaking
+for existing documents that may contain these fields.

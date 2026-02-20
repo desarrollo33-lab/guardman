@@ -9,6 +9,13 @@ export const getAllCompanyValues = query({
   },
 });
 
+export const getCompanyValueById = query({
+  args: { id: v.id('company_values') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 // Mutations
 
 export const createCompanyValue = mutation({

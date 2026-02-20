@@ -137,10 +137,10 @@ export const updateLeadStatus = mutation({
 // Query: Get lead by ID
 export const getLeadById = query({
   args: {
-    leadId: v.id('leads'),
+    id: v.id('leads'),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.leadId);
+    return await ctx.db.get(args.id);
   },
 });
 

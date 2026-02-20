@@ -1,68 +1,103 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Layout from './components/layout/Layout';
-import AuthGuard from './components/shared/AuthGuard';
+/**
+ * Guardman Admin - Refine Application
+ * 
+ * Main application entry point with Refine, Convex data provider, and auth.
+ */
 
-// Pages
-import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
-import LeadsIndex from './pages/leads';
-import ServicesIndex from './pages/services';
-import SolutionsIndex from './pages/solutions';
-import BlogIndex from './pages/blog';
-import HeroesIndex from './pages/heroes';
-import FAQsIndex from './pages/faqs';
-import TeamIndex from './pages/team';
-import TestimonialsIndex from './pages/testimonials';
-import CommunesIndex from './pages/communes';
-import PartnersIndex from './pages/partners';
-import IndustriesIndex from './pages/industries';
-import AuthorsIndex from './pages/authors';
-import CompanyValuesIndex from './pages/company-values';
-import ProcessStepsIndex from './pages/process-steps';
-import StatsIndex from './pages/stats';
-import CtasIndex from './pages/ctas';
-import ConfigIndex from './pages/config';
+import { Refine, Authenticated } from "@refinedev/core";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ConvexReactClient } from "convex/react";
 
-export default function App() {
+import { createConvexDataProvider } from "./providers/convexDataProvider";
+import { authProvider } from "./providers/authProvider";
+import { ConvexAuthProviderWrapper } from "./providers/ConvexAuthProvider";
+
+import { LoginPage } from "./pages/Login";
+import { Dashboard } from "./pages/Dashboard";
+import { AdminLayout } from "./layouts/AdminLayout";
+
+// Convex client configuration - use environment variable or fallback to local dev
+const CONVEX_URL = import.meta.env.VITE_CONVEX_URL || 'https://opulent-cod-610.convex.cloud';
+const convexClient = new ConvexReactClient(CONVEX_URL);
+
+// Create data provider
+const dataProvider = createConvexDataProvider(convexClient);
+
+// Resource definitions for Refine
+const resources = [
+  { name: "services", label: "Servicios" },
+  { name: "solutions", label: "Soluciones" },
+  { name: "leads", label: "Leads" },
+  { name: "communes", label: "Comunas" },
+  { name: "blog_posts", label: "Blog" },
+  { name: "heroes", label: "Heroes" },
+  { name: "faqs", label: "FAQs" },
+  { name: "testimonials", label: "Testimonios" },
+  { name: "partners", label: "Partners" },
+  { name: "industries", label: "Industrias" },
+  { name: "ctas", label: "CTAs" },
+  { name: "stats", label: "Estadísticas" },
+  { name: "process_steps", label: "Procesos" },
+  { name: "team_members", label: "Equipo" },
+  { name: "company_values", label: "Valores" },
+  { name: "authors", label: "Autores" },
+  { name: "pages", label: "Páginas" },
+  { name: "content_blocks", label: "Bloques" },
+  { name: "site_config", label: "Configuración" },
+];
+
+/**
+ * App content with Refine configuration
+ */
+function AppContent() {
   return (
-    <BrowserRouter basename="/admin">
+    <Refine
+      dataProvider={dataProvider}
+      authProvider={authProvider}
+      resources={resources}
+    >
       <Routes>
-        {/* Public route */}
-        <Route path="/login" element={<Login />} />
-
-        {/* Protected routes */}
-        <Route
-          path="/"
+        <Route path="/login" element={<LoginPage />} />
+        <Route 
+          path="/test" 
           element={
-            <AuthGuard>
-              <Layout />
-            </AuthGuard>
+            <Authenticated key="admin" fallback={<Navigate to="/login" />}>
+              <AdminLayout>
+                <Dashboard />
+              </AdminLayout>
+            </Authenticated>
           }
         >
-          <Route index element={<Dashboard />} />
-          <Route path="leads" element={<LeadsIndex />} />
-          <Route path="leads/:id" element={<LeadsIndex />} />
-          <Route path="services" element={<ServicesIndex />} />
-          <Route path="solutions" element={<SolutionsIndex />} />
-          <Route path="blog" element={<BlogIndex />} />
-          <Route path="heroes" element={<HeroesIndex />} />
-          <Route path="faqs" element={<FAQsIndex />} />
-          <Route path="team" element={<TeamIndex />} />
-          <Route path="testimonials" element={<TestimonialsIndex />} />
-          <Route path="communes" element={<CommunesIndex />} />
-          <Route path="partners" element={<PartnersIndex />} />
-          <Route path="industries" element={<IndustriesIndex />} />
-          <Route path="authors" element={<AuthorsIndex />} />
-          <Route path="company-values" element={<CompanyValuesIndex />} />
-          <Route path="process-steps" element={<ProcessStepsIndex />} />
-          <Route path="stats" element={<StatsIndex />} />
-          <Route path="ctas" element={<CtasIndex />} />
-          <Route path="config" element={<ConfigIndex />} />
+          {resources.map((resource) => (
+            <Route
+              key={resource.name}
+              path={resource.name}
+              element={
+                <div className="p-6">
+                  <h1 className="text-2xl font-bold mb-4">{resource.label}</h1>
+                  <p className="text-gray-600">
+                    CRUD para {resource.label} - En construcción
+                  </p>
+                </div>
+              }
+            />
+          ))}
         </Route>
-
-        {/* Redirect unknown routes */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/test" replace />} />
       </Routes>
+    </Refine>
+  );
+}
+
+/**
+ * Main App component with Convex Auth Provider wrapper
+ */
+export default function App() {
+  return (
+    <BrowserRouter>
+      <ConvexAuthProviderWrapper>
+        <AppContent />
+      </ConvexAuthProviderWrapper>
     </BrowserRouter>
   );
 }

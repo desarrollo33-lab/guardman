@@ -1,0 +1,94 @@
+# Task 1.5: Wave 1 Schema Migration - Evidence File
+
+## Date: 2026-02-19
+
+## Summary
+Successfully implemented Wave 1 schema changes for the Guardman Convex backend.
+
+## Changes Made
+
+### A. Removed Legacy Fields
+
+| Table | Field Removed | Reason |
+|-------|--------------|--------|
+| solutions | name | Replaced by title |
+| site_config | navbar_items[].path | Replaced by href |
+| site_config | footer_config | v.any() field never used |
+| industries | id | Legacy field |
+| industries | challenges | Legacy field |
+| industries | relatedServices | Legacy field |
+| industries | solutions | Legacy field |
+| industries | meta_title | Legacy field |
+| industries | meta_description | Legacy field |
+
+### B. Added Soft Delete Fields (is_active: v.optional(v.boolean()))
+
+| Table | Added is_active |
+|-------|-----------------|
+| leads | Yes (line 27) |
+| communes | Yes (line 61) |
+| faqs | Yes (line 96) |
+| pages | Yes (line 142) |
+| content_blocks | Yes (line 154) |
+| testimonials | Yes (line 166) |
+| partners | Yes (line 178) |
+| files | Yes (line 214) |
+| company_values | Yes (line 261) |
+| process_steps | Yes (line 270) |
+| stats | Yes (line 279) |
+| ctas | Yes (line 309) |
+| authors | Yes (line 318) |
+
+### C. No Changes Required (Already Correct)
+
+- Slug fields: Already correctly named 'slug' on all tables
+- Slug indexes: All tables with slugs already have 'by_slug' index
+
+## Data Migration
+
+Created `convex/migrations.ts` with migration functions:
+
+1. `removeIndustriesLegacyFields` - Removes legacy fields from industries
+2. `removeSolutionsLegacyFields` - Removes name field from solutions
+3. `removeSiteConfigLegacyFields` - Removes path from navbar_items and footer_config
+4. `runWave1` - Runs all migrations in sequence
+
+### Migration Results
+```
+{
+  "industries": { "migrated": 8, "total": 8 },
+  "site_config": { "migrated": 1, "total": 1 },
+  "solutions": { "migrated": 8, "total": 8 }
+}
+```
+
+## Verification
+
+```bash
+npx convex dev --once
+# Result: Convex functions ready! (6.25s)
+```
+
+Schema validates without errors.
+
+## Files Modified
+
+1. `convex/schema.ts` - Schema changes (legacy fields removed, is_active added)
+2. `convex/migrations.ts` - New migration file for data cleanup
+
+## Preserved Fields (NOT removed)
+
+- `services.id` - Used for seed idempotency
+- `solutions.id` - Used for seed idempotency
+- `faqs.id` - Used for seed idempotency
+
+These fields are required for the seed functions to check for existing records before inserting.
+
+## Notes
+
+The migration required a chicken-and-egg workaround:
+1. Schema validation blocks deployment if data doesn't match
+2. Migration can't run if functions aren't deployed
+3. Solution: Temporarily kept legacy fields, deployed, ran migration, then removed legacy fields
+
+This pattern should be used for future schema migrations that remove fields with existing data.

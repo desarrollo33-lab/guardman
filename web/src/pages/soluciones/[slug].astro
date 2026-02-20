@@ -1,122 +1,189 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro';
-import Container from '@/components/ui/Container.astro';
-import Section from '@/components/ui/Section.astro';
-import Button from '@/components/ui/Button.astro';
-import Card from '@/components/ui/Card.astro';
-import Icon from '@/components/ui/Icon.astro';
-import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
-import ChallengesSection from '@/components/sections/ChallengesSection.astro';
-import SolutionsListSection from '@/components/sections/SolutionsListSection.astro';
-import RelatedServicesSection from '@/components/sections/RelatedServicesSection.astro';
-import CTASection from '@/components/sections/CTASection.astro';
-import { convexServer } from '@/lib/convex';
-import { api } from '@convex/_generated/api';
-import { site } from '@/data/site';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getConvexServer } from "../../lib/convex";
 
-// SSR: fetch solution by slug and all services from Convex
+export const prerender = false;
+
+// Get params from URL
 const { slug } = Astro.params;
+
+// Validate params exist
+if (!slug) {
+  return Astro.redirect("/404");
+}
+
+// Get Convex client
+const convex = await getConvexServer();
+if (!convex) {
+  return Astro.redirect("/404");
+}
+
+// Fetch solution by slug from Convex
 let solution = null;
-
 try {
-  solution = await convexServer.query(api.solutions.getSolutionBySlug, { slug: slug! });
-} catch (e) {
-  console.error('Error fetching solution:', e);
+  solution = await convex.query("solutions:getSolutionBySlug", { slug });
+} catch (error) {
+  console.error("Error fetching solution:", error);
 }
 
+// 404 if not found
 if (!solution) {
-  return Astro.redirect('/soluciones');
+  return Astro.redirect("/404");
 }
 
-const safeSolution = solution!;
-
-let allServices = [];
-try {
-  allServices = await convexServer.query(api.services.getAllServices);
-} catch (e) {
-  console.error('Error fetching services for solution:', e);
-  allServices = [];
-}
-const relatedServices = allServices.filter(
-  (s: any) =>
-    safeSolution.relatedServices?.includes(s.slug) ||
-    s.solutions?.includes(safeSolution.slug)
-);
-
-const title = safeSolution.meta_title || `Seguridad para ${safeSolution.name} | Guardman Chile`;
-const description = safeSolution.meta_description || safeSolution.description;
-const ogImage = safeSolution.og_image || `${Astro.url.origin}/og/solutions/${slug}.png`;
+// Generate meta tags
+const metaTitle = solution.meta_title || `${solution.title} | Guardman Chile`;
+const metaDescription = solution.meta_description || solution.description;
 ---
 
-<BaseLayout title={title} description={description} ogImage={ogImage}>
-  <!-- Hero de la Solución -->
-  <section class="relative bg-black py-20 px-4 overflow-hidden">
-    <div class="absolute inset-0 opacity-20">
-      <div class="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black z-10"></div>
-      <img src="https://images.unsplash.com/photo-1557597774-9d2739f85a76?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" alt="" class="w-full h-full object-cover grayscale" />
+<BaseLayout
+  title={metaTitle}
+  description={metaDescription}
+>
+  <!-- Breadcrumb -->
+  <nav class="bg-white border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <ol class="flex items-center space-x-2 py-3 text-sm">
+        <li>
+          <a href="/" class="text-gray-500 hover:text-gray-700">Inicio</a>
+        </li>
+        <li class="text-gray-400">/</li>
+        <li>
+          <a href="/soluciones" class="text-gray-500 hover:text-gray-700">Soluciones</a>
+        </li>
+        <li class="text-gray-400">/</li>
+        <li class="text-gray-900 font-medium">{solution.title}</li>
+      </ol>
     </div>
+  </nav>
 
-    <Container class="relative z-20">
-      <Breadcrumbs items={[
-        { name: 'Soluciones', url: '/soluciones' },
-        { name: safeSolution.name }
-      ]} />
-
-      <div class="max-w-4xl">
-        <h1 class="text-4xl md:text-6xl font-semibold text-white mb-8 tracking-tight leading-[1.1]">
-          Especialidad en<br/>
-          <span class="text-white/40 italic">{safeSolution.name}</span>
-        </h1>
-        <p class="text-lg md:text-xl text-white/50 mb-12 max-w-2xl leading-relaxed">
-          {safeSolution.description}
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4">
-          <Button href="/cotizar" variant="accent" size="lg" class="bg-white text-black hover:bg-gray-100 border-none">
-            Consultar ahora
-          </Button>
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-br from-green-900 to-green-700 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {solution.icon && (
+        <div class="mb-6">
+          <span class="text-6xl">{solution.icon}</span>
         </div>
-      </div>
-    </Container>
+      )}
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">
+        {solution.title}
+      </h1>
+      <p class="text-lg text-green-50 max-w-3xl">
+        {solution.description}
+      </p>
+    </div>
   </section>
 
-  <!-- Desafíos / Pain Points -->
-  <ChallengesSection
-    subtitle="Puntos críticos que resolvemos en su sector."
-    challenges={safeSolution.challenges || []}
-  />
-
-  <!-- Soluciones -->
-  <SolutionsListSection
-    subtitle={`Protocolos especializados para ${safeSolution.name}.`}
-    solutions={safeSolution.solutions || []}
-    background="gray"
-  />
-
-  <!-- Servicios Relacionados -->
-  {relatedServices.length > 0 && (
-    <RelatedServicesSection
-      title={`Servicios para ${safeSolution.name}`}
-      services={relatedServices.map((s: any) => ({
-        title: s.title,
-        description: s.description,
-        slug: s.slug
-      }))}
-    />
+  <!-- Challenges Section -->
+  {solution.challenges && solution.challenges.length > 0 && (
+    <section class="py-16 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold mb-8 text-center">Desafíos que enfrentamos</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+          {solution.challenges.map((challenge: string) => (
+            <div class="flex items-start gap-3 p-4 bg-white rounded-lg shadow-sm">
+              <svg class="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span class="text-gray-700">{challenge}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   )}
 
-  <!-- CTA -->
-  <CTASection
-    headline="Asegure su operación industrial"
-    headlineAccent="industrial"
-    subtitle={`Nuestros asesores diseñarán un plan de seguridad específico para las necesidades de ${safeSolution.name}.`}
-    primaryButton={{
-      text: 'Solicitar análisis de riesgo',
-      href: '/cotizar'
-    }}
-    secondaryButton={{
-      text: 'Contactar vía WhatsApp',
-      href: `https://wa.me/${site.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola, necesito seguridad para ${safeSolution.name}`)}`,
-      variant: 'outline'
-    }}
-  />
+  <!-- Features Section -->
+  {solution.features && solution.features.length > 0 && (
+    <section class="py-16 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold mb-8 text-center">¿Qué incluye nuestra solución?</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {solution.features.map((feature: string) => (
+            <div class="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <svg class="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span class="text-gray-700">{feature}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Benefits Section -->
+  {solution.benefits && solution.benefits.length > 0 && (
+    <section class="py-16 bg-green-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold mb-8 text-center">Beneficios de nuestra solución</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+          {solution.benefits.map((benefit: string) => (
+            <div class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-sm">
+              <svg class="w-8 h-8 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-lg text-gray-700">{benefit}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Industries Section -->
+  {solution.industries && solution.industries.length > 0 && (
+    <section class="py-16 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold mb-8 text-center">Industrias que Atendemos</h2>
+        <div class="flex flex-wrap justify-center gap-3">
+          {solution.industries.map((industry: string) => (
+            <a 
+              href={`/soluciones/${industry}`}
+              class="px-4 py-2 bg-green-50 text-green-700 rounded-full font-medium hover:bg-green-100 transition"
+            >
+              {industry}
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Related Services Section -->
+  {solution.relatedServices && solution.relatedServices.length > 0 && (
+    <section class="py-16 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold mb-8 text-center">Servicios Relacionados</h2>
+        <div class="flex flex-wrap justify-center gap-3">
+          {solution.relatedServices.map((service: string) => (
+            <a 
+              href={`/servicios/${service}`}
+              class="px-4 py-2 bg-blue-50 text-blue-700 rounded-full font-medium hover:bg-blue-100 transition"
+            >
+              {service}
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- CTA Section -->
+  <section class="py-16 bg-green-600">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-white mb-4">
+        ¿Necesitas nuestra solución de {solution.title}?
+      </h2>
+      <p class="text-xl text-green-100 mb-8">
+        Contáctanos hoy y recibe una cotización personalizada
+      </p>
+      <a 
+        href="/contacto"
+        class="inline-block bg-white text-green-700 font-semibold px-8 py-4 rounded-lg hover:bg-gray-100 transition"
+      >
+        Solicitar Cotización
+      </a>
+    </div>
+  </section>
 </BaseLayout>

@@ -1,0 +1,109 @@
+---
+// CookieConsent.astro - Complies with Chilean Law 21.719 (Ley de Cookies)
+---
+
+<div
+  id="cookie-consent-banner"
+  class="fixed bottom-0 left-0 right-0 z-50 bg-gray-900 text-white p-4 md:p-6 shadow-lg transform translate-y-full transition-transform duration-300 ease-in-out"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="cookie-title"
+  aria-describedby="cookie-description"
+>
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div class="flex-1">
+      <h2 id="cookie-title" class="text-lg font-semibold mb-2">
+        🍪 Uso de Cookies
+      </h2>
+      <p id="cookie-description" class="text-sm text-gray-300 leading-relaxed">
+        Utilizamos cookies y tecnologías similares para mejorar tu experiencia en nuestro sitio web.
+        Conforme a la Ley 21.719 de Protección de Datos Personales, te informamos que recopilamos
+        información para fines analyticos y de funcionamiento del sitio. Puedes aceptar todas las
+        cookies o rechazarlas. Tienes derecho a acceder, rectificar y eliminar tus datos.
+        <a href="/privacidad" class="underline hover:text-white transition-colors">
+          Ver Política de Privacidad
+        </a>
+      </p>
+    </div>
+    <div class="flex flex-row gap-3 shrink-0">
+      <button
+        id="cookie-reject"
+        type="button"
+        class="px-5 py-2.5 text-sm font-medium bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+      >
+        Rechazar
+      </button>
+      <button
+        id="cookie-accept"
+        type="button"
+        class="px-5 py-2.5 text-sm font-medium bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+      >
+        Aceptar
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const COOKIE_KEY = 'guardman_cookie_consent';
+  const CONSENT_VALUE = 'accepted';
+  const REJECT_VALUE = 'rejected';
+
+  function getCookieConsent(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(COOKIE_KEY);
+  }
+
+  function setCookieConsent(value: string): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(COOKIE_KEY, value);
+  }
+
+  function showBanner(): void {
+    const banner = document.getElementById('cookie-consent-banner');
+    if (banner) {
+      banner.classList.remove('translate-y-full');
+    }
+  }
+
+  function hideBanner(): void {
+    const banner = document.getElementById('cookie-consent-banner');
+    if (banner) {
+      banner.classList.add('translate-y-full');
+      // Remove from DOM after animation
+      setTimeout(() => {
+        banner.remove();
+      }, 300);
+    }
+  }
+
+  function initCookieConsent(): void {
+    const consent = getCookieConsent();
+
+    // Show banner only if no consent has been given
+    if (!consent) {
+      // Small delay to ensure page is loaded
+      setTimeout(showBanner, 100);
+    }
+
+    const acceptBtn = document.getElementById('cookie-accept');
+    const rejectBtn = document.getElementById('cookie-reject');
+
+    acceptBtn?.addEventListener('click', () => {
+      setCookieConsent(CONSENT_VALUE);
+      hideBanner();
+    });
+
+    rejectBtn?.addEventListener('click', () => {
+      setCookieConsent(REJECT_VALUE);
+      hideBanner();
+    });
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCookieConsent);
+  } else {
+    initCookieConsent();
+  }
+</script>

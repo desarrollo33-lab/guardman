@@ -15,10 +15,24 @@
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean && rm -rf node_modules",
     "convex:dev": "convex dev",
-    "convex:deploy": "convex deploy"
+    "convex:deploy": "convex deploy",
+    "cf:login": "wrangler login",
+    "cf:whoami": "wrangler whoami",
+    "cf:deploy": "wrangler deploy",
+    "cf:dev": "wrangler dev",
+    "cf:tail": "wrangler tail",
+    "cf:secret:put": "wrangler secret put",
+    "cf:secret:delete": "wrangler secret delete",
+    "cf:d1:list": "wrangler d1 list",
+    "cf:d1:execute": "wrangler d1 execute",
+    "cf:r2:list": "wrangler r2 object list",
+    "cf:pages:list": "wrangler pages project list",
+    "cf:kv:list": "wrangler kv:namespace list"
   },
   "devDependencies": {
-    "turbo": "^2.3.0"
+    "convex": "^1.32.0",
+    "turbo": "^2.3.0",
+    "wrangler": "^3.28.0"
   },
   "packageManager": "npm@10.0.0",
   "workspaces": [

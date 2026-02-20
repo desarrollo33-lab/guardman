@@ -1,0 +1,75 @@
+---
+import { getConvexServer } from '../lib/convex';
+
+// Default values for fields not in site_config
+const DEFAULT_OPENING_HOURS = 'Mo-Fr 08:00-20:00, Sa 09:00-14:00';
+const DEFAULT_LATITUDE = -33.4489; // Santiago, Chile
+const DEFAULT_LONGITUDE = -70.6693;
+const DEFAULT_COUNTRY = 'CL';
+
+interface SiteConfig {
+  brand_name: string;
+  phone_primary: string;
+  phone_secondary?: string;
+  whatsapp_number: string;
+  email_contact: string;
+  address_main?: string;
+  social_links?: {
+    instagram?: string;
+    linkedin?: string;
+    facebook?: string;
+    youtube?: string;
+  };
+}
+
+const convex = await getConvexServer();
+let siteConfig: SiteConfig | null = null;
+
+if (convex) {
+  try {
+    siteConfig = await convex.query('site_config:get') as SiteConfig | null;
+  } catch (e) {
+    console.error('Failed to fetch site_config:', e);
+  }
+}
+
+// Build the LocalBusiness schema
+const localBusinessSchema = siteConfig ? {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: siteConfig.brand_name,
+  telephone: siteConfig.phone_primary,
+  email: siteConfig.email_contact,
+  address: siteConfig.address_main ? {
+    '@type': 'PostalAddress',
+    streetAddress: siteConfig.address_main,
+    addressCountry: DEFAULT_COUNTRY,
+  } : undefined,
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '08:00',
+      closes: '20:00',
+    },
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: 'Saturday',
+      opens: '09:00',
+      closes: '14:00',
+    },
+  ],
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: DEFAULT_LATITUDE,
+    longitude: DEFAULT_LONGITUDE,
+  },
+  priceRange: '$$',
+} : null;
+
+const schemaString = localBusinessSchema ? JSON.stringify(localBusinessSchema) : '';
+---
+
+{localBusinessSchema && (
+  <script type="application/ld+json" set:html={schemaString} />
+)}

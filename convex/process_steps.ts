@@ -22,6 +22,13 @@ export const getAllProcessSteps = query({
   },
 });
 
+export const getProcessStepById = query({
+  args: { id: v.id('process_steps') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 // Mutations
 
 export const createProcessStep = mutation({

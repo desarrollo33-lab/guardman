@@ -9,6 +9,13 @@ export const getAllPosts = query({
   },
 });
 
+export const getPostById = query({
+  args: { id: v.id('blog_posts') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const getPublishedPosts = query({
   handler: async (ctx) => {
     const allPosts = await ctx.db.query('blog_posts').collect();
@@ -46,7 +53,7 @@ export const createPost = mutation({
     excerpt: v.string(),
     cover_image: v.string(),
     author: v.string(),
-    author_id: v.optional(v.string()),
+    author_id: v.optional(v.id('authors')),
     published_at: v.number(),
     read_time: v.number(),
     tags: v.array(v.string()),
@@ -88,7 +95,7 @@ export const updatePost = mutation({
     excerpt: v.optional(v.string()),
     cover_image: v.optional(v.string()),
     author: v.optional(v.string()),
-    author_id: v.optional(v.string()),
+    author_id: v.optional(v.id('authors')),
     published_at: v.optional(v.number()),
     read_time: v.optional(v.number()),
     tags: v.optional(v.array(v.string())),
