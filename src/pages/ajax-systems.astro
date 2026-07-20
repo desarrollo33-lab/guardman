@@ -1,0 +1,174 @@
+---
+// /ajax-systems — migración 1:1 del live (incluye YouTube lite embed).
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+
+const features = [
+  { icon: 'wifi', title: 'Protocolo Jeweller', description: 'Comunicación inalámbrica encriptada con alcance de hasta 2 km en campo abierto. Garantiza transmisión de alarmas en menos de 0.3 segundos, sin interferencias ni falsas alarmas.' },
+  { icon: 'radar', title: 'Tecnología Wings', description: 'Sistema de comunicación por radiofrecuencia con diversidad de antenas y encriptación AES. Asegura la conexión incluso en entornos con alta densidad de señales o interferencias electromagnéticas.' },
+  { icon: 'settings', title: 'OS Malevich', description: 'Sistema operativo propietario de Ajax, diseñado para máxima estabilidad y seguridad. Permite actualizaciones remotas, configuración granular y monitoreo en tiempo real desde cualquier dispositivo.' },
+  { icon: 'eye', title: 'Detección Inteligente', description: 'Sensores con algoritmos de inteligencia artificial que distinguen entre intrusiones reales y falsas alarmas (mascotas, cambios climáticos, vibraciones). Reduce hasta un 95% las falsas activaciones.' },
+  { icon: 'bolt', title: 'Batería de Larga Duración', description: 'Dispositivos con baterías de litio que ofrecen hasta 5 años de autonomía. Sin cables, sin mantenimiento frecuente, ideal para instalaciones en lugares de difícil acceso.' },
+  { icon: 'device', title: 'App Ajax para Automonitoreo', description: 'Aplicación móvil Ajax permite armar/desarmar, recibir notificaciones instantáneas, ver historial de eventos y gestionar usuarios. Compatible con iOS y Android. Sin contrato forzado: usted monitorea desde su smartphone sin pagar mensualidad.' },
+];
+
+const whyUs = [
+  { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>', title: 'Instaladores oficiales', text: 'Equipo técnico certificado por Ajax Systems. Instalación profesional con productos originales y soporte técnico en español.' },
+  { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', title: 'Monitoreo 24/7 opcional', text: 'Si lo desea, agregue monitoreo profesional desde nuestra central propia como servicio mensual, sin contrato forzado. Si no, use la app Ajax para automonitoreo gratuito desde su smartphone.' },
+  { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857"/></svg>', title: 'Apoyo con guardias OS-10', text: 'Si la alarma se activa, nuestros guardias certificados pueden responder en terreno como servicio opcional. Sin compromiso de contratación permanente.' },
+];
+
+const stats = [
+  { value: '187', label: 'Países con presencia Ajax' },
+  { value: '4.5M', label: 'Usuarios protegidos' },
+  { value: 'Grade 3', label: 'Máxima certificación' },
+  { value: '2 km', label: 'Alcance radio Jeweller' },
+];
+
+const faqs = [
+  { question: '¿Qué significa que Ajax Systems tenga certificación Grado 3?', answer: 'La certificación Grado 3 es un estándar europeo que garantiza que el sistema detecta intrusiones con alta precisión, resiste intentos de sabotaje y mantiene comunicación encriptada. Es ideal para hogares, oficinas y comercios que requieren máxima seguridad sin falsas alarmas.' },
+  { question: '¿Cómo funciona el protocolo Jeweller y qué alcance tiene?', answer: 'Jeweller es un protocolo de radiofrecuencia patentado por Ajax que permite comunicación bidireccional entre sensores y la central. Su alcance es de hasta 2 km en campo abierto, pero en interiores puede cubrir edificios de hasta 3 pisos con múltiples habitaciones, gracias a su capacidad de repetir señal.' },
+  { question: '¿Puedo instalar Ajax Systems yo mismo o debo contratar a un instalador certificado?', answer: 'Para garantizar el rendimiento y la validez de la garantía, recomendamos instalación por parte de un partner certificado como GuardMan Chile. Nuestros técnicos configuran el sistema según las características de su propiedad, optimizando la cobertura y evitando errores comunes.' },
+  { question: '¿Qué pasa si se corta la luz o el internet? ¿El sistema sigue funcionando?', answer: 'Sí, los dispositivos Ajax funcionan con baterías de respaldo que duran hasta 5 años. Además, la central cuenta con batería interna y puede usar datos móviles (3G/4G) como respaldo si falla la conexión WiFi. La comunicación Jeweller no depende de internet para transmitir alarmas.' },
+  { question: '¿Ajax Systems se integra con otros sistemas de seguridad como cámaras o sensores de humo?', answer: 'Sí, Ajax es compatible con una amplia gama de dispositivos de terceros mediante su plataforma abierta. Puede integrar cámaras IP, sensores de humo, detectores de gas, cerraduras inteligentes y más, todo controlado desde la misma aplicación. GuardMan le asesora en la selección de dispositivos compatibles.' },
+  { question: '¿Necesito contratar un plan mensual con GuardMan para usar Ajax Systems?', answer: 'No. El sistema Ajax funciona con la app oficial para automonitoreo desde su smartphone, sin contrato ni mensualidad con GuardMan. Si más adelante desea monitoreo profesional 24/7 desde nuestra central o respuesta en terreno con guardias OS-10, puede agregarlos como servicios opcionales.' },
+  { question: '¿Ajax Systems tiene sensores aptos para exterior?', answer: 'Sí. Ajax ofrece detectores de movimiento para exterior con tecnología de doble PIR, anti-masking y resistencia a la intemperie (IP54/IP65). Son ideales para perímetros, jardines, estacionamientos y fachadas, con comunicación inalámbrica Jeweller y batería de hasta 5 años.' },
+];
+
+
+---
+
+<BaseLayout
+  title="Ajax Systems en Chile sin Contrato y con App de Automonitoreo"
+  description="Ajax Systems en Chile: alarmas inalámbricas con app de automonitoreo, sin contrato forzado. Sensores para exterior, instalación profesional y opción de monitoreo 24/7 desde nuestra central si lo necesita."
+  theme="dark"
+  loadDarkCss={true}
+  breadcrumb="Ajax Systems"
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Ajax Systems', url: '/ajax-systems' }]}
+  showCluster={true}
+  clusterType="servicios"
+  faq={faqs}
+>
+  <section class="hero" data-od-id="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="hero-badge">
+          <Icon name="bolt" size={14} />
+          Instalador Oficial
+        </div>
+        <h1>Ajax <span>Systems</span></h1>
+        <p class="hero-sub">Alarmas inalámbricas con certificación Grade 3 Professional. Controle su sistema desde la app Ajax para automonitoreo (sin contrato forzado) o agregue monitoreo 24/7 desde nuestra central cuando lo necesite. Sensores para interior y exterior, instalación profesional.</p>
+        <div class="hero-ctas">
+          <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar Ajax Systems</a>
+          <a href="#caracteristicas" class="btn btn-ghost btn-lg">Conozca la tecnología</a>
+        </div>
+        <div class="hero-stats">
+          <div><div class="hero-stat-value">Grado 3</div><div class="hero-stat-label">Certificación</div></div>
+          <div><div class="hero-stat-value">2 km</div><div class="hero-stat-label">Alcance Jeweller</div></div>
+          <div><div class="hero-stat-value">1.5M+</div><div class="hero-stat-label">Usuarios globales</div></div>
+          <div class="hero-youtube-badge">YouTube</div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-product">
+          <iframe
+            src="https://www.youtube.com/embed/XZsDWxHdgP4?autoplay=1&mute=1&rel=0&playsinline=1&controls=1&modestbranding=1&loop=1&playlist=XZsDWxHdgP4"
+            title="Ajax Systems"
+            loading="lazy"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+            style="position:absolute;inset:0;width:100%;height:100%;border:0"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="caracteristicas" data-od-id="intro">
+    <div class="container split">
+      <div class="split-text">
+        <span class="section-label">Seguridad inteligente</span>
+        <h2 class="section-title">Sistemas de alarma inalámbrica Grade 3 con tecnología Jeweller y Wings</h2>
+        <p>Ajax Systems es un fabricante europeo de sistemas de alarma inalámbrica de alto rendimiento, reconocido mundialmente por su innovación y fiabilidad. Sus dispositivos cuentan con certificación Grade 3, la más alta para entornos residenciales y comerciales, garantizando detección temprana y respuesta inmediata ante intrusiones.</p>
+        <p>En GuardMan Chile somos instaladores oficiales y partner certificado de Ajax Systems. Usted accede a productos originales, instalación profesional, configuración personalizada y soporte técnico. Use la app Ajax para automonitoreo desde su smartphone sin contrato, o agregue monitoreo 24/7 desde nuestra central como servicio opcional. Si necesita apoyo en terreno, también puede sumar guardias OS-10 o unidades Guardpod para perímetros extensos sin infraestructura eléctrica.</p>
+      </div>
+      <div class="split-image">
+        <img src="/images/Ajax-systems-header.jpg" alt="Central Ajax Systems con sensores inalámbricos" loading="lazy" onerror="this.style.display='none'" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section-dark" data-od-id="features" id="features">
+    <div class="container">
+      <span class="section-label">Ventajas Ajax con GuardMan</span>
+      <h2 class="section-title">Tecnología que redefine la seguridad</h2>
+      <div class="feature-grid">
+        {features.map((f) => (
+          <div class="feature-card">
+            <div class="feature-card-icon">
+              <Icon name={f.icon} size={20} />
+            </div>
+            <h3>{f.title}</h3>
+            <p>{f.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section data-od-id="why-us">
+    <div class="container">
+      <span class="section-label">Por qué GuardMan más Ajax</span>
+      <h2 class="section-title">La combinación perfecta</h2>
+      <p class="section-subtitle">No solo instalamos Ajax Systems. Somos una empresa de seguridad integral que respalda cada instalación con guardias OS-10, central de monitoreo propia, unidades Guardpod para perímetros sin infraestructura y más de 10 años de trayectoria en Chile.</p>
+      <div class="why-grid">
+        {whyUs.map((w) => (
+          <div class="why-card">
+            <span set:html={w.icon} />
+            <h4>{w.title}</h4>
+            <p>{w.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-row" data-od-id="stats">
+    <div class="container">
+      <div class="stats-grid">
+        {stats.map((s) => (
+          <div class="stat-item">
+            <div class="stat-value">{s.value}</div>
+            <div class="stat-label">{s.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <section data-od-id="faq">
+    <div class="container" style="max-width:760px">
+      <span class="section-label">Preguntas frecuentes</span>
+      <h2 class="section-title">Todo lo que necesita saber de Ajax Systems</h2>
+      <div class="faq">
+        {faqs.map((f, i) => (
+          <details open={i === 0}>
+            <summary>{f.question}</summary>
+            <div class="answer">{f.answer}</div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-band" data-od-id="cta">
+    <div class="container">
+      <h2 class="section-title">Proteja su propiedad con la mejor tecnología de alarma inalámbrica</h2>
+      <p class="section-subtitle">Solicite una cotización sin compromiso y descubra cómo Ajax Systems, integrado por GuardMan Chile, puede transformar su seguridad residencial o empresarial.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar Ajax Systems</a>
+        <a href="/contacto" class="btn btn-ghost btn-lg">Hablar con un experto</a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,9 @@
+---
+// /admin/pipeline — Pipeline Kanban con drag&drop.
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import Pipeline from '../../islands/crm/Pipeline.tsx';
+---
+
+<AdminLayout title="Pipeline de Ventas" section="pipeline">
+  <Pipeline client:only="react" />
+</AdminLayout>

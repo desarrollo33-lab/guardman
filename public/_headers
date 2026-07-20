@@ -1,0 +1,13 @@
+# Cloudflare Pages / Workers Static Assets headers
+# versioned assets (con ?v= en el nombre) se sirven 1 año immutable
+/styles/site.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/scripts/main.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/scripts/yt-lite.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/vendor/*
+  Cache-Control: public, max-age=31536000, immutable

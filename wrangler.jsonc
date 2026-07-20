@@ -1,0 +1,35 @@
+{
+  // Cloudflare Workers config for guardman-astro (Astro 6 SSR).
+  // PUBLIC_* vars are exposed to the client bundle and are intentionally
+  // public (domain + API origin). Any real secret (API keys, signing
+  // secrets) belongs in the Cloudflare Secrets Store — set with:
+  //   npx wrangler secret put <NAME>
+  // and read in handlers via env.<NAME>.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "guardman-astro",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2026-06-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true },
+    "head_sampling_rate": 1
+  },
+  "vars": {
+    "PUBLIC_API_URL": "https://guardman.oficinadesarrollo33.workers.dev",
+    "PUBLIC_SITE_URL": "https://guardman.cl"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "guardman-v2-db",
+      "database_id": "fd1871a2-77a4-42ca-8b07-de283ff70bab",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

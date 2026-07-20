@@ -1,0 +1,89 @@
+---
+// /sectores — hub de sectores.
+// v5.2 — Copy único, español neutro, refuerzo de Guardpod en construcción.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SECTOR_NAMES, SECTOR_TO_SERVICE, SERVICE_NAMES, SITE } from '../../lib/constants';
+import Icon from '../../components/Icon.astro';
+
+
+const sectors = Object.entries(SECTOR_NAMES).map(([slug, name]) => ({
+  slug,
+  name,
+  relatedService: SECTOR_TO_SERVICE[slug] ? SERVICE_NAMES[SECTOR_TO_SERVICE[slug]] : null,
+}));
+---
+
+<BaseLayout
+  title="Seguridad Privada Especializada por Sector Industrial"
+  description="Protocolos de seguridad privada especializados por sector: residencial, comercial, industrial, construcción, educación, eventos, hotelería, salud, automotriz y deportivo. GuardMan Chile, certificación OS-10, central de monitoreo propia y unidades Guardpod."
+  breadcrumb="Sectores"
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Sectores', url: '/sectores' }]}
+  showCluster={true}
+  clusterType="servicios"
+>
+  <section class="hub-hero" data-od-id="hero">
+    <div class="container">
+      <h1>Sectores especializados</h1>
+      <p>Protocolos específicos para cada tipo de propiedad. Conocemos los riesgos, normativas y dinámicas operativas de cada sector, desde residencial hasta industrial, y diseñamos un plan con métricas verificables para cada cliente.</p>
+    </div>
+  </section>
+
+  <section class="bg-neutral" data-od-id="grid">
+    <div class="container">
+      <div class="sectors-grid">
+        {sectors.map((s) => (
+          <a href={`/sectores/${s.slug}`} class="sector-card">
+            <div class="sector-image">
+              <img src={`/images/sector-${s.slug}.webp`} alt={s.name} loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+              <div class="sector-image-fallback" style="display:none">
+                <Icon name={s.slug} size={56} />
+              </div>
+            </div>
+            <div class="sector-body">
+              <h2>Seguridad {s.name}</h2>
+              <p>Protocolos especializados para el sector {s.name.toLowerCase()}, con personal formado en los riesgos propios de la industria.</p>
+              <span class="service-cta">Ver sector →</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white-section" data-od-id="why-us">
+    <div class="container">
+      <span class="section-label">Adaptados a cada industria</span>
+      <h2 class="section-title">Por qué elegir GuardMan para su sector</h2>
+      <p class="section-subtitle">Cada sector tiene riesgos únicos. Diseñamos protocolos específicos con personal capacitado y, cuando el caso lo requiere, sumamos la unidad autónoma Guardpod para reforzar perímetros extensos o faenas temporales.</p>
+      <div class="sector-features-grid">
+        <div class="sector-feature">
+          <h4>Personal especializado</h4>
+          <p>Guardias con formación específica en los riesgos y procedimientos del sector al que se asignan.</p>
+        </div>
+        <div class="sector-feature">
+          <h4>Protocolos a medida</h4>
+          <p>Diseñamos procedimientos personalizados según las características operativas y normativas de cada industria.</p>
+        </div>
+        <div class="sector-feature">
+          <h4>Coordinación institucional</h4>
+          <p>Trabajamos directamente con mutuales, municipalidades, Carabineros y autoridades sectoriales.</p>
+        </div>
+        <div class="sector-feature">
+          <h4>Supervisión especializada</h4>
+          <p>Supervisores zonales con experiencia en el sector específico que supervisan, con reportes periódicos al cliente.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-dark" data-od-id="cta">
+    <div class="container" style="text-align:center;padding:80px 0">
+      <h2 class="section-title" style="color:#fff">¿Necesita seguridad para su sector?</h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.7);max-width:600px;margin:0 auto 28px">Converse con un experto en su industria. Cotización personalizada en menos de 24 horas hábiles, con visita técnica gratuita a su propiedad.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+        <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg"><Icon name="phone" size={16} /> Llamar ahora</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

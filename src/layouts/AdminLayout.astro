@@ -1,0 +1,39 @@
+---
+// AdminLayout v3.0 — shell del panel admin. Astro puro + islas React.
+import '../styles/global.css';
+import AdminSidebar from '../components/admin/AdminSidebar.astro';
+import AdminTopbar from '../components/admin/AdminTopbar.astro';
+
+interface Props {
+  title: string;
+  section: string;
+  requireAuth?: boolean;
+  breadcrumb?: { name: string; url?: string }[];
+}
+const { title, section, requireAuth = true, breadcrumb = [] } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} — GuardMan Admin</title>
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="theme-color" content="#1A2744" />
+  </head>
+  <body data-theme="dark" class="admin-shell">
+    {requireAuth && <script is:inline src="/scripts/admin-auth-guard.js"></script>}
+    <div id="app-shell">
+      <AdminSidebar active={section} />
+      <AdminTopbar title={title} section={section} breadcrumb={breadcrumb} />
+      <main id="main-content">
+        <div class="view active">
+          <slot />
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

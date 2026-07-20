@@ -1,0 +1,278 @@
+---
+// /canal-de-denuncias/estado/[id] — v4.1
+// Consulta pública del estado de una denuncia por su ID.
+// El ID es un secreto que solo el denunciante conoce (se entrega
+// en pantalla tras enviar el formulario y se guarda en localStorage).
+// Lectura SSR directa desde D1 para evitar self-fetch del worker.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { env } from 'cloudflare:workers';
+import { SITE } from '../../../lib/constants';
+
+const { id } = Astro.params;
+const rawId = (id ?? '').toUpperCase();
+const validFormat = /^D-\d{8}-[A-HJ-NP-Z2-9]{4}$/.test(rawId);
+
+let initial: {
+  ok: boolean;
+  error?: string;
+  denuncia?: {
+    id: string; created_at: string; updated_at: string;
+    status: string; categoria: string; relacion: string | null; lugar: string | null;
+  };
+} = { ok: false };
+
+if (validFormat) {
+  // Lectura SSR directa desde D1 (evita loop self-fetch del worker).
+  try {
+    const db = (env as { DB?: D1Database }).DB;
+    if (db) {
+      const row = await db
+        .prepare('SELECT id, created_at, updated_at, status, categoria, relacion, lugar FROM denuncias WHERE id = ?')
+        .bind(rawId)
+        .first<{
+          id: string; created_at: string; updated_at: string;
+          status: string; categoria: string; relacion: string | null; lugar: string | null;
+        }>();
+      if (row) {
+        initial = { ok: true, denuncia: row };
+      } else {
+        initial = { ok: false, error: 'No se encontró una denuncia con ese ID. Verifica que esté bien escrito.' };
+      }
+    } else {
+      initial = { ok: false, error: 'DB no configurada en el worker.' };
+    }
+  } catch (err) {
+    initial = { ok: false, error: `No se pudo consultar el estado: ${err instanceof Error ? err.message : String(err)}` };
+  }
+}
+
+const STATUS_LABELS: Record<string, { label: string; color: string; desc: string }> = {
+  pending:     { label: 'Recibida',          color: 'amber',  desc: 'Tu denuncia fue registrada y está en cola para revisión inicial por el EPD.' },
+  reviewing:   { label: 'En revisión',       color: 'blue',   desc: 'El Encargado de Prevención de Delitos está evaluando los antecedentes.' },
+  investigating:{ label: 'En investigación', color: 'violet', desc: 'Se están realizando indagaciones para esclarecer los hechos denunciados.' },
+  resolved:    { label: 'Resuelta',          color: 'green',  desc: 'La investigación se cerró. Si proporcionaste un medio de contacto, te informamos las conclusiones.' },
+  archived:    { label: 'Archivada',         color: 'gray',   desc: 'La denuncia fue cerrada y archivada conforme al protocolo del MPD.' },
+};
+
+const fmt = (iso: string) => {
+  try {
+    return new Date(iso).toLocaleString('es-CL', {
+      timeZone: 'America/Santiago',
+      year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
+  } catch { return iso; }
+};
+
+const STATUS_ORDER = ['pending', 'reviewing', 'investigating', 'resolved'] as const;
+
+const current = initial.denuncia ? STATUS_LABELS[initial.denuncia.status] ?? null : null;
+---
+
+<BaseLayout
+  title={initial.denuncia ? `Estado de denuncia ${initial.denuncia.id} | GuardMan Chile` : 'Consulta el estado de tu denuncia | GuardMan Chile'}
+  description="Consulta el estado de tu denuncia anónima en el Canal de Denuncias de GuardMan Chile."
+  breadcrumb="Estado de denuncia"
+  breadcrumbs={[
+    { name: 'Inicio', url: '/' },
+    { name: 'Canal de Denuncias', url: '/canal-de-denuncias' },
+    { name: 'Consulta de estado', url: `/canal-de-denuncias/estado/${rawId || ''}` },
+  ]}
+  noindex
+>
+  <section class="bg-white">
+    <div class="container" style="max-width:760px">
+      <div class="estado-header">
+        <a href="/canal-de-denuncias" class="estado-back">← Volver al canal</a>
+        <h1 style="margin-top:12px">Estado de tu denuncia</h1>
+        {validFormat && (
+          <p class="estado-id-label">ID consultado: <code>{rawId}</code></p>
+        )}
+      </div>
+
+      {initial.ok && initial.denuncia && current && (
+        <div class={`estado-card estado-card-${current.color}`} data-od-id="estado-card">
+          <div class="estado-status-row">
+            <span class={`estado-pill estado-pill-${current.color}`}>{current.label}</span>
+            <span class="estado-updated">Última actualización: {fmt(initial.denuncia.updated_at)}</span>
+          </div>
+          <h2 class="estado-status-title">{current.label}</h2>
+          <p class="estado-status-desc">{current.desc}</p>
+
+          <div class="estado-timeline" data-od-id="estado-timeline">
+            {(STATUS_ORDER).map((s) => {
+              const order = STATUS_ORDER.indexOf(initial.denuncia!.status as typeof STATUS_ORDER[number]);
+              const idx = STATUS_ORDER.indexOf(s);
+              const state = order < 0 ? (initial.denuncia!.status === 'archived' ? 'archived' : 'pending') :
+                            (idx < order ? 'done' : idx === order ? 'active' : 'pending');
+              const meta = STATUS_LABELS[s];
+              return (
+                <div class={`estado-step estado-step-${state}`}>
+                  <div class="estado-step-dot">{idx + 1}</div>
+                  <div class="estado-step-text">
+                    <strong>{meta.label}</strong>
+                    <span>{meta.desc}</span>
+                  </div>
+                </div>
+              );
+            })}
+            {initial.denuncia.status === 'archived' && (
+              <div class="estado-step estado-step-archived-active">
+                <div class="estado-step-dot">5</div>
+                <div class="estado-step-text">
+                  <strong>Archivada</strong>
+                  <span>La denuncia fue cerrada y archivada.</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <details class="estado-details">
+            <summary>Detalles registrados</summary>
+            <dl class="estado-dl">
+              <dt>ID</dt><dd><code>{initial.denuncia.id}</code></dd>
+              <dt>Categoría</dt><dd>{initial.denuncia.categoria.replace(/_/g, ' ')}</dd>
+              {initial.denuncia.relacion && <><dt>Relación con GuardMan</dt><dd>{initial.denuncia.relacion}</dd></>}
+              {initial.denuncia.lugar && <><dt>Lugar</dt><dd>{initial.denuncia.lugar}</dd></>}
+              <dt>Fecha de creación</dt><dd>{fmt(initial.denuncia.created_at)}</dd>
+            </dl>
+          </details>
+
+          <div class="estado-cta">
+            <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-primary">Llamar al equipo de cumplimiento</a>
+            <a href={`mailto:${SITE.EMAIL_INFO}?subject=Consulta sobre denuncia ${initial.denuncia.id}`} class="btn btn-outline">Escribir a cumplimiento</a>
+          </div>
+          <p class="estado-foot">
+            Por seguridad, no mostramos el contenido de tu denuncia ni tus datos de contacto.
+            Si necesitas agregar antecedentes, contáctanos directamente indicando el ID.
+          </p>
+        </div>
+      )}
+
+      {!initial.ok && validFormat && (
+        <div class="estado-card estado-card-error" data-od-id="estado-card-error">
+          <div class="estado-pill estado-pill-red">No encontrada</div>
+          <h2 class="estado-status-title">No encontramos una denuncia con ese ID</h2>
+          <p class="estado-status-desc">
+            {initial.error ?? 'Verifica que esté bien escrito (formato D-YYYYMMDD-XXXX) o que no tenga espacios extra.'}
+          </p>
+          <a href="/canal-de-denuncias" class="btn btn-primary">Hacer una nueva denuncia</a>
+        </div>
+      )}
+
+      {!validFormat && (
+        <div class="estado-card estado-card-error" data-od-id="estado-card-error">
+          <div class="estado-pill estado-pill-red">ID inválido</div>
+          <h2 class="estado-status-title">El formato del ID no es correcto</h2>
+          <p class="estado-status-desc">
+            El ID de seguimiento tiene el formato <code>D-YYYYMMDD-XXXX</code> (por ejemplo <code>D-20260715-43NV</code>). Si lo perdiste, contáctanos directamente.
+          </p>
+          <a href="/canal-de-denuncias" class="btn btn-primary">Hacer una nueva denuncia</a>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .estado-header { padding: 40px 0 24px; }
+  .estado-back {
+    display: inline-block;
+    color: var(--muted);
+    font-size: 14px;
+    text-decoration: none;
+    margin-bottom: 8px;
+  }
+  .estado-back:hover { color: var(--accent); }
+  .estado-id-label { color: var(--muted); font-size: 14px; }
+  .estado-id-label code {
+    background: var(--bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+  }
+
+  .estado-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    margin-bottom: 64px;
+    box-shadow: var(--shadow-sm);
+  }
+  .estado-status-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
+  }
+  .estado-pill {
+    display: inline-flex; align-items: center;
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .estado-pill-amber  { background: #FEF3C7; color: #92400E; }
+  .estado-pill-blue   { background: #DBEAFE; color: #1E40AF; }
+  .estado-pill-violet { background: #EDE9FE; color: #5B21B6; }
+  .estado-pill-green  { background: #D1FAE5; color: #065F46; }
+  .estado-pill-gray   { background: #E5E7EB; color: #374151; }
+  .estado-pill-red    { background: #FEE2E2; color: #991B1B; }
+  .estado-updated { font-size: 12px; color: var(--muted); }
+  .estado-status-title { font-size: 28px; font-weight: 800; color: var(--primary); margin: 4px 0 8px; letter-spacing: -0.02em; }
+  .estado-status-desc { color: var(--muted); font-size: 15px; line-height: 1.6; margin: 0 0 24px; }
+
+  .estado-timeline { margin: 24px 0 32px; padding: 24px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .estado-step { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+  .estado-step:last-child { margin-bottom: 0; }
+  .estado-step-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--bg); color: var(--muted);
+    display: grid; place-items: center;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+  }
+  .estado-step-text strong { display: block; font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+  .estado-step-text span { display: block; font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .estado-step-done .estado-step-dot { background: var(--success); color: #fff; border-color: var(--success); }
+  .estado-step-done .estado-step-text strong { color: var(--muted); }
+  .estado-step-done .estado-step-text span { color: var(--muted-light, #ADB5BD); }
+  .estado-step-active .estado-step-dot { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59,130,246,.2); }
+  .estado-step-archived-active .estado-step-dot { background: #6B7280; color: #fff; border-color: #6B7280; }
+
+  .estado-details { margin: 24px 0; border-top: 1px solid var(--border); padding-top: 20px; }
+  .estado-details summary {
+    cursor: pointer; font-weight: 600; color: var(--primary);
+    font-size: 14px; padding: 4px 0;
+  }
+  .estado-dl { display: grid; grid-template-columns: 180px 1fr; gap: 8px 16px; margin: 12px 0 0; font-size: 14px; }
+  .estado-dl dt { color: var(--muted); font-weight: 500; }
+  .estado-dl dd { color: var(--fg); margin: 0; text-transform: capitalize; }
+
+  .estado-cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .estado-foot { font-size: 12px; color: var(--muted); margin: 16px 0 0; line-height: 1.5; }
+</style>
+
+<script>
+  // Refresca la página cada 60s mientras esté abierta para mostrar cambios
+  // en el estado (solo si el ID es válido). Sin hacer request extra a la API.
+  const meta = document.querySelector<HTMLElement>('.estado-card:not(.estado-card-error)');
+  if (meta) {
+    let lastUpdate = document.querySelector<HTMLElement>('.estado-updated')?.textContent ?? '';
+    setInterval(async () => {
+      try {
+        const id = window.location.pathname.split('/').pop();
+        if (!id) return;
+        const res = await fetch(`/api/denuncias/${id}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const updated = data?.denuncia?.updated_at;
+        if (updated && updated !== lastUpdate && lastUpdate !== '') {
+          window.location.reload();
+        }
+        lastUpdate = updated ?? lastUpdate;
+      } catch { /* silent */ }
+    }, 60_000);
+  }
+</script>

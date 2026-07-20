@@ -1,0 +1,189 @@
+---
+// LeadCTA — Componente reutilizable de CTA orientado a conversión.
+// Variantes: hero | inline | sticky | footer
+import { SITE } from '../lib/constants';
+import Icon from './Icon.astro';
+
+interface Props {
+  variant?: 'hero' | 'inline' | 'sticky' | 'footer' | 'dark';
+  title?: string;
+  subtitle?: string;
+  primaryText?: string;
+  primaryHref?: string;
+  secondaryText?: string;
+  secondaryHref?: string;
+  showPhone?: boolean;
+  trustBadges?: boolean;
+}
+
+const {
+  variant = 'inline',
+  title,
+  subtitle,
+  primaryText = 'Solicitar cotización',
+  primaryHref = '/cotizacion',
+  secondaryText,
+  secondaryHref,
+  showPhone = true,
+  trustBadges = false,
+} = Astro.props;
+
+const defaultTitles: Record<string, { title: string; subtitle: string }> = {
+  hero: {
+    title: 'Proteja lo que más le importa con GuardMan Chile',
+    subtitle: 'Cotización personalizada en menos de 24 horas hábiles. Guardias certificados OS-10, monitoreo propio 24/7 y el sistema autónomo Guardpod, único en el mercado chileno.',
+  },
+  inline: {
+    title: '¿Listo para proteger su propiedad?',
+    subtitle: 'Reciba una propuesta personalizada sin compromiso. Nuestro equipo comercial le contacta en menos de 24 horas hábiles.',
+  },
+  sticky: {
+    title: 'Cotización en 24 horas hábiles',
+    subtitle: 'Sin compromiso. Hable con un experto en seguridad.',
+  },
+  footer: {
+    title: 'Hablemos de su seguridad',
+    subtitle: 'Nuestro equipo comercial está disponible 24/7 para responder cualquier consulta y diseñar una solución a su medida.',
+  },
+  dark: {
+    title: 'Seguridad profesional, respuesta inmediata',
+    subtitle: 'Más de 200 guardias certificados y un equipo con más de 10 años de experiencia protegen lo que importa con certificación OS-10 y respaldo del sistema autónomo Guardpod.',
+  },
+};
+
+const content = { ...defaultTitles[variant], title: title ?? defaultTitles[variant].title, subtitle: subtitle ?? defaultTitles[variant].subtitle };
+
+const primaryTextDefault = 'Solicitar cotización';
+const finalPrimaryText = primaryText || primaryTextDefault;
+---
+
+{variant === 'hero' && (
+  <div class={`lead-cta lead-cta-hero`}>
+    <h2>{content.title}</h2>
+    <p>{content.subtitle}</p>
+    <div class="lead-cta-actions">
+      <a href={primaryHref} class="btn btn-primary btn-lg">
+        <Icon name="shield" size={16} />
+        {finalPrimaryText}
+      </a>
+      {secondaryText && secondaryHref && (
+        <a href={secondaryHref} class="btn btn-outline-light btn-lg">{secondaryText}</a>
+      )}
+      {showPhone && (
+        <a href={`tel:${SITE.PHONE_TEL}`} class="lead-cta-phone">
+          <Icon name="phone" size={16} />
+          <span>
+            <small>Llame ahora</small>
+            <strong>{SITE.PHONE}</strong>
+          </span>
+        </a>
+      )}
+    </div>
+    {trustBadges && (
+      <div class="lead-cta-trust">
+        <span><Icon name="check" size={14} /> Certificación OS-10</span>
+        <span><Icon name="check" size={14} /> Respuesta en 24h</span>
+        <span><Icon name="check" size={14} /> 10+ años de experiencia</span>
+        <span><Icon name="check" size={14} /> Sin compromiso</span>
+      </div>
+    )}
+  </div>
+)}
+
+{variant === 'inline' && (
+  <section class="lead-cta lead-cta-inline" data-od-id="lead-cta-inline">
+    <div class="container">
+      <div class="lead-cta-card">
+        <div class="lead-cta-content">
+          <h2>{content.title}</h2>
+          <p>{content.subtitle}</p>
+          <div class="lead-cta-actions">
+            <a href={primaryHref} class="btn btn-primary btn-lg">{finalPrimaryText}</a>
+            {showPhone && (
+              <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light">
+                <Icon name="phone" size={16} />
+                {SITE.PHONE}
+              </a>
+            )}
+          </div>
+        </div>
+        <div class="lead-cta-trust-vertical">
+          <div class="trust-item">
+            <Icon name="clock3" size={20} />
+            <div>
+              <strong>Respuesta en 24 horas hábiles</strong>
+              <span>Cotización personalizada</span>
+            </div>
+          </div>
+          <div class="trust-item">
+            <Icon name="shield" size={20} />
+            <div>
+              <strong>OS-10 certificado</strong>
+              <span>Autorizado por Carabineros</span>
+            </div>
+          </div>
+          <div class="trust-item">
+            <Icon name="check" size={20} />
+            <div>
+              <strong>Sin compromiso</strong>
+              <span>Asesoría gratuita</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+{variant === 'dark' && (
+  <section class="lead-cta lead-cta-dark" data-od-id="lead-cta-dark">
+    <div class="container">
+      <h2>{content.title}</h2>
+      <p>{content.subtitle}</p>
+      <div class="lead-cta-actions">
+        <a href={primaryHref} class="btn btn-primary btn-lg">{finalPrimaryText}</a>
+        {secondaryText && secondaryHref && (
+          <a href={secondaryHref} class="btn btn-outline-light btn-lg">{secondaryText}</a>
+        )}
+      </div>
+      {trustBadges && (
+        <div class="lead-cta-trust">
+          <span><Icon name="check" size={14} /> 200+ guardias certificados</span>
+          <span><Icon name="check" size={14} /> 10+ años de experiencia</span>
+          <span><Icon name="check" size={14} /> 14 comunas con cobertura</span>
+        </div>
+      )}
+    </div>
+  </section>
+)}
+
+{variant === 'footer' && (
+  <section class="lead-cta lead-cta-footer" data-od-id="lead-cta-footer">
+    <div class="container">
+      <div class="lead-cta-footer-grid">
+        <div>
+          <h2>{content.title}</h2>
+          <p>{content.subtitle}</p>
+        </div>
+        <div class="lead-cta-footer-actions">
+          <a href={primaryHref} class="btn btn-primary btn-lg">{finalPrimaryText}</a>
+          {showPhone && (
+            <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline">
+              <Icon name="phone" size={16} /> {SITE.PHONE}
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+{variant === 'sticky' && (
+  <div class="lead-cta-sticky" data-od-id="lead-cta-sticky">
+    <div>
+      <strong>{content.title}</strong>
+      <span>{content.subtitle}</span>
+    </div>
+    <a href={primaryHref} class="btn btn-primary btn-sm">{finalPrimaryText}</a>
+  </div>
+)}

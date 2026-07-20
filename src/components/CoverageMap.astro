@@ -1,0 +1,109 @@
+---
+// CoverageMap — mapa Leaflet con marcadores de las 14 comunas.
+// Replicación 1:1 del `renderMap()` + `buildHomeMapScript()` del original.
+// Carga Leaflet 1.9.4 desde unpkg.
+import { LOCATIONS, ZONE_COLORS, ZONE_DOT_COLORS, type Location } from '../lib/constants';
+
+interface Props {
+  id?: string;
+  height?: number;
+  showMarkers?: boolean;
+  zoom?: number;
+  centerLat?: number;
+  centerLng?: number;
+  variant?: 'light' | 'dark';
+}
+
+const {
+  id = 'map-home',
+  height = 420,
+  showMarkers = true,
+  zoom = 10,
+  centerLat = -33.45,
+  centerLng = -70.65,
+  variant = 'light',
+} = Astro.props;
+
+// Marcadores derivados de LOCATIONS (con coordenadas exactas).
+const markers = LOCATIONS.map((l: Location) => {
+  const zoneColorClass = ZONE_COLORS[l.zone] ?? 'blue';
+  const color = ZONE_DOT_COLORS[zoneColorClass] ?? '#3B82F6';
+  return { name: l.name, lat: l.lat, lng: l.lng, color, slug: l.slug };
+});
+
+const borderColor = variant === 'dark' ? 'rgba(255,255,255,.12)' : 'var(--border)';
+const bg = variant === 'dark' ? '#1a1a2e' : '#f8f9fa';
+const captionColor = variant === 'dark' ? 'rgba(255,255,255,.75)' : 'var(--muted)';
+---
+
+<link rel="stylesheet" href="/vendor/leaflet/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="" />
+
+<section class="bg-neutral" data-od-id="block-map">
+  <div class="container">
+    <h2 class="section-title" style="margin-bottom:8px">Mapa de cobertura</h2>
+    <p class="section-subtitle" style="margin-bottom:32px">Presencia operativa verificada en 14 comunas de la Región Metropolitana más Los Andes y San Felipe.</p>
+    <figure class="coverage-map">
+      <div
+        id={id}
+        style={`height:${height}px;border-radius:var(--radius-xl);border:1px solid ${borderColor};background:${bg}`}
+        data-lat={centerLat}
+        data-lng={centerLng}
+        data-zoom={zoom}
+      ></div>
+      <figcaption style={`font-size:13px;color:${captionColor};margin-top:8px`}>
+        GuardMan Chile — cobertura verificada en <strong>14 comunas</strong> de la Región Metropolitana.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<script is:inline src="/vendor/leaflet/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin=""></script>
+
+<script is:inline define:vars={{ id, centerLat, centerLng, zoom, markers, showMarkers }}>
+  (function () {
+    var d = document.getElementById(id);
+    if (!d || typeof L === 'undefined') return;
+    var map = L.map(d, {
+      center: [centerLat, centerLng],
+      zoom: zoom,
+      scrollWheelZoom: false,
+      zoomControl: true,
+      attributionControl: false,
+    });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; OpenStreetMap',
+    }).addTo(map);
+
+    if (showMarkers && markers.length > 0) {
+      var bounds = L.latLngBounds([]);
+      for (var i = 0; i < markers.length; i++) {
+        var m = markers[i];
+        var mk = L.circleMarker([m.lat, m.lng], {
+          radius: 8,
+          fillColor: m.color,
+          color: '#fff',
+          weight: 2,
+          fillOpacity: 1,
+        })
+          .addTo(map)
+          .bindPopup(
+            '<strong>' + m.name + '</strong><br><a href="/ubicaciones/' + m.slug + '" style="font-size:12px;font-weight:600;color:#3B82F6">Ver cobertura &rarr;</a>',
+          );
+        bounds.extend([m.lat, m.lng]);
+      }
+      map.fitBounds(bounds.pad(0.15));
+    } else {
+      L.circleMarker([centerLat, centerLng], {
+        radius: 10,
+        fillColor: '#3B82F6',
+        color: '#fff',
+        weight: 2,
+        fillOpacity: 0.9,
+      })
+        .addTo(map)
+        .bindPopup('<strong>GuardMan Chile</strong>')
+        .openPopup();
+    }
+  })();
+</script>

@@ -1,0 +1,92 @@
+---
+// /servicios — hub de servicios.
+// v5.2 — Copy único por página, español neutro, estructura y componentes preservados.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SERVICE_NAMES, SITE } from '../../lib/constants';
+import { SERVICES } from '../../lib/content';
+import { SERVICE_ICONS } from '../../lib/icons';
+import Icon from '../../components/Icon.astro';
+
+const services = Object.entries(SERVICE_NAMES).map(([slug, name]) => ({
+  slug,
+  name,
+  description: SERVICES[slug].shortDesc,
+  icon: SERVICE_ICONS[slug] ?? '',
+}));
+
+
+---
+
+<BaseLayout
+  title="Servicios de Seguridad Privada OS-10 en Chile"
+  description="Catálogo de servicios de seguridad privada de GuardMan Chile: guardias OS-10, CCTV, control de accesos, PPI (Protección de Personas Importantes), monitoreo 24/7, el sistema autónomo Guardpod, Ajax Systems Grade 3, auditoría y aseo. Cobertura en 14 comunas de la Región Metropolitana y Valparaíso."
+  breadcrumb="Servicios"
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Servicios', url: '/servicios' }]}
+  showCluster={true}
+  clusterType="ubicaciones"
+>
+  <section class="hub-hero" data-od-id="hero">
+    <div class="container">
+      <h1>Nuestros servicios</h1>
+      <p>Soluciones integrales de seguridad privada con certificación OS-10. Personal entrenado en academia propia, tecnología de origen europeo y la unidad autónoma Guardpod, exclusiva de GuardMan en Chile. Cobertura operativa en 14 comunas de la Región Metropolitana y Valparaíso.</p>
+    </div>
+  </section>
+
+  <section class="bg-neutral" data-od-id="grid">
+    <div class="container">
+      <div class="services-grid">
+        {services.map((s) => (
+          <a href={`/servicios/${s.slug}`} class="service-card">
+            <div class="service-image">
+              <img src={`/images/service-${s.slug}.webp`} alt={s.name} loading="lazy" onerror="this.style.display='none'" />
+            </div>
+            <div class="service-body">
+              <div class="service-icon">
+                <Icon name={s.slug} size={22} />
+              </div>
+              <h2>{s.name}</h2>
+              <p>{s.description}</p>
+              <span class="service-cta">Ver detalles →</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white-section" data-od-id="why-us">
+    <div class="container">
+      <span class="section-label">Por qué elegirnos</span>
+      <h2 class="section-title">Servicios profesionales con certificación OS-10</h2>
+      <p class="section-subtitle">Contamos con academia propia donde formamos a nuestros guardias bajo estándares superiores al mínimo legal, sumada a una central de monitoreo propia 24/7 y a la unidad autónoma Guardpod, única en el mercado chileno.</p>
+      <div class="why-grid-hub">
+        <div class="why-card-hub">
+          <Icon name="shield" size={36} />
+          <h3>Personal certificado OS-10</h3>
+          <p>Cada guardia acredita certificación vigente emitida por la Prefectura de Seguridad Privada de Carabineros de Chile.</p>
+        </div>
+        <div class="why-card-hub">
+          <Icon name="monitor" size={36} />
+          <h3>Central de monitoreo 24/7</h3>
+          <p>Supervisión permanente desde nuestras propias instalaciones, sin tercerizar la operación ni los tiempos de respuesta.</p>
+        </div>
+        <div class="why-card-hub">
+          <Icon name="location" size={36} />
+          <h3>Cobertura regional</h3>
+          <p>14 comunas de la Región Metropolitana más Los Andes y San Felipe en Valparaíso, con capacidad de respuesta coordinada.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-dark" data-od-id="cta">
+    <div class="container" style="text-align:center;padding:80px 0">
+      <h2 class="section-title" style="color:#fff">¿No sabe qué servicio necesita?</h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.7);max-width:600px;margin:0 auto 28px">Nuestro equipo comercial le ayuda a identificar la combinación adecuada para su propiedad. Solicite una evaluación gratuita sin compromiso y reciba una propuesta en 24 horas hábiles.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="/contacto" class="btn btn-primary btn-lg">Contactar a un experto</a>
+        <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg"><Icon name="phone" size={16} /> {SITE.PHONE}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

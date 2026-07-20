@@ -1,0 +1,41 @@
+---
+// Icon — único punto de uso para todos los SVG iconos del sitio público.
+// Centraliza tamaño, stroke-width y color (currentColor).
+//
+// Uso:
+//   <Icon name="check" size={16} />
+//   <Icon name="residencial" size={24} class="my-icon" />
+//
+// Reglas:
+//   - name debe existir en SECTOR_ICONS, SERVICE_ICONS o ICONS (lib/icons.ts).
+//   - size default 20. Tamaños sugeridos: 14, 16, 20, 24, 32.
+//   - Color siempre currentColor (heredado del contexto).
+//   - stroke-width se controla en la definición del icono (default 2).
+import { ICONS, SERVICE_ICONS, SECTOR_ICONS } from '../lib/icons';
+
+interface Props {
+  name: string;
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 20, class: className } = Astro.props;
+
+const all = { ...ICONS, ...SERVICE_ICONS, ...SECTOR_ICONS } as Record<string, string>;
+const rawSvg = all[name] ?? null;
+
+if (!rawSvg) {
+  throw new Error(
+    `<Icon> "${name}" no existe en ICONS, SERVICE_ICONS ni SECTOR_ICONS. ` +
+    `Agrégalo en src/lib/icons.ts.`,
+  );
+}
+
+// Inyecta width/height (los iconos vienen con viewBox pero sin tamaño en el HTML).
+// class se aplica al <svg> para que el consumidor pueda estilar vía CSS.
+const svg = rawSvg.replace(
+  /^<svg /,
+  `<svg width="${size}" height="${size}"${className ? ` class="${className}"` : ''} `,
+);
+---
+<Fragment set:html={svg} />

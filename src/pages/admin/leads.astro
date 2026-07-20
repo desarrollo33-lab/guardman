@@ -1,0 +1,9 @@
+---
+// /admin/leads — Listado de leads con filtros.
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import LeadsList from '../../islands/crm/LeadsList.tsx';
+---
+
+<AdminLayout title="Leads" section="leads">
+  <LeadsList client:only="react" />
+</AdminLayout>

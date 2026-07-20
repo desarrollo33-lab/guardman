@@ -1,0 +1,266 @@
+---
+// BaseLayout — Layout raíz del sitio público v5.2
+// SEO+GEO ready: schemas Service/ServiceArea/Place/Review, geo meta,
+// hreflang, OG article, theme-color, sitemap enrichment.
+// v5.2: título sin separadores `|` o `-`; español neutro; design tokens unificados.
+import '../styles/global.css';
+import '../styles/design-tokens.css';
+import '../styles/components.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import RelatedLinks from '../components/RelatedLinks.astro';
+import Analytics from '../components/Analytics.astro';
+import { SITE } from '../lib/constants';
+import {
+  organizationSchema,
+  localBusinessSchema,
+  serviceSchema,
+  locationSchema,
+  breadcrumbSchema,
+  faqSchema,
+  articleSchema,
+  speakableSchema,
+  websiteSchema,
+  geoMetaTags,
+  hreflangTags,
+  type BreadcrumbItem,
+} from '../lib/seo';
+import type { Location } from '../lib/constants';
+
+interface Props {
+  title: string;
+  description?: string;
+  canonical?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  /** 'light' (sitio público) | 'dark' (Guard Pod / Ajax). Por defecto light. */
+  theme?: 'light' | 'dark';
+  /** Cargar dark.css (override para páginas dark). */
+  loadDarkCss?: boolean;
+  /** Etiqueta de breadcrumb (ej. "Servicios", "Las Condes"). */
+  breadcrumb?: string;
+  /** Schema LocalBusiness (homepage). */
+  localBusiness?: boolean;
+  /** Schema Product/Servicio (páginas de servicio). */
+  product?: {
+    name: string;
+    description: string;
+    image?: string;
+    url?: string;
+  };
+  /** Schema Service (servicios). */
+  service?: {
+    slug: string;
+    name: string;
+    description: string;
+    url: string;
+    image?: string;
+    category?: string;
+  };
+  /** Schema ServiceArea + Place (páginas de ubicación). */
+  location?: Location;
+  /** Schema FAQPage (páginas con preguntas frecuentes). */
+  faq?: { question: string; answer: string }[];
+  /** Schema Article (contenido editorial). */
+  article?: {
+    headline: string;
+    description: string;
+    image?: string;
+    datePublished?: string;
+    dateModified?: string;
+    author?: string;
+  };
+  /** Items para BreadcrumbList schema. */
+  breadcrumbs?: BreadcrumbItem[];
+  /** Mostrar cluster de links relacionados al final. */
+  showCluster?: boolean;
+  /** Cluster tipo: servicios | ubicaciones | sectores | servicio | ubicacion | sector. */
+  clusterType?: 'servicios' | 'ubicaciones' | 'sectores' | 'servicio' | 'ubicacion' | 'sector';
+  /** Slug del item actual (para excluirlo del cluster). */
+  clusterExclude?: string;
+}
+
+const {
+  title,
+  description = SITE.DESCRIPTION,
+  canonical,
+  ogImage = '/images/og-default.jpg',
+  noindex = false,
+  theme = 'light',
+  loadDarkCss = false,
+  breadcrumb,
+  localBusiness = false,
+  product,
+  service,
+  location,
+  faq,
+  article,
+  breadcrumbs,
+  showCluster = false,
+  clusterType,
+  clusterExclude,
+} = Astro.props;
+
+const url = canonical ?? new URL(Astro.url.pathname, SITE.URL).href;
+// v5.2: títulos sin separadores `|` o `-`. Se concatena con espacio natural.
+// Cada page ya entrega su title en español neutro sin guiones ni pipes.
+const fullTitle = title.includes(SITE.NAME) ? title : `${title} ${SITE.NAME}`;
+const ogType = article ? 'article' : 'website';
+const publishedISO = article?.datePublished ?? '2024-01-01';
+const modifiedISO = article?.dateModified ?? new Date().toISOString().slice(0, 10);
+
+// ── Schemas ─────────────────────────────────────────────────────
+const orgLd = organizationSchema();
+const websiteLd = websiteSchema();
+const localBusinessLd = localBusiness ? localBusinessSchema() : null;
+const serviceLd = service ? serviceSchema(service) : null;
+const productLd = product
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: product.name,
+      description: product.description,
+      image: product.image ? new URL(product.image, SITE.URL).href : `${SITE.URL}/favicon.svg`,
+      url: product.url ?? url,
+      brand: { '@type': 'Brand', name: SITE.NAME },
+      provider: { '@type': 'Organization', name: SITE.NAME, url: SITE.URL },
+      category: 'Seguridad Privada',
+    }
+  : null;
+const locationLd = location ? locationSchema({ location }) : null;
+const articleLd = article
+  ? articleSchema({ ...article, url: Astro.url.pathname })
+  : null;
+const faqLd = faq && faq.length > 0 ? faqSchema(faq) : null;
+const breadcrumbLd =
+  (breadcrumbs && breadcrumbs.length > 0) || breadcrumb
+    ? breadcrumbSchema(
+        breadcrumbs && breadcrumbs.length > 0
+          ? breadcrumbs
+          : [{ name: breadcrumb!, url: Astro.url.pathname }],
+      )
+    : null;
+const speakableLd = speakableSchema(Astro.url.pathname);
+
+// Todos los JSON-LD en un array para imprimir
+const allSchemas = [
+  orgLd, websiteLd, localBusinessLd, serviceLd, productLd,
+  ...(locationLd ?? []), articleLd, faqLd, breadcrumbLd, speakableLd,
+].filter(Boolean);
+
+const geoTags = geoMetaTags();
+const hreflangs = hreflangTags(Astro.url.pathname);
+---
+
+<!doctype html>
+<html lang="es-CL">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={SITE.LEGAL_NAME} />
+    <meta name="language" content="Spanish" />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="rating" content="general" />
+    <meta name="distribution" content="global" />
+    <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'} />
+
+    {/* Canonical */}
+    <link rel="canonical" href={url} />
+
+    {/* Hreflang multi-región */}
+    {hreflangs.map((h) => (
+      <link rel="alternate" hreflang={h.hreflang} href={h.href} />
+    ))}
+
+    {/* Geo + misc meta tags */}
+    {geoTags.map((t) => (
+      <meta name={t.name} content={t.content} />
+    ))}
+
+    {/* OpenGraph */}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={url} />
+    <meta property="og:image" content={new URL(ogImage, SITE.URL).href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={fullTitle} />
+    <meta property="og:locale" content="es_CL" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:locale:alternate" content="es_419" />
+    <meta property="og:site_name" content={SITE.NAME} />
+    {article && (
+      <>
+        <meta property="article:published_time" content={publishedISO} />
+        <meta property="article:modified_time" content={modifiedISO} />
+        <meta property="article:author" content={article.author ?? SITE.LEGAL_NAME} />
+        <meta property="article:section" content="Seguridad Privada" />
+        <meta property="article:publisher" content={SITE.URL} />
+      </>
+    )}
+
+    {/* Twitter Card */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(ogImage, SITE.URL).href} />
+    <meta name="twitter:image:alt" content={fullTitle} />
+    <meta name="twitter:label1" content="Escrito por" />
+    <meta name="twitter:data1" content={SITE.LEGAL_NAME} />
+    <meta name="twitter:label2" content="Tiempo de lectura" />
+    <meta name="twitter:data2" content="3 min" />
+
+    {/* Icons + PWA */}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="mask-icon" href="/favicon.svg" color="#1A2744" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    {/* Preload Inter Variable (única fuente del sitio) — quita 5 TTF de la cadena crítica */}
+    <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin />
+
+    {/* Preload del CSS legacy — baja el render-blocking efectivo (download en paralelo, ya en cache al aplicar) */}
+    <link rel="preload" href="/styles/site.css?v=20260720" as="style" />
+
+    {/* CSS originales (preservados 1:1) */}
+    <link rel="stylesheet" href="/styles/site.css?v=20260720" />
+    {loadDarkCss && <link rel="stylesheet" href="/styles/dark.css?v=20260720" />}
+
+    {/* JSON-LD structured data — todos los schemas */}
+    {allSchemas.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
+
+    <slot name="head" />
+  </head>
+  <body data-theme={theme} class:list={[theme === 'dark' && 'dark-page']}>
+    <a href="#main-content" class="skip-link">Saltar al contenido</a>
+    <Header theme={theme} />
+
+    {breadcrumb && (
+      <nav class="breadcrumb" data-od-id="breadcrumb" aria-label="Breadcrumb">
+        <div class="breadcrumb-inner">
+          <a href="/">Inicio</a>
+          <span class="breadcrumb-sep">/</span>
+          <span aria-current="page">{breadcrumb}</span>
+        </div>
+      </nav>
+    )}
+
+    <main id="main-content">
+      <slot />
+      {showCluster && clusterType && (
+        <RelatedLinks type={clusterType} exclude={clusterExclude} />
+      )}
+    </main>
+
+    <Footer />
+    <Analytics />
+    <script is:inline src="/scripts/main.js"></script>
+    <script is:inline src="/scripts/yt-lite.js"></script>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+{
+  "name": "GuardMan Chile — Seguridad Privada Profesional",
+  "short_name": "GuardMan",
+  "description": "Seguridad privada con certificación OS-10. Guardias, CCTV, control de accesos, monitoreo 24/7.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#1A2744",
+  "theme_color": "#1A2744",
+  "lang": "es-CL",
+  "dir": "ltr",
+  "orientation": "portrait-primary",
+  "categories": ["business", "security", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Solicitar cotización",
+      "short_name": "Cotizar",
+      "url": "/cotizacion",
+      "description": "Recibe una propuesta personalizada en menos de 24 horas"
+    },
+    {
+      "name": "Contacto",
+      "short_name": "Contacto",
+      "url": "/contacto"
+    },
+    {
+      "name": "Cobertura",
+      "short_name": "Cobertura",
+      "url": "/ubicaciones"
+    }
+  ]
+}

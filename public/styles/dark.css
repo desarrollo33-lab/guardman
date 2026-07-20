@@ -1,0 +1,112 @@
+/* ═══════════ GuardMan Chile — Dark Theme ═══════════ */
+/* Include AFTER shared.css for Guard Pod and Ajax Systems */
+/* Uses !important to override Tailwind v4 @layer resets */
+
+:root{--bg-dark:#0A1019}
+body{font-family:var(--font)!important;color:#fff!important;line-height:1.5!important;-webkit-font-smoothing:antialiased;background:var(--bg-dark)!important}
+
+/* ── Header dark ── */
+[data-od-id="header"]{background:rgba(10,16,25,.92)!important;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.06);box-shadow:none}
+.logo{font-weight:800!important;font-size:22px!important;color:#fff!important}
+nav a{color:rgba(255,255,255,.85)!important;font-size:15px!important;font-weight:500!important;transition:color .2s}nav a:hover,nav a.active{color:#fff!important}
+/* Dropdown menus del header — fondo blanco del site.css + texto blanco del body dark = invisible. Override: */
+[data-od-id="header"] .dropdown-menu{background:rgba(15,23,41,.96)!important;border:1px solid rgba(255,255,255,.06)!important;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+[data-od-id="header"] .dropdown-menu a{color:rgba(255,255,255,.85)!important}
+[data-od-id="header"] .dropdown-menu a:hover{background:rgba(59,130,246,.12)!important;color:#fff!important}
+.header-phone{color:rgba(255,255,255,.85)!important}.header-phone svg{width:16px!important;height:16px!important;color:var(--accent)!important}
+.header-right{display:flex!important;align-items:center!important;gap:16px!important;flex-shrink:0}
+.btn-primary{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important;box-shadow:0 0 20px rgba(59,130,246,.3)}.btn-primary:hover{background:var(--accent-hover)!important;transform:translateY(-1px);box-shadow:0 0 30px rgba(59,130,246,.5)}
+.btn-ghost{background:transparent!important;color:#fff!important;border-color:rgba(255,255,255,.2)!important}.btn-ghost:hover{background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.4)!important}
+.btn-outline-light{background:transparent!important;color:#fff!important;border-color:rgba(255,255,255,.2)!important}.btn-outline-light:hover{background:rgba(255,255,255,.08)!important}
+
+/* ── Breadcrumb dark ── */
+[data-od-id="breadcrumb"]{background:#151d2b!important;border-bottom:1px solid rgba(255,255,255,.06)}
+.breadcrumb-inner{color:rgba(255,255,255,.4)!important}.breadcrumb-inner a{color:rgba(255,255,255,.4)!important}.breadcrumb-inner a:hover{color:var(--accent)!important}.breadcrumb-inner span{color:rgba(255,255,255,.6)!important}.breadcrumb-sep{color:rgba(255,255,255,.2)!important}
+
+/* ── Section labels ── */
+.section-label{color:var(--accent)!important}.section-title{color:#fff!important}.section-subtitle{color:rgba(255,255,255,.6)!important}
+
+/* ── Hero dark theme adjustments ── */
+.hero{padding:96px 0!important}@media(max-width:767px){.hero{padding:64px 0!important}}@media(min-width:1024px){.hero{padding:120px 0!important}}
+.hero::before{top:-50%!important;left:50%!important;transform:translateX(-50%)!important;width:900px!important;height:900px!important;background:radial-gradient(circle,rgba(59,130,246,.18),transparent 60%)!important}
+.hero h1 span{background:linear-gradient(135deg,#60A5FA,#93C5FD)!important;-webkit-background-clip:text!important;-webkit-text-fill-color:transparent!important;background-clip:text!important}
+.hero-product{width:100%!important;aspect-ratio:4/3!important;background:radial-gradient(ellipse at center,rgba(59,130,246,.12),transparent 70%)!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:var(--radius-xl)!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;position:relative!important}.hero-product img{width:100%!important;height:100%!important;object-fit:cover!important;opacity:.85!important}
+.hero-visual{display:flex!important;align-items:center!important;justify-content:center!important}
+
+/* ── Feature cards dark ── */
+.feature-grid{display:grid!important;grid-template-columns:1fr!important;gap:16px!important;margin-top:32px!important}@media(min-width:640px){.feature-grid{grid-template-columns:repeat(2,1fr)!important}}
+.feature-card{padding:24px!important;background:rgba(255,255,255,.03)!important;border:1px solid rgba(255,255,255,.06)!important;border-radius:var(--radius-lg)!important;transition:all .25s}.feature-card:hover{border-color:rgba(59,130,246,.25)!important;background:rgba(59,130,246,.04)!important}
+.feature-card-icon{width:40px!important;height:40px!important;border-radius:var(--radius-md)!important;background:rgba(59,130,246,.15)!important;display:flex!important;align-items:center!important;justify-content:center!important;margin-bottom:14px!important;color:var(--accent)!important}.feature-card-icon svg{width:20px!important;height:20px!important}
+.feature-card h3{font-size:16px!important;font-weight:700!important;margin-bottom:6px!important;color:#fff!important}.feature-card p{font-size:14px!important;color:rgba(255,255,255,.5)!important;line-height:1.5!important}
+
+/* ── Problems dark ── */
+.problems-grid{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;margin-top:28px!important}@media(min-width:640px){.problems-grid{grid-template-columns:repeat(3,1fr)!important}}@media(max-width:767px){.problems-grid{grid-template-columns:1fr!important}}
+.problem-card{padding:20px!important;background:rgba(255,255,255,.03)!important;border:1px solid rgba(255,255,255,.06)!important;border-radius:var(--radius-lg)!important;display:flex!important;gap:12px!important}.problem-card svg{width:20px!important;height:20px!important;color:var(--warning)!important;flex-shrink:0!important;margin-top:2px!important}.problem-card p{font-size:14px!important;color:rgba(255,255,255,.5)!important;line-height:1.55!important}
+
+/* ── FAQ dark ── */
+.faq details{border:1px solid rgba(255,255,255,.06)!important;background:rgba(255,255,255,.02)!important}.faq summary{color:#fff!important}.faq summary::after{color:rgba(255,255,255,.25)!important}.faq .answer{color:rgba(255,255,255,.45)!important}
+
+/* ── Split dark ── */
+.split-text p{font-size:16px!important;color:rgba(255,255,255,.5)!important;line-height:1.7!important;margin-bottom:16px!important}
+.split-image{border-radius:var(--radius-xl)!important;overflow:hidden!important;background:radial-gradient(ellipse at center,rgba(59,130,246,.08),transparent 70%)!important;border:1px solid rgba(255,255,255,.06)!important}.split-image img{width:100%!important;display:block!important}
+
+/* ── Why grid dark ── */
+.why-grid{display:grid!important;grid-template-columns:1fr!important;gap:20px!important;margin-top:32px!important}@media(min-width:640px){.why-grid{grid-template-columns:repeat(3,1fr)!important}}
+.why-card{padding:20px!important;background:rgba(255,255,255,.025)!important;border:1px solid rgba(255,255,255,.05)!important;border-radius:var(--radius-lg)!important;text-align:center!important}.why-card svg{width:36px!important;height:36px!important;color:var(--accent)!important;margin-bottom:12px!important}.why-card h4{font-size:16px!important;font-weight:700!important;color:#fff!important;margin-bottom:6px!important}.why-card p{font-size:14px!important;color:rgba(255,255,255,.45)!important;line-height:1.5!important}
+
+/* ── Stats dark ── */
+.stats-row{padding:40px 0!important;background:rgba(255,255,255,.015)!important;border-top:1px solid rgba(255,255,255,.04)!important;border-bottom:1px solid rgba(255,255,255,.04)!important}
+.stats-grid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:24px!important}@media(min-width:640px){.stats-grid{grid-template-columns:repeat(4,1fr)!important}}.stat-item{text-align:center!important}.stat-value{font-size:32px!important;font-weight:800!important;color:#fff!important}.stat-label{font-size:13px!important;color:rgba(255,255,255,.4)!important;margin-top:4px!important}
+
+/* ── CTA dark ── */
+.cta-band{padding:80px 0!important;text-align:center!important;position:relative!important;overflow:hidden!important;background:transparent!important}.cta-band::before{content:''!important;position:absolute!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;width:600px!important;height:600px!important;background:radial-gradient(circle,rgba(59,130,246,.1),transparent 60%)!important;border-radius:50%!important}.cta-band .container{position:relative!important;z-index:1!important}.cta-band .section-title{max-width:600px!important;margin:0 auto 12px!important}.cta-band .section-subtitle{max-width:500px!important;margin:0 auto 28px!important;color:rgba(255,255,255,.5)!important}
+
+/* ── Section dark utility ── */
+.section-dark{background:rgba(255,255,255,.04)!important}
+
+/* ── All sections visible on dark ── */
+section{background:transparent!important}
+section .container{color:#fff!important}
+section .section-label{color:var(--accent)!important}
+section .section-title{color:#fff!important}
+section p{color:rgba(255,255,255,.7)!important}
+
+/* ── Split layout dark ── */
+.split{display:grid;grid-template-columns:1fr;gap:48px;align-items:center!important}@media(min-width:1024px){.split{grid-template-columns:1fr 1fr!important}}
+.split-text p{color:rgba(255,255,255,.7)!important;line-height:1.7!important;margin-bottom:16px!important}
+.split-image{border-radius:var(--radius-xl)!important;overflow:hidden!important;background:rgba(255,255,255,.05)!important;border:1px solid rgba(255,255,255,.1)!important}
+.split-image img{width:100%!important;display:block!important}
+
+/* ── Hero stats dark ── */
+.hero-stats{display:flex;gap:40px;flex-wrap:wrap;padding-top:24px;border-top:1px solid rgba(255,255,255,.1)!important}
+.hero-stat-value{font-size:24px!important;font-weight:800!important;color:#fff!important}
+.hero-stat-label{font-size:13px!important;color:rgba(255,255,255,.5)!important;margin-top:2px!important}
+
+/* ── Hero visual dark ── */
+.hero-visual{display:flex!important;align-items:center!important;justify-content:center!important}
+.hero-product{width:100%!important;aspect-ratio:4/3!important;background:radial-gradient(ellipse at center,rgba(59,130,246,.15),transparent 70%)!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:var(--radius-xl)!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;position:relative!important}
+.hero-product img{width:100%!important;height:100%!important;object-fit:cover!important;opacity:.9!important}
+
+/* ── FAQ dark ── */
+.faq details{border:1px solid rgba(255,255,255,.1)!important;background:rgba(255,255,255,.03)!important;border-radius:var(--radius-lg)!important;margin-bottom:8px!important;overflow:hidden!important}
+.faq summary{padding:16px 20px!important;font-weight:600!important;font-size:16px!important;cursor:pointer!important;color:#fff!important;display:flex!important;justify-content:space-between!important;align-items:center!important}
+.faq summary::after{content:'+'!important;font-size:22px!important;color:rgba(255,255,255,.3)!important;transition:transform .25s!important}
+.faq details[open] summary::after{content:'−'!important}
+.faq .answer{padding:0 20px 18px!important;color:rgba(255,255,255,.6)!important;line-height:1.7!important;font-size:15px!important}
+
+/* ── CTA band dark ── */
+.cta-band{background:rgba(255,255,255,.03)!important;border-top:1px solid rgba(255,255,255,.06)!important;border-bottom:1px solid rgba(255,255,255,.06)!important}
+
+/* ── Footer dark ── */
+[data-od-id="footer"]{background:rgba(0,0,0,.3)!important;color:rgba(255,255,255,.5)!important;border-top:1px solid rgba(255,255,255,.06)}
+.footer-col h4{color:rgba(255,255,255,.7)!important}.footer-col a{color:rgba(255,255,255,.4)!important}.footer-col a:hover{color:rgba(255,255,255,.7)!important}
+.footer-bottom{border-top-color:rgba(255,255,255,.06)!important}
+
+/* ── Ajax / Guard Pod contrast fixes ── */
+body[data-theme="dark"] .hero-sub{color:rgba(255,255,255,.55)!important}
+body[data-theme="dark"] .hero-trust-item{color:rgba(255,255,255,.5)!important}
+body[data-theme="dark"] .hero-stat-label{color:rgba(255,255,255,.5)!important}
+body[data-theme="dark"] .section-dark .feature-card p,
+body[data-theme="dark"] .why-card p{color:rgba(255,255,255,.85)!important}
+body[data-theme="dark"] .stat-label,
+body[data-theme="dark"] .section-subtitle{color:rgba(255,255,255,.65)!important}

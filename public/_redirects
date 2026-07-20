@@ -1,0 +1,5 @@
+# Cloudflare Workers — redirecciones.
+# Cada ruta del admin es una página Astro real, no necesita rewrite.
+
+# Home alias
+/home / 301

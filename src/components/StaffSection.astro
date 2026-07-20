@@ -1,0 +1,44 @@
+---
+// StaffSection — sección "Personal que marca la diferencia" con layout split
+// (imagen + 5 staff-check items). Estilos en public/styles/site.css.
+//
+// Replica 1:1 del modelo que vive en /nosotros, ahora centralizado y reusable
+// en sectores, servicios, ubicaciones y combos servicio×ubicación.
+//
+// data-od-id="staff" se mantiene para no romper tracking externo.
+import Icon from './Icon.astro';
+
+const staffPoints = [
+  'Guardias con certificación OS-10, rigurosamente seleccionados y entrenados para proteger su patrimonio con profesionalismo.',
+  'Capacitación continua en protocolos de seguridad, manteniendo a nuestro personal actualizado frente a nuevas amenazas y tecnologías.',
+  'Central de monitoreo propia 24/7 con operadores especializados que supervisan en tiempo real cada alerta y emergencia.',
+  'Más de 10 años de trayectoria protegiendo empresas y residencias, respaldados por una historia de confianza y resultados.',
+  'Coordinación directa con Carabineros para una respuesta rápida y efectiva ante cualquier incidente de seguridad.',
+];
+---
+
+<section class="staff-section" data-od-id="staff">
+  <div class="container split">
+    <div class="split-image">
+      <img
+        src="/images/nosotros_seccion.webp"
+        alt="Personal GuardMan Chile en formación"
+        loading="lazy"
+        onerror="this.style.display='none';this.parentElement.style.minHeight='360px'"
+      />
+    </div>
+    <div>
+      <span class="section-label">Personal que marca la diferencia</span>
+      <h2 class="section-title">El equipo detrás de cada operación</h2>
+      <p style="color:rgba(255,255,255,.85);font-size:16px;line-height:1.6;margin-bottom:24px">
+        Nuestros guardias son la base de la confianza que los clientes depositan en nosotros. Cada uno pasa por un proceso riguroso de selección, certificación y formación continua.
+      </p>
+      {staffPoints.map((p) => (
+        <div class="staff-check">
+          <Icon name="check" size={20} />
+          {p}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

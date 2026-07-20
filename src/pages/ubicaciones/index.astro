@@ -1,0 +1,151 @@
+---
+// /ubicaciones — hub de comunas con mapa Leaflet.
+// v5.2 — Copy único, español neutro, estructura y componentes preservados.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LOCATIONS, ZONE_CONTEXT, ZONE_COLORS, SITE } from '../../lib/constants';
+import Icon from '../../components/Icon.astro';
+
+const locations = LOCATIONS.map((l) => ({
+  slug: l.slug,
+  name: l.name,
+  context: ZONE_CONTEXT[l.slug] ?? '',
+  zoneColorClass: ZONE_COLORS[l.zone] ?? 'blue',
+}));
+
+const markers = LOCATIONS.map((l) => ({
+  name: l.name,
+  lat: l.lat,
+  lng: l.lng,
+  slug: l.slug,
+  color: { red: '#EF4444', blue: '#3B82F6', yellow: '#F59E0B', purple: '#8B5CF6', green: '#10B981' }[ZONE_COLORS[l.zone] ?? 'blue'] ?? '#3B82F6',
+}));
+
+// Group by zone for visual variety
+const ZONES = ['Oriente', 'Centro', 'Norte', 'Poniente', 'Sur', 'Valparaíso'];
+const locationsByZone = ZONES.map((zone) => ({
+  zone,
+  locations: locations.filter((l) => {
+    const loc = LOCATIONS.find((ll) => ll.slug === l.slug);
+    return loc && loc.zone === zone;
+  }),
+})).filter((z) => z.locations.length > 0);
+---
+
+<BaseLayout
+  title="Cobertura de Seguridad Privada en Santiago y Valparaíso"
+  description="GuardMan Chile cubre 14 comunas de la Región Metropolitana más Los Andes y San Felipe. Personal OS-10 disponible en Las Condes, Vitacura, Lo Barnechea, Providencia, Santiago Centro, Huechuraba, Quilicura y más. Mapa operativo verificado."
+  breadcrumb="Ubicaciones"
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Ubicaciones', url: '/ubicaciones' }]}
+  showCluster={true}
+  clusterType="servicios"
+>
+  <section class="hub-hero" data-od-id="hero">
+    <div class="container">
+      <h1>Nuestra cobertura</h1>
+      <p>Presencia directa en 14 comunas de la Región Metropolitana, más Los Andes y San Felipe en Valparaíso. Personal y supervisores zonales que conocen el territorio, con capacidad de respuesta coordinada entre comunas y respaldo de la central de monitoreo propia 24/7.</p>
+    </div>
+  </section>
+
+  <section class="bg-neutral" data-od-id="grid">
+    <div class="container">
+      <div class="locations-grid-hub">
+        {locations.map((l) => (
+          <a href={`/ubicaciones/${l.slug}`} class="location-card-hub">
+            <span class={`zone-dot dot-${l.zoneColorClass}`}></span>
+            <div>
+              <h3>{l.name}</h3>
+              <p>{l.context.split(',')[0]}.</p>
+            </div>
+            <span class="card-arrow">→</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white-section" data-od-id="map-section">
+    <div class="container">
+      <span class="section-label">Mapa interactivo</span>
+      <h2 class="section-title">14 comunas en el mapa</h2>
+      <p class="section-subtitle">Haga clic en cada marcador para ver detalles de la comuna y solicitar cotización.</p>
+      <figure class="coverage-map">
+        <div id="map-ubicaciones" style="height:480px;border-radius:var(--radius-xl);border:1px solid var(--border)"></div>
+        <figcaption style="font-size:13px;color:var(--muted);margin-top:8px;text-align:center">
+          Cobertura operativa verificada en 14 comunas de la Región Metropolitana y la Región de Valparaíso.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="bg-neutral" data-od-id="zones">
+    <div class="container">
+      <span class="section-label">Por zona</span>
+      <h2 class="section-title">Cobertura agrupada por zona</h2>
+      <p class="section-subtitle">Encuentre su zona y revise las comunas donde tenemos presencia operativa directa.</p>
+      <div class="zones-grid">
+        {locationsByZone.map((z) => (
+          <div class="zone-card">
+            <div class="zone-header">
+              <span class={`zone-dot dot-${ZONE_COLORS[z.zone] ?? 'blue'}`}></span>
+              <h3>Zona {z.zone}</h3>
+            </div>
+            <div class="zone-locations">
+              {z.locations.map((l) => (
+                <a href={`/ubicaciones/${l.slug}`} class="zone-location-tag">{l.name}</a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-dark" data-od-id="cta">
+    <div class="container" style="text-align:center;padding:80px 0">
+      <h2 class="section-title" style="color:#fff">¿Necesita cobertura en su comuna?</h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.7);max-width:600px;margin:0 auto 28px">Si no encuentra su comuna en la lista, contáctenos. Evaluamos solicitudes en otras zonas del país con planes de despliegue escalonado.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+        <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg"><Icon name="phone" size={16} /> {SITE.PHONE}</a>
+      </div>
+    </div>
+  </section>
+
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="" />
+  <script is:inline src="/vendor/leaflet/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin=""></script>
+  <script is:inline define:vars={{ markers }}>
+    (function () {
+      var d = document.getElementById('map-ubicaciones');
+      if (!d || typeof L === 'undefined') return;
+      var map = L.map(d, {
+        center: [-33.45, -70.65],
+        zoom: 10,
+        scrollWheelZoom: false,
+        zoomControl: true,
+        attributionControl: false,
+      });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap',
+      }).addTo(map);
+
+      var bounds = L.latLngBounds([]);
+      for (var i = 0; i < markers.length; i++) {
+        var m = markers[i];
+        var mk = L.circleMarker([m.lat, m.lng], {
+          radius: 8,
+          fillColor: m.color,
+          color: '#fff',
+          weight: 2,
+          fillOpacity: 1,
+        })
+          .addTo(map)
+          .bindPopup(
+            '<strong>' + m.name + '</strong><br><a href="/ubicaciones/' + m.slug + '" style="font-size:12px;font-weight:600;color:#3B82F6">Ver cobertura &rarr;</a>',
+          );
+        bounds.extend([m.lat, m.lng]);
+      }
+      map.fitBounds(bounds.pad(0.15));
+    })();
+  </script>
+</BaseLayout>

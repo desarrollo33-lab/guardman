@@ -1,0 +1,250 @@
+---
+// /ubicaciones/[slug] — detalle de ubicación (migración 1:1 del live).
+// Estructura idéntica al live: contenido con sidebar + block-map + block-related.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LOCATIONS, SERVICE_NAMES, SECTOR_NAMES } from '../../lib/constants';
+import { LOCATIONS as LOC_CONTENT } from '../../lib/content';
+import Icon from '../../components/Icon.astro';
+import StaffSection from '../../components/StaffSection.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  return LOCATIONS.map((l) => ({
+    params: { slug: l.slug },
+    props: { slug: l.slug, name: l.name, lat: l.lat, lng: l.lng, zone: l.zone },
+  }));
+}
+
+interface Props {
+  slug: string;
+  name: string;
+  lat: number;
+  lng: number;
+  zone: string;
+}
+const { slug, name, lat, lng, zone } = Astro.props;
+const loc = LOC_CONTENT[slug];
+// Location desde constants (para schema) — tiene lat/lng/zone
+const locSchema = LOCATIONS.find((l) => l.slug === slug);
+
+// Servicios disponibles (todos) ordenados alfabéticamente
+const serviciosDisponibles = Object.entries(SERVICE_NAMES).sort((a, b) => a[1].localeCompare(b[1]));
+
+// Sectores que atiende (todos con relación a este sector)
+const sectoresAtencion = Object.entries(SECTOR_NAMES).slice(0, 7);
+
+// Servicios relacionados (3 para el bloque "También te puede interesar")
+const relacionados = ['guard-pod', 'auditoria-seguridad', 'control-de-accesos'].map((s) => ({
+  slug: s,
+  name: SERVICE_NAMES[s],
+}));
+
+// Coordenadas para el mapa Leaflet
+const zoneColorMap: Record<string, string> = {
+  'Oriente': '#EF4444',
+  'Centro': '#3B82F6',
+  'Norte': '#F59E0B',
+  'Poniente': '#8B5CF6',
+  'Sur': '#3B82F6',
+  'Valparaíso': '#10B981',
+};
+const dotColor = zoneColorMap[zone] ?? '#3B82F6';
+---
+
+<BaseLayout
+  title={`Seguridad Privada OS-10 en ${name}`}
+  description={`Servicios de seguridad privada en ${name} con certificación OS-10. GuardMan Chile ofrece guardias, CCTV, control de accesos, monitoreo 24/7 y unidades Guardpod para esta comuna de la zona ${zone}. Cotización en 24 horas.`}
+  breadcrumb={name}
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Ubicaciones', url: '/ubicaciones' }, { name, url: `/ubicaciones/${slug}` }]}
+  location={locSchema}
+  showCluster={true}
+  clusterType="ubicacion"
+  clusterExclude={slug}
+>
+  <!-- HERO -->
+  <section class="detail-hero" data-od-id="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="zone-badge">
+          <span class={`zone-dot dot-${zone.toLowerCase()}`}></span>
+          <span>Zona {zone}</span>
+        </div>
+        <h1>Seguridad privada en {name}</h1>
+        <p>Protegemos {name} con guardias certificados OS-10, central de monitoreo propia 24/7 y la unidad autónoma Guardpod para faenas y terrenos sin infraestructura. Cobertura operativa en la zona {zone}.</p>
+        <div class="detail-hero-ctas">
+          <a href="/cotizacion" class="btn btn-primary">Cotizar ahora</a>
+          <a href="/servicios" class="btn btn-outline-light">Ver servicios</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL con sidebar -->
+  <section class="contenido" data-od-id="contenido">
+    <div class="container">
+      <div class="detail-content-grid">
+        <div class="article-body">
+          <div class="block" data-od-id="block-intro">
+            <h2>Seguridad en {name}, zona {zone}</h2>
+            <p>{loc.intro}</p>
+            <p>Esta comuna de la zona {zone} presenta características específicas que requieren soluciones de seguridad adaptadas. Nuestro equipo conoce el territorio y está distribuido estratégicamente para maximizar la cobertura y minimizar los tiempos de respuesta.</p>
+            <p>Todos nuestros guardias en {name} acreditan certificación OS-10 vigente, verificación de antecedentes y capacitación continua en protocolos de seguridad y atención de emergencias.</p>
+          </div>
+
+          <div class="block" data-od-id="block-features">
+            <h2>Qué incluye nuestro servicio en esta comuna</h2>
+            <div class="detail-features-grid">
+              {loc.features.map((f) => (
+                <div class="detail-feature-item">
+                  <Icon name="check" size={18} />
+                  <span>{f}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div class="block" data-od-id="block-issues">
+            <h2>Problemas que resolvemos</h2>
+            <div class="detail-issues-grid">
+              {loc.problems.map((p) => (
+                <div class="detail-issue-card">
+                  <Icon name="warn" size={20} />
+                  <span>{p}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <StaffSection />
+
+          <div class="block" data-od-id="block-locations">
+            <h2>Servicios disponibles en esta comuna</h2>
+            <p>Servicios profesionales con certificación OS-10, disponibles en {name} con supervisión desde nuestra central de monitoreo propia.</p>
+            <div class="services-list-block">
+              {serviciosDisponibles.map(([s, n]) => (
+                <a href={`/servicios/${s}/${slug}`} class="service-link-block">
+                  <h4>{n}</h4>
+                </a>
+              ))}
+            </div>
+            <div style="margin-top:16px">
+              <a href="/ubicaciones" class="btn btn-outline btn-sm">Explorar mapa de cobertura →</a>
+            </div>
+          </div>
+
+          <div class="block" data-od-id="block-faq">
+            <h2>Preguntas frecuentes</h2>
+            <div class="detail-faq">
+              {loc.faqs.map((f, i) => (
+                <details open={i === 0}>
+                  <summary>{f.q}</summary>
+                  <div class="answer">{f.a}</div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside data-od-id="sidebar">
+          <div class="sidebar-sticky">
+            <div class="sidebar-cta-top">
+              <h3>Proteja su propiedad</h3>
+              <a href="/cotizacion" class="btn btn-primary">Cotizar ahora</a>
+              <a href="/contacto" class="btn btn-outline">Hablar con un experto</a>
+            </div>
+            <div class="sidebar-body">
+              <div class="sb-section">
+                <h4>Servicios disponibles</h4>
+                {serviciosDisponibles.map(([s, n]) => (
+                  <a href={`/servicios/${s}/${slug}`} class="sb-link">{n}</a>
+                ))}
+              </div>
+              <div class="sb-section">
+                <h4>Sectores que atiende</h4>
+                <div class="sb-tags">
+                  {sectoresAtencion.map(([s, n]) => (
+                    <a href={`/sectores/${s}`} class={`sb-tag sb-tag-${s}`}>{n}</a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAPA -->
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="" />
+  <section class="bg-white" data-od-id="block-map">
+    <div class="container">
+      <span class="section-label">Mapa</span>
+      <h2 class="section-title">Mapa de cobertura</h2>
+      <figure class="coverage-map">
+        <div id={`map-${slug}`} style="height:360px;border-radius:var(--radius-xl);border:1px solid var(--border)"></div>
+        <figcaption style="font-size:13px;color:var(--muted);margin-top:8px;text-align:center">
+          {name} — zona {zone}. Cobertura operativa verificada.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+  <script is:inline src="/vendor/leaflet/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin=""></script>
+  <script is:inline define:vars={{ mapId: `map-${slug}`, lat, lng, name, dotColor }}>
+    (function () {
+      var d = document.getElementById(mapId);
+      if (!d || typeof L === 'undefined') return;
+      var map = L.map(d, {
+        center: [lat, lng],
+        zoom: 13,
+        scrollWheelZoom: false,
+        zoomControl: true,
+        attributionControl: false,
+      });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap',
+      }).addTo(map);
+      L.circleMarker([lat, lng], {
+        radius: 12,
+        fillColor: dotColor,
+        color: '#fff',
+        weight: 3,
+        fillOpacity: 0.9,
+      })
+        .addTo(map)
+        .bindPopup('<strong>GuardMan Chile — ' + name + '</strong><br>Cobertura operativa verificada.')
+        .openPopup();
+    })();
+  </script>
+
+  <!-- TAMBIÉN TE PUEDE INTERESAR -->
+  <section class="bg-neutral-section" data-od-id="block-related">
+    <div class="container">
+      <span class="section-label">Servicios relacionados</span>
+      <h2 class="section-title">También le puede interesar</h2>
+      <div class="related-grid-detail">
+        {relacionados.map((r) => (
+          <a href={`/servicios/${r.slug}/${slug}`} class="related-card-block">
+            <div class="related-icon">
+              <Icon name={r.slug} size={22} />
+            </div>
+            <h3>{r.name}</h3>
+            <p>Servicio profesional disponible en {name} con supervisión 24/7.</p>
+            <span class="card-link">Ver más →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="bg-dark cta-section-detail" data-od-id="block-cta">
+    <div class="container" style="text-align:center">
+      <h2 class="section-title" style="color:#fff">Cotice seguridad para {name}</h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.7)">Evaluación gratuita sin compromiso. Cubrimos toda la comuna con respuesta coordinada.</p>
+      <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+    </div>
+  </section>
+</BaseLayout>

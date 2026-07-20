@@ -1,0 +1,9 @@
+---
+// /admin — Dashboard CRM (nueva home del admin).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import Dashboard from '../../islands/crm/Dashboard.tsx';
+---
+
+<AdminLayout title="Dashboard — CRM" section="dashboard">
+  <Dashboard client:only="react" />
+</AdminLayout>

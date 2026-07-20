@@ -1,0 +1,385 @@
+---
+// Homepage v4.0 — Optimizada para captura de leads.
+// Hero persuasivo + trust signals + cómo funciona + CTA inline + cluster.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SERVICE_NAMES, LOCATIONS, ZONE_COLORS } from '../lib/constants';
+import { ICONS, SERVICE_ICONS } from '../lib/icons';
+import { SERVICES, ZONAS } from '../lib/content';
+import Icon from '../components/Icon.astro';
+import LeadCTA from '../components/LeadCTA.astro';
+import TrustSignals from '../components/TrustSignals.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+
+const servicios = Object.entries(SERVICE_NAMES).map(([slug, name]) => ({
+  slug,
+  name,
+  description: SERVICES[slug].shortDesc,
+  icon: SERVICE_ICONS[slug] ?? '',
+}));
+
+const sectors = [
+  { slug: 'automotriz', name: 'Automotriz' },
+  { slug: 'comercial', name: 'Comercial' },
+  { slug: 'construccion', name: 'Construcción' },
+  { slug: 'deportivo', name: 'Deportivo' },
+  { slug: 'educacion', name: 'Educación' },
+  { slug: 'eventos', name: 'Eventos' },
+  { slug: 'hoteleria', name: 'Hotelería' },
+  { slug: 'industrial', name: 'Industrial' },
+  { slug: 'residencial', name: 'Residencial' },
+  { slug: 'salud', name: 'Salud' },
+];
+
+const nosotrosFeatures = [
+  { title: 'Personal certificado OS-10' },
+  { title: 'Centro de monitoreo propio' },
+  { title: 'Cobertura regional amplia' },
+  { title: 'Tecnología Ajax Systems' },
+];
+
+const guardPodFeatures = [
+  { icon: 'eye', title: 'Guardia virtual visible y disuasiva', description: 'Cámaras PTZ 360° con detección de intrusos por IA. Iluminación y señalización que disuaden antes del intento.' },
+  { icon: 'monitor', title: 'Monitoreo 24/7 con respuesta inmediata', description: 'Central propia dispara alarma, voceo y coordina con Carabineros cuando corresponde.' },
+  { icon: 'dollar', title: 'Disponible en arriendo, más económico que un guardia', description: 'Mensualidad fija con instalación, monitoreo y mantenimiento incluidos. Sin inversión inicial.' },
+];
+
+const ajaxFeatures = [
+  { icon: 'lock', title: 'Alarmas sin Contrato' },
+  { icon: 'wifi', title: 'Sensores de Exterior' },
+  { icon: 'device', title: 'App Automonitoreo' },
+];
+
+const markers = LOCATIONS.map((l) => {
+  const zoneColorClass = ZONE_COLORS[ZONAS.find(z => z.locations.includes(l.name))?.name ?? 'Centro'] ?? 'blue';
+  const colorMap: Record<string, string> = {
+    red: '#EF4444',
+    blue: '#3B82F6',
+    yellow: '#F59E0B',
+    purple: '#8B5CF6',
+    green: '#10B981',
+  };
+  return {
+    name: l.name,
+    lat: l.lat,
+    lng: l.lng,
+    color: colorMap[zoneColorClass] ?? '#3B82F6',
+    slug: l.slug,
+  };
+});
+---
+
+<BaseLayout
+  title="Seguridad Privada OS-10 en Santiago Chile"
+  description="GuardMan Chile ofrece seguridad privada con certificación OS-10 en 14 comunas de la Región Metropolitana y Valparaíso. Guardias, CCTV, control de accesos, PPI (Protección de Personas Importantes), monitoreo 24/7, el sistema autónomo Guardpod y Ajax Systems Grade 3. Cotización personalizada en 24 horas."
+  localBusiness={true}
+  showCluster={true}
+  clusterType="servicios"
+  faq={[
+    { question: '¿Cuánto demora la cotización de seguridad privada?', answer: 'Nuestro equipo comercial le contacta en menos de 24 horas hábiles. Para urgencias, llame al +56 9 3000 0010 y atendemos en el acto, todos los días del año.' },
+    { question: '¿Cubren todas las comunas de Santiago?', answer: 'Cubrimos 14 comunas de la Región Metropolitana: Las Condes, Vitacura, Lo Barnechea, La Reina, Providencia, Santiago Centro, Huechuraba, Quilicura, Conchalí, Renca, Pudahuel, La Pintana y Lampa. También Los Andes y San Felipe en la Región de Valparaíso.' },
+    { question: '¿Los guardias están certificados OS-10?', answer: 'Sí, todos nuestros guardias acreditan certificación OS-10 vigente emitida por la Prefectura de Seguridad Privada de Carabineros de Chile. Verificamos antecedentes penales, laborales y referencias antes de asignarlos a un cliente.' },
+    { question: '¿Cuál es el costo de un guardia de seguridad en Chile?', answer: 'El valor depende del número de guardias, turnos, ubicación y servicios complementarios. Cotizamos sin compromiso en 24 horas, con planes desde un guardia parcial hasta operaciones 24/7 con cobertura multiplanta.' },
+  ]}
+>
+  <!-- HERO -->
+  <section class="hero" data-od-id="hero">
+    <div class="hero-bg">
+      <img src="/images/hero-home.webp" alt="Seguridad Privada GuardMan Chile — Guardias OS-10" fetchpriority="high" decoding="async" width="1920" height="1080" onerror="this.style.display='none'" />
+      <div class="hero-bg-overlay"></div>
+    </div>
+    <div class="container">
+      <div class="hero-badge">
+        <Icon name="shield" size={14} />
+        Certificación OS-10 · Ley 21.659
+      </div>
+      <h1>Seguridad Privada Profesional en Santiago de Chile</h1>
+      <p>Proteja su empresa, condominio o evento con <strong>guardias certificados OS-10</strong>, monitoreo propio 24/7 y el sistema autónomo <strong>Guardpod</strong>, una tecnología exclusiva en el mercado chileno. Más de 10 años de experiencia, 200+ guardias certificados y cobertura en 14 comunas de la Región Metropolitana y Valparaíso.</p>
+      <div class="hero-ctas">
+        <a href="/cotizacion" class="btn btn-primary btn-lg">
+          <Icon name="shield" size={16} />
+          Solicitar Cotización
+        </a>
+        <a href={`tel:+56930000010`} class="btn btn-outline-light btn-lg">
+          <Icon name="phone" size={16} />
+          Llamar al +56 9 3000 0010
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOSOTROS (dark split) -->
+  <section class="bg-dark" data-od-id="nosotros" style="background:#0D0D0D">
+    <div class="container split">
+      <div class="split-content">
+        <span class="section-label">Quiénes somos</span>
+        <h2 class="section-title">Grupo GuardMan Chile, su socio en seguridad privada</h2>
+        <p style="color:rgba(255,255,255,.95);font-size:16px;line-height:1.6;margin-bottom:24px">
+          Acompañamos a cientos de empresas e instituciones en Chile, desde cadenas hoteleras internacionales y embajadas hasta condominios residenciales, clínicas, plantas industriales y concesionarios automotrices. Nuestra misión es proteger lo que más les importa con profesionalismo, transparencia y cercanía operativa, combinando personal certificado con tecnología propia que ninguna otra empresa de seguridad ofrece en el país.
+        </p>
+        <div class="feature-tiles">
+          {nosotrosFeatures.map((f) => (
+            <div class="feature-tile">
+              <div class="feature-tile-icon">
+                <Icon name="shield" size={20} />
+              </div>
+              <h3>{f.title}</h3>
+            </div>
+          ))}
+        </div>
+        <a href="/nosotros" style="display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-weight:600;font-size:15px;margin-top:24px">
+          Conozca nuestra trayectoria
+          <Icon name="chevronRight" size={16} />
+        </a>
+      </div>
+      <div class="split-image">
+        <img src="/images/nosotros_seccion.webp" alt="Equipo GuardMan" loading="lazy" decoding="async" width="640" height="480" onerror="this.style.display='none'" />
+        <div class="split-image-badge">Conoce GuardMan</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <HowItWorks />
+
+  <!-- CTA INLINE — primer empuje de conversión -->
+  <LeadCTA
+    variant="inline"
+    title="¿Listo para proteger su propiedad?"
+    subtitle="Reciba una propuesta personalizada sin compromiso. Nuestro equipo comercial le contacta en menos de 24 horas hábiles con un plan diseñado a su medida."
+    primaryText="Solicitar Cotización"
+  />
+
+  <!-- SERVICIOS -->
+  <section class="bg-white" data-od-id="servicios" style="padding:64px 0">
+    <div class="container">
+      <span class="section-label">Nuestros servicios</span>
+      <h2 class="section-title">Servicios de seguridad privada en Chile</h2>
+      <p class="section-subtitle">Soluciones integrales con personal certificado OS-10, monitoreo propio 24/7, videovigilancia, control de accesos, servicio de PPI (Protección de Personas Importantes) y el sistema autónomo Guardpod. Cada propuesta se diseña según las características operativas de su propiedad.</p>
+      <div class="card-grid" style="margin-top:40px">
+        {servicios.map((s) => (
+          <a href={`/servicios/${s.slug}`} class="card">
+            <div class="card-image">
+              <img src={`/images/service-${s.slug}.webp`} alt={s.name} loading="lazy" decoding="async" width="400" height="240" onerror="this.src='/images/hero-home.webp';this.onerror=null" />
+            </div>
+            <div class="card-body">
+              <div class="card-icon">
+                <Icon name={s.slug} size={20} />
+              </div>
+              <h3>{s.name}</h3>
+              <p>{s.description}</p>
+              <span class="card-link">
+                Ver servicio
+                <Icon name="chevronRight" size={16} />
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- GUARD POD (dark split) -->
+  <section class="bg-dark" data-od-id="guardpod">
+    <div class="container split">
+      <div>
+        <span class="section-label">Tecnología exclusiva GuardMan</span>
+        <h2 class="section-title">Guardpod, la guardia virtual autónoma que ninguna otra seguridad ofrece en Chile</h2>
+        <p class="dark-intro">
+          Vigilancia autónoma con cámaras PTZ 360° e IA, sin conexión eléctrica ni internet fijo. Protege faenas, estacionamientos, condominios y eventos 24/7, a una fracción del costo de un guardia presencial. Único en Chile operado por una empresa de seguridad.
+        </p>
+        <div class="stat-strip" role="list">
+          <div class="stat-cell" role="listitem">
+            <div class="stat-cell-value">0</div>
+            <div class="stat-cell-label">Cableado</div>
+          </div>
+          <div class="stat-cell" role="listitem">
+            <div class="stat-cell-value">15</div>
+            <div class="stat-cell-label">Meses de I+D</div>
+          </div>
+          <div class="stat-cell" role="listitem">
+            <div class="stat-cell-value">360°</div>
+            <div class="stat-cell-label">Cobertura PTZ</div>
+          </div>
+        </div>
+        <div class="feature-tiles">
+          {guardPodFeatures.map((f) => (
+            <div class="feature-tile">
+              <div class="feature-tile-icon">
+                <Icon name={f.icon} size={20} />
+              </div>
+              <h3>{f.title}</h3>
+              <p>{f.description}</p>
+            </div>
+          ))}
+        </div>
+        <a href="/guard-pod" class="inline-cta">
+          Conozca Guardpod a fondo
+          <Icon name="chevronRight" size={16} />
+        </a>
+      </div>
+      <div class="split-image">
+        <video src="/videos/guardpod-home.mp4" autoplay loop muted playsinline preload="auto" aria-label="Guardpod, sistema autónomo de vigilancia"></video>
+        <div class="split-image-badge">Disponible en arriendo</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTORES -->
+  <section class="bg-neutral" data-od-id="sectores" style="padding:64px 0">
+    <div class="container">
+      <span class="section-label">Soluciones por sector</span>
+      <h2 class="section-title">Sectores que protegemos</h2>
+      <p class="section-subtitle">Protocolos especializados para residencial, comercial, industrial, construcción, educación, eventos, hotelería, salud, automotriz y deporte. Cada sector recibe un diagnóstico propio y un plan operativo con métricas verificables.</p>
+      <div class="card-grid" style="margin-top:40px">
+        {sectors.map((s) => (
+          <a href={`/sectores/${s.slug}`} class="card">
+            <div class="card-image" style="position:relative;background:var(--primary);overflow:hidden">
+              <img src={`/images/sector-${s.slug}.webp`} alt={s.name} loading="lazy" decoding="async" width="400" height="240" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+              <div style="display:none;align-items:center;justify-content:center;width:100%;height:100%;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:1.4rem;font-weight:700;position:absolute;top:0;left:0">{s.name}</div>
+            </div>
+            <div class="card-body">
+              <h3>Seguridad {s.name}</h3>
+              <p>Protección especializada para el sector {s.name.toLowerCase()}.</p>
+              <span class="card-link">Ver sector <Icon name="chevronRight" size={16} /></span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- AJAX SYSTEMS (dark split) -->
+  <section class="bg-dark" data-od-id="ajax">
+    <div class="container split">
+      <div>
+        <span class="section-label">Instalador oficial Ajax Systems</span>
+        <h2 class="section-title">Tecnología Ajax en Chile, sin contrato y con app de automonitoreo</h2>
+        <p style="color:rgba(255,255,255,.95);font-size:16px;line-height:1.6;margin-bottom:24px">
+          Instaladores oficiales de Ajax Systems en Chile. Sensores inalámbricos para exterior, instalación profesional y app de automonitoreo desde su smartphone. Si lo necesita, agregue monitoreo 24/7 desde nuestra central. Sin contratos forzosos.
+        </p>
+        <div class="feature-tiles">
+          {ajaxFeatures.map((f) => (
+            <div class="feature-tile">
+              <div class="feature-tile-icon">
+                <Icon name={f.icon} size={20} />
+              </div>
+              <h3>{f.title}</h3>
+            </div>
+          ))}
+        </div>
+        <a href="/ajax-systems" style="display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-weight:600;font-size:15px;margin-top:24px">
+          Conozca Ajax Systems
+          <Icon name="chevronRight" size={16} />
+        </a>
+      </div>
+      <div class="split-image">
+        <img src="/images/Ajax-systems-header.jpg" alt="Ajax Systems" loading="lazy" decoding="async" width="640" height="360" onerror="this.style.display='none'" />
+        <div class="split-image-badge">Instalador Oficial</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST SIGNALS — stats, certificaciones, testimonios, FAQ -->
+  <TrustSignals />
+
+  <!-- COBERTURA / UBICACIONES con mapa Leaflet -->
+  <section class="bg-navy" data-od-id="ubicaciones" style="position:relative;z-index:0">
+    <div class="container" style="padding-top:72px;padding-bottom:72px">
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:32px">
+        <div class="hero-badge" style="margin-bottom:0"><span set:html={ICONS.shield} /> Certificación OS-10</div>
+        <div class="hero-badge" style="margin-bottom:0">
+          <Icon name="doc" size={14} />
+          Ley 21.659
+        </div>
+      </div>
+      <h2 class="section-title" style="text-align:center;max-width:700px;margin:0 auto 12px">Protección profesional para su tranquilidad</h2>
+      <p class="section-subtitle" style="text-align:center;max-width:600px;margin:0 auto 28px">Más de 10 años protegiendo empresas y residencias con guardias certificados, tecnología propia y atención personalizada de un equipo que conoce su comuna.</p>
+      <div style="text-align:center;margin-bottom:48px">
+        <a href="/contacto" class="btn btn-primary btn-lg">Hablar con un experto</a>
+      </div>
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,.1);margin:0 0 48px" />
+      <span class="section-label">Cobertura regional</span>
+      <h2 class="section-title">Presencia en 14 comunas de Santiago y la Región de Valparaíso</h2>
+      <p class="section-subtitle">Atendemos en Providencia, Las Condes, Vitacura, Lo Barnechea, La Reina, Santiago Centro, Huechuraba, Quilicura, Conchalí, Pudahuel, Renca, Lampa, La Pintana, además de Los Andes y San Felipe. Cobertura operativa con respuesta coordinada entre zonas.</p>
+
+      <div class="coverage-split" style="margin-top:28px">
+        <div class="coverage-zones">
+          {ZONAS.map((z) => (
+            <div class="zone-card">
+              <div class="zone-card-header">
+                <span class={`zone-dot dot-${ZONE_COLORS[z.name] ?? 'blue'}`} style="width:8px;height:8px;flex-shrink:0"></span>
+                {z.name}
+              </div>
+              <div class="zone-tags">
+                {z.locations.map((locName) => {
+                  const loc = LOCATIONS.find(l => l.name === locName);
+                  return loc ? (
+                    <a href={`/ubicaciones/${loc.slug}`} class="zone-tag-link">{locName}</a>
+                  ) : null;
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+        <figure class="coverage-map" style="margin:0;position:relative;z-index:0;overflow:hidden">
+          <div id="map-home" style="height:400px;border-radius:var(--radius-xl);border:1px solid rgba(255,255,255,.12);touch-action:pan-y;background:#1a1a2e"></div>
+          <figcaption style="font-size:13px;color:rgba(255,255,255,.75);margin-top:8px;text-align:center">14 comunas con cobertura verificada · Central de monitoreo propia 24/7</figcaption>
+        </figure>
+      </div>
+      <div style="text-align:center;margin-top:28px">
+        <a href="/ubicaciones" class="btn btn-outline-light">Ver todas las ubicaciones →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAPA Leaflet + scripts -->
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="" />
+  <script is:inline src="/vendor/leaflet/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin=""></script>
+  <script is:inline define:vars={{ markers }}>
+    (function () {
+      var d = document.getElementById('map-home');
+      if (!d || typeof L === 'undefined') return;
+      var map = L.map(d, {
+        center: [-33.45, -70.65],
+        zoom: 10,
+        scrollWheelZoom: false,
+        zoomControl: true,
+        attributionControl: false,
+      });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap',
+      }).addTo(map);
+
+      var bounds = L.latLngBounds([]);
+      for (var i = 0; i < markers.length; i++) {
+        var m = markers[i];
+        var mk = L.circleMarker([m.lat, m.lng], {
+          radius: 8,
+          fillColor: m.color,
+          color: '#fff',
+          weight: 2,
+          fillOpacity: 1,
+        })
+          .addTo(map)
+          .bindPopup(
+            '<strong>' + m.name + '</strong><br><a href="/ubicaciones/' + m.slug + '" style="font-size:12px;font-weight:600;color:#3B82F6">Ver cobertura &rarr;</a>',
+          );
+        bounds.extend([m.lat, m.lng]);
+      }
+      if (markers.length > 0) {
+        map.fitBounds(bounds.pad(0.15));
+      }
+    })();
+  </script>
+
+  <!-- CTA FINAL — cierre de conversión -->
+  <LeadCTA
+    variant="footer"
+    title="Hablemos de su seguridad"
+    subtitle="Nuestro equipo comercial está disponible 24/7 para responder consultas y diseñar una solución a su medida. Cotización personalizada en menos de 24 horas hábiles."
+    primaryText="Solicitar Cotización"
+    secondaryText="Hablar con un experto"
+    secondaryHref="/contacto"
+  />
+</BaseLayout>

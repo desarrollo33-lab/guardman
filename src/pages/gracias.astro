@@ -1,0 +1,26 @@
+---
+// /gracias — página post-formulario (migración 1:1).
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/constants';
+
+const type = Astro.url.searchParams.get('type') ?? 'contacto';
+const title = type === 'cotizacion' ? 'Cotización enviada' : 'Mensaje enviado';
+---
+
+<BaseLayout title={title} description="Gracias por contactar GuardMan Chile. Nuestro equipo le responderá en menos de 24 horas hábiles." noindex>
+  <section class="thanks">
+    <div class="container-narrow thanks-card">
+      <div class="thanks-icon">✅</div>
+      <h1>¡Gracias por contactarnos!</h1>
+      <p>Hemos recibido su {type === 'cotizacion' ? 'solicitud de cotización' : 'mensaje'}. Nuestro equipo comercial lo revisará y le contactará en menos de 24 horas hábiles.</p>
+      <div class="thanks-actions">
+        <a href="/" class="btn btn-primary">Volver al inicio</a>
+        <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline">Llamar ahora: {SITE.PHONE}</a>
+      </div>
+      <div class="thanks-info">
+        <p>Para consultas inmediatas, contáctenos directamente:</p>
+        <p>📞 <a href={`tel:${SITE.PHONE_TEL}`}>{SITE.PHONE}</a> · ✉️ <a href={`mailto:${SITE.EMAIL_INFO}`}>{SITE.EMAIL_INFO}</a></p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

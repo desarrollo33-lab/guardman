@@ -1,0 +1,74 @@
+---
+// Section — Standardized section wrapper for every public page.
+// v5.2 — Normalizes vertical padding, background variants, container width
+// and optional section-label/title/header. Eliminates inline `style=` noise.
+//
+// Usage:
+//   <Section variant="neutral">...</Section>
+//   <Section variant="dark" padding="lg"><Section.Header .../>...</Section>
+//
+// Props:
+//   variant  : 'white' | 'neutral' | 'dark' | 'navy' | 'transparent' (default 'white')
+//   padding  : 'sm' | 'md' | 'lg' | 'none' (default 'md' = 64px 0)
+//   container: 'default' | 'narrow' | 'wide' | 'none' (default 'default')
+//   id       : anchor id
+//   class    : extra classes
+
+interface Props {
+  variant?: 'white' | 'neutral' | 'dark' | 'navy' | 'transparent';
+  padding?: 'sm' | 'md' | 'lg' | 'none';
+  container?: 'default' | 'narrow' | 'wide' | 'none';
+  id?: string;
+  class?: string;
+  /** Optional eyebrow label (section-label). */
+  label?: string;
+  /** Optional section title (h2.section-title). */
+  title?: string;
+  /** Optional section subtitle (p.section-subtitle). */
+  subtitle?: string;
+  /** Center the header block (default true). */
+  centerHeader?: boolean;
+  /** data-od-id for analytics. */
+  odId?: string;
+}
+
+const {
+  variant = 'white',
+  padding = 'md',
+  container = 'default',
+  id,
+  class: className,
+  label,
+  title,
+  subtitle,
+  centerHeader = true,
+  odId,
+} = Astro.props;
+
+const padClass = {
+  sm: 'gm-section--pad-sm',
+  md: 'gm-section--pad-md',
+  lg: 'gm-section--pad-lg',
+  none: 'gm-section--pad-none',
+}[padding];
+
+const variantClass = `gm-section--${variant}`;
+const containerClass = container === 'none' ? '' : `container container--${container}`;
+---
+
+<section
+  id={id}
+  class:list={['gm-section', variantClass, padClass, className]}
+  data-od-id={odId}
+>
+  <div class={containerClass}>
+    {(label || title || subtitle) && (
+      <header class:list={['gm-section-header', !centerHeader && 'gm-section-header--left']}>
+        {label && <span class="section-label">{label}</span>}
+        {title && <h2 class="section-title">{title}</h2>}
+        {subtitle && <p class="section-subtitle">{subtitle}</p>}
+      </header>
+    )}
+    <slot />
+  </div>
+</section>

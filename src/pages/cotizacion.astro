@@ -1,0 +1,128 @@
+---
+// /cotizacion — formulario detallado (migración 1:1 del live).
+// v4.2 — usa componentes del sistema de diseño: Icon, HowItWorks, LeadCTA, TrustSignals, LeadForm.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SERVICE_NAMES, LOCATIONS } from '../lib/constants';
+import { SERVICES } from '../lib/content';
+import Icon from '../components/Icon.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import LeadCTA from '../components/LeadCTA.astro';
+import TrustSignals from '../components/TrustSignals.astro';
+import LeadForm from '../components/LeadForm.astro';
+import { SITE } from '../lib/constants';
+
+const services = Object.entries(SERVICE_NAMES).map(([slug, name]) => ({
+  slug, name, description: SERVICES[slug].shortDesc,
+})).concat([{ slug: 'asesoria', name: 'No estoy seguro — necesito asesoría', description: '' }]);
+
+const locations = LOCATIONS.map((l) => l.name).concat(['Otra']);
+
+const whyBenefits = [
+  { icon: 'check', title: 'Sin compromiso', desc: 'Reciba su cotización sin costo ni obligación de compra. Evaluamos su caso particular en terreno.' },
+  { icon: 'clock', title: 'Respuesta en 24 horas hábiles', desc: 'Nuestro equipo comercial le contacta en menos de 24 horas hábiles para afinar la propuesta.' },
+  { icon: 'location', title: 'Visita técnica gratuita', desc: 'Evaluamos su propiedad en terreno para diseñar la solución de seguridad más adecuada.' },
+  { icon: 'shield', title: 'Personal certificado', desc: 'Todo el equipo acredita certificación OS-10 vigente, con verificación de antecedentes y formación continua.' },
+];
+
+// Estructura declarativa de fields del form. El componente <LeadForm> agrupa
+// automáticamente los campos de a 2 (form-row) y respeta `fullWidth` para los
+// que abarcan la fila completa.
+const propertyTypes = [
+  'Residencial / Condominio', 'Oficina / Corporativo', 'Comercio / Retail',
+  'Bodega / Industrial', 'Obra en construcción', 'Evento', 'Hotel',
+  'Clínica / Hospital', 'Colegio / Universidad', 'Otro',
+];
+const guardsCounts = ['1-2', '3-5', '6-10', '10+', 'No estoy seguro'];
+
+const leadFormSections = [
+  {
+    title: 'Datos personales',
+    fields: [
+      { name: 'name', label: 'Nombre completo', type: 'text' as const, required: true },
+      { name: 'email', label: 'Correo electrónico', type: 'email' as const, required: true },
+      { name: 'phone', label: 'Teléfono', type: 'tel' as const, required: true },
+      { name: 'company', label: 'Empresa (opcional)', type: 'text' as const },
+    ],
+  },
+  {
+    title: 'Detalles del servicio',
+    fields: [
+      { name: 'location', label: 'Comuna donde necesitas el servicio', type: 'select' as const, required: true, options: locations },
+      { name: 'service', label: 'Servicio de interés', type: 'select' as const, required: true, options: services.map((s) => s.name) },
+      { name: 'property_type', label: 'Tipo de propiedad', type: 'select' as const, options: propertyTypes },
+      { name: 'guards_count', label: '¿Cuántos guardias necesitas?', type: 'select' as const, options: guardsCounts },
+      { name: 'message', label: 'Describe tu necesidad de seguridad', type: 'textarea' as const, fullWidth: true, rows: 5, placeholder: 'Cuéntanos sobre tu propiedad, puntos críticos, horarios, número de personas, etc.' },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Cotización de Seguridad Privada en 24 Horas"
+  description="Cotice seguridad privada con guardias OS-10, CCTV, monitoreo 24/7, el sistema autónomo Guardpod y Ajax Systems. Respuesta personalizada en menos de 24 horas hábiles. Cobertura en 14 comunas de la Región Metropolitana y Valparaíso."
+  breadcrumb="Cotización"
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Cotización', url: '/cotizacion' }]}
+  showCluster={true}
+  clusterType="servicios"
+>
+  <section class="hero" data-od-id="hero">
+    <div class="container">
+      <h1>Solicite su cotización en 24 horas hábiles</h1>
+      <p>Reciba una propuesta personalizada <strong>sin compromiso</strong> en menos de 24 horas hábiles. Nuestro equipo comercial evalúa sus necesidades de seguridad y diseña un plan a su medida, con respaldo de la central de monitoreo propia 24/7 y del sistema autónomo Guardpod.</p>
+      <div class="trust-badges">
+        <div class="trust-badge"><Icon name="check" size={14} />Certificación OS-10 vigente</div>
+        <div class="trust-badge"><Icon name="check" size={14} />Respuesta en menos de 24h</div>
+        <div class="trust-badge"><Icon name="check" size={14} />Cotización sin compromiso</div>
+        <div class="trust-badge"><Icon name="check" size={14} />10+ años de trayectoria</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-neutral">
+    <div class="container form-wrap">
+      <LeadForm
+        id="quote-form"
+        title="Cotización personalizada"
+        subtitle="Cuéntenos sobre sus necesidades y le enviaremos una propuesta adaptada."
+        sections={leadFormSections}
+        submitText="Solicitar cotización →"
+        trackName="cotizacion"
+        successRedirect="/gracias?type=cotizacion"
+        footNote="Sus datos están seguros. No compartimos información con terceros. Le contactaremos una sola vez para enviar su cotización."
+      />
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS — sistema de diseño: explica el proceso post-formulario -->
+  <HowItWorks />
+
+  <section class="bg-white" data-od-id="why-us">
+    <div class="container">
+      <span class="section-label">Por qué cotizar con nosotros</span>
+      <h2 class="section-title">Cuatro ventajas de cotizar con GuardMan Chile</h2>
+      <div class="why-grid">
+        {whyBenefits.map((b) => (
+          <div class="why-card">
+            <Icon name={b.icon} size={32} />
+            <h3>{b.title}</h3>
+            <p>{b.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST SIGNALS — sistema de diseño: certificaciones + FAQ para reducir objeciones -->
+  <TrustSignals />
+
+  <!-- CTA FINAL — sistema de diseño: variante dark con botón de llamada -->
+  <LeadCTA
+    variant="dark"
+    title="¿Prefiere llamarnos directamente?"
+    subtitle="Un experto en seguridad le orientará sin compromiso. Atención 24/7, todos los días del año."
+    primaryText="Llamar ahora"
+    primaryHref={`tel:${SITE.PHONE_TEL}`}
+    showPhone={false}
+    trustBadges={true}
+  />
+</BaseLayout>

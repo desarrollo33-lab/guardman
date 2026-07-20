@@ -1,0 +1,81 @@
+---
+// Header — replicación 1:1 del `hdr()` de src/ssr/site-renderer.ts.
+// Incluye dropdowns para Servicios, Ubicaciones, Sectores + link Nosotros.
+// v4.1: agrega link "Canal de Denuncias" con marca discreta (punto rojo).
+// Mobile toggle (#mobile-toggle) abre/cierra #nav-links vía main.js.
+import { SITE, SERVICE_NAMES, LOCATIONS, SECTOR_NAMES, DENUNCIA_PATH } from '../lib/constants';
+import { ICONS } from '../lib/icons';
+
+interface Props {
+  theme?: 'light' | 'dark';
+}
+const { theme = 'light' } = Astro.props;
+const darkClass = theme === 'dark' ? ' header-dark' : '';
+
+const services = Object.entries(SERVICE_NAMES).map(([slug, name]) => ({ slug, name }));
+const locations = LOCATIONS.map((l) => ({ slug: l.slug, name: l.name }));
+const sectors = Object.entries(SECTOR_NAMES).map(([slug, name]) => ({ slug, name }));
+---
+
+<header class={`site-header${darkClass}`} data-od-id="header">
+  <div class="header-inner">
+    <a href="/" class="logo" aria-label={SITE.NAME}>
+      <img src="/images/logo-byn.png" alt={SITE.NAME} class="logo-img" width="680" height="250" />
+    </a>
+    <nav id="nav-links">
+      <div class="dropdown">
+        <button class="dropdown-btn">
+          Servicios
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+        <div class="dropdown-menu">
+          {services.map((s) => (
+            <a href={`/servicios/${s.slug}`}>{s.name}</a>
+          ))}
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="dropdown-btn">
+          Ubicaciones
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+        <div class="dropdown-menu">
+          {locations.map((l) => (
+            <a href={`/ubicaciones/${l.slug}`}>{l.name}</a>
+          ))}
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="dropdown-btn">
+          Sectores
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+        <div class="dropdown-menu">
+          {sectors.map((s) => (
+            <a href={`/sectores/${s.slug}`}>{s.name}</a>
+          ))}
+        </div>
+      </div>
+      <a href="/nosotros" class="nav-link">Nosotros</a>
+      <a href={DENUNCIA_PATH} class="nav-link nav-link-denuncia">
+        Canal de Denuncias
+      </a>
+    </nav>
+    <div class="header-actions">
+      <a href={`tel:${SITE.PHONE_TEL}`} class="header-phone">
+        <span set:html={ICONS.phone} />
+        {SITE.PHONE}
+      </a>
+      <a href="/cotizacion" class="btn btn-primary">Cotizar</a>
+    </div>
+    <button id="mobile-toggle" class="mobile-toggle" aria-label="Menú" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+

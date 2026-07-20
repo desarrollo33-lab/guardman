@@ -1,0 +1,347 @@
+---
+// /privacidad — Política de Privacidad v4.1
+// Marco legal aplicable:
+//   - Ley 19.628 sobre Protección de la Vida Privada (Chile, vigente desde 1999).
+//   - D.S. N° 83/2005 — Reglamento de la Ley 19.628.
+//   - Ley 20.575 — Principios sobre probidad y transparencia (cookies, etc.).
+// Migrado al sistema de diseño: hero con badge, layout 2-col con TOC
+// sticky, cards de derechos, FAQ schema, privacy schema, breadcrumb.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/constants';
+import Icon from '../components/Icon.astro';
+import LeadCTA from '../components/LeadCTA.astro';
+
+const lastUpdated = '2026-07-15';
+const lastUpdatedHuman = '15 de julio de 2026';
+const effectiveDate = '2026-07-22';
+
+const sections = [
+  {
+    id: 'informacion-que-recopilamos',
+    num: '01',
+    icon: 'database' as const,
+    title: 'Información que recopilamos',
+    intro: 'Recopilamos solo los datos necesarios para prestar el servicio que contratas o el que nos solicitas.',
+    blocks: [
+      { kind: 'kv', label: 'Datos de contacto', value: 'nombre, correo electrónico, número de teléfono, dirección.' },
+      { kind: 'kv', label: 'Datos comerciales', value: 'empresa, cargo, tipo de propiedad, necesidades de seguridad.' },
+      { kind: 'kv', label: 'Datos técnicos', value: 'dirección IP, tipo de navegador, páginas visitadas, tiempo de navegación.' },
+      { kind: 'kv', label: 'Datos de cotización', value: 'detalles específicos sobre los servicios de seguridad solicitados.' },
+    ],
+  },
+  {
+    id: 'como-usamos',
+    num: '02',
+    icon: 'settings' as const,
+    title: 'Cómo utilizamos tu información',
+    intro: 'El uso está limitado a las finalidades declaradas en esta política. No vendemos ni alquilamos datos personales.',
+    list: [
+      'Procesar y responder a tus consultas y solicitudes enviadas desde el sitio.',
+      'Gestionar cotizaciones que nos solicites a través de los formularios del sitio.',
+      'Enviar comunicaciones relacionadas con tu solicitud o consulta.',
+      'Cumplir con obligaciones legales y regulatorias aplicables en Chile.',
+      'Mejorar la experiencia de usuario en nuestro sitio web.',
+    ],
+  },
+  {
+    id: 'proteccion',
+    num: '03',
+    icon: 'shield' as const,
+    title: 'Protección de datos',
+    intro: 'Aplicamos medidas técnicas y organizativas para resguardar tu información contra acceso no autorizado, alteración, divulgación o destrucción.',
+    list: [
+      'Cifrado TLS 1.3 en tránsito y AES-256 en reposo.',
+      'Firewalls, control de acceso por rol y registro de auditoría.',
+      'Backups cifrados con retención limitada.',
+      'Personal con acuerdo de confidencialidad y capacitación periódica.',
+    ],
+  },
+  {
+    id: 'comparticion',
+    num: '04',
+    icon: 'users' as const,
+    title: 'Compartición de información',
+    intro: 'Sólo compartimos información personal en los siguientes casos:',
+    list: [
+      'Con proveedores de servicios que nos asisten en nuestras operaciones, bajo acuerdos de confidencialidad.',
+      'Cuando sea requerido por ley o por orden de autoridad competente (tribunales, Ministerio Público, Carabineros, PDI).',
+      'Para proteger los derechos, propiedad o seguridad de GuardMan Chile, nuestros clientes o el público.',
+    ],
+    note: 'Nunca vendemos, alquilamos ni comercializamos tu información personal.',
+  },
+  {
+    id: 'cookies',
+    num: '05',
+    icon: 'eye' as const,
+    title: 'Cookies y tecnologías similares',
+    intro: 'Usamos cookies para mejorar la navegación, analizar tráfico y personalizar contenido. Puedes rechazar las cookies no esenciales desde el banner de consentimiento.',
+    table: {
+      headers: ['Tipo', 'Finalidad', 'Proveedor', 'Duración'],
+      rows: [
+        ['Esenciales', 'Sesión, seguridad, equilibrio de carga', 'GuardMan Chile', 'Sesión'],
+        ['Analítica (opcional)', 'Métricas agregadas de uso del sitio', 'Google Analytics / Plausible', 'Hasta 24 meses'],
+        ['Marketing (opcional)', 'Sin uso actualmente', '—', '—'],
+      ],
+    },
+  },
+  {
+    id: 'derechos',
+    num: '06',
+    icon: 'scale' as const,
+    title: 'Tus derechos',
+    intro: 'Conforme a la Ley 19.628 y sus reglamentos, tienes los siguientes derechos sobre tus datos personales:',
+  },
+  {
+    id: 'cambios',
+    num: '07',
+    icon: 'flag' as const,
+    title: 'Cambios a esta política',
+    intro: 'Podemos actualizar esta política periódicamente para reflejar cambios legales, técnicos o de operación.',
+    note: 'Cuando un cambio sea sustancial, lo notificaremos mediante un aviso visible en el sitio y, cuando proceda, por correo electrónico.',
+  },
+];
+
+const derechos = [
+  {
+    icon: 'eye' as const,
+    title: 'Acceso',
+    desc: 'Conocer qué datos personales tenemos sobre ti y cómo los tratamos.',
+  },
+  {
+    icon: 'edit' as const,
+    title: 'Rectificación',
+    desc: 'Solicitar la corrección de datos inexactos, incompletos o desactualizados.',
+  },
+  {
+    icon: 'close' as const,
+    title: 'Supresión / Cancelación',
+    desc: 'Pedir la eliminación de tus datos cuando ya no sean necesarios para la finalidad declarada.',
+  },
+  {
+    icon: 'shield' as const,
+    title: 'Oposición',
+    desc: 'Oponerte al tratamiento de tus datos para fines de marketing o cuando afecte tus derechos.',
+  },
+];
+
+const contacto = [
+  { icon: 'mail' as const, label: 'Email', value: SITE.EMAIL_INFO, href: `mailto:${SITE.EMAIL_INFO}` },
+  { icon: 'phone' as const, label: 'Teléfono', value: SITE.PHONE, href: `tel:${SITE.PHONE_TEL}` },
+  { icon: 'location' as const, label: 'Dirección', value: SITE.ADDRESS, href: null as string | null },
+];
+
+const faq = [
+  { question: '¿Comparten mis datos con terceros?', answer: 'No vendemos ni comercializamos datos personales. Sólo los compartimos con proveedores de servicios bajo acuerdos de confidencialidad, o cuando la ley lo exige (tribunales, Ministerio Público, Carabineros, PDI).' },
+  { question: '¿Puedo pedir que eliminen mis datos?', answer: 'Sí. Conforme a la Ley 19.628 tienes derecho de supresión/cancelación. Escríbenos a ' + SITE.EMAIL_INFO + ' con tu solicitud y la procesaremos en los plazos legales aplicables.' },
+  { question: '¿Cuánto tiempo conservan mis datos?', answer: 'Sólo durante el tiempo necesario para la finalidad declarada. Para cotizaciones no concretadas: hasta 24 meses. Para clientes activos: durante la relación contractual y el plazo legal de conservación contable (6 años).' },
+];
+---
+
+<BaseLayout
+  title="Política de Privacidad GuardMan Chile"
+  description="Cómo recopilamos, usamos y protegemos tus datos personales cuando visitas guardman.cl. Conforme a la Ley 19.628 de Protección de la Vida Privada. Cookies y derechos ARCO."
+  breadcrumb="Política de Privacidad"
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Política de Privacidad', url: '/privacidad' }]}
+  faq={faq}
+>
+  <!-- ═══════ HERO ═══════ -->
+  <section class="legal-hero" data-od-id="hero">
+    <div class="container">
+      <span class="hero-badge">
+        <Icon name="lock" size={14} />
+        Documento legal · Ley 19.628
+      </span>
+      <h1>Política de Privacidad</h1>
+      <p class="legal-hero-lead">Cómo recopilamos, usamos y protegemos tus datos personales cuando visitas <strong>guardman.cl</strong>.</p>
+      <div class="legal-hero-meta">
+        <span><strong>Última actualización:</strong> {lastUpdatedHuman}</span>
+        <span class="legal-hero-dot">·</span>
+        <span><strong>Vigente desde:</strong> {effectiveDate}</span>
+      </div>
+      <div class="hero-ctas">
+        <a href="#informacion-que-recopilamos" class="btn btn-primary btn-lg">
+          <Icon name="book" size={16} />
+          Leer política completa
+        </a>
+        <a href="#derechos" class="btn btn-outline-light btn-lg">Tus derechos</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ LAYOUT 2-COL: TOC + CONTENIDO ═══════ -->
+  <section class="bg-neutral" data-od-id="legal-content">
+    <div class="container legal-layout">
+      <!-- TOC lateral (desktop sticky) -->
+      <aside class="legal-toc" data-od-id="legal-toc" aria-label="Tabla de contenidos">
+        <div class="legal-toc-inner">
+          <span class="legal-toc-label">Tabla de contenidos</span>
+          <ol>
+            {sections.map((s) => (
+              <li>
+                <a href={`#${s.id}`}>
+                  <span class="legal-toc-num">{s.num}</span>
+                  <span class="legal-toc-text">{s.title}</span>
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href="#contacto">
+                <span class="legal-toc-num">08</span>
+                <span class="legal-toc-text">Contacto</span>
+              </a>
+            </li>
+          </ol>
+          <a href="#contacto" class="legal-toc-cta">
+            <Icon name="mail" size={14} />
+            Ejercer tus derechos
+          </a>
+        </div>
+      </aside>
+
+      <!-- Contenido principal -->
+      <article class="legal-content" data-od-id="legal-article">
+        <p class="legal-intro">
+          En <strong>{SITE.LEGAL_NAME}</strong> (en adelante "GuardMan Chile"), valoramos y respetamos la privacidad de quienes visitan <strong>guardman.cl</strong>. Esta Política describe cómo recopilamos, utilizamos, almacenamos, compartimos y protegemos tu información personal a través de nuestro sitio web, conforme a la <strong>Ley 19.628 sobre Protección de la Vida Privada</strong> y sus reglamentos. Al utilizar nuestro sitio, aceptas las prácticas descritas en este documento.
+        </p>
+
+        {sections.map((s) => (
+          <section class={`legal-section ${s.id === 'derechos' ? 'legal-section-full' : ''}`} id={s.id} data-od-id={`legal-section-${s.num}`}>
+            <header class="legal-section-head">
+              <span class="legal-section-num">{s.num}</span>
+              <div class="legal-section-icon">
+                <Icon name={s.icon} size={20} />
+              </div>
+              <h2>{s.title}</h2>
+            </header>
+            <p class="legal-section-intro">{s.intro}</p>
+
+            {s.blocks && (
+              <dl class="legal-kv">
+                {s.blocks.map((b) => (
+                  <div class="legal-kv-row">
+                    <dt>{b.label}</dt>
+                    <dd>{b.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+
+            {s.list && (
+              <ul class="legal-list">
+                {s.list.map((item) => (
+                  <li>
+                    <span class="legal-list-bullet" aria-hidden="true">
+                      <Icon name="check" size={12} />
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {s.table && (
+              <div class="legal-table-wrap">
+                <table class="legal-table">
+                  <thead>
+                    <tr>{s.table.headers.map((h) => <th>{h}</th>)}</tr>
+                  </thead>
+                  <tbody>
+                    {s.table.rows.map((row) => (
+                      <tr>{row.map((cell) => <td>{cell}</td>)}</tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {s.note && <p class="legal-note">{s.note}</p>}
+
+            {s.id === 'derechos' && (
+              <div class="derechos-grid">
+                {derechos.map((d) => (
+                  <article class="derecho-card">
+                    <div class="derecho-card-icon">
+                      <Icon name={d.icon} size={22} />
+                    </div>
+                    <h3>{d.title}</h3>
+                    <p>{d.desc}</p>
+                  </article>
+                ))}
+                <p class="derechos-cta">
+                  Para ejercer cualquiera de estos derechos, escríbenos a <a href={`mailto:${SITE.EMAIL_INFO}?subject=Ejercicio de derechos ARCO - Ley 19.628`}>{SITE.EMAIL_INFO}</a> indicando tu nombre completo, RUN o RUT, el derecho que deseas ejercer y los antecedentes que lo justifiquen. Responderemos en los plazos legales aplicables.
+                </p>
+              </div>
+            )}
+          </section>
+        ))}
+
+        <!-- ═══════ SECCIÓN DE CONTACTO ═══════ -->
+        <section class="legal-section legal-section-contact" id="contacto" data-od-id="legal-contact">
+          <header class="legal-section-head">
+            <span class="legal-section-num">08</span>
+            <div class="legal-section-icon"><Icon name="mail" size={20} /></div>
+            <h2>Cómo contactarnos</h2>
+          </header>
+          <p class="legal-section-intro">Para consultas sobre esta política, ejercer tus derechos o reportar un incidente de privacidad, escríbenos a cualquiera de estos canales.</p>
+          <div class="contacto-grid">
+            {contacto.map((c) => (
+              <article class="contacto-card">
+                <div class="contacto-icon"><Icon name={c.icon} size={20} /></div>
+                <span class="contacto-label">{c.label}</span>
+                {c.href ? (
+                  <a href={c.href} class="contacto-value">{c.value}</a>
+                ) : (
+                  <span class="contacto-value">{c.value}</span>
+                )}
+              </article>
+            ))}
+          </div>
+          <p class="legal-foot">
+            <strong>{SITE.LEGAL_NAME}</strong> · RUT {SITE.RUT}<br>
+            Encargado de tratamiento de datos: <a href={`mailto:${SITE.EMAIL_INFO}`}>{SITE.EMAIL_INFO}</a>
+          </p>
+        </section>
+
+        <!-- ═══════ FAQ ═══════ -->
+        <section class="legal-faq" data-od-id="legal-faq">
+          <h2 class="legal-faq-title">Preguntas frecuentes</h2>
+          <div class="faq-list">
+            {faq.map((f, i) => (
+              <details class="faq-item" open={i === 0}>
+                <summary>{f.question}</summary>
+                <p>{f.answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      </article>
+    </div>
+  </section>
+
+  <!-- ═══════ CTA FINAL ═══════ -->
+  <LeadCTA
+    variant="footer"
+    title="¿Tienes dudas sobre tu privacidad?"
+    subtitle="Nuestro equipo de cumplimiento responde en menos de 24 horas hábiles. Si lo prefieres, también puedes contactarnos directamente."
+    primaryText="Ejercer mis derechos ARCO"
+    primaryHref={`mailto:${SITE.EMAIL_INFO}?subject=Ejercicio de derechos ARCO`}
+    secondaryText="Ver Términos y Condiciones"
+    secondaryHref="/terminos"
+  />
+</BaseLayout>
+
+<script type="application/ld+json" set:html={JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'PrivacyPolicy',
+  name: 'Política de Privacidad de GuardMan Chile',
+  url: new URL('/privacidad', SITE.URL).href,
+  dateModified: lastUpdated,
+  publisher: {
+    '@type': 'Organization',
+    name: SITE.LEGAL_NAME,
+    url: SITE.URL,
+    logo: new URL('/favicon.svg', SITE.URL).href,
+  },
+  inLanguage: 'es-CL',
+  appliesTo: { '@type': 'Country', name: 'Chile' },
+})} />

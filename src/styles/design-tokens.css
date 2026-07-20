@@ -1,0 +1,201 @@
+/* ═══════════ GuardMan Chile — Design Tokens v5.2 ═══════════ */
+/* Single source of truth. Imported by BaseLayout.astro.
+   v5.2: Adds legacy aliases so every existing CSS rule keeps working
+   while we standardize the codebase on the `--gm-*` namespace. */
+
+/* ── Brand ── */
+:root {
+  --gm-primary: #1A2744;
+  --gm-primary-light: #1A3A5C;
+  --gm-primary-lighter: #5F7A96;
+  --gm-primary-pale: #E8ECF1;
+  --gm-primary-dark: #0F1829;
+
+  /* Accent / Interactive */
+  --gm-accent: #3B82F6;
+  --gm-accent-hover: #2563EB;
+  --gm-accent-soft: rgba(59, 130, 246, 0.1);
+
+  /* Semantic */
+  --gm-success: #10B981;
+  --gm-warning: #F59E0B;
+  --gm-error: #EF4444;
+
+  /* Surfaces */
+  --gm-surface: #FFFFFF;
+  --gm-surface-alt: #F8F9FA;
+  --gm-bg: #F8F9FA;
+
+  /* Text */
+  --gm-text: #0D0D0D;
+  --gm-text-muted: #6C757D;
+  --gm-text-dim: #ADB5BD;
+
+  /* Border */
+  --gm-border: #E5E7EB;
+  --gm-border-light: rgba(255, 255, 255, 0.06);
+
+  /* Dark page surfaces */
+  --gm-dark-bg: #0A1019;
+  --gm-dark-surface-0: #0D1525;
+  --gm-dark-surface-1: #131D33;
+  --gm-dark-surface-2: #1A2744;
+  --gm-dark-surface-3: #0f1729;
+  --gm-dark-fg: #e8ecf1;
+  --gm-dark-fg-muted: #8896ab;
+  --gm-dark-fg-dim: #5a6880;
+}
+
+/* ── Border Radius ── */
+:root {
+  --gm-radius: 8px;
+  --gm-radius-sm: 4px;
+  --gm-radius-md: 8px;
+  --gm-radius-lg: 12px;
+  --gm-radius-xl: 16px;
+  --gm-radius-2xl: 24px;
+  --gm-radius-full: 9999px;
+}
+
+/* ── Spacing Scale ── */
+:root {
+  --gm-space-xs: 4px;
+  --gm-space-sm: 8px;
+  --gm-space-md: 16px;
+  --gm-space-lg: 24px;
+  --gm-space-xl: 32px;
+  --gm-space-2xl: 48px;
+  --gm-space-3xl: 64px;
+  --gm-space-4xl: 80px;
+  --gm-space-5xl: 96px;
+}
+
+/* ── Typography ── */
+:root {
+  --gm-font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --gm-font-mono: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+
+  /* Heading sizes */
+  --gm-text-xs: 11px;
+  --gm-text-sm: 13px;
+  --gm-text-base: 15px;
+  --gm-text-md: 16px;
+  --gm-text-lg: 18px;
+  --gm-text-xl: 22px;
+  --gm-text-2xl: 28px;
+  --gm-text-3xl: 36px;
+  --gm-text-4xl: 48px;
+  --gm-text-5xl: 52px;
+}
+
+/* ── Shadows ── */
+:root {
+  --gm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --gm-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --gm-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --gm-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --gm-shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+/* ── Transitions ── */
+:root {
+  --gm-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --gm-transition-fast: 150ms ease;
+  --gm-transition-base: 200ms ease;
+  --gm-transition-slow: 300ms ease;
+}
+
+/* ── Z-index Scale ── */
+:root {
+  --gm-z-header: 50;
+  --gm-z-dropdown: 100;
+  --gm-z-sticky: 40;
+  --gm-z-overlay: 200;
+}
+
+/* ── Layout constants ── */
+:root {
+  --gm-container: 1200px;
+  --gm-container-narrow: 760px;
+  --gm-section-pad-y: 64px;
+  --gm-section-pad-y-sm: 40px;
+  --gm-section-pad-y-lg: 80px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LEGACY ALIASES — v5.2
+   Every legacy variable used by site.css / dark.css / inline
+   styles maps 1:1 to its `--gm-*` equivalent. This lets us
+   standardize on the prefixed namespace without rewriting
+   thousands of CSS rules.
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  --primary: var(--gm-primary);
+  --primary-light: var(--gm-primary-light);
+  --primary-lighter: var(--gm-primary-lighter);
+  --primary-pale: var(--gm-primary-pale);
+  --primary-dark: var(--gm-primary-dark);
+  --accent: var(--gm-accent);
+  --accent-hover: var(--gm-accent-hover);
+  --success: var(--gm-success);
+  --warning: var(--gm-warning);
+  --error: var(--gm-error);
+  --fg: var(--gm-text);
+  --muted: var(--gm-text-muted);
+  --muted-light: var(--gm-text-dim);
+  --border: var(--gm-border);
+  --bg: var(--gm-bg);
+  --surface: var(--gm-surface);
+  --radius-sm: var(--gm-radius-sm);
+  --radius-md: var(--gm-radius-md);
+  --radius: var(--gm-radius);
+  --radius-lg: var(--gm-radius-lg);
+  --radius-xl: var(--gm-radius-xl);
+  --radius-2xl: var(--gm-radius-2xl);
+  --radius-full: var(--gm-radius-full);
+  --shadow-sm: var(--gm-shadow-sm);
+  --shadow-md: var(--gm-shadow-md);
+  --shadow-lg: var(--gm-shadow-lg);
+  --shadow-xl: var(--gm-shadow-xl);
+  --ease: var(--gm-ease);
+  --font: var(--gm-font-sans);
+
+  /* Dark surface aliases (used by site.css dark sections) */
+  --surface-0: var(--gm-dark-surface-0);
+  --surface-1: var(--gm-dark-surface-1);
+  --surface-2: var(--gm-dark-surface-2);
+  --surface-3: var(--gm-dark-surface-3);
+  --color-navy: var(--gm-primary);
+  --color-navy-light: var(--gm-primary-light);
+  --color-navy-dark: var(--gm-primary-dark);
+  --color-fg: var(--gm-dark-fg);
+  --color-fg-muted: var(--gm-dark-fg-muted);
+  --color-fg-dim: var(--gm-dark-fg-dim);
+  --color-accent: var(--gm-accent);
+  --color-accent-hover: var(--gm-accent-hover);
+  --color-success: var(--gm-success);
+  --color-warning: var(--gm-warning);
+  --color-error: var(--gm-error);
+}
+
+/* ═══════ Dark Theme Overrides ═══════ */
+[data-theme="dark"] {
+  --gm-bg: var(--gm-dark-bg);
+  --gm-surface: var(--gm-dark-surface-1);
+  --gm-surface-alt: var(--gm-dark-surface-0);
+  --gm-text: var(--gm-dark-fg);
+  --gm-text-muted: var(--gm-dark-fg-muted);
+  --gm-text-dim: var(--gm-dark-fg-dim);
+  --gm-border: rgba(255, 255, 255, 0.08);
+  --gm-accent-soft: rgba(59, 130, 246, 0.15);
+
+  /* Keep legacy aliases in sync */
+  --primary: var(--gm-primary);
+  --accent: var(--gm-accent);
+  --fg: var(--gm-text);
+  --muted: var(--gm-text-muted);
+  --muted-light: var(--gm-text-dim);
+  --border: var(--gm-border);
+  --bg: var(--gm-bg);
+  --surface: var(--gm-surface);
+}

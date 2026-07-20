@@ -1,0 +1,42 @@
+{
+  "name": "guardman-astro",
+  "version": "5.2.0",
+  "description": "GuardMan Chile — Astro 6 en Cloudflare Workers. v5.2: normalización de layouts, design system unificado, copy/SEO en español neutro, Guardpod reforzado.",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "wrangler dev",
+    "check": "astro check",
+    "deploy": "astro build && wrangler deploy --config dist/server/wrangler.json",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:coverage": "vitest run --coverage",
+    "lighthouse": "node scripts/lighthouse-audit.mjs"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^13.6.0",
+    "@astrojs/react": "^4.0.0",
+    "astro": "^6.0.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.8.0",
+    "marked": "^18.0.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "vite": "7.1.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@playwright/test": "^1.61.1",
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitest/coverage-v8": "^4.1.10",
+    "jsdom": "^29.1.1",
+    "lighthouse": "^12.8.2",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.0",
+    "wrangler": "^4.0.0"
+  }
+}

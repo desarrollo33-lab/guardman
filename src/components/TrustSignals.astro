@@ -1,0 +1,133 @@
+---
+// TrustSignals — Bloque de señales de confianza para conversión.
+// Stats + certificaciones.
+import Icon from './Icon.astro';
+
+const certifications = [
+  { label: 'Certificación OS-10', desc: 'Vigente, autorizada por Carabineros de Chile', icon: 'shield' },
+  { label: 'Ley 21.659', desc: 'Cumplimiento de la norma de seguridad privada', icon: 'doc' },
+  { label: 'Seguro RC', desc: 'Responsabilidad civil cubierta', icon: 'check' },
+  { label: 'Central de monitoreo propia', desc: 'Operación 24/7 con redundancia de sistemas', icon: 'monitor' },
+];
+
+const faqs = [
+  {
+    q: '¿Cuánto demora la cotización?',
+    a: 'Nuestro equipo comercial le contacta en menos de 24 horas hábiles. Para urgencias, llame al +56 9 3000 0010 y atendemos en el acto, todos los días del año.',
+  },
+  {
+    q: '¿Cuál es el mínimo de guardias que puedo contratar?',
+    a: 'No hay mínimo. Diseñamos planes desde un guardia con turno parcial hasta operaciones 24/7 con múltiples puestos. Cada cotización se ajusta a sus necesidades reales.',
+  },
+  {
+    q: '¿Los guardias están realmente certificados?',
+    a: 'Sí, todos nuestros guardias acreditan certificación OS-10 vigente emitida por la Prefectura de Seguridad Privada de Carabineros. Verificamos antecedentes penales, laborales y referencias.',
+  },
+  {
+    q: '¿Qué comunas de Santiago cubren?',
+    a: 'Cubrimos 14 comunas de la Región Metropolitana: Las Condes, Vitacura, Lo Barnechea, La Reina, Providencia, Santiago Centro, Huechuraba, Quilicura, Conchalí, Renca, Pudahuel, La Pintana y Lampa. También Los Andes y San Felipe en la Región de Valparaíso.',
+  },
+  {
+    q: '¿Pueden combinar guardias con tecnología?',
+    a: 'Sí. Integramos guardias OS-10 con CCTV, control de accesos biométrico, Ajax Systems (somos instaladores oficiales) y el sistema autónomo Guardpod para vigilancia en zonas sin infraestructura. La cotización incluye la combinación óptima para su propiedad.',
+  },
+  {
+    q: '¿Qué pasa si necesito reemplazar un guardia?',
+    a: 'Contamos con un sistema de respaldo garantizado. Si un guardia se ausenta, enviamos reemplazo certificado en menos de 4 horas, sin costo adicional para el cliente.',
+  },
+];
+---
+
+<section class="trust-section" data-od-id="trust-signals">
+  <!-- Certificaciones -->
+  <div class="container">
+    <div class="cert-split">
+      <div class="cert-split-image">
+        <img
+          src="/images/flota/portada-residencial.webp"
+          alt="Flota operativa GuardMan — Saveiros identificadas en condominio"
+          loading="lazy"
+          decoding="async"
+          width="1200"
+          height="900"
+        />
+      </div>
+      <div class="cert-grid">
+        {certifications.map((c) => (
+          <div class="cert-item">
+            <div class="cert-icon">
+              <Icon name={c.icon} size={20} />
+            </div>
+            <div>
+              <strong>{c.label}</strong>
+              <span>{c.desc}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <section class="cta-section" data-od-id="faq">
+    <div class="container">
+      <span class="section-label">Preguntas frecuentes</span>
+      <h2 class="section-title">Resolvemos sus dudas</h2>
+      <p class="section-subtitle">Las preguntas más comunes antes de contratar seguridad privada en Chile.</p>
+      <div class="faq-grid">
+        {faqs.map((f, i) => (
+          <details class="faq-item" open={i === 0}>
+            <summary>
+              <span>{f.q}</span>
+              <Icon name="chevronDown" size={18} />
+            </summary>
+            <div class="faq-answer">{f.a}</div>
+          </details>
+        ))}
+      </div>
+      <div style="text-align:center;margin-top:40px">
+        <p style="color:var(--muted);font-size:14px;margin:0 0 16px">¿No encontró respuesta a su pregunta?</p>
+        <a href="/contacto" class="btn btn-primary">Hablar con un experto</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<style>
+  .cert-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .cert-split-image {
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: #0d1d3a;
+  }
+  .cert-split-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Cuando el cert-grid vive dentro del split 50/50, forzar 2x2 en vez
+     del 4x1 del global, y dar más padding a los items para que respiren. */
+  .cert-split .cert-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .cert-split .cert-item {
+    padding: 20px;
+  }
+  @media (max-width: 768px) {
+    .cert-split {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .cert-split .cert-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

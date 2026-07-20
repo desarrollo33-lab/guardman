@@ -1,0 +1,22 @@
+---
+// /admin/leads/[id] — Lead 360° (timeline, tasks, notes, comms, quotes).
+// SSR mode: usamos Astro.params.id directamente. getStaticPaths es para static output.
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import LeadDetail from '../../../islands/crm/LeadDetail.tsx';
+import { crmLeads } from '../../../lib/crm-data';
+
+const { id } = Astro.params;
+const lead = crmLeads.find((l) => l.id === id);
+
+if (!lead) {
+  return Astro.redirect('/admin/leads');
+}
+---
+
+<AdminLayout
+  title={`Lead: ${lead.name}`}
+  section="leads"
+  breadcrumb={[{ name: 'Leads', url: '/admin/leads' }, { name: lead.name }]}
+>
+  <LeadDetail client:only="react" leadId={lead.id} />
+</AdminLayout>

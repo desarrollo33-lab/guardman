@@ -1,0 +1,102 @@
+---
+// HowItWorks — Bloque "Cómo funciona" simple de 3 pasos para reducir fricción.
+import Icon from './Icon.astro';
+
+const steps = [
+  {
+    num: '01',
+    title: 'Cuéntenos qué necesita proteger',
+    desc: 'Complete el formulario de cotización en menos de 2 minutos. Indique tipo de propiedad, comuna y servicio de interés.',
+    icon: 'doc',
+    cta: { text: 'Comenzar cotización', href: '/cotizacion' },
+  },
+  {
+    num: '02',
+    title: 'Reciba propuesta personalizada en 24 horas hábiles',
+    desc: 'Un experto en seguridad le contacta, evalúa su necesidad y diseña un plan a medida, sin compromiso.',
+    icon: 'clock3',
+  },
+  {
+    num: '03',
+    title: 'Comience a operar con guardias OS-10',
+    desc: 'Firmamos contrato, desplegamos personal certificado y activamos monitoreo 24/7. Reportes operativos periódicos al cliente.',
+    icon: 'shield',
+  },
+];
+---
+
+<section class="cta-section how-section" data-od-id="how-it-works">
+  <div class="container">
+    <span class="section-label">Proceso simple</span>
+    <h2 class="section-title">Contratar seguridad nunca fue tan fácil</h2>
+    <p class="section-subtitle">Tres pasos para proteger lo que más le importa. Sin burocracia, sin sorpresas, con la confianza de una empresa certificada OS-10 y respaldo del sistema autónomo Guardpod.</p>
+
+    <div class="steps-grid">
+      {steps.map((step, i) => (
+        <div class={`step-card${i === steps.length - 1 ? ' step-3-final' : ''}`}>
+          <div class="step-num">{step.num}</div>
+          <div class="step-icon">
+            <Icon name={step.icon} size={24} />
+          </div>
+          <h3>{step.title}</h3>
+          <p>{step.desc}</p>
+          {step.cta && (
+            <a href={step.cta.href} class="step-cta">
+              {step.cta.text}
+              <Icon name="arrowRight" size={14} />
+            </a>
+          )}
+          {i < steps.length - 1 && (
+            <div class="step-arrow">
+              <Icon name="arrowRight" size={20} />
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* step-3-final: tercer card con foto real del equipo comercial firmando
+     el contrato. Overlay azul corporativo para legibilidad. */
+  .step-3-final {
+    position: relative;
+    isolation: isolate;
+    color: #ffffff;
+    background-color: #0d1d3a;
+    background-image: url('/images/equipo/firma-contrato.webp');
+    background-size: cover;
+    background-position: 18% center;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 88px 28px 36px;
+  }
+  .step-3-final::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(105deg, rgba(13, 29, 58, 0.45) 0%, rgba(13, 29, 58, 0.72) 100%);
+    z-index: -1;
+  }
+  .step-3-final .step-num {
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--gm-accent), #1d4ed8);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+  .step-3-final h3,
+  .step-3-final p {
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    max-width: 32ch;
+  }
+  /* Step 03 no necesita icono de escudo: la imagen ya comunica el acto
+     de firma. El SVG cian competía con la cara de la persona. */
+  .step-3-final .step-icon {
+    display: none;
+  }
+</style>

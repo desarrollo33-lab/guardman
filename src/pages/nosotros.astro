@@ -1,0 +1,249 @@
+---
+// /nosotros — Empresa de seguridad privada GuardMan Chile desde 2014.
+// v5.3 — Rediseño con estructura dark de páginas dedicadas (ajax-systems / guard-pod).
+// Hero-grid con video YouTube autoplay+mute como visual principal.
+// Secciones: intro, valores (feature-grid), diferenciadores, timeline, stats,
+// staff, certificaciones, FAQ, CTA.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import StaffSection from '../components/StaffSection.astro';
+
+const stats = [
+  { value: '10+', label: 'Años de experiencia' },
+  { value: '200+', label: 'Guardias certificados' },
+  { value: '14', label: 'Comunas con cobertura' },
+  { value: '24/7', label: 'Central de monitoreo' },
+];
+
+const values = [
+  { icon: 'shield', title: 'Integridad', text: 'Actuamos con honestidad y transparencia en cada servicio, cuidando la confianza que clientes y colaboradores depositan en nosotros.' },
+  { icon: 'check', title: 'Compromiso', text: 'Entregamos seguridad con dedicación y responsabilidad, protegiendo a las personas y sus bienes como si fueran propios.' },
+  { icon: 'users', title: 'Profesionalismo', text: 'Nuestro equipo mantiene estándares de excelencia en cada operación, con certificación OS-10 vigente y capacitación continua.' },
+  { icon: 'location', title: 'Cercanía operativa', text: 'Acompañamos a cada cliente con un ejecutivo dedicado y supervisores zonales que conocen el territorio y sus dinámicas.' },
+];
+
+const differentiators = [
+  { icon: 'bolt', title: 'Guardpod, tecnología propia con 15 meses de I+D', text: 'Sistema autónomo de vigilancia con cámaras PTZ 360° y detección por IA. Único en el mercado chileno, sustituye guardias presenciales a una fracción del costo en faenas, terrenos y eventos temporales sin infraestructura eléctrica ni personal permanente.' },
+  { icon: 'radar', title: 'Central de monitoreo propia 24/7', text: 'Operamos nuestra propia central de vigilancia, sin tercerizar. Supervisión en tiempo real, redundancia de sistemas y respuesta inmediata ante cada evento validado.' },
+  { icon: 'shield', title: 'Certificación OS-10 vigente', text: 'Acreditación oficial de la Prefectura de Seguridad Privada de Carabineros de Chile, que respalda nuestro cumplimiento de la Ley 21.659 de seguridad privada.' },
+  { icon: 'clock', title: 'Más de 10 años de trayectoria', text: 'Desde 2014 protegemos hogares, empresas e instituciones en la Región Metropolitana y Valparaíso, con un equipo estable y clientes recurrentes.' },
+  { icon: 'location', title: 'Cobertura en 14 comunas', text: 'Presencia operativa directa en 14 comunas de Santiago más Los Andes y San Felipe, con capacidad de respuesta coordinada entre zonas.' },
+];
+
+const certifications = [
+  { title: 'OS-10', text: 'Autorización de Carabineros de Chile que garantiza que cada guardia cumple con los requisitos legales para prestar servicios de seguridad privada.' },
+  { title: 'Ley 21.659', text: 'Cumplimiento de la nueva normativa chilena de seguridad privada, vigente desde 2024, que eleva los estándares de idoneidad y formación del personal.' },
+  { title: 'Capacitación continua', text: 'Entrenamiento permanente en protocolos de seguridad, primeros auxilios y atención de emergencias, con evaluaciones periódicas de desempeño.' },
+  { title: 'Seguro de responsabilidad civil', text: 'Cobertura RC que resguarda al cliente ante cualquier eventualidad derivada de la prestación del servicio.' },
+];
+
+const faqs = [
+  { question: '¿Cuántos años de experiencia tiene GuardMan Chile en seguridad privada?', answer: 'Operamos de forma continua desde 2014. Más de 10 años nos respaldan en la protección de hogares, empresas e instituciones en la Región Metropolitana y Valparaíso.' },
+  { question: '¿Qué certificaciones y cumplimiento legal tienen sus guardias?', answer: 'Cada guardia cuenta con certificación OS-10 vigente, exigida por la Prefectura de Seguridad Privada de Carabineros de Chile, y nuestra operación cumple con la Ley 21.659 de seguridad privada vigente desde 2024.' },
+  { question: '¿GuardMan tiene central de monitoreo propia?', answer: 'Sí. Operamos nuestra propia central de monitoreo 24/7, sin tercerizar el servicio. Esto nos permite supervisar en tiempo real cada alerta, validar eventos y coordinar respuesta con Carabineros o equipos en terreno cuando corresponde.' },
+  { question: '¿Qué es Guardpod y por qué es un diferenciador de GuardMan?', answer: 'Guardpod es un sistema autónomo de vigilancia desarrollado por GuardMan Chile durante 15 meses de I+D. Integra cámaras PTZ 360°, detección por inteligencia artificial y conexión a nuestra central propia, sin requerir infraestructura eléctrica ni personal permanente. Ninguna otra empresa de seguridad en Chile ofrece un sistema equivalente.' },
+  { question: '¿En qué comunas y regiones opera GuardMan?', answer: 'Tenemos cobertura operativa directa en 14 comunas de la Región Metropolitana, además de Los Andes y San Felipe en la Región de Valparaíso, con capacidad de respuesta coordinada entre zonas.' },
+  { question: '¿Puedo contratar solo guardias OS-10 sin monitoreo?', answer: 'Sí. Ofrecemos esquemas flexibles: guardias OS-10 con supervisión propia, monitoreo 24/7 desde nuestra central, unidades Guardpod para perímetros sin infraestructura, o combinaciones de estos servicios según las necesidades de cada cliente.' },
+];
+---
+
+<BaseLayout
+  title="Nosotros GuardMan Chile Seguridad Privada desde 2014"
+  description={`Conozca a GuardMan Chile: empresa de seguridad privada con certificación OS-10, central de monitoreo propia y el sistema autónomo Guardpod. Más de 10 años protegiendo empresas y residencias en 14 comunas de la Región Metropolitana y Valparaíso.`}
+  theme="dark"
+  loadDarkCss={true}
+  breadcrumb="Nosotros"
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Nosotros', url: '/nosotros' }]}
+  showCluster={true}
+  clusterType="servicios"
+  faq={faqs}
+>
+  <!-- HERO: estructura página dedicada con video YouTube autoplay+mute -->
+  <section class="hero" data-od-id="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-badge">
+            <Icon name="shield" size={14} />
+            Seguridad privada certificada
+          </div>
+          <h1>Protegemos lo que más le importa <span>desde 2014</span></h1>
+          <p class="hero-sub">GuardMan Chile nació con una convicción: la seguridad privada en el país merecía un estándar más alto. Más de 10 años después, somos la opción de cientos de empresas e instituciones y protegemos 14 comunas de la Región Metropolitana, sumando la Región de Valparaíso con cobertura propia en Los Andes y San Felipe.</p>
+          <div class="hero-ctas">
+            <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+            <a href="#historia" class="btn btn-ghost btn-lg">Conocer nuestra historia</a>
+          </div>
+          <div class="hero-stats">
+            <div><div class="hero-stat-value">10+</div><div class="hero-stat-label">Años</div></div>
+            <div><div class="hero-stat-value">200+</div><div class="hero-stat-label">Guardias OS-10</div></div>
+            <div><div class="hero-stat-value">14</div><div class="hero-stat-label">Comunas</div></div>
+            <div><div class="hero-stat-value">24/7</div><div class="hero-stat-label">Central propia</div></div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-product">
+            <iframe
+              src="https://www.youtube.com/embed/mqpLsKrwjAI?autoplay=1&mute=1&rel=0&playsinline=1&controls=1&modestbranding=1&loop=1&playlist=mqpLsKrwjAI"
+              title="GuardMan Chile - Seguridad privada desde 2014"
+              loading="lazy"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowfullscreen
+              style="position:absolute;inset:0;width:100%;height:100%;border:0"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO: split texto + cards de dirección (reemplaza imagen previa) -->
+  <section data-od-id="intro">
+    <div class="container">
+      <div class="split">
+        <div class="split-text">
+          <span class="section-label">Quiénes somos</span>
+          <h2 class="section-title">Una empresa de seguridad privada con estándar operativo propio</h2>
+          <p>GuardMan Chile es una empresa de seguridad privada con más de 10 años de trayectoria en el mercado chileno. Iniciamos operaciones en 2014 con un equipo fundador de guardias certificados OS-10 y, desde entonces, hemos construido una operación que combina capital humano calificado, tecnología propia y un central de monitoreo que no terceriza la supervisión de sus clientes.</p>
+          <p>A diferencia de otras empresas del rubro, en GuardMan el compromiso no se delega. Capacitamos a nuestro personal en academia interna, supervisamos cada servicio desde nuestra propia central y, desde 2024, contamos con Guardpod, un sistema autónomo de vigilancia desarrollado internamente durante 15 meses de investigación y desarrollo. Esto nos permite ofrecer una propuesta integral, con tecnología que ningún competidor en Chile puede replicar.</p>
+        </div>
+        <div class="leadership-grid" style="display:flex;flex-direction:column;gap:16px;align-items:stretch">
+          <div class="feature-card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px">
+            <div style="width:120px;height:120px;border-radius:50%;overflow:hidden;border:2px solid var(--gm-accent);flex-shrink:0">
+              <img
+                src="/images/director-general.webp"
+                alt="Rodrigo Mora, Director General de GuardMan Chile"
+                width="120"
+                height="120"
+                loading="lazy"
+                onerror="this.style.display='none'"
+                style="width:120px!important;height:120px!important;display:block!important;object-fit:cover"
+              />
+            </div>
+            <h3 style="margin:6px 0 0;font-size:18px">Rodrigo Mora</h3>
+            <p style="color:rgba(255,255,255,.55);font-size:13px;margin:0">Director General</p>
+            <a href="mailto:rmora@guardman.cl" style="color:var(--gm-accent);font-size:13px;display:inline-flex;align-items:center;gap:6px;text-decoration:none">
+              <Icon name="mail" size={12} />
+              rmora@guardman.cl
+            </a>
+            <a href="tel:+56942820580" style="color:rgba(255,255,255,.7);font-size:13px;display:inline-flex;align-items:center;gap:6px;text-decoration:none">
+              <Icon name="phone" size={12} />
+              +56 9 4282 0580
+            </a>
+          </div>
+          <div class="feature-card" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px">
+            <div style="width:120px;height:120px;border-radius:50%;overflow:hidden;border:2px solid var(--gm-accent);flex-shrink:0">
+              <img
+                src="/images/director-seguridad.webp"
+                alt="Rodrigo Rosello, Director de Seguridad de GuardMan Chile"
+                width="120"
+                height="120"
+                loading="lazy"
+                onerror="this.style.display='none'"
+                style="width:120px!important;height:120px!important;display:block!important;object-fit:cover"
+              />
+            </div>
+            <h3 style="margin:6px 0 0;font-size:18px">Rodrigo Rosello</h3>
+            <p style="color:rgba(255,255,255,.55);font-size:13px;margin:0">Director de Seguridad</p>
+            <a href="mailto:rrosello@guardman.cl" style="color:var(--gm-accent);font-size:13px;display:inline-flex;align-items:center;gap:6px;text-decoration:none">
+              <Icon name="mail" size={12} />
+              rrosello@guardman.cl
+            </a>
+            <a href="tel:+56970892223" style="color:rgba(255,255,255,.7);font-size:13px;display:inline-flex;align-items:center;gap:6px;text-decoration:none">
+              <Icon name="phone" size={12} />
+              +56 9 708 922 23
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALORES: feature-grid estilo página dedicada -->
+  <section class="section-dark" data-od-id="valores" id="valores">
+    <div class="container">
+      <span class="section-label">Nuestros valores</span>
+      <h2 class="section-title">Principios que orientan cada operación</h2>
+      <p class="section-subtitle" style="max-width:600px">En seguridad, los valores no son un eslogan: son la base sobre la que se construye la confianza de quien nos contrata. Estos cuatro principios rigen cada guardia desplegado, cada alerta validada y cada decisión operativa.</p>
+      <div class="feature-grid">
+        {values.map((v) => (
+          <div class="feature-card">
+            <div class="feature-card-icon">
+              <Icon name={v.icon} size={20} />
+            </div>
+            <h3>{v.title}</h3>
+            <p>{v.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- DIFERENCIADORES: feature-grid extendido -->
+  <section data-od-id="diferenciadores">
+    <div class="container">
+      <span class="section-label">Nuestros diferenciadores</span>
+      <h2 class="section-title">Qué nos distingue en el mercado chileno</h2>
+      <p class="section-subtitle" style="max-width:600px">En seguridad, los detalles marcan la diferencia entre un servicio profesional y uno que solo cumple el mínimo. Estos son los cinco pilares que sostienen nuestra propuesta de valor.</p>
+      <div class="feature-grid">
+        {differentiators.map((d) => (
+          <div class="feature-card">
+            <div class="feature-card-icon">
+              <Icon name={d.icon} size={20} />
+            </div>
+            <h3>{d.title}</h3>
+            <p>{d.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- STAFF: sección ya centralizada -->
+  <StaffSection />
+
+  <!-- CERTIFICACIONES -->
+  <section data-od-id="certificaciones">
+    <div class="container">
+      <span class="section-label">Certificaciones</span>
+      <h2 class="section-title">Cumplimiento normativo y respaldo legal</h2>
+      <p class="section-subtitle" style="max-width:600px">Operamos dentro del marco legal chileno con todas las certificaciones exigidas y cobertura de responsabilidad civil vigente.</p>
+      <div class="why-grid">
+        {certifications.map((c) => (
+          <div class="why-card">
+            <Icon name="check" size={24} />
+            <h4>{c.title}</h4>
+            <p>{c.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section data-od-id="faq">
+    <div class="container" style="max-width:760px">
+      <span class="section-label">Preguntas frecuentes</span>
+      <h2 class="section-title">Todo lo que necesita saber sobre GuardMan Chile</h2>
+      <div class="faq">
+        {faqs.map((f, i) => (
+          <details open={i === 0}>
+            <summary>{f.question}</summary>
+            <div class="answer">{f.answer}</div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA final -->
+  <div class="cta-band" data-od-id="cta">
+    <div class="container">
+      <h2 class="section-title">¿Quiere conocernos en persona?</h2>
+      <p class="section-subtitle">Agende una visita a nuestra central de monitoreo o solicite una reunión con nuestro equipo comercial. Le mostramos cómo protegemos lo que más le importa.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+        <a href="/contacto" class="btn btn-ghost btn-lg">Hablar con un experto</a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

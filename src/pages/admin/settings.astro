@@ -1,0 +1,107 @@
+---
+// /admin/settings — ajustes del CRM. Astro puro, sin isla React.
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { SITE } from '../../lib/constants';
+---
+
+<AdminLayout title="Configuración" section="settings">
+  <div class="settings-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <h3>Sesión</h3>
+      </div>
+      <p style="color: var(--fg-muted); font-size: 13px; margin-bottom: 16px;">
+        Conectado como <strong>admin@guardman.cl</strong>
+      </p>
+      <button id="logout-btn" class="admin-btn admin-btn-secondary">Cerrar sesión</button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h3>🧪 Modo Demo CRM</h3>
+      </div>
+      <p style="color: var(--fg-muted); font-size: 13px; margin-bottom: 16px;">
+        Activa datos mock para probar el CRM sin conexión al backend. Las acciones no se persisten.
+      </p>
+      <button id="demo-toggle" class="admin-btn admin-btn-secondary">Activar Modo Demo</button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h3>Información del sistema</h3>
+      </div>
+      <div style="display: grid; gap: 8px; font-size: 13px; color: var(--fg-muted);">
+        <div style="display: flex; justify-content: space-between;">
+          <span>Backend:</span>
+          <code style="color: var(--fg);">{SITE.API_URL}</code>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Frontend:</span>
+          <code style="color: var(--fg);">{SITE.URL}</code>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Versión:</span>
+          <code style="color: var(--fg);">v4.0.0 (CRM-only + Lead Capture)</code>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Stack:</span>
+          <code style="color: var(--fg);">Astro + React + Tailwind v4</code>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Hosting:</span>
+          <code style="color: var(--fg);">Cloudflare Workers</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h3>Captura de Leads</h3>
+      </div>
+      <p style="color: var(--fg-muted); font-size: 13px; margin-bottom: 16px;">
+        Los leads capturados desde los formularios de <a href="/contacto" style="color: var(--color-accent);">Contacto</a> y <a href="/cotizacion" style="color: var(--color-accent);">Cotización</a> llegan automáticamente a la <a href="/admin/inbox" style="color: var(--color-accent);">Bandeja de Leads</a>.
+      </p>
+      <ul style="color: var(--fg-muted); font-size: 13px; padding-left: 20px; line-height: 1.8;">
+        <li>Formulario de contacto → estado <code style="background: var(--surface-2); padding: 1px 6px; border-radius: 4px; font-size: 11px;">Nuevo</code></li>
+        <li>Formulario de cotización → prioridad <code style="background: var(--surface-2); padding: 1px 6px; border-radius: 4px; font-size: 11px;">Alta</code></li>
+        <li>Teléfono clic-to-call → <code style="background: var(--surface-2); padding: 1px 6px; border-radius: 4px; font-size: 11px;">+56 9 3000 0010</code></li>
+        <li>Email → <code style="background: var(--surface-2); padding: 1px 6px; border-radius: 4px; font-size: 11px;">ventas@guardman.cl</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <script is:inline>
+    document.getElementById('logout-btn')?.addEventListener('click', () => {
+      localStorage.removeItem('gm_token');
+      localStorage.removeItem('gm_token_expires_at');
+      window.location.href = '/admin/login';
+    });
+
+    const demoBtn = document.getElementById('demo-toggle');
+    if (demoBtn) {
+      const isDemo = localStorage.getItem('gm_demo_mode') === 'crm';
+      demoBtn.textContent = isDemo ? '✅ Desactivar Modo Demo' : 'Activar Modo Demo';
+      demoBtn.addEventListener('click', () => {
+        const next = !(localStorage.getItem('gm_demo_mode') === 'crm');
+        if (next) localStorage.setItem('gm_demo_mode', 'crm');
+        else localStorage.removeItem('gm_demo_mode');
+        window.location.reload();
+      });
+    }
+  </script>
+
+  <style>
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    code {
+      background: var(--surface-2);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+  </style>
+</AdminLayout>

@@ -1,0 +1,193 @@
+---
+// /guard-pod - Producto exclusivo GuardMan.
+// v5.2 - Copy reforzado como DIFERENCIADOR ÚNICO en el mercado chileno.
+// Estructura, secciones, imágenes, colores de fondo y componentes preservados.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+
+const features = [
+  {
+    icon: 'guard-pod',
+    title: 'Cámaras PTZ con detección por inteligencia artificial',
+    description: 'Cámaras de alta definición con movimiento horizontal, vertical y zoom, capaces de identificar personas, vehículos y objetos mediante inteligencia artificial. Reducen falsas alarmas y emiten alertas precisas ante intrusiones reales.',
+  },
+  {
+    icon: 'monitor',
+    title: 'Alimentación autónoma con baterías',
+    description: 'Baterías de litio de alta capacidad y panel de carga que garantizan operación continua. Sin conexión a la red eléctrica ni generadores ruidosos.',
+  },
+  {
+    icon: 'wifi',
+    title: 'Conectividad 4G/LTE integrada',
+    description: 'Módem 4G incorporado que permite transmisión de video en tiempo real y recepción de alertas desde cualquier lugar. Ideal para terrenos sin acceso a internet fijo.',
+  },
+  {
+    icon: 'eye',
+    title: 'Monitoreo 24/7 desde central propia',
+    description: 'Nuestra central de monitoreo supervisa cada unidad las 24 horas. Ante una alerta validada se activan protocolos de verificación y se coordina respuesta con Carabineros cuando corresponde.',
+  },
+  {
+    icon: 'bolt',
+    title: 'Instalación rápida sin obras',
+    description: 'No requiere excavaciones, cableado ni permisos de construcción. Se instala en minutos sobre superficie plana y puede reubicarse fácilmente según las necesidades del proyecto.',
+  },
+];
+
+const problems = [
+  'Robos y vandalismo en obras de construcción durante la noche o fines de semana',
+  'Falta de vigilancia en terrenos sin acceso a electricidad ni internet',
+  'Costos elevados de guardias presenciales para turnos nocturnos o fines de semana',
+  'Dificultad para monitorear eventos masivos o ferias temporales sin infraestructura',
+  'Necesidad de respuesta inmediata ante intrusiones en zonas aisladas',
+  'Imposibilidad de instalar sistemas de seguridad tradicionales en terrenos en desarrollo',
+];
+
+const faqs = [
+  {
+    question: '¿Guardpod funciona sin electricidad ni internet?',
+    answer: 'Sí. Guardpod es completamente autónoma gracias a sus paneles solares y baterías de litio, que ofrecen hasta 72 horas de respaldo sin recarga. Además, cuenta con módem 4G integrado para transmitir video y alertas sin necesidad de conexión fija a internet.',
+  },
+  {
+    question: '¿Qué tipo de detección tiene Guardpod?',
+    answer: 'Utiliza inteligencia artificial para detectar personas, vehículos y objetos, reduciendo significativamente las falsas alarmas. Puede diferenciar entre una persona y un animal, por ejemplo, y emitir alertas solo cuando el evento es relevante.',
+  },
+  {
+    question: '¿Cuánto tiempo puede operar sin sol?',
+    answer: 'Las baterías de litio de alta capacidad permiten operar hasta 72 horas sin recarga solar, dependiendo del uso de las cámaras y la frecuencia de transmisión de video. En condiciones normales, la recarga diaria es suficiente para mantener operación continua.',
+  },
+  {
+    question: '¿Se puede reubicar Guardpod fácilmente?',
+    answer: 'Sí. Su diseño modular permite desmontarla y trasladarla a otra ubicación en pocos minutos. Es ideal para proyectos temporales como obras, eventos o ferias que cambian de lugar.',
+  },
+  {
+    question: '¿Por qué Guardpod es única en Chile?',
+    answer: 'Guardpod es el único producto de vigilancia autónoma diseñado, fabricado y operado por una empresa de seguridad privada en Chile. Combina hardware propio, software de detección IA y monitoreo desde una central propia, sin tercerizar ningún componente del servicio.',
+  },
+  {
+    question: '¿Quién monitorea las alertas de Guardpod?',
+    answer: 'Todas las alertas son recibidas y verificadas por la central de monitoreo propia de GuardMan, operativa las 24 horas. Ante una intrusión confirmada se coordina la respuesta con Carabineros o con personal de seguridad en terreno, según el caso.',
+  },
+];
+---
+
+<BaseLayout
+  title="Guardpod Sistema Autónomo de Vigilancia 24/7"
+  description="Guardpod es el sistema autónomo de vigilancia desarrollado por GuardMan Chile. Integra cámaras PTZ 360°, detección IA y monitoreo 24/7 desde nuestra central propia. Único en el mercado chileno. Sin infraestructura eléctrica ni personal permanente."
+  theme="dark"
+  loadDarkCss={true}
+  breadcrumb="Guardpod"
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Guardpod', url: '/guard-pod' }]}
+  showCluster={true}
+  clusterType="servicios"
+  clusterExclude="guard-pod"
+  faq={faqs}
+>
+  <!-- HERO -->
+  <section class="hero" data-od-id="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-badge">
+            <Icon name="shield" size={14} />
+            Tecnología exclusiva GuardMan
+          </div>
+          <h1>Guardpod, sistema autónomo de vigilancia 24/7 sin infraestructura</h1>
+          <p class="hero-sub">Sistema autónomo de vigilancia con cámaras PTZ 360° y detección de intrusos por IA, supervisado desde nuestra central propia. Desarrollado durante 15 meses de I+D, sustituye guardias presenciales a una fracción del costo, sin infraestructura eléctrica ni personal permanente. Ninguna otra empresa de seguridad en Chile ofrece un sistema equivalente.</p>
+          <div class="hero-ctas">
+            <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+            <a href="#features" class="btn btn-ghost btn-lg">Ver ficha técnica</a>
+          </div>
+          <div class="hero-stats">
+            <div><div class="hero-stat-value">0</div><div class="hero-stat-label">Cableado</div></div>
+            <div><div class="hero-stat-value">15</div><div class="hero-stat-label">Meses de I+D</div></div>
+            <div><div class="hero-stat-value">360°</div><div class="hero-stat-label">Cobertura PTZ</div></div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-product">
+            <video src="/videos/guardpod-hero.mp4" autoplay loop muted playsinline preload="auto" aria-label="Guardpod V1 - sistema autónomo de vigilancia"></video>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section data-od-id="intro">
+    <div class="container">
+      <div class="split">
+        <div class="split-text">
+          <span class="section-label">Vigilancia autónoma</span>
+          <h2 class="section-title">¿Paga de más por vigilar zonas sin infraestructura?</h2>
+          <p>Contratar guardias presenciales 24/7 para faenas, terrenos o estacionamientos suele superar los $3.000.000 mensuales. Guardpod ofrece la misma cobertura, con detección por IA y respuesta inmediata, por una fracción de ese costo, sin necesidad de personal permanente, conexión eléctrica ni obras civiles.</p>
+          <p>A diferencia de una cámara de seguridad convencional o de una torre CCTV solar tradicional, Guardpod es un sistema autónomo completo que integra visión nocturna, análisis de video en tiempo real y alertas inmediatas ante intrusiones. Su diseño modular permite reubicación en minutos, adaptándose a proyectos temporales o permanentes. Desarrollado durante 15 meses de investigación interna, es la primera solución de vigilancia autónoma diseñada y operada por una empresa de seguridad privada en Chile.</p>
+        </div>
+        <div class="split-image">
+          <img src="/images/guardpod-16-9.png" alt="Sistema autónomo Guardpod en operación nocturna" loading="lazy" onerror="this.style.display='none'" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section-dark" data-od-id="features" id="features">
+    <div class="container">
+      <span class="section-label">Características principales</span>
+      <h2 class="section-title">Tecnología que protege sin descanso</h2>
+      <div class="feature-grid">
+        {features.map((f) => (
+          <div class="feature-card">
+            <div class="feature-card-icon">
+              <Icon name={f.icon} size={20} />
+            </div>
+            <h3>{f.title}</h3>
+            <p>{f.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEMS -->
+  <section data-od-id="problems">
+    <div class="container">
+      <span class="section-label">Problemas que resolvemos</span>
+      <h2 class="section-title">Seguridad sin compromisos</h2>
+      <div class="problems-grid">
+        {problems.map((p) => (
+          <div class="problem-card">
+            <Icon name="warn" size={20} />
+            <p>{p}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section data-od-id="faq">
+    <div class="container" style="max-width:760px">
+      <span class="section-label">Preguntas frecuentes</span>
+      <h2 class="section-title">Todo lo que necesita saber sobre Guardpod</h2>
+      <div class="faq">
+        {faqs.map((f, i) => (
+          <details open={i === 0}>
+            <summary>{f.question}</summary>
+            <div class="answer">{f.answer}</div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-band" data-od-id="cta">
+    <div class="container">
+      <h2 class="section-title">Proteja su obra, evento o terreno con Guardpod</h2>
+      <p class="section-subtitle">Solicite una cotización sin compromiso y descubra cómo esta solución autónoma reemplaza guardias presenciales a una fracción del costo, sin perder capacidad de respuesta.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar ahora</a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

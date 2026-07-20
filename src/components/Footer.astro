@@ -1,0 +1,128 @@
+---
+// Footer v3.0 — enriquecido con más cross-linking para SEO interno.
+// v4.1: link amarillo de Canal de Denuncias en columna "Empresa".
+import { SITE, SERVICE_NAMES, LOCATIONS, SECTOR_NAMES, DENUNCIA_PATH } from '../lib/constants';
+import { ICONS } from '../lib/icons';
+const year = new Date().getFullYear();
+const topServices = Object.entries(SERVICE_NAMES).slice(0, 6);
+const topLocations = LOCATIONS.slice(0, 7);
+const topSectors = Object.entries(SECTOR_NAMES).slice(0, 6);
+---
+
+<footer class="site-footer" data-od-id="footer">
+  <div class="container">
+    <div class="footer-grid footer-grid-v3">
+      <div class="footer-col footer-brand">
+        <div class="footer-brand-logo">
+          <img src="/images/logo-byn.png" alt="GuardMan" class="footer-logo-img" width="680" height="250" />
+        </div>
+        <p>Empresa de seguridad privada con certificación OS-10. Protegemos lo que más le importa, con personal propio y tecnología exclusiva.</p>
+        <div class="footer-social">
+          <a href={SITE.INSTAGRAM_URL} target="_blank" rel="noopener" aria-label="Instagram" set:html={ICONS.instagram} />
+          <a href={SITE.YOUTUBE_URL} target="_blank" rel="noopener" aria-label="YouTube" set:html={ICONS.youtube} />
+        </div>
+        <div class="footer-cert">
+          <span class="cert-badge">🛡️ OS-10 Autorizado</span>
+          <span class="cert-badge cert-badge-years">10+ años</span>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Servicios</h4>
+        {topServices.map(([slug, name]) => (
+          <a href={`/servicios/${slug}`}>{name}</a>
+        ))}
+        <a href="/servicios" class="footer-see-all">Ver todos los servicios →</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Cobertura</h4>
+        {topLocations.map((l) => (
+          <a href={`/ubicaciones/${l.slug}`}>{l.name}</a>
+        ))}
+        <a href="/ubicaciones" class="footer-see-all">Ver mapa completo →</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Sectores</h4>
+        {topSectors.map(([slug, name]) => (
+          <a href={`/sectores/${slug}`}>{name}</a>
+        ))}
+        <a href="/sectores" class="footer-see-all">Ver todos los sectores →</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Empresa</h4>
+        <a href="/nosotros">Nosotros</a>
+        <a href="/guard-pod">Guardpod</a>
+        <a href="/ajax-systems">Ajax Systems</a>
+        <a href="/contacto">Contacto</a>
+        <a href="/cotizacion">Solicitar cotización</a>
+        <a href="/privacidad">Privacidad</a>
+        <a href="/terminos">Términos</a>
+      </div>
+
+      <div class="footer-col footer-contact">
+        <h4>Contacto directo</h4>
+        <a href={`tel:${SITE.PHONE_TEL}`}>📞 {SITE.PHONE}</a>
+        <a href={`mailto:${SITE.EMAIL_INFO}`}>📧 {SITE.EMAIL_INFO}</a>
+        <a href={`mailto:${SITE.EMAIL_VENTAS}`}>💼 {SITE.EMAIL_VENTAS}</a>
+        <p class="footer-address">📍 {SITE.ADDRESS}</p>
+        <p class="footer-hours">🕒 Monitoreo 24/7, todos los días del año</p>
+        <a href={DENUNCIA_PATH} class="footer-link-denuncia">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" width="14" height="14"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+          Canal de Denuncias
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-link-cluster">
+      <strong>Servicios destacados:</strong>
+      <a href="/servicios/guardias-de-seguridad">Guardias de Seguridad</a>
+      <span class="footer-sep">·</span>
+      <a href="/servicios/cctv-videovigilancia">CCTV</a>
+      <span class="footer-sep">·</span>
+      <a href="/servicios/control-de-accesos">Control de Accesos</a>
+      <span class="footer-sep">·</span>
+      <a href="/servicios/monitoreo-24-7">Monitoreo 24/7</a>
+      <span class="footer-sep">·</span>
+      <a href="/servicios/escoltas-privados">PPI (Protección de Personas Importantes)</a>
+      <span class="footer-sep">·</span>
+      <a href="/servicios/seguridad-eventos">Seguridad Eventos</a>
+      <span class="footer-sep">·</span>
+      <a href="/servicios/seguridad-deportiva">Seguridad Deportiva</a>
+      <span class="footer-sep">·</span>
+      <a href="/servicios/seguridad-industrial">Seguridad Industrial</a>
+      <span class="footer-sep">·</span>
+      <a href="/servicios/auditoria-seguridad">Auditoría de Seguridad</a>
+      <span class="footer-sep">·</span>
+      <a href="/guard-pod">Guardpod</a>
+    </div>
+
+    <div class="footer-link-cluster">
+      <strong>Ubicaciones principales:</strong>
+      <a href="/ubicaciones/las-condes">Las Condes</a>
+      <span class="footer-sep">·</span>
+      <a href="/ubicaciones/vitacura">Vitacura</a>
+      <span class="footer-sep">·</span>
+      <a href="/ubicaciones/lo-barnechea">Lo Barnechea</a>
+      <span class="footer-sep">·</span>
+      <a href="/ubicaciones/santiago-centro">Santiago Centro</a>
+      <span class="footer-sep">·</span>
+      <a href="/ubicaciones/huechuraba">Huechuraba</a>
+      <span class="footer-sep">·</span>
+      <a href="/ubicaciones/providencia">Providencia</a>
+      <span class="footer-sep">·</span>
+      <a href="/ubicaciones/pudahuel">Pudahuel</a>
+      <span class="footer-sep">·</span>
+      <a href="/ubicaciones/quilicura">Quilicura</a>
+      <span class="footer-sep">·</span>
+      <a href="/ubicaciones">Ver todas →</a>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© {year} {SITE.LEGAL_NAME}. RUT {SITE.RUT}</span>
+      <span>{SITE.ADDRESS}</span>
+    </div>
+  </div>
+</footer>

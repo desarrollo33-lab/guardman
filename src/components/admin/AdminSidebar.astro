@@ -1,0 +1,151 @@
+---
+// AdminSidebar v3.0 — CRM-first, agrupado por módulo con labels visibles.
+import { ADMIN_NAV_GROUPS } from '../../lib/constants';
+import { ICONS } from '../../lib/icons';
+
+interface Props {
+  active: string;
+}
+const { active } = Astro.props;
+
+const iconMap: Record<string, string> = {
+  gauge: ICONS.gauge,
+  inbox: ICONS.inbox,
+  pipeline: ICONS.pipeline,
+  users: ICONS.users,
+  doc: ICONS.doc,
+  shield: ICONS.shield,
+  edit: ICONS.edit,
+  image: ICONS.image,
+  radar: ICONS.radar,
+  dna: ICONS.dna,
+  settings: ICONS.settings,
+  calendar: ICONS.calendar,
+  chat: ICONS.chat,
+};
+---
+
+<aside id="sidebar">
+  <a href="/admin" class="sb-logo" aria-label="GuardMan Admin — Inicio">
+    <span set:html={ICONS.shield} />
+  </a>
+
+  {ADMIN_NAV_GROUPS.map((group) => (
+    <div class="nav-group">
+      <div class="nav-group-label">{group.label}</div>
+      <nav class="nav-group-items">
+        {group.items.map((item) => (
+          <a
+            href={item.href}
+            class:list={['nav-item', { active: active === item.id }]}
+            aria-current={active === item.id ? 'page' : undefined}
+          >
+            <span class="nav-item-icon" set:html={iconMap[item.icon]} />
+            <span class="nav-item-label">{item.label}</span>
+            {item.id === 'inbox' && <span class="nav-item-badge" data-badge="inbox">3</span>}
+          </a>
+        ))}
+      </nav>
+    </div>
+  ))}
+
+  <div class="nav-spacer"></div>
+  <a href="/admin/settings" class:list={['nav-item', { active: active === 'settings' }]}>
+    <span class="nav-item-icon" set:html={ICONS.settings} />
+    <span class="nav-item-label">Configuración</span>
+  </a>
+</aside>
+
+<style>
+  #sidebar {
+    grid-area: sidebar;
+    background: var(--surface-3);
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+    display: flex;
+    flex-direction: column;
+    padding: 14px 10px;
+    z-index: 30;
+    overflow-y: auto;
+    width: 220px;
+  }
+  .sb-logo {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--color-accent), #1d4ed8);
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 18px;
+    flex-shrink: 0;
+    color: #fff;
+    text-decoration: none;
+  }
+  .sb-logo svg { width: 20px; height: 20px; }
+
+  .nav-group { margin-bottom: 18px; }
+  .nav-group-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fg-dim);
+    padding: 0 10px;
+    margin-bottom: 6px;
+  }
+  .nav-group-items {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: var(--fg-muted);
+    transition: color 150ms ease, background 150ms ease;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .nav-item:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
+  .nav-item.active { color: var(--fg); background: rgba(59, 130, 246, 0.12); }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    background: var(--color-accent);
+    border-radius: 0 2px 2px 0;
+  }
+  .nav-item-icon {
+    width: 18px;
+    height: 18px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  .nav-item-icon svg { width: 18px; height: 18px; }
+  .nav-item-label { flex: 1; }
+  .nav-item-badge {
+    background: var(--color-error);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 999px;
+    min-width: 18px;
+    text-align: center;
+  }
+  .nav-spacer { flex: 1; }
+
+  @media (max-width: 768px) {
+    #sidebar { display: none; }
+  }
+</style>

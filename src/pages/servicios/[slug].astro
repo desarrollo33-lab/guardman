@@ -1,0 +1,186 @@
+---
+// /servicios/[slug] — detalle de servicio (migración 1:1 del live).
+// Estructura idéntica al live: hero + contenido (con blocks anidados) + block-related.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SERVICE_NAMES, LOCATIONS } from '../../lib/constants';
+import { SERVICES } from '../../lib/content';
+import Icon from '../../components/Icon.astro';
+import StaffSection from '../../components/StaffSection.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  return Object.keys(SERVICES).map((slug) => ({
+    params: { slug },
+    props: { slug, name: SERVICE_NAMES[slug] },
+  }));
+}
+
+interface Props {
+  slug: string;
+  name: string;
+}
+const { slug, name } = Astro.props;
+const svc = SERVICES[slug];
+const allLocations = LOCATIONS;
+const relacionados = Object.entries(SERVICE_NAMES)
+  .filter(([s]) => s !== slug)
+  .slice(0, 3)
+  .map(([s, n]) => ({ slug: s, name: n }));
+---
+
+<BaseLayout
+  title={`${name} con Certificación OS-10`}
+  description={`${name} con certificación OS-10 en 14 comunas de la Región Metropolitana y Valparaíso. Personal propio, central de monitoreo 24/7 y tecnología Guardpod. Cotización personalizada en 24 horas.`}
+  breadcrumb={name}
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Servicios', url: '/servicios' }, { name, url: `/servicios/${slug}` }]}
+  service={{
+    slug,
+    name,
+    description: svc.shortDesc,
+    url: `/servicios/${slug}`,
+    category: 'Seguridad Privada',
+  }}
+  faq={svc.faqs.map(f => ({ question: f.q, answer: f.a }))}
+  showCluster={true}
+  clusterType="servicio"
+  clusterExclude={slug}
+>
+  <section class="detail-hero" data-od-id="hero">
+    <div class="container">
+      <div class="detail-hero-badge">
+        <span class="detail-hero-badge-icon">
+          <Icon name="shield" size={14} />
+        </span>
+        {svc.heroBadge}
+      </div>
+      <h1>{svc.heroTitle}</h1>
+      <p>{svc.heroSub}</p>
+      <div class="detail-hero-ctas">
+        <a href="/cotizacion" class="btn btn-primary">Cotizar Ahora</a>
+        <a href="/ubicaciones" class="btn btn-outline-light">Ver cobertura</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="contenido" data-od-id="contenido">
+    <div class="container">
+      <div class="detail-content-grid">
+        <div class="article-body">
+          <div class="block" data-od-id="block-intro">
+            <h2>Seguridad privada de confianza para su propiedad</h2>
+            <p>{svc.longDesc}</p>
+            <p>Al contratar este servicio accede a un equipo de profesionales certificados OS-10 con más de 10 años de trayectoria, respaldado por nuestra central de monitoreo propia 24/7 y por el sistema autónomo Guardpod cuando el caso requiere vigilancia en zonas sin infraestructura.</p>
+          </div>
+
+          <div class="block" data-od-id="block-features">
+            <h2>Por qué elegir {name.toLowerCase()} de GuardMan Chile</h2>
+            <div class="detail-features-grid">
+              {svc.features.map((f) => (
+                <div class="detail-feature-item">
+                  <Icon name="check" size={16} />
+                  <span>{f.title}: {f.description}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div class="block" data-od-id="block-issues">
+            <h2>Problemas que resolvemos</h2>
+            <div class="detail-issues-grid">
+              {svc.problems.map((p) => (
+                <div class="detail-issue-card">
+                  <Icon name="warn" size={18} />
+                  <span>{p}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <StaffSection />
+
+          <div class="block" data-od-id="block-locations">
+            <h2>Disponible en 14 comunas</h2>
+            <p>Seleccione su comuna para ver detalles específicos y solicitar cotización.</p>
+            <div class="locations-tags">
+              {allLocations.map((l) => (
+                <a href={`/ubicaciones/${l.slug}`} class="loc-tag">{l.name}</a>
+              ))}
+            </div>
+            <div style="margin-top:16px">
+              <a href="/ubicaciones" class="btn btn-outline btn-sm">Explorar mapa de cobertura →</a>
+            </div>
+          </div>
+
+          <div class="block" data-od-id="block-faq">
+            <h2>Preguntas frecuentes</h2>
+            <div class="detail-faq">
+              {svc.faqs.map((f, i) => (
+                <details open={i === 0}>
+                  <summary>{f.q}</summary>
+                  <div class="answer">{f.a}</div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <aside data-od-id="sidebar">
+          <div class="sidebar-sticky">
+            <div class="sidebar-cta-top">
+              <h3>¿Necesita este servicio?</h3>
+              <a href="/cotizacion" class="btn btn-primary">Cotizar ahora</a>
+              <a href="/contacto" class="btn btn-outline">Hablar con un experto</a>
+            </div>
+            <div class="sidebar-body">
+              <div class="sb-section">
+                <h4>Otros servicios</h4>
+                {Object.entries(SERVICE_NAMES)
+                  .filter(([s]) => s !== slug)
+                  .slice(0, 4)
+                  .map(([s, n]) => (
+                    <a href={`/servicios/${s}`} class="sb-link">{n}</a>
+                  ))}
+              </div>
+              <div class="sb-section">
+                <h4>Sectores que atiende</h4>
+                <div class="sb-tags">
+                  {['comercial', 'residencial', 'industrial', 'educacion', 'salud'].map((s) => (
+                    <a href={`/sectores/${s}`} class={`sb-tag sb-tag-${s}`}>{s.charAt(0).toUpperCase() + s.slice(1)}</a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-neutral-section" data-od-id="block-related">
+    <div class="container">
+      <span class="section-label">Servicios relacionados</span>
+      <h2 class="section-title">También le puede interesar</h2>
+      <div class="related-grid-detail">
+        {relacionados.map((r) => (
+          <a href={`/servicios/${r.slug}`} class="related-card-block">
+            <div class="related-icon">
+              <Icon name={r.slug} size={22} />
+            </div>
+            <h3>{r.name}</h3>
+            <p>Protección profesional con personal certificado OS-10 y respaldo de la central de monitoreo propia 24/7.</p>
+            <span class="card-link">Ver más →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-dark cta-section-detail" data-od-id="block-cta">
+    <div class="container" style="text-align:center">
+      <h2 class="section-title" style="color:#fff">Solicite una cotización sin compromiso</h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.7)">Proteja su empresa, condominio o residencia con {name.toLowerCase()} de GuardMan Chile. Respuesta personalizada en menos de 24 horas hábiles.</p>
+      <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar ahora</a>
+    </div>
+  </section>
+</BaseLayout>

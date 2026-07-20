@@ -1,0 +1,224 @@
+---
+// /terminos — Términos y Condiciones v4.2
+// Versión simple y honesta: 4 secciones fundamentales, lenguaje claro, sin
+// exigir nada al cliente ni cubrirnos con cláusulas intimidatorias. Se aplica
+// el mismo sistema de diseño que /privacidad (hero + TOC + cards + FAQ + schemas).
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/constants';
+import Icon from '../components/Icon.astro';
+import LeadCTA from '../components/LeadCTA.astro';
+
+const lastUpdatedHuman = '15 de julio de 2026';
+const effectiveDate = '22 de julio de 2026';
+
+const sections = [
+  {
+    id: 'quienes-somos',
+    num: '01',
+    icon: 'shield' as const,
+    title: '¿Quiénes somos?',
+    intro: 'GuardMan Chile es una empresa de seguridad privada con certificación OS-10 vigente, que opera hace más de 10 años en la Región Metropolitana.',
+    blocks: [
+      { kind: 'kv', label: 'Razón social', value: SITE.LEGAL_NAME },
+      { kind: 'kv', label: 'RUT', value: SITE.RUT },
+      { kind: 'kv', label: 'Domicilio', value: SITE.ADDRESS },
+    ],
+  },
+  {
+    id: 'sitio-y-contenido',
+    num: '02',
+    icon: 'doc' as const,
+    title: 'Sobre este sitio y sus contenidos',
+    intro: 'Las fotos, textos, logos y diseño de guardman.cl son nuestros. Si quieres usar algo con fines comerciales, escríbenos y lo conversamos.',
+    note: 'Para uso personal o periodístico no hay problema. Para uso comercial o republicación, necesitamos un visto bueno por escrito.',
+  },
+  {
+    id: 'cambios',
+    num: '03',
+    icon: 'edit' as const,
+    title: 'Si cambiamos este documento',
+    intro: 'Ocasionalmente actualizaremos estos Términos. Cuando el cambio sea importante, te avisaremos por correo electrónico si eres cliente activo, o con un aviso visible en el sitio.',
+  },
+  {
+    id: 'marco-legal',
+    num: '04',
+    icon: 'scale' as const,
+    title: 'Marco legal',
+    intro: 'Operamos bajo las leyes chilenas, en particular la Ley 21.659 de Seguridad Privada. Si tienes dudas legales sobre el contrato, contáctanos y derivamos con nuestro equipo jurídico.',
+  },
+];
+
+const faq = [
+  { question: '¿Estos términos aplican al sitio web o también a los servicios contratados?', answer: 'A ambos. Estos Términos regulan el uso de guardman.cl y la contratación de cualquier servicio ofrecido por GuardMan Chile. Cada contrato de servicio puede incluir condiciones comerciales específicas acordadas por escrito.' },
+  { question: '¿Puedo usar fotos o textos de guardman.cl en mi sitio?', answer: 'Para uso personal o periodístico no hay problema. Para uso comercial o republicación, necesitamos un visto bueno por escrito. Escríbenos a ' + SITE.EMAIL_INFO + '.' },
+  { question: '¿Cómo me entero si cambian estos términos?', answer: 'Cuando un cambio sea importante, te avisaremos por correo electrónico si eres cliente activo, o con un aviso visible en el sitio. La fecha de última actualización está al inicio de este documento.' },
+  { question: '¿Qué ley aplica a estos términos?', answer: 'Se rige por las leyes de la República de Chile. Cualquier controversia será resuelta por los tribunales competentes de la Región Metropolitana.' },
+];
+
+const contacto = [
+  { icon: 'mail' as const, label: 'Email', value: SITE.EMAIL_INFO, href: `mailto:${SITE.EMAIL_INFO}` },
+  { icon: 'phone' as const, label: 'Teléfono', value: SITE.PHONE, href: `tel:${SITE.PHONE_TEL}` },
+  { icon: 'location' as const, label: 'Dirección', value: SITE.ADDRESS, href: null as string | null },
+];
+---
+
+<BaseLayout
+  title="Términos y Condiciones GuardMan Chile"
+  description="Términos simples y claros para el uso del sitio web guardman.cl de GuardMan Chile. Sin letra chica."
+  breadcrumb="Términos"
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Términos', url: '/terminos' }]}
+  faq={faq}
+>
+  <!-- ═══════ HERO ═══════ -->
+  <section class="legal-hero" data-od-id="hero">
+    <div class="container">
+      <span class="hero-badge">
+        <Icon name="doc" size={14} />
+        Documento legal · Ley 21.659
+      </span>
+      <h1>Términos y Condiciones</h1>
+      <p class="legal-hero-lead">Reglas de uso del sitio web <strong>guardman.cl</strong>.</p>
+      <div class="legal-hero-meta">
+        <span><strong>Última actualización:</strong> {lastUpdatedHuman}</span>
+        <span class="legal-hero-dot">·</span>
+        <span><strong>Vigente desde:</strong> {effectiveDate}</span>
+      </div>
+      <div class="hero-ctas">
+        <a href="#quienes-somos" class="btn btn-primary btn-lg">
+          <Icon name="book" size={16} />
+          Leer términos completos
+        </a>
+        <a href="/privacidad" class="btn btn-outline-light btn-lg">
+          <Icon name="lock" size={14} />
+          Política de Privacidad
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ LAYOUT 2-COL: TOC + CONTENIDO ═══════ -->
+  <section class="bg-neutral" data-od-id="legal-content">
+    <div class="container legal-layout">
+      <aside class="legal-toc" data-od-id="legal-toc" aria-label="Tabla de contenidos">
+        <div class="legal-toc-inner">
+          <span class="legal-toc-label">Tabla de contenidos</span>
+          <ol>
+            {sections.map((s) => (
+              <li>
+                <a href={`#${s.id}`}>
+                  <span class="legal-toc-num">{s.num}</span>
+                  <span class="legal-toc-text">{s.title}</span>
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href="#contacto">
+                <span class="legal-toc-num">05</span>
+                <span class="legal-toc-text">Contacto</span>
+              </a>
+            </li>
+          </ol>
+          <a href="/privacidad" class="legal-toc-cta">
+            <Icon name="lock" size={14} />
+            Ver Política de Privacidad
+          </a>
+        </div>
+      </aside>
+
+      <article class="legal-content" data-od-id="legal-article">
+        <p class="legal-intro">
+          Bienvenido a <strong>{SITE.NAME}</strong>. Estos Términos y Condiciones regulan el uso del sitio web <strong>guardman.cl</strong>. Al navegar en este sitio, aceptas estos términos en su totalidad, conforme a la legislación chilena vigente.
+        </p>
+
+        {sections.map((s) => (
+          <section class="legal-section" id={s.id} data-od-id={`legal-section-${s.num}`}>
+            <header class="legal-section-head">
+              <span class="legal-section-num">{s.num}</span>
+              <div class="legal-section-icon">
+                <Icon name={s.icon} size={20} />
+              </div>
+              <h2>{s.title}</h2>
+            </header>
+            <p class="legal-section-intro">{s.intro}</p>
+
+            {s.blocks && (
+              <dl class="legal-kv">
+                {s.blocks.map((b) => (
+                  <div class="legal-kv-row">
+                    <dt>{b.label}</dt>
+                    <dd>{b.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+
+            {s.list && (
+              <ul class="legal-list">
+                {s.list.map((item) => (
+                  <li>
+                    <span class="legal-list-bullet" aria-hidden="true">
+                      <Icon name="check" size={12} />
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {s.note && <p class="legal-note">{s.note}</p>}
+          </section>
+        ))}
+
+        <!-- ═══════ SECCIÓN DE CONTACTO ═══════ -->
+        <section class="legal-section legal-section-contact" id="contacto" data-od-id="legal-contact">
+          <header class="legal-section-head">
+            <span class="legal-section-num">05</span>
+            <div class="legal-section-icon"><Icon name="mail" size={20} /></div>
+            <h2>Contacto</h2>
+          </header>
+          <p class="legal-section-intro">Para consultas sobre estos términos o cualquier asunto legal, escríbenos a cualquiera de estos canales.</p>
+          <div class="contacto-grid">
+            {contacto.map((c) => (
+              <article class="contacto-card">
+                <div class="contacto-icon"><Icon name={c.icon} size={20} /></div>
+                <span class="contacto-label">{c.label}</span>
+                {c.href ? (
+                  <a href={c.href} class="contacto-value">{c.value}</a>
+                ) : (
+                  <span class="contacto-value">{c.value}</span>
+                )}
+              </article>
+            ))}
+          </div>
+          <p class="legal-foot">
+            <strong>{SITE.LEGAL_NAME}</strong> · RUT {SITE.RUT}<br>
+            Email: <a href={`mailto:${SITE.EMAIL_INFO}`}>{SITE.EMAIL_INFO}</a> · Teléfono: <a href={`tel:${SITE.PHONE_TEL}`}>{SITE.PHONE}</a>
+          </p>
+        </section>
+
+        <!-- ═══════ FAQ ═══════ -->
+        <section class="legal-faq" data-od-id="legal-faq">
+          <h2 class="legal-faq-title">Preguntas frecuentes</h2>
+          <div class="faq-list">
+            {faq.map((f, i) => (
+              <details class="faq-item" open={i === 0}>
+                <summary>{f.question}</summary>
+                <p>{f.answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      </article>
+    </div>
+  </section>
+
+  <LeadCTA
+    variant="footer"
+    title="¿Dudas sobre estos términos?"
+    subtitle="Si tienes preguntas sobre el uso del sitio o el alcance de este documento, escríbenos."
+    primaryText="Escribir al equipo"
+    primaryHref={`mailto:${SITE.EMAIL_INFO}?subject=Consulta sobre Términos y Condiciones`}
+    secondaryText="Ver Política de Privacidad"
+    secondaryHref="/privacidad"
+  />
+</BaseLayout>

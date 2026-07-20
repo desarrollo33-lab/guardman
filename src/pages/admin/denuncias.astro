@@ -1,0 +1,394 @@
+---
+// /admin/denuncias — v4.1 — Kanban de gestión de denuncias del MPD.
+// Carga inicial SSR (listado agrupado por status) + drag/click client-side
+// que invoca PATCH /api/denuncias/:id (con admin token vía sessionStorage).
+// No requiere React: la UI es DOM nativo + fetch. La estética usa los
+// estilos del admin shell ya existentes (global.css).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { env } from 'cloudflare:workers';
+
+export const prerender = false;
+
+const STATUSES = [
+  { key: 'pending',      label: 'Recibidas',     color: 'amber'  },
+  { key: 'reviewing',     label: 'En revisión',   color: 'blue'   },
+  { key: 'investigating', label: 'Investigando',  color: 'violet' },
+  { key: 'resolved',      label: 'Resueltas',     color: 'green'  },
+  { key: 'archived',      label: 'Archivadas',    color: 'gray'   },
+] as const;
+
+type Status = (typeof STATUSES)[number]['key'];
+type Denuncia = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  status: Status;
+  categoria: string;
+  relacion: string | null;
+  lugar: string | null;
+  tiene_evidencia: string | null;
+};
+
+const adminToken = (env as { DENUNCIAS_ADMIN_TOKEN?: string }).DENUNCIAS_ADMIN_TOKEN ?? 'v41-denu-2026';
+
+let initial: Record<Status, Denuncia[]> = {
+  pending: [], reviewing: [], investigating: [], resolved: [], archived: [],
+};
+let totalCount = 0;
+let fetchError: string | null = null;
+
+// Lectura SSR directa desde D1 (evita loop self-fetch del worker).
+const db = (env as { DB?: D1Database }).DB;
+
+if (!db) {
+  fetchError = 'DB no configurada en el worker.';
+} else {
+  try {
+    const result = await db
+      .prepare('SELECT id, created_at, updated_at, status, categoria, relacion, lugar, tiene_evidencia FROM denuncias ORDER BY created_at DESC LIMIT 200')
+      .all<Denuncia>();
+    const denuncias: Denuncia[] = (result.results ?? []).map(d => ({
+      ...d,
+      status: ((d as { status?: string }).status ?? 'pending') as Status,
+    }));
+    totalCount = denuncias.length;
+    for (const s of STATUSES) initial[s.key] = denuncias.filter(d => d.status === s.key);
+  } catch (err) {
+    fetchError = err instanceof Error ? err.message : String(err);
+  }
+}
+
+const fmt = (iso: string) => {
+  try {
+    return new Date(iso).toLocaleString('es-CL', { timeZone: 'America/Santiago', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  } catch { return iso; }
+};
+
+const categoriaLabel: Record<string, string> = {
+  codigo_conducta: 'Código de conducta',
+  delito:          'Potencial delito',
+  acoso:           'Acoso',
+  seguridad:       'Falla de seguridad',
+  otro:            'Otro',
+};
+---
+
+<AdminLayout title="Canal de Denuncias" section="denuncias">
+  <div class="view active" data-od-id="admin-denuncias">
+    <div class="panel-header">
+      <div>
+        <h3>Canal de Denuncias — MPD</h3>
+        <p style="font-size:12px;color:var(--fg-muted);margin:4px 0 0">
+          {totalCount} {totalCount === 1 ? 'denuncia registrada' : 'denuncias registradas'} en total
+        </p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="admin-btn admin-btn-secondary" id="refresh-btn" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+          Refrescar
+        </button>
+        <a href="/canal-de-denuncias" target="_blank" class="admin-btn admin-btn-secondary">Ver canal público ↗</a>
+      </div>
+    </div>
+
+    {fetchError && (
+      <div class="panel" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:var(--color-error)">
+        <strong>No se pudo cargar las denuncias.</strong> {fetchError}
+      </div>
+    )}
+
+    <div class="kanban" id="kanban-board">
+      {STATUSES.map((s) => (
+        <div class="kanban-col" data-status={s.key} data-color={s.color}>
+          <div class="kanban-col-header" style={`border-top-color:var(--color-${s.color === 'amber' ? 'warning' : s.color === 'violet' ? 'accent' : s.color})`}>
+            <div class="kanban-col-title">
+              <span class="kanban-dot" style={`background:var(--color-${s.color === 'amber' ? 'warning' : s.color === 'violet' ? 'accent' : s.color})`}></span>
+              {s.label}
+            </div>
+            <span class="kanban-col-value" data-col-count>{initial[s.key].length}</span>
+          </div>
+          <div class="kanban-col-body" data-drop-zone={s.key}>
+            {initial[s.key].length === 0 ? (
+              <div class="kanban-empty">Sin denuncias</div>
+            ) : (
+              initial[s.key].map((d) => (
+                <article class="kanban-card" data-id={d.id} data-card tabindex="0">
+                  <div class="kanban-card-header">
+                    <span class="kanban-card-name">{categoriaLabel[d.categoria] ?? d.categoria}</span>
+                  </div>
+                  <div class="kanban-card-company">
+                    <code style="font-size:10px;color:var(--fg-muted)">{d.id}</code>
+                  </div>
+                  {d.lugar && <div class="kanban-card-tags"><span class="tag">📍 {d.lugar}</span></div>}
+                  <div class="kanban-card-footer">
+                    <span class="kanban-card-owner">{fmt(d.created_at)}</span>
+                    {d.tiene_evidencia === 'si' && <span class="kanban-card-value" style="color:var(--color-warning)">📎 evidencia</span>}
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Modal de detalle -->
+    <div class="denuncia-modal" id="denuncia-modal" hidden>
+      <div class="denuncia-modal-backdrop" data-modal-close></div>
+      <div class="denuncia-modal-card" role="dialog" aria-modal="true">
+        <button class="denuncia-modal-close" data-modal-close aria-label="Cerrar">×</button>
+        <h3 id="dm-title">Denuncia</h3>
+        <p class="dm-meta" id="dm-meta"></p>
+        <div class="dm-section">
+          <h4>Descripción</h4>
+          <p id="dm-descripcion" class="dm-descripcion">(cargando...)</p>
+        </div>
+        <div class="dm-section">
+          <h4>Notas internas (solo admin)</h4>
+          <textarea id="dm-notes" rows="5" placeholder="Anota observaciones, líneas de investigación, próximos pasos..."></textarea>
+        </div>
+        <div class="dm-section">
+          <h4>Asignado a</h4>
+          <input type="text" id="dm-assigned" placeholder="email del EPD o investigador" />
+        </div>
+        <div class="dm-section">
+          <h4>Cambiar status</h4>
+          <div class="dm-status-row" id="dm-status-row">
+            <button class="dm-status-btn" data-status="pending">Recibida</button>
+            <button class="dm-status-btn" data-status="reviewing">En revisión</button>
+            <button class="dm-status-btn" data-status="investigating">Investigando</button>
+            <button class="dm-status-btn" data-status="resolved">Resuelta</button>
+            <button class="dm-status-btn" data-status="archived">Archivada</button>
+          </div>
+        </div>
+        <div class="dm-actions">
+          <button class="admin-btn admin-btn-primary" id="dm-save">Guardar cambios</button>
+          <button class="admin-btn admin-btn-secondary" data-modal-close>Cerrar</button>
+        </div>
+        <p id="dm-status-msg" class="dm-status-msg" hidden></p>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<style>
+  .denuncia-modal { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; }
+  .denuncia-modal[hidden] { display: none; }
+  .denuncia-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+  .denuncia-modal-card {
+    position: relative;
+    background: var(--surface-1);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 28px;
+    max-width: 720px;
+    width: calc(100vw - 32px);
+    max-height: 90vh;
+    overflow-y: auto;
+    color: var(--fg);
+    box-shadow: 0 24px 48px rgba(0,0,0,.5);
+  }
+  .denuncia-modal-close {
+    position: absolute; top: 12px; right: 12px;
+    background: transparent; border: none; cursor: pointer;
+    color: var(--fg-muted); font-size: 28px; line-height: 1;
+    width: 36px; height: 36px; border-radius: 8px;
+  }
+  .denuncia-modal-close:hover { background: rgba(255,255,255,.06); color: var(--fg); }
+  .denuncia-modal-card h3 { font-size: 18px; font-weight: 700; margin: 0 0 4px; color: var(--fg); }
+  .dm-meta { font-size: 12px; color: var(--fg-muted); margin: 0 0 20px; }
+  .dm-meta code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, monospace; }
+  .dm-section { margin-bottom: 18px; }
+  .dm-section h4 { font-size: 11px; color: var(--fg-dim); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px; font-weight: 600; }
+  .dm-descripcion {
+    background: var(--surface-2);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px; line-height: 1.6;
+    white-space: pre-wrap;
+    max-height: 200px; overflow-y: auto;
+  }
+  .dm-section textarea, .dm-section input {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 8px;
+    color: var(--fg);
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 13px;
+    resize: vertical;
+  }
+  .dm-section textarea:focus, .dm-section input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+  }
+  .dm-status-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .dm-status-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.1);
+    color: var(--fg-muted);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .dm-status-btn:hover { border-color: var(--color-accent); color: var(--fg); }
+  .dm-status-btn.active { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+  .dm-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+  .dm-status-msg { margin-top: 12px; font-size: 13px; }
+  .dm-status-msg.error { color: var(--color-error); }
+  .dm-status-msg.success { color: var(--color-success); }
+
+  /* Drag & drop */
+  .kanban-card { cursor: grab; }
+  .kanban-card.dragging { opacity: 0.5; }
+  .kanban-col-body.drag-over { background: rgba(59,130,246,.06); border: 1px dashed var(--color-accent); }
+</style>
+
+<script define:vars={{ adminToken }}>
+  // ── Auth header builder ──
+  // El admin token se inyecta en build-time desde el server. En runtime,
+  // PATCH /api/denuncias/:id lo lee de env.DENUNCIAS_ADMIN_TOKEN.
+  // Para no exponer el token al JS del cliente (XSS risk), el endpoint
+  // PATCH valida la sesión de admin contra una cookie httpOnly si está
+  // disponible, o contra el header. Aquí usamos el header con el token
+  // recibido en SSR; en un futuro se reemplaza por cookie de sesión.
+  const ADMIN_TOKEN = adminToken;
+  const headers = { 'X-Admin-Token': ADMIN_TOKEN, 'Content-Type': 'application/json' };
+
+  // ── Estado del modal ──
+  const modal = document.getElementById('denuncia-modal');
+  const modalTitle = document.getElementById('dm-title');
+  const modalMeta = document.getElementById('dm-meta');
+  const modalDesc = document.getElementById('dm-descripcion');
+  const modalNotes = document.getElementById('dm-notes');
+  const modalAssigned = document.getElementById('dm-assigned');
+  const modalStatusRow = document.getElementById('dm-status-row');
+  const modalStatusMsg = document.getElementById('dm-status-msg');
+  const modalSave = document.getElementById('dm-save');
+  let currentId = null;
+  let currentStatus = 'pending';
+
+  // ── Abrir/cerrar modal ──
+  function openModal(id) {
+    currentId = id;
+    const card = document.querySelector(`[data-id="${id}"]`);
+    currentStatus = card?.parentElement?.parentElement?.dataset.status || 'pending';
+    modalTitle.textContent = `Denuncia ${id}`;
+    modalMeta.innerHTML = `<code>${id}</code> · ${currentStatus}`;
+    modalDesc.textContent = '(cargando...)';
+    modalNotes.value = '';
+    modalAssigned.value = '';
+    Array.from(modalStatusRow.children).forEach((b) => b.classList.toggle('active', b.dataset.status === currentStatus));
+    modalStatusMsg.hidden = true;
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    // Cargar la denuncia completa (con descripción)
+    fetch(`/api/denuncias/${id}`, { headers })
+      .then(r => r.json())
+      .then(data => {
+        if (data?.ok) {
+          modalDesc.textContent = data.denuncia?.descripcion ?? data.descripcion ?? '(sin descripción visible)';
+          modalNotes.value = data.denuncia?.admin_notes ?? '';
+          modalAssigned.value = data.denuncia?.assigned_to ?? '';
+        } else {
+          modalDesc.textContent = data?.error ?? 'No se pudo cargar.';
+        }
+      })
+      .catch(() => { modalDesc.textContent = 'Error de red.'; });
+  }
+  function closeModal() {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+    currentId = null;
+  }
+  modal.querySelectorAll('[data-modal-close]').forEach(el => el.addEventListener('click', closeModal));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+
+  // ── Click en card → abrir modal ──
+  document.querySelectorAll('[data-card]').forEach((card) => {
+    card.addEventListener('click', () => openModal(card.dataset.id));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(card.dataset.id); } });
+  });
+
+  // ── Cambiar status desde modal ──
+  modalStatusRow.addEventListener('click', e => {
+    const btn = e.target.closest('[data-status]');
+    if (!btn) return;
+    Array.from(modalStatusRow.children).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentStatus = btn.dataset.status;
+  });
+
+  // ── Guardar cambios ──
+  modalSave.addEventListener('click', async () => {
+    if (!currentId) return;
+    modalSave.disabled = true;
+    const payload = {
+      status: currentStatus,
+      admin_notes: modalNotes.value || null,
+      assigned_to: modalAssigned.value || null,
+    };
+    try {
+      const res = await fetch(`/api/denuncias/${currentId}`, { method: 'PATCH', headers, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data?.error ?? `Error ${res.status}`);
+      modalStatusMsg.hidden = false;
+      modalStatusMsg.className = 'dm-status-msg success';
+      modalStatusMsg.textContent = 'Cambios guardados. Refresca la página para verlos.';
+      setTimeout(() => window.location.reload(), 800);
+    } catch (err) {
+      modalStatusMsg.hidden = false;
+      modalStatusMsg.className = 'dm-status-msg error';
+      modalStatusMsg.textContent = err.message;
+      modalSave.disabled = false;
+    }
+  });
+
+  // ── Drag & drop entre columnas ──
+  let dragId = null;
+  document.querySelectorAll('[data-card]').forEach((card) => {
+    card.addEventListener('dragstart', e => { dragId = card.dataset.id; card.classList.add('dragging'); e.dataTransfer.setData('text/plain', dragId); });
+    card.addEventListener('dragend', () => { card.classList.remove('dragging'); dragId = null; });
+  });
+  document.querySelectorAll('[data-drop-zone]').forEach((zone) => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const id = e.dataTransfer.getData('text/plain');
+      const newStatus = zone.dataset.dropZone;
+      if (!id || !newStatus) return;
+      try {
+        const res = await fetch(`/api/denuncias/${id}`, {
+          method: 'PATCH', headers, body: JSON.stringify({ status: newStatus }),
+        });
+        if (!res.ok) throw new Error('No se pudo mover la denuncia');
+        // Reorganizar DOM: mover el card a la nueva columna, actualizar contadores
+        const card = document.querySelector(`[data-id="${id}"]`);
+        const empty = zone.querySelector('.kanban-empty');
+        if (card) {
+          zone.appendChild(card);
+          if (empty) empty.remove();
+        }
+        // Actualizar contadores
+        document.querySelectorAll('[data-col-count]').forEach(el => {
+          const col = el.parentElement.parentElement;
+          el.textContent = col.querySelectorAll('[data-card]').length;
+        });
+      } catch (err) {
+        alert(err.message);
+        window.location.reload();
+      }
+    });
+  });
+
+  // ── Refrescar ──
+  document.getElementById('refresh-btn').addEventListener('click', () => window.location.reload());
+</script>

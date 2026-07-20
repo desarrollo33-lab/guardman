@@ -1,0 +1,92 @@
+---
+// Analytics — carga condicional de Google Analytics 4 o Plausible
+// según consentimiento. No trackea hasta que el usuario acepta.
+import { SITE } from '../lib/constants';
+
+interface Props {
+  /** ID de medición de GA4 (G-XXXXXX). Vacío = no cargar GA. */
+  gaId?: string;
+  /** Dominio de Plausible. Vacío = no cargar Plausible. */
+  plausibleDomain?: string;
+}
+
+const {
+  gaId = '',
+  plausibleDomain = '',
+} = Astro.props;
+---
+
+<script is:inline define:vars={{ gaId, plausibleDomain, siteUrl: SITE.URL }}>
+  (function () {
+    if (typeof window === 'undefined') return;
+    var KEY = 'gm_consent';
+    var granted = false;
+    try {
+      granted = localStorage.getItem(KEY) === 'granted';
+    } catch (e) { granted = false; }
+
+    function loadGA(id) {
+      if (!id) return;
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { window.dataLayer.push(arguments); }
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', id, { anonymize_ip: true, send_page_view: true });
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id);
+      document.head.appendChild(s);
+    }
+
+    function loadPlausible(domain) {
+      if (!domain) return;
+      var s = document.createElement('script');
+      s.defer = true;
+      s.dataset.domain = domain;
+      s.src = 'https://plausible.io/js/script.js';
+      document.head.appendChild(s);
+    }
+
+    function enable() {
+      granted = true;
+      try { localStorage.setItem(KEY, 'granted'); } catch (e) {}
+      loadGA(gaId);
+      loadPlausible(plausibleDomain);
+    }
+
+    if (granted) {
+      enable();
+      return;
+    }
+
+    // Show a one-time banner asking for consent. Non-blocking.
+    function showBanner() {
+      if (document.getElementById('gm-consent-banner')) return;
+      var b = document.createElement('div');
+      b.id = 'gm-consent-banner';
+      b.style.cssText = 'position:fixed;bottom:16px;left:16px;right:16px;max-width:520px;margin:auto;padding:14px 16px;background:#0D0D0D;color:#fff;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.4);z-index:99999;font:14px/1.4 system-ui,-apple-system,sans-serif;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap';
+      b.innerHTML =
+        '<span>Usamos cookies para análisis y mejorar tu experiencia. ' +
+        '<a href="' + siteUrl + '/privacidad" style="color:#60A5FA;text-decoration:underline">Política</a></span>' +
+        '<span style="display:flex;gap:8px">' +
+        '<button id="gm-consent-accept" style="background:#10B981;color:#fff;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600">Aceptar</button>' +
+        '<button id="gm-consent-reject" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);padding:8px 14px;border-radius:8px;cursor:pointer">Rechazar</button>' +
+        '</span>';
+      document.body.appendChild(b);
+      document.getElementById('gm-consent-accept').addEventListener('click', function () {
+        enable();
+        b.remove();
+      });
+      document.getElementById('gm-consent-reject').addEventListener('click', function () {
+        try { localStorage.setItem(KEY, 'rejected'); } catch (e) {}
+        b.remove();
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', showBanner);
+    } else {
+      setTimeout(showBanner, 1200);
+    }
+  })();
+</script>

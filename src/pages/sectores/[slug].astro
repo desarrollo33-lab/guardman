@@ -1,0 +1,204 @@
+---
+// /sectores/[slug] — detalle de sector (migración 1:1 del live).
+// Estructura idéntica al live: hero + contenido (con blocks anidados) + block-related.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SECTOR_NAMES, SECTOR_TO_SERVICE, SERVICE_NAMES, SITE } from '../../lib/constants';
+import { SECTORS } from '../../lib/content';
+import Icon from '../../components/Icon.astro';
+import StaffSection from '../../components/StaffSection.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  return Object.keys(SECTORS).map((slug) => ({
+    params: { slug },
+    props: { slug, name: SECTOR_NAMES[slug], relatedServiceSlug: SECTOR_TO_SERVICE[slug] ?? 'guardias-de-seguridad' },
+  }));
+}
+
+interface Props {
+  slug: string;
+  name: string;
+  relatedServiceSlug: string;
+}
+const { slug, name, relatedServiceSlug } = Astro.props;
+const sector = SECTORS[slug];
+const relatedServiceName = SERVICE_NAMES[relatedServiceSlug];
+
+// Sectores relacionados (3 para el bloque "También te puede interesar")
+const sectoresRelacionados = Object.entries(SECTOR_NAMES)
+  .filter(([s]) => s !== slug)
+  .slice(0, 3)
+  .map(([s, n]) => ({ slug: s, name: n }));
+---
+
+<BaseLayout
+  title={sector.seoTitle ?? `Seguridad Privada para Sector ${name}`}
+  description={sector.seoDescription ?? `Servicios de seguridad especializados para el sector ${name.toLowerCase()} en Chile. Protocolos específicos, personal certificado OS-10 y tecnología Guardpod. GuardMan Chile, 14 comunas con cobertura operativa.`}
+  breadcrumb={name}
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Sectores', url: '/sectores' }, { name, url: `/sectores/${slug}` }]}
+  service={{
+    slug: relatedServiceSlug,
+    name: `Seguridad para ${name}`,
+    description: `Servicios de seguridad privada especializados para el sector ${name.toLowerCase()}. Protocolos específicos, personal certificado OS-10 y experiencia comprobada.`,
+    url: `/sectores/${slug}`,
+    category: name,
+  }}
+  showCluster={true}
+  clusterType="sector"
+  clusterExclude={slug}
+  faq={sector.faqs.map(f => ({ question: f.q, answer: f.a }))}
+>
+  <section class="detail-hero" data-od-id="hero">
+    <div class="container">
+      <h1>{sector.heroTitle}</h1>
+      <p>{sector.heroSub}</p>
+      <div class="detail-hero-ctas">
+        <a href="/cotizacion" class="btn btn-primary">Cotizar ahora</a>
+        <a href="#caracteristicas" class="btn btn-outline-light">Ver características</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="contenido" data-od-id="contenido">
+    <div class="container">
+      <div class="detail-content-grid">
+        <div class="article-body">
+          <div class="block" data-od-id="block-intro">
+            <h2>Seguridad {name} profesional en Chile</h2>
+            <p>{sector.intro}</p>
+          </div>
+
+          <div class="block" data-od-id="block-features" id="caracteristicas">
+            <h2>Características de nuestro servicio para el sector {name}</h2>
+            <div class="detail-features-grid">
+              {sector.features.map((f) => (
+                <div class="detail-feature-item">
+                  <Icon name="check" size={16} />
+                  <span><strong>{f.title}:</strong> {f.description}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div class="block" data-od-id="block-related-service">
+            <h2>Servicio recomendado: {relatedServiceName}</h2>
+            <p>Para el sector {name.toLowerCase()} recomendamos nuestro servicio de <strong>{relatedServiceName.toLowerCase()}</strong>, que se adapta mejor a las necesidades específicas de la industria.</p>
+            <p>También ofrecemos el portafolio completo de servicios —CCTV, monitoreo 24/7, control de accesos, la unidad autónoma Guardpod para faenas o perímetros extensos, y más— adaptados a los requerimientos operativos del sector {name.toLowerCase()}.</p>
+            <a href={`/servicios/${relatedServiceSlug}`} class="btn btn-primary">Ver {relatedServiceName}</a>
+          </div>
+
+          <StaffSection />
+
+          <div class="block" data-od-id="block-issues">
+            <h2>Problemas que resolvemos</h2>
+            <div class="detail-issues-grid">
+              {sector.problems.map((p) => (
+                <div class="detail-issue-card">
+                  <Icon name="warn" size={18} />
+                  <span>{p}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div class="block" data-od-id="block-locations">
+            <h2>Cobertura en 14 comunas</h2>
+            <p>Seleccione su comuna para ver detalles y solicitar cotización.</p>
+            <div class="locations-tags">
+              <a href="/ubicaciones/las-condes" class="loc-tag">Las Condes</a>
+              <a href="/ubicaciones/vitacura" class="loc-tag">Vitacura</a>
+              <a href="/ubicaciones/lo-barnechea" class="loc-tag">Lo Barnechea</a>
+              <a href="/ubicaciones/santiago-centro" class="loc-tag">Santiago Centro</a>
+              <a href="/ubicaciones/huechuraba" class="loc-tag">Huechuraba</a>
+              <a href="/ubicaciones/quilicura" class="loc-tag">Quilicura</a>
+              <a href="/ubicaciones/la-reina" class="loc-tag">La Reina</a>
+              <a href="/ubicaciones/conchali" class="loc-tag">Conchalí</a>
+              <a href="/ubicaciones/pudahuel" class="loc-tag">Pudahuel</a>
+              <a href="/ubicaciones/renca" class="loc-tag">Renca</a>
+              <a href="/ubicaciones/lampa" class="loc-tag">Lampa</a>
+              <a href="/ubicaciones/la-pintana" class="loc-tag">La Pintana</a>
+              <a href="/ubicaciones/los-andes" class="loc-tag">Los Andes</a>
+              <a href="/ubicaciones/san-felipe" class="loc-tag">San Felipe</a>
+            </div>
+            <div style="margin-top:16px">
+              <a href="/ubicaciones" class="btn btn-outline btn-sm">Explorar mapa de cobertura →</a>
+            </div>
+          </div>
+
+          <div class="block" data-od-id="block-faq">
+            <h2>Preguntas frecuentes</h2>
+            <div class="detail-faq">
+              {sector.faqs.map((f, i) => (
+                <details open={i === 0}>
+                  <summary>{f.q}</summary>
+                  <div class="answer">{f.a}</div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <aside data-od-id="sidebar">
+          <div class="sidebar-sticky">
+            <div class="sidebar-cta-top">
+              <h3>Cotice para su sector</h3>
+              <p>Diagnóstico personalizado para {name.toLowerCase()}.</p>
+              <a href="/cotizacion" class="btn btn-primary">Solicitar cotización</a>
+              <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline"><Icon name="phone" size={16} /> {SITE.PHONE}</a>
+            </div>
+            <div class="sidebar-body">
+              <div class="sb-section">
+                <h4>Otros sectores</h4>
+                {Object.entries(SECTOR_NAMES)
+                  .filter(([s]) => s !== slug)
+                  .slice(0, 4)
+                  .map(([s, n]) => (
+                    <a href={`/sectores/${s}`} class="sb-link">{n}</a>
+                  ))}
+              </div>
+              <div class="sb-section">
+                <h4>Servicios relacionados</h4>
+                <div class="sb-tags">
+                  {Object.entries(SERVICE_NAMES)
+                    .filter(([s]) => ['guardias-de-seguridad', 'cctv-videovigilancia', 'monitoreo-24-7', 'control-de-accesos'].includes(s))
+                    .slice(0, 4)
+                    .map(([s, n]) => (
+                      <a href={`/servicios/${s}`} class="sb-tag">{n}</a>
+                    ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-neutral-section" data-od-id="block-related">
+    <div class="container">
+      <span class="section-label">Sectores relacionados</span>
+      <h2 class="section-title">También le puede interesar</h2>
+      <div class="related-grid-detail">
+        {sectoresRelacionados.map((r) => (
+          <a href={`/sectores/${r.slug}`} class="related-card-block">
+            <div class="related-icon">
+              <Icon name={r.slug} size={22} />
+            </div>
+            <h3>Seguridad {r.name}</h3>
+            <p>Protocolos especializados para el sector {r.name.toLowerCase()}.</p>
+            <span class="card-link">Ver sector →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-dark cta-section-detail" data-od-id="block-cta">
+    <div class="container" style="text-align:center">
+      <h2 class="section-title" style="color:#fff">Proteja su negocio en {name}</h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.7)">Converse con un experto en seguridad sectorial. Cotización personalizada en menos de 24 horas hábiles.</p>
+      <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+    </div>
+  </section>
+</BaseLayout>

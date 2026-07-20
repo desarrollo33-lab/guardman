@@ -1,0 +1,382 @@
+---
+// /canal-de-denuncias — Canal de Denuncias v4.2
+// Marco legal aplicable (referenciado en hero + FAQ + footer):
+//   - Ley 20.393 (2009): responsabilidad penal de las personas jurídicas.
+//   - Ley 21.595 (vigente para empresas desde 1 sept 2024): delitos económicos (200+ tipos).
+//   - Ley 21.643 "Karin" (vigente desde 1 ago 2024): acoso laboral, sexual y violencia
+//     en el trabajo (sector privado y público, investigación interna ≤30 días).
+// Este canal es parte de nuestro Modelo de Prevención de Delitos (MPD) y cumple
+// los requisitos del art. 4 de la Ley 20.393 (texto consolidado tras la 21.595).
+// Anonimato por diseño: nombre/email/teléfono son OPCIONALES.
+// v4.2 — usa <LeadForm> compartido (mode="custom") con script inline para
+//        conditional fields, contador y submit al endpoint propio.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE, DENUNCIA_CATEGORIES, DENUNCIA_RELACIONES } from '../lib/constants';
+import Icon from '../components/Icon.astro';
+import LeadForm from '../components/LeadForm.astro';
+
+const faq = [
+  {
+    question: '¿Es realmente anónimo?',
+    answer:
+      'Sí. La Ley 20.393 no exige identificación del denunciante y la jurisprudencia chilena acepta las denuncias anónimas como gatillo de una investigación (no como prueba autónoma). Los campos de nombre, email y teléfono de este formulario son opcionales. Si no los completa, no se almacenan. Solo guardamos un hash técnico de su IP — no la IP — para evitar spam y abuso del canal.',
+  },
+  {
+    question: '¿Qué pasa después de enviar mi denuncia?',
+    answer:
+      'Recibirá un ID de seguimiento (formato D-YYYYMMDD-XXXX) en menos de 24-72 horas hábiles. Nuestro Encargado de Prevención de Delitos (EPD) analiza la admisibilidad y, si procede, abre una investigación formal. Si proporcionó un medio de contacto le responderemos por ese canal; si no, puede consultarnos usando el ID. La investigación se resuelve en un plazo máximo de 30 días corridos, prorrogable fundadamente.',
+  },
+  {
+    question: '¿Qué tipo de hechos puedo denunciar?',
+    answer:
+      'Cualquier hecho que pueda constituir un delito de los cubiertos por las Leyes 20.393 y 21.595 (lavado de activos, financiamiento del terrorismo, cohecho, soborno, receptación, negociación incompatible, administración desleal, corrupción entre privados, delitos tributarios, ambientales, contra la libre competencia, contra los consumidores, laborales, financieros, falsificación documental, etc.) o por la Ley 21.643 (acoso laboral, acoso sexual, violencia en el trabajo). También aceptamos infracciones a nuestro código de conducta y fallas de seguridad o incumplimiento de protocolos OS-10.',
+  },
+  {
+    question: '¿Tengo protección contra represalias?',
+    answer:
+      'Sí. Nuestro Modelo de Prevención de Delitos prohíbe expresamente cualquier represalia contra denunciantes de buena fe. En materia de acoso laboral, sexual y violencia en el trabajo, la Ley 21.643 (Ley Karin) le protege con medidas de resguardo, confidencialidad y atención psicológica temprana. Cualquier represalia —directa o indirecta— es investigada internamente y sancionada conforme a la ley.',
+  },
+  {
+    question: '¿Debo identificarme obligatoriamente?',
+    answer:
+      'No. Puede denunciar completamente anónimo. Sin embargo, si deja un medio de contacto, podemos pedirle antecedentes adicionales para investigar mejor el caso. Una denuncia identificada permite entregarle respuesta formal sobre las medidas adoptadas; una anónima se usa exclusivamente para gatillar y orientar la investigación.',
+  },
+  {
+    question: '¿Quién investiga mi denuncia?',
+    answer:
+      'La recibe el Encargado de Prevención de Delitos (EPD) — independiente de la administración—, quien coordina la investigación con el Comité de Ética. Si los antecedentes son constitutivos de delito, se deriva al Ministerio Público y/o a las policías (Carabineros, PDI). En casos de acoso laboral, sexual o violencia en el trabajo, el procedimiento se rige por el protocolo de la Ley Karin y, si corresponde, la Inspección del Trabajo (DT).',
+  },
+  {
+    question: '¿Cuánto tarda en resolverse?',
+    answer:
+      'La ley 20.393 no fija un plazo único, pero los manuales de prevención de las empresas reguladas en Chile (y la práctica recomendada) establecen: acuse de recibo en 24-72 horas hábiles, inicio de la investigación dentro de 3 días hábiles, respuesta formal al denunciante en 10 días hábiles, e informe final en un máximo de 30 días corridos (prorrogable). La Ley Karin fija expresamente 30 días para la investigación interna de denuncias por acoso o violencia laboral.',
+  },
+];
+---
+
+<BaseLayout
+  title="Canal de Denuncias Ley 20.393 21.595 21.643 GuardMan Chile"
+  description="Canal oficial de denuncias anónimo de GuardMan Chile. Conforme a las Leyes 20.393 (responsabilidad penal de personas jurídicas), 21.595 (delitos económicos) y 21.643 Ley Karin (acoso y violencia laboral). Modelo de Prevención de Delitos, EPD independiente, confidencialidad y prohibición de represalias."
+  breadcrumb="Canal de Denuncias"
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Canal de Denuncias', url: '/canal-de-denuncias' }]}
+  showCluster={true}
+  clusterType="servicios"
+  faq={faq}
+  noindex={false}
+>
+  <!-- ═══════ HERO ═══════ -->
+  <section class="hero denuncia-hero" data-od-id="hero">
+    <div class="container">
+      <span class="hero-badge">
+        <Icon name="shield" size={14} />
+        Modelo de Prevención de Delitos · Ley 20.393 / 21.595 / 21.643
+      </span>
+      <h1>Canal de Denuncias</h1>
+      <p>Denuncie de forma <strong>anónima</strong> infracciones al código de conducta, hechos constitutivos de los delitos de la Ley 20.393 y 21.595 (lavado, cohecho, soborno, receptación, negociación incompatible, administración desleal, corrupción entre privados, delitos económicos, ambientales, laborales, financieros, tributarios, etc.) o situaciones de <strong>acoso laboral, sexual o violencia en el trabajo</strong> de la Ley 21.643 (Karin). Confidencialidad garantizada y cero represalias.</p>
+      <div class="hero-ctas">
+        <a href="#denuncia-form" class="btn btn-primary btn-lg">
+          <Icon name="alert-triangle" size={16} />
+          Denunciar ahora
+        </a>
+        <a href="#como-funciona" class="btn btn-outline-light btn-lg">¿Cómo funciona?</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ COMPROMISO ÉTICO ═══════ -->
+  <section class="bg-neutral" data-od-id="compromiso">
+    <div class="container">
+      <span class="section-label">Nuestro compromiso</span>
+      <h2 class="section-title">Por qué este canal es seguro</h2>
+      <p class="section-subtitle" style="margin-bottom:32px">Tres principios que la ley exige y nosotros cumplimos, sin excepciones.</p>
+
+      <div class="compromiso-grid">
+        <div class="compromiso-card">
+          <div class="compromiso-icon compromiso-icon-anon">
+            <Icon name="eye-off" size={28} />
+          </div>
+          <h3>Anonimato y confidencialidad</h3>
+          <p>La Ley 20.393 no exige identificación y la jurisprudencia chilena acepta denuncias anónimas como gatillo de investigación. Aquí puedes denunciar sin identificarte. Si dejas un medio de contacto, lo usamos solo para la investigación y nunca lo compartimos. Internamente, el acceso a la denuncia está restringido al EPD y al Comité de Ética.</p>
+        </div>
+        <div class="compromiso-card">
+          <div class="compromiso-icon compromiso-icon-law">
+            <Icon name="scale" size={28} />
+          </div>
+          <h3>Modelo de Prevención de Delitos</h3>
+          <p>Este canal es parte de nuestro MPD (art. 4, Ley 20.393, conforme a la reforma de la Ley 21.595). Lo operan un Encargado de Prevención de Delitos independiente de la administración, con protocolos, matriz de riesgos y evaluaciones periódicas por terceros independientes.</p>
+        </div>
+        <div class="compromiso-card">
+          <div class="compromiso-icon compromiso-icon-shield">
+            <Icon name="shield" size={28} />
+          </div>
+          <h3>Cero represalias (Ley Karin)</h3>
+          <p>Está prohibido tomar represalias —directas o indirectas— contra denunciantes de buena fe. La Ley 21.643 (Karin, vigente desde agosto 2024) refuerza esta protección en casos de acoso laboral, sexual y violencia en el trabajo, con medidas de resguardo, confidencialidad y derivación a atención psicológica temprana.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ FORMULARIO ═══════ -->
+  <section class="bg-white" id="denuncia-form" data-od-id="form">
+    <div class="container form-wrap">
+      <LeadForm
+        id="denuncia-form"
+        mode="custom"
+        trackName="denuncia"
+        headerLabel="Formulario de denuncia"
+        headerTitle="Cuéntanos qué pasó"
+        subtitle='Todos los campos marcados con <span class="required">*</span> son obligatorios. Los datos de contacto son opcionales — la denuncia puede ser anónima.'
+        novalidate={true}
+        autocomplete="off"
+        submitText="Enviar denuncia de forma anónima"
+        submitIcon="send"
+        submitClass="denuncia-submit"
+        footNote="Su denuncia viaja cifrada. No almacenamos su IP, solo un hash técnico."
+        errorText="Hubo un error al enviar la denuncia. Por favor intente nuevamente."
+        successPanel={{
+          id: 'denuncia-success',
+          icon: '✅',
+          title: 'Denuncia registrada con éxito',
+          subtitle: 'Hemos recibido su denuncia. Guárdela bien — la necesitará para consultar el estado.',
+          trackingLabel: 'Su ID de seguimiento',
+          trackingIdElementId: 'denuncia-tracking-id',
+          copyButtonId: 'copy-tracking',
+          footIcon: 'clock3',
+          footNote: 'Nuestro equipo revisará la denuncia en menos de 72 horas hábiles. Si proporcionó email o teléfono, le contactaremos por ese medio.',
+          actions: [
+            { text: 'Consultar estado de mi denuncia', href: '/canal-de-denuncias/estado/', variant: 'primary' },
+            { text: 'Volver al inicio', href: '/', variant: 'outline' },
+            { text: 'Contactar directamente', href: '/contacto', variant: 'outline' },
+          ],
+        }}
+        sections={[
+          {
+            number: 1,
+            title: 'Tipo de denuncia',
+            fields: [
+              { name: 'categoria', label: 'Categoría', type: 'select', required: true, id: 'f-categoria', options: DENUNCIA_CATEGORIES.map(c => c.label), fullWidth: false },
+              { name: 'categoria_otro', label: 'Especifique la categoría', type: 'text', required: false, id: 'f-categoria-otro', maxlength: 200, placeholder: 'Describa brevemente el tipo de hecho', wrapId: 'f-categoria-otro-wrap', hidden: true },
+              { name: 'relacion', label: '¿Cuál es su relación con GuardMan?', type: 'select', options: DENUNCIA_RELACIONES.map(r => r.label), fullWidth: true },
+            ],
+          },
+          {
+            number: 2,
+            title: 'Sobre el hecho',
+            fields: [
+              { name: 'fecha_incidente', label: 'Fecha del incidente (aproximada)', type: 'date', id: 'f-fecha', hint: 'Si no la recuerda, déjela en blanco.' },
+              { name: 'lugar', label: 'Lugar (comuna, dirección o instalación)', type: 'text', maxlength: 200, placeholder: 'Ej: Las Condes, oficina Av. Apoquindo 4000' },
+              { name: 'personas_involucradas', label: 'Personas involucradas (opcional)', type: 'text', maxlength: 500, fullWidth: true, placeholder: 'Nombres, cargos, roles o cualquier dato que ayude a identificar a los involucrados' },
+              { name: 'descripcion', label: 'Describa el hecho', type: 'textarea', required: true, rows: 6, minlength: 30, maxlength: 5000, fullWidth: true, placeholder: 'Cuente con el mayor detalle posible: qué pasó, cómo pasó, en qué contexto. Mínimo 30 caracteres.', counterId: 'f-desc-counter', counterMax: 5000, hint: 'mínimo 30' },
+              { name: 'tiene_evidencia', label: '¿Tiene evidencia del hecho?', type: 'radio', fullWidth: true, radioOptions: [
+                { value: 'si', label: 'Sí' },
+                { value: 'no', label: 'No' },
+                { value: 'desconocido', label: 'No estoy seguro' },
+              ], hint: 'Si tiene evidencia (fotos, videos, documentos), podrá compartirla con el equipo después de enviar la denuncia, mediante el ID de seguimiento.' },
+            ],
+          },
+          {
+            number: 3,
+            title: 'Datos de contacto',
+            optionalTag: 'opcional',
+            help: 'Puede dejar estos campos vacíos para hacer una denuncia <strong>completamente anónima</strong>. Si los completa, nos permitirán pedirle antecedentes adicionales.',
+            fields: [
+              { name: 'nombre', label: 'Nombre', type: 'text', maxlength: 120, placeholder: 'Su nombre' },
+              { name: 'email', label: 'Email', type: 'email', placeholder: 'su@correo.com' },
+              { name: 'telefono', label: 'Teléfono', type: 'tel', fullWidth: true, placeholder: '+56 9 1234 5678' },
+              { name: 'acepta_terminos', label: '', type: 'acceptance', required: true, id: 'f-acepta', fullWidth: true, acceptLabel: 'Declaro que la información entregada es veraz, que actúo de buena fe y que <a href="/terminos" target="_blank">acepto los términos del canal</a>. <span class="required">*</span>' },
+            ],
+          },
+        ]}
+      >
+      </LeadForm>
+    </div>
+  </section>
+
+
+  <!-- ═══════ ¿CÓMO FUNCIONA? ═══════ -->
+  <section class="bg-neutral" id="como-funciona" data-od-id="how">
+    <div class="container">
+      <span class="section-label">¿Cómo funciona?</span>
+      <h2 class="section-title">Plazos del proceso</h2>
+      <p class="section-subtitle">Estos son los tiempos que nuestro MPD aplica a cada denuncia. Los plazos para acoso laboral/sexual/violencia (Ley Karin) están expresamente regulados.</p>
+
+      <div class="how-grid">
+        <div class="how-step">
+          <div class="how-step-num">1</div>
+          <span class="how-step-sla">24-72h hábiles</span>
+          <h3>Acuse de recibo + ID</h3>
+          <p>Recibe un ID de seguimiento (D-YYYYMMDD-XXXX) y el EPD confirma la admisibilidad. Si su denuncia no es materia del MPD, se deriva al área correspondiente y se le informa.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">2</div>
+          <span class="how-step-sla">3 días hábiles</span>
+          <h3>Inicio de investigación</h3>
+          <p>El Encargado de Prevención de Delitos (EPD) y el Comité de Ética inician la recopilación de antecedentes. En casos Ley Karin, se aplican medidas de resguardo inmediatas al denunciante.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">3</div>
+          <span class="how-step-sla">≤30 días corridos</span>
+          <h3>Informe final</h3>
+          <p>La investigación concluye con un informe y, si hay indicios de delito, derivamos al Ministerio Público, Carabineros o PDI. Plazo prorrogable fundadamente (Ley Karin: máx. 30 días).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ FAQ + CTA OSCURO ═══════ -->
+  <section class="bg-white" data-od-id="faq">
+    <div class="container">
+      <span class="section-label">Preguntas frecuentes</span>
+      <h2 class="section-title">Lo que más nos preguntan</h2>
+      <div class="faq-list">
+        {faq.map((f, i) => (
+          <details class="faq-item" open={i === 0}>
+            <summary>{f.question}</summary>
+            <p>{f.answer}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-dark" style="text-align:center;padding:80px 0" data-od-id="cta">
+    <div class="container">
+      <h2 class="section-title" style="color:#fff">¿Prefiere hablar directamente?</h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.7);max-width:560px;margin:0 auto 28px">Si su caso no es una denuncia pero necesita contactarnos, llame a nuestra línea 24/7 o escríbanos a {SITE.EMAIL_INFO}.</p>
+      <div class="hero-ctas" style="justify-content:center">
+        <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-primary btn-lg">
+          <Icon name="phone" size={16} />
+          {SITE.PHONE}
+        </a>
+        <a href={`mailto:${SITE.EMAIL_INFO}`} class="btn btn-outline-light btn-lg">
+          {SITE.EMAIL_INFO}
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { validateDenuncia } from '../lib/denuncias-validation';
+
+  // ── Límite de fecha = hoy ──
+  const fecha = document.getElementById('f-fecha') as HTMLInputElement | null;
+  if (fecha) fecha.max = new Date().toISOString().slice(0, 10);
+
+  // ── Mostrar campo "categoría otro" ──
+  const catSel = document.getElementById('f-categoria') as HTMLSelectElement | null;
+  const catOtroWrap = document.getElementById('f-categoria-otro-wrap');
+  const catOtro = document.getElementById('f-categoria-otro') as HTMLInputElement | null;
+  if (catSel && catOtroWrap) {
+    catSel.addEventListener('change', () => {
+      const isOther = catSel.value.toLowerCase().includes('otro');
+      catOtroWrap.hidden = !isOther;
+      if (catOtro) catOtro.required = isOther;
+    });
+  }
+
+  // ── Contador de caracteres descripción ──
+  const desc = document.querySelector<HTMLTextAreaElement>('textarea[name="descripcion"]');
+  const counter = document.getElementById('f-desc-counter');
+  if (desc && counter) {
+    const update = () => { counter.textContent = String(desc.value.length); };
+    desc.addEventListener('input', update);
+    update();
+  }
+
+  // ── Submit ──
+  const form = document.getElementById('denuncia-form') as HTMLFormElement | null;
+  const successPanel = document.getElementById('denuncia-success');
+  const trackingEl = document.getElementById('denuncia-tracking-id');
+  const copyBtn = document.getElementById('copy-tracking');
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('form-status');
+      const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      if (!btn) return;
+
+      const raw = Object.fromEntries(new FormData(form));
+      // Quitar campos que no van al backend
+      delete (raw as Record<string, unknown>).acepta_terminos;
+
+      const result = validateDenuncia(raw);
+      if (!result.ok) {
+        const first = Object.values(result.errors)[0];
+        if (status) {
+          status.hidden = false;
+          status.textContent = '⚠️ ' + first;
+          status.style.color = 'var(--color-error)';
+        }
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      try {
+        const res = await fetch('/api/denuncias', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(result.sanitized),
+        });
+        const data = (await res.json().catch(() => ({}))) as {
+          ok?: boolean;
+          id?: string;
+          error?: string;
+        };
+
+        if (!res.ok || !data.ok || !data.id) {
+          throw new Error(data.error || `Error ${res.status}`);
+        }
+
+        // Guardar en localStorage para que pueda consultarlo más tarde
+        try {
+          const KEY = 'guardman:denuncias';
+          const arr = JSON.parse(localStorage.getItem(KEY) ?? '[]');
+          arr.push({ id: data.id, createdAt: new Date().toISOString() });
+          localStorage.setItem(KEY, JSON.stringify(arr.slice(-20)));
+        } catch { /* localStorage bloqueado, no-op */ }
+
+        // Mostrar panel de éxito
+        if (trackingEl) trackingEl.textContent = data.id;
+        const statusLink = document.getElementById('denuncia-status-link') as HTMLAnchorElement | null;
+        if (statusLink) statusLink.href = `/canal-de-denuncias/estado/${data.id}`;
+        if (form) form.hidden = true;
+        if (successPanel) {
+          successPanel.hidden = false;
+          successPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } catch (err) {
+        if (status) {
+          status.hidden = false;
+          status.textContent = `Hubo un error al enviar la denuncia. ${err instanceof Error ? err.message : 'Intenta nuevamente.'}`;
+          status.style.color = 'var(--color-error)';
+        }
+        btn.disabled = false;
+        btn.textContent = 'Enviar denuncia de forma anónima';
+      }
+    });
+  }
+
+  // ── Copiar ID al portapapeles ──
+  if (copyBtn && trackingEl) {
+    copyBtn.addEventListener('click', async () => {
+      const id = trackingEl.textContent ?? '';
+      try {
+        await navigator.clipboard.writeText(id);
+        const original = copyBtn.textContent;
+        copyBtn.textContent = '¡Copiado!';
+        setTimeout(() => { copyBtn.textContent = original; }, 2000);
+      } catch {
+        // Fallback
+        const range = document.createRange();
+        range.selectNode(trackingEl);
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+      }
+    });
+  }
+</script>

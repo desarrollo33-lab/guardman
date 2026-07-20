@@ -1,0 +1,387 @@
+---
+// LeadForm — Componente compartido para todos los forms del sitio público.
+// v1.1 — extendido para soportar tanto forms simples (cotización, contacto)
+//        como complejos (canal de denuncias con secciones numeradas, radio
+//        pills, check pill con HTML, success panel inline, conditional fields).
+//
+// Soporta 2 modes:
+//   - mode="lead" (default): usa validateLead + /api/crm/leads/capture.
+//     Aplica a /cotizacion y /contacto.
+//   - mode="custom": la page provee su propio script de submit (slot name="script").
+//     Aplica a /canal-de-denuncias (endpoint propio, validaciones, success panel).
+//
+// API:
+//   <LeadForm
+//     id="..." title="..." subtitle="..." headerLabel="..."
+//     sections={[{ title, number?, optionalTag?, help?, fields: [...] }]}
+//     submitText="..." submitIcon?="send" submitClass?="..."
+//     mode?="lead" | "custom"
+//     trackName?="cotizacion|contacto|denuncia"
+//     successRedirect?="/gracias..."
+//     footNote?="..." errorText?="..."
+//     successPanel?={{ icon, title, subtitle, trackingLabel, trackingIdTemplate,
+//                       actions: [{ text, href, variant }], footNote? }}
+//   >
+//     <Fragment slot="script">...custom JS...</Fragment>
+//   </LeadForm>
+import { SITE } from '../lib/constants';
+import Icon from './Icon.astro';
+
+type FieldType = 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'date' | 'radio' | 'acceptance';
+type SectionType = { title?: string; number?: number | string; optionalTag?: string; help?: string; fields: Field[] };
+type SuccessAction = { text: string; href: string; variant?: 'primary' | 'outline' };
+
+interface Field {
+  name: string;
+  label: string;
+  type: FieldType;
+  required?: boolean;
+  placeholder?: string;
+  rows?: number;
+  options?: string[];
+  fullWidth?: boolean;
+  // Extendidos
+  id?: string;
+  hint?: string;
+  minlength?: number;
+  maxlength?: number;
+  min?: string;
+  radioOptions?: { value: string; label: string }[];
+  acceptLabel?: string;   // HTML rich para acceptance (con <a> etc)
+  counterId?: string;     // id del span contador (para textareas)
+  counterMax?: number;    // valor max del counter
+  // Conditional: si se setea, este field está oculto por default y el script lo muestra
+  wrapId?: string;
+  hidden?: boolean;
+}
+
+interface Props {
+  id: string;
+  title?: string;
+  subtitle?: string;
+  headerLabel?: string;       // section-label arriba del title (ej: "Formulario de denuncia")
+  headerTitle?: string;       // h2 (en lugar de h3 default)
+  sections: SectionType[];
+  submitText: string;
+  submitIcon?: string;
+  submitClass?: string;
+  mode?: 'lead' | 'custom';
+  trackName?: 'cotizacion' | 'contacto' | 'denuncia' | string;
+  successRedirect?: string;
+  footNote?: string;
+  errorText?: string;
+  novalidate?: boolean;
+  autocomplete?: 'on' | 'off';
+  // Para denuncias: success panel inline
+  successPanel?: {
+    id: string;              // id del contenedor (ej: "denuncia-success")
+    icon: string;            // emoji o "check"
+    title: string;
+    subtitle: string;
+    trackingLabel: string;   // "Tu ID de seguimiento"
+    trackingIdElementId: string;  // id del <code> donde se inyecta el ID
+    copyButtonId: string;    // id del botón copy
+    actions: SuccessAction[];
+    footNote?: string;
+    footIcon?: string;
+  };
+}
+
+const {
+  id, title, subtitle, headerLabel, headerTitle,
+  sections, submitText, submitIcon, submitClass,
+  mode = 'lead', trackName, successRedirect,
+  footNote, errorText = 'Hubo un error. Por favor intenta nuevamente o llámanos.',
+  novalidate, autocomplete,
+  successPanel,
+} = Astro.props;
+
+// Agrupa los fields de una section en rows. `fullWidth: true` sale del grid
+// 2-col y ocupa toda la línea (ej: textarea, radio-row, conditional).
+type RowItem = { kind: 'pair'; fields: Field[] } | { kind: 'single'; field: Field };
+const sectionRows = (section: SectionType): RowItem[] => {
+  const out: RowItem[] = [];
+  let buffer: Field[] = [];
+  for (const f of section.fields) {
+    if (f.fullWidth) {
+      if (buffer.length) {
+        out.push({ kind: 'pair', fields: buffer });
+        buffer = [];
+      }
+      out.push({ kind: 'single', field: f });
+    } else {
+      buffer.push(f);
+      if (buffer.length === 2) {
+        out.push({ kind: 'pair', fields: buffer });
+        buffer = [];
+      }
+    }
+  }
+  if (buffer.length) {
+    out.push({ kind: 'pair', fields: buffer });
+  }
+  return out;
+};
+---
+
+<div class="form-card">
+  {(headerLabel || headerTitle || title || subtitle) && (
+    <div class="form-header">
+      {headerLabel && <span class="section-label">{headerLabel}</span>}
+      {headerTitle && <h2 class="section-title">{headerTitle}</h2>}
+      {title && !headerTitle && <h3>{title}</h3>}
+      {subtitle && <p class="form-sub">{subtitle}</p>}
+    </div>
+  )}
+
+  <form
+    id={id}
+    action={mode === 'lead' ? `${SITE.API_URL}/api/crm/leads/capture` : undefined}
+    method={mode === 'lead' ? 'POST' : undefined}
+    data-track={trackName}
+    data-success-redirect={successRedirect}
+    data-error-text={errorText}
+    data-mode={mode}
+    novalidate={novalidate}
+    autocomplete={autocomplete}
+  >
+    {sections.map((section) => (
+      <Fragment>
+        {section.title && (
+          <h4 class="form-section-title">
+            {section.number !== undefined && (
+              <span class="form-section-number">{section.number}.</span>
+            )}
+            {section.title}
+            {section.optionalTag && (
+              <span class="optional-tag">{section.optionalTag}</span>
+            )}
+          </h4>
+        )}
+        {section.help && (
+          <p class="form-section-help" set:html={section.help} />
+        )}
+        {sectionRows(section).map((row) =>
+          row.kind === 'pair' ? (
+            <div class="form-row">
+              {row.fields.map((f) => (
+                <div class="form-group" id={f.wrapId} hidden={f.hidden}>
+                  <label>
+                    {f.label}
+                    {f.required && <span class="required">*</span>}
+                  </label>
+                  {f.type === 'select' ? (
+                    <select name={f.name} id={f.id} required={f.required}>
+                      <option value="">Selecciona</option>
+                      {f.options?.map((opt) => <option value={opt}>{opt}</option>)}
+                    </select>
+                  ) : f.type === 'date' ? (
+                    <input type="date" name={f.name} id={f.id} required={f.required} min={f.min} max={f.max} />
+                  ) : f.type === 'radio' ? (
+                    <div class="radio-row">
+                      {f.radioOptions?.map((opt) => (
+                        <label class="radio-pill">
+                          <input type="radio" name={f.name} value={opt.value} />
+                          <span>{opt.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  ) : f.type === 'acceptance' ? (
+                    <div class="form-acceptance">
+                      <label class="check-pill">
+                        <input type="checkbox" name={f.name} id={f.id} required={f.required} />
+                        <span set:html={f.acceptLabel} />
+                      </label>
+                    </div>
+                  ) : (
+                    <input
+                      type={f.type}
+                      name={f.name}
+                      id={f.id}
+                      required={f.required}
+                      placeholder={f.placeholder}
+                      minlength={f.minlength}
+                      maxlength={f.maxlength}
+                    />
+                  )}
+                  {f.hint && <small class="form-hint">{f.hint}</small>}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div class="form-group" id={row.field.wrapId} hidden={row.field.hidden}>
+              <label>
+                {row.field.label}
+                {row.field.required && <span class="required">*</span>}
+              </label>
+              {row.field.type === 'textarea' ? (
+                <>
+                  <textarea
+                    name={row.field.name}
+                    id={row.field.id}
+                    required={row.field.required}
+                    rows={row.field.rows ?? 5}
+                    placeholder={row.field.placeholder}
+                    minlength={row.field.minlength}
+                    maxlength={row.field.maxlength}
+                  />
+                  {row.field.hint && (
+                    <small class="form-hint">
+                      {row.field.counterId && (
+                        <span id={row.field.counterId}>0</span>
+                      )}
+                      {row.field.counterMax && (
+                        <> / {row.field.counterMax} caracteres</>
+                      )}
+                      {row.field.minlength && !row.field.counterMax && (
+                        <>mínimo {row.field.minlength} caracteres</>
+                      )}
+                    </small>
+                  )}
+                </>
+              ) : row.field.type === 'select' ? (
+                <select name={row.field.name} id={row.field.id} required={row.field.required}>
+                  <option value="">Selecciona</option>
+                  {row.field.options?.map((opt) => <option value={opt}>{opt}</option>)}
+                </select>
+              ) : row.field.type === 'date' ? (
+                <input type="date" name={row.field.name} id={row.field.id} required={row.field.required} min={row.field.min} max={row.field.max} />
+              ) : row.field.type === 'radio' ? (
+                <>
+                  <div class="radio-row">
+                    {row.field.radioOptions?.map((opt) => (
+                      <label class="radio-pill">
+                        <input type="radio" name={row.field.name} value={opt.value} />
+                        <span>{opt.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {row.field.hint && <small class="form-hint">{row.field.hint}</small>}
+                </>
+              ) : row.field.type === 'acceptance' ? (
+                <div class="form-acceptance">
+                  <label class="check-pill">
+                    <input type="checkbox" name={row.field.name} id={row.field.id} required={row.field.required} />
+                    <span set:html={row.field.acceptLabel} />
+                  </label>
+                </div>
+              ) : (
+                <input
+                  type={row.field.type}
+                  name={row.field.name}
+                  id={row.field.id}
+                  required={row.field.required}
+                  placeholder={row.field.placeholder}
+                  minlength={row.field.minlength}
+                  maxlength={row.field.maxlength}
+                />
+              )}
+              {row.field.type !== 'textarea' && row.field.type !== 'radio' && row.field.hint && (
+                <small class="form-hint">{row.field.hint}</small>
+              )}
+            </div>
+          ),
+        )}
+      </Fragment>
+    ))}
+
+    <button type="submit" class={`btn btn-primary btn-lg ${submitClass ?? ''}`} style="width:100%">
+      {submitIcon && <Icon name={submitIcon} size={16} />}
+      {submitText}
+    </button>
+    {footNote && (
+      <p class="form-foot-note">
+        <Icon name="lock" size={14} />
+        {footNote}
+      </p>
+    )}
+    <p id="form-status" hidden></p>
+  </form>
+
+  {successPanel && (
+    <div id={successPanel.id} hidden class="denuncia-success">
+      <div class="denuncia-success-icon">{successPanel.icon}</div>
+      <h3>{successPanel.title}</h3>
+      <p>{successPanel.subtitle}</p>
+      <div class="denuncia-tracking">
+        <span class="denuncia-tracking-label">{successPanel.trackingLabel}</span>
+        <code id={successPanel.trackingIdElementId} class="denuncia-tracking-id"></code>
+        <button type="button" class="btn btn-outline btn-sm" id={successPanel.copyButtonId}>Copiar ID</button>
+      </div>
+      <div class="denuncia-success-actions">
+        {successPanel.actions.map((a) => (
+          <a href={a.href} class={`btn ${a.variant === 'outline' ? 'btn-outline' : 'btn-primary'}`}>{a.text}</a>
+        ))}
+      </div>
+      {successPanel.footNote && (
+        <p class="denuncia-success-foot">
+          {successPanel.footIcon && <Icon name={successPanel.footIcon} size={14} />}
+          {successPanel.footNote}
+        </p>
+      )}
+    </div>
+  )}
+
+  <slot name="script" />
+</div>
+
+{mode === 'lead' && (
+  <script is:inline>
+    (function () {
+      function initLeadForm() {
+        document.querySelectorAll('form[data-mode="lead"]').forEach(function (form) {
+          if (form.dataset.leadBound === '1') return;
+          form.dataset.leadBound = '1';
+          var trackName = form.dataset.track;
+          var successRedirect = form.dataset.successRedirect || '/gracias';
+          var errorText = form.dataset.errorText || 'Hubo un error. Por favor intenta nuevamente o llámanos.';
+          var submitOriginal = (form.querySelector('button[type="submit"]') || {}).textContent || 'Enviar';
+
+          form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var status = form.querySelector('#form-status');
+            var btn = form.querySelector('button[type="submit"]');
+            var raw = Object.fromEntries(new FormData(form));
+            var errs = [];
+            if (!raw.name || String(raw.name).trim().length < 2) errs.push('Ingresa tu nombre completo.');
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(raw.email || ''))) errs.push('Correo electrónico inválido.');
+            if (!/^\+?56\s?9\s?[\d\s]{8,}$|^9[\d\s]{8,}$|^[\d\s+\-()]{8,}$/.test(String(raw.phone || ''))) errs.push('Teléfono inválido. Usa formato +56 9 XXXX XXXX.');
+            if (!raw.service) errs.push('Selecciona un servicio.');
+            if (errs.length) {
+              if (status) {
+                status.hidden = false;
+                status.textContent = '⚠️ ' + errs[0];
+                status.style.color = 'var(--color-error)';
+              }
+              return;
+            }
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+            raw.source = trackName;
+            fetch(form.action, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(raw),
+            }).then(function (res) {
+              if (res.ok) {
+                window.location.href = successRedirect;
+              } else {
+                throw new Error('Error');
+              }
+            }).catch(function () {
+              if (status) {
+                status.hidden = false;
+                status.textContent = errorText;
+                status.style.color = 'var(--color-error)';
+              }
+              btn.disabled = false;
+              btn.textContent = submitOriginal;
+            });
+          });
+        });
+      }
+      initLeadForm();
+      document.addEventListener('astro:page-load', initLeadForm);
+    })();
+  </script>
+)}
