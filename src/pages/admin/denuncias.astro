@@ -137,10 +137,48 @@ const categoriaLabel: Record<string, string> = {
         <button class="denuncia-modal-close" data-modal-close aria-label="Cerrar">×</button>
         <h3 id="dm-title">Denuncia</h3>
         <p class="dm-meta" id="dm-meta"></p>
+
         <div class="dm-section">
           <h4>Descripción</h4>
           <p id="dm-descripcion" class="dm-descripcion">(cargando...)</p>
         </div>
+
+        <div class="dm-grid">
+          <div>
+            <h4>Categoría</h4>
+            <p class="dm-val" id="dm-categoria">—</p>
+          </div>
+          <div>
+            <h4>Relación</h4>
+            <p class="dm-val" id="dm-relacion">—</p>
+          </div>
+          <div>
+            <h4>Fecha del incidente</h4>
+            <p class="dm-val" id="dm-fecha">—</p>
+          </div>
+          <div>
+            <h4>Lugar</h4>
+            <p class="dm-val" id="dm-lugar">—</p>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <h4>Personas involucradas</h4>
+            <p class="dm-val" id="dm-personas">—</p>
+          </div>
+          <div>
+            <h4>¿Tiene evidencia?</h4>
+            <p class="dm-val" id="dm-evidencia">—</p>
+          </div>
+        </div>
+
+        <div class="dm-section" id="dm-contacto-section">
+          <h4>Datos de contacto del denunciante</h4>
+          <div class="dm-grid">
+            <div><h4>Nombre</h4><p class="dm-val" id="dm-nombre">—</p></div>
+            <div><h4>Email</h4><p class="dm-val" id="dm-email">—</p></div>
+            <div style="grid-column: 1 / -1;"><h4>Teléfono</h4><p class="dm-val" id="dm-telefono">—</p></div>
+          </div>
+        </div>
+
         <div class="dm-section">
           <h4>Notas internas (solo admin)</h4>
           <textarea id="dm-notes" rows="5" placeholder="Anota observaciones, líneas de investigación, próximos pasos..."></textarea>
@@ -198,6 +236,20 @@ const categoriaLabel: Record<string, string> = {
   .dm-meta code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, monospace; }
   .dm-section { margin-bottom: 18px; }
   .dm-section h4 { font-size: 11px; color: var(--fg-dim); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px; font-weight: 600; }
+  .dm-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    background: var(--surface-2);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 18px;
+  }
+  .dm-grid > div h4 { font-size: 10px; margin-bottom: 4px; }
+  .dm-val { margin: 0; font-size: 13px; color: var(--fg); line-height: 1.5; word-break: break-word; }
+  .dm-val-empty { color: var(--fg-dim); font-style: italic; }
+  @media (max-width: 600px) { .dm-grid { grid-template-columns: 1fr; } }
   .dm-descripcion {
     background: var(--surface-2);
     border: 1px solid rgba(255,255,255,.06);
@@ -270,6 +322,34 @@ const categoriaLabel: Record<string, string> = {
   let currentStatus = 'pending';
 
   // ── Abrir/cerrar modal ──
+  const CATEGORIA_LABELS = {
+    codigo_conducta: 'Infracción al código de conducta',
+    delito: 'Potencial delito (robo, fraude, corrupción)',
+    acoso: 'Acoso laboral o sexual',
+    seguridad: 'Falla de seguridad o protocolo',
+    otro: 'Otro',
+  };
+  const RELACION_LABELS = {
+    trabajador: 'Trabajador de GuardMan',
+    cliente: 'Cliente',
+    proveedor: 'Proveedor o contratista',
+    externo: 'Externo (visitante, transeúnte)',
+    anonimo: 'Prefiero no decirlo',
+  };
+  const EVIDENCIA_LABELS = { si: 'Sí', no: 'No', desconocido: 'No estoy seguro' };
+
+  function setOrDash(id, val) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const v = (val === null || val === undefined || val === '') ? null : String(val);
+    el.textContent = v ?? '—';
+    el.classList.toggle('dm-val-empty', !v);
+  }
+  function setOrHideSection(sectionId, condition) {
+    const el = document.getElementById(sectionId);
+    if (el) el.hidden = !condition;
+  }
+
   function openModal(id) {
     currentId = id;
     const card = document.querySelector(`[data-id="${id}"]`);
@@ -277,23 +357,38 @@ const categoriaLabel: Record<string, string> = {
     modalTitle.textContent = `Denuncia ${id}`;
     modalMeta.innerHTML = `<code>${id}</code> · ${currentStatus}`;
     modalDesc.textContent = '(cargando...)';
+    // Reset campos
+    ['dm-categoria','dm-relacion','dm-fecha','dm-lugar','dm-personas','dm-evidencia',
+     'dm-nombre','dm-email','dm-telefono'].forEach(id => setOrDash(id, null));
+    setOrHideSection('dm-contacto-section', false);
     modalNotes.value = '';
     modalAssigned.value = '';
     Array.from(modalStatusRow.children).forEach((b) => b.classList.toggle('active', b.dataset.status === currentStatus));
     modalStatusMsg.hidden = true;
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
-    // Cargar la denuncia completa (con descripción)
+    // Cargar la denuncia completa (admin: con descripción, admin_notes, contacto)
     fetch(`/api/denuncias/${id}`, { ...fetchOpts, headers })
       .then(r => r.json())
       .then(data => {
-        if (data?.ok) {
-          modalDesc.textContent = data.denuncia?.descripcion ?? data.descripcion ?? '(sin descripción visible)';
-          modalNotes.value = data.denuncia?.admin_notes ?? '';
-          modalAssigned.value = data.denuncia?.assigned_to ?? '';
-        } else {
+        if (!data?.ok) {
           modalDesc.textContent = data?.error ?? 'No se pudo cargar.';
+          return;
         }
+        const d = data.denuncia ?? {};
+        modalDesc.textContent = d.descripcion || '(sin descripción)';
+        setOrDash('dm-categoria', CATEGORIA_LABELS[d.categoria] ?? d.categoria);
+        setOrDash('dm-relacion', RELACION_LABELS[d.relacion] ?? d.relacion);
+        setOrDash('dm-fecha', d.fecha_incidente);
+        setOrDash('dm-lugar', d.lugar);
+        setOrDash('dm-personas', d.personas_involucradas);
+        setOrDash('dm-evidencia', EVIDENCIA_LABELS[d.tiene_evidencia] ?? d.tiene_evidencia);
+        setOrHideSection('dm-contacto-section', !!(d.nombre || d.email || d.telefono));
+        setOrDash('dm-nombre', d.nombre);
+        setOrDash('dm-email', d.email);
+        setOrDash('dm-telefono', d.telefono);
+        modalNotes.value = d.admin_notes ?? '';
+        modalAssigned.value = d.assigned_to ?? '';
       })
       .catch(() => { modalDesc.textContent = 'Error de red.'; });
   }

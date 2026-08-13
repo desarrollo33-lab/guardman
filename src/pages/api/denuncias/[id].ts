@@ -55,7 +55,12 @@ const isAdmin = (request: Request): boolean => isAdminRequest(request);
 const STATUS_VALUES = ['pending', 'reviewing', 'investigating', 'resolved', 'archived'] as const;
 type Status = (typeof STATUS_VALUES)[number];
 
-// ── GET público: estado de una denuncia ────────────────────────
+// ── GET: estado de una denuncia ─────────────────────────────────
+//   Público: devuelve SOLO metadata (id, status, fechas, categoría, relación, lugar).
+//            NO expone descripción, denunciante, ni admin_notes. El ID es secreto
+//            que solo conoce el denunciante; aun si se filtra, no debe filtrar contenido.
+//   Admin:   si la request está autenticada como admin (cookie o token), devuelve
+//            el registro completo incluyendo descripción, admin_notes y assigned_to.
 export const GET: APIRoute = async ({ params, request }) => {
   const origin = request.headers.get('Origin');
   const id = String(params.id ?? '').toUpperCase();
@@ -69,27 +74,23 @@ export const GET: APIRoute = async ({ params, request }) => {
     return json({ ok: false, error: 'DB no configurada' }, 500, origin);
   }
 
-  const row = await db
-    .prepare(
-      `SELECT id, created_at, updated_at, status, categoria, relacion, lugar
-       FROM denuncias WHERE id = ?`,
-    )
-    .bind(id)
-    .first<{
-      id: string;
-      created_at: string;
-      updated_at: string;
-      status: string;
-      categoria: string;
-      relacion: string | null;
-      lugar: string | null;
-    }>();
+  const admin = isAdmin(request);
+  const sql = admin
+    ? `SELECT id, created_at, updated_at, status, categoria, relacion, lugar,
+              fecha_incidente, personas_involucradas, descripcion,
+              tiene_evidencia, nombre, email, telefono,
+              admin_notes, assigned_to, ip_hash
+         FROM denuncias WHERE id = ?`
+    : `SELECT id, created_at, updated_at, status, categoria, relacion, lugar
+         FROM denuncias WHERE id = ?`;
+
+  const row = await db.prepare(sql).bind(id).first<Record<string, unknown>>();
 
   if (!row) {
     return json({ ok: false, error: 'Denuncia no encontrada. Verifica el ID.' }, 404, origin);
   }
 
-  return json({ ok: true, denuncia: row }, 200, origin);
+  return json({ ok: true, denuncia: row, admin }, 200, origin);
 };
 
 // ── PATCH admin: actualizar status + admin_notes ────────────────
