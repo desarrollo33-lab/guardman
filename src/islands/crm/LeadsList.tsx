@@ -1,7 +1,7 @@
 // LeadsList — tabla filtrable + búsqueda + bulk actions.
-import { useMemo, useState } from 'react';
+// Conectado a /api/leads (D1).
+import { useEffect, useMemo, useState } from 'react';
 import {
-  crmLeads,
   STATUS_FLOW,
   STATUS_LABELS,
   STATUS_COLORS,
@@ -9,17 +9,75 @@ import {
   PRIORITY_COLORS,
   formatCLP,
   relativeTime,
+  type Lead,
+  type LeadStatus,
+  type LeadPriority,
 } from '../../lib/crm-data';
 
 type SortKey = 'created_at' | 'value' | 'updated_at' | 'name';
 
+interface ApiLead {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+  email: string;
+  phone: string;
+  company?: string | null;
+  service: string;
+  location?: string | null;
+  status: LeadStatus;
+  priority: LeadPriority;
+  source: string;
+  value: number;
+}
+
+function apiToLead(a: ApiLead): Lead {
+  return {
+    id: a.id,
+    name: a.name,
+    email: a.email,
+    phone: a.phone,
+    company: a.company ?? undefined,
+    service: a.service,
+    location: a.location ?? '',
+    status: a.status,
+    priority: a.priority,
+    source: (a.source as Lead['source']) ?? 'web_contacto',
+    value: a.value,
+    created_at: a.created_at,
+    updated_at: a.updated_at,
+  };
+}
+
 export default function LeadsList() {
-  const leads = crmLeads;
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [sortKey, setSortKey] = useState<SortKey>('updated_at');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/leads?limit=200', { credentials: 'same-origin' });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
+      setLeads((data.leads ?? []).map(apiToLead));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const filtered = useMemo(() => {
     let r = leads;
@@ -35,22 +93,24 @@ export default function LeadsList() {
       );
     }
     r = [...r].sort((a, b) => {
-      let av: string | number = a[sortKey];
-      let bv: string | number = b[sortKey];
+      const av = a[sortKey] as string | number | undefined;
+      const bv = b[sortKey] as string | number | undefined;
       if (typeof av === 'string' && typeof bv === 'string') {
         return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
       }
-      av = Number(av); bv = Number(bv);
-      return sortDir === 'asc' ? av - bv : bv - av;
+      return sortDir === 'asc'
+        ? Number(av) - Number(bv)
+        : Number(bv) - Number(av);
     });
     return r;
   }, [leads, query, statusFilter, sortKey, sortDir]);
 
   const counts = useMemo(
-    () => STATUS_FLOW.reduce<Record<string, number>>((acc, s) => {
-      acc[s] = leads.filter((l) => l.status === s).length;
-      return acc;
-    }, {}),
+    () =>
+      STATUS_FLOW.reduce<Record<string, number>>((acc, s) => {
+        acc[s] = leads.filter((l) => l.status === s).length;
+        return acc;
+      }, {}),
     [leads],
   );
 
@@ -72,6 +132,21 @@ export default function LeadsList() {
     });
   };
 
+  if (loading) {
+    return <div className="panel empty-panel"><p className="empty-state">Cargando leads…</p></div>;
+  }
+
+  if (error) {
+    return (
+      <div className="panel" style={{ background: 'rgba(239,68,68,.1)', borderColor: 'rgba(239,68,68,.3)', color: 'var(--color-error)' }}>
+        <strong>Error cargando leads.</strong> {error}
+        <div style={{ marginTop: 12 }}>
+          <button className="admin-btn admin-btn-primary" onClick={load}>Reintentar</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="leads-toolbar">
@@ -84,19 +159,19 @@ export default function LeadsList() {
         <select className="form-input leads-filter" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="">Todos los estados</option>
           {STATUS_FLOW.map((s) => (
-            <option key={s} value={s}>{STATUS_LABELS[s]} ({counts[s]})</option>
+            <option key={s} value={s}>{STATUS_LABELS[s]} ({counts[s] ?? 0})</option>
           ))}
         </select>
-        <button className="admin-btn admin-btn-primary">+ Nuevo lead</button>
+        <button className="admin-btn admin-btn-secondary" onClick={load} title="Refrescar">↻</button>
       </div>
 
       {selected.size > 0 && (
         <div className="bulk-bar">
           <span>{selected.size} seleccionados</span>
-          <button className="admin-btn admin-btn-secondary">Asignar a…</button>
-          <button className="admin-btn admin-btn-secondary">Cambiar estado</button>
-          <button className="admin-btn admin-btn-secondary">Exportar</button>
-          <button className="admin-btn admin-btn-danger">Eliminar</button>
+          <button className="admin-btn admin-btn-secondary" disabled>Asignar a…</button>
+          <button className="admin-btn admin-btn-secondary" disabled>Cambiar estado</button>
+          <button className="admin-btn admin-btn-secondary" disabled>Exportar</button>
+          <button className="admin-btn admin-btn-danger" disabled>Eliminar</button>
           <button className="admin-btn admin-btn-secondary" onClick={() => setSelected(new Set())}>Limpiar</button>
         </div>
       )}
@@ -138,7 +213,7 @@ export default function LeadsList() {
                   </div>
                 </td>
                 <td><span className="tag">{l.service.replace(/-/g, ' ')}</span></td>
-                <td><span className="tag">{l.location.replace(/-/g, ' ')}</span></td>
+                <td><span className="tag">{(l.location ?? '').replace(/-/g, ' ')}</span></td>
                 <td>
                   <span className="status-chip" style={{ background: STATUS_COLORS[l.status], color: '#fff' }}>
                     {STATUS_LABELS[l.status]}

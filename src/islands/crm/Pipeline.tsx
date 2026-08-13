@@ -1,23 +1,43 @@
-// Pipeline — Kanban con drag&drop, filtros y export CSV.
-import { useMemo, useState, useCallback } from 'react';
+// Pipeline — Kanban con drag&drop conectado a /api/leads (D1).
+// Permite mover leads entre columnas con persistencia real.
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import {
-  crmLeads,
-  buildPipeline,
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   formatCLP,
   type Lead,
   type LeadStatus,
-  type PipelineColumn,
 } from '../../lib/crm-data';
 
+const STATUSES: LeadStatus[] = ['new', 'contacted', 'visit', 'proposal', 'negotiation', 'won', 'lost'];
+
+const STATUS_HEADERS: Record<LeadStatus, string> = {
+  new: 'Nuevos',
+  contacted: 'Contactados',
+  visit: 'Visita',
+  proposal: 'Cotización',
+  negotiation: 'Negociación',
+  won: 'Ganados',
+  lost: 'Perdidos',
+};
+
+const STATUS_COL_KINDS: Record<LeadStatus, string> = {
+  new: 'info',
+  contacted: 'success',
+  visit: 'warning',
+  proposal: 'accent',
+  negotiation: 'accent',
+  won: 'success',
+  lost: 'error',
+};
+
 function exportCSV(leads: Lead[]) {
-  const headers = ['id', 'name', 'email', 'phone', 'company', 'service', 'location', 'status', 'priority', 'source', 'value', 'created_at', 'expected_close', 'assigned_to', 'message'];
+  const headers = ['id', 'name', 'email', 'phone', 'company', 'service', 'location', 'status', 'priority', 'source', 'value', 'created_at', 'updated_at', 'assigned_to', 'message'];
   const rows = leads.map((l) =>
     [
-      l.id, l.name, l.email, l.phone, l.company ?? '', l.service, l.location,
-      l.status, l.priority, l.source, String(l.value), l.created_at,
-      l.expected_close ?? '', l.owner_email, (l.message ?? '').replace(/"/g, '""'),
+      l.id, l.name, l.email, l.phone, l.company ?? '', l.service, l.location ?? '',
+      l.status, l.priority, l.source, String(l.value), l.created_at, l.updated_at ?? '',
+      l.owner_email ?? '', (l.message ?? '').replace(/"/g, '""'),
     ]
       .map((v) => `"${String(v).replace(/"/g, '""')}"`)
       .join(','),
@@ -32,47 +52,129 @@ function exportCSV(leads: Lead[]) {
   URL.revokeObjectURL(url);
 }
 
-interface Filters {
-  assignee: string;
+interface ApiLead {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+  email: string;
+  phone: string;
+  company?: string | null;
   service: string;
-  priority: string;
-  query: string;
+  location?: string | null;
+  status: LeadStatus;
+  priority: Lead['priority'];
+  source: string;
+  value: number;
+  owner_email?: string | null;
+  message?: string | null;
+}
+
+function apiToLead(a: ApiLead): Lead {
+  return {
+    id: a.id,
+    name: a.name,
+    email: a.email,
+    phone: a.phone,
+    company: a.company ?? undefined,
+    service: a.service,
+    location: a.location ?? '',
+    status: a.status,
+    priority: a.priority,
+    source: (a.source as Lead['source']) ?? 'web_contacto',
+    value: a.value,
+    created_at: a.created_at,
+    updated_at: a.updated_at,
+    owner_email: a.owner_email ?? undefined,
+    message: a.message ?? undefined,
+  };
 }
 
 export default function Pipeline() {
-  const [leads, setLeads] = useState<Lead[]>(crmLeads);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOverCol, setDragOverCol] = useState<LeadStatus | null>(null);
-  const [filters, setFilters] = useState<Filters>({ assignee: '', service: '', priority: '', query: '' });
-  const [showFilters, setShowFilters] = useState(false);
+  const [query, setQuery] = useState('');
 
-  const filteredLeads = useMemo(() => {
-    return leads.filter((l) => {
-      if (filters.assignee && l.assigned_to !== filters.assignee) return false;
-      if (filters.service && l.service !== filters.service) return false;
-      if (filters.priority && l.priority !== filters.priority) return false;
-      if (filters.query) {
-        const q = filters.query.toLowerCase();
-        if (!l.name.toLowerCase().includes(q) && !l.email.toLowerCase().includes(q) && !(l.company ?? '').toLowerCase().includes(q)) {
-          return false;
-        }
-      }
-      return true;
-    });
-  }, [leads, filters]);
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/leads?limit=200', { credentials: 'same-origin' });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
+      setLeads((data.leads ?? []).map(apiToLead));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const columns = useMemo<PipelineColumn[]>(
-    () => buildPipeline(filteredLeads),
-    [filteredLeads],
-  );
-
-  const moveLead = useCallback((leadId: string, toStatus: LeadStatus) => {
-    setLeads((prev) =>
-      prev.map((l) => (l.id === leadId ? { ...l, status: toStatus, updated_at: new Date().toISOString().slice(0, 10) } : l)),
-    );
+  useEffect(() => {
+    load();
   }, []);
 
+  const filteredLeads = useMemo(() => {
+    if (!query) return leads;
+    const q = query.toLowerCase();
+    return leads.filter(
+      (l) =>
+        l.name.toLowerCase().includes(q) ||
+        l.email.toLowerCase().includes(q) ||
+        (l.company ?? '').toLowerCase().includes(q),
+    );
+  }, [leads, query]);
+
+  const columns = useMemo(() => {
+    const map: Record<LeadStatus, Lead[]> = {
+      new: [], contacted: [], visit: [], proposal: [], negotiation: [], won: [], lost: [],
+    };
+    for (const l of filteredLeads) {
+      if (map[l.status]) map[l.status].push(l);
+    }
+    for (const s of STATUSES) {
+      map[s].sort((a, b) => b.created_at.localeCompare(a.created_at));
+    }
+    return map;
+  }, [filteredLeads]);
+
+  const moveLead = useCallback(async (leadId: string, toStatus: LeadStatus) => {
+    const prev = leads;
+    setLeads((cur) => cur.map((l) => (l.id === leadId ? { ...l, status: toStatus, updated_at: new Date().toISOString() } : l)));
+    try {
+      const res = await fetch(`/api/leads/${leadId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ status: toStatus }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
+    } catch (err) {
+      setLeads(prev);
+      alert('No se pudo mover: ' + (err instanceof Error ? err.message : String(err)));
+    }
+  }, [leads]);
+
   const totalValue = filteredLeads.reduce((s, l) => s + l.value, 0);
+
+  if (loading) {
+    return <div className="panel empty-panel"><p className="empty-state">Cargando pipeline…</p></div>;
+  }
+
+  if (error) {
+    return (
+      <div className="panel" style={{ background: 'rgba(239,68,68,.1)', borderColor: 'rgba(239,68,68,.3)', color: 'var(--color-error)' }}>
+        <strong>Error cargando pipeline.</strong> {error}
+        <div style={{ marginTop: 12 }}>
+          <button className="admin-btn admin-btn-primary" onClick={load}>Reintentar</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -80,120 +182,68 @@ export default function Pipeline() {
         <input
           className="form-input pipeline-search"
           placeholder="🔍 Buscar por nombre, email, empresa…"
-          value={filters.query}
-          onChange={(e) => setFilters({ ...filters, query: e.target.value })}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
         />
-        <button className="admin-btn admin-btn-secondary" onClick={() => setShowFilters(!showFilters)}>
-          ⚙️ Filtros {showFilters ? '▲' : '▼'}
-        </button>
         <button className="admin-btn admin-btn-secondary" onClick={() => exportCSV(filteredLeads)}>
           📤 Exportar CSV
         </button>
+        <button className="admin-btn admin-btn-secondary" onClick={load} title="Refrescar">↻</button>
         <div className="pipeline-summary">
           <span><strong>{filteredLeads.length}</strong> leads</span>
           <span><strong>{formatCLP(totalValue)}</strong> total</span>
         </div>
       </div>
 
-      {showFilters && (
-        <div className="panel filter-panel">
-          <div className="filter-grid">
-            <div>
-              <label className="filter-label">Asignado a</label>
-              <select className="form-input" value={filters.assignee} onChange={(e) => setFilters({ ...filters, assignee: e.target.value })}>
-                <option value="">Todos</option>
-                <option value="U001">Administrador</option>
-                <option value="U002">María Soto</option>
-                <option value="U003">Carlos Díaz</option>
-                <option value="U004">Patricia Rivas</option>
-              </select>
-            </div>
-            <div>
-              <label className="filter-label">Servicio</label>
-              <select className="form-input" value={filters.service} onChange={(e) => setFilters({ ...filters, service: e.target.value })}>
-                <option value="">Todos</option>
-                <option value="guardias-de-seguridad">Guardias de Seguridad</option>
-                <option value="cctv-videovigilancia">CCTV Videovigilancia</option>
-                <option value="control-de-accesos">Control de Accesos</option>
-                <option value="escoltas-privados">PPI (Protección de Personas Importantes)</option>
-                <option value="monitoreo-24-7">Monitoreo 24/7</option>
-                <option value="seguridad-eventos">Seguridad Eventos</option>
-                <option value="seguridad-industrial">Seguridad Industrial</option>
-                <option value="auditoria-seguridad">Auditoría de Seguridad</option>
-                <option value="guard-pod">Guard Pod</option>
-              </select>
-            </div>
-            <div>
-              <label className="filter-label">Prioridad</label>
-              <select className="form-input" value={filters.priority} onChange={(e) => setFilters({ ...filters, priority: e.target.value })}>
-                <option value="">Todas</option>
-                <option value="urgent">Urgente</option>
-                <option value="high">Alta</option>
-                <option value="medium">Media</option>
-                <option value="low">Baja</option>
-              </select>
-            </div>
-            <div className="filter-actions">
-              <button className="admin-btn admin-btn-secondary" onClick={() => setFilters({ assignee: '', service: '', priority: '', query: '' })}>
-                Limpiar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="kanban">
-        {columns.map((col) => (
+      <div className="pipeline-kanban">
+        {STATUSES.map((s) => (
           <div
-            key={col.status}
-            className="kanban-col"
-            onDragOver={(e) => { e.preventDefault(); setDragOverCol(col.status); }}
-            onDragLeave={() => setDragOverCol((c) => (c === col.status ? null : c))}
+            key={s}
+            className={`pipeline-col ${dragOverCol === s ? 'drag-over' : ''}`}
+            data-status={s}
+            onDragOver={(e) => { e.preventDefault(); setDragOverCol(s); }}
+            onDragLeave={() => setDragOverCol((cur) => (cur === s ? null : cur))}
             onDrop={(e) => {
               e.preventDefault();
-              if (dragId) moveLead(dragId, col.status);
-              setDragId(null);
               setDragOverCol(null);
+              if (dragId) {
+                moveLead(dragId, s);
+                setDragId(null);
+              }
             }}
           >
-            <div className="kanban-col-header" style={{ borderTopColor: col.color }}>
-              <div className="kanban-col-title">
-                <span className="kanban-dot" style={{ background: col.color }} />
-                <span>{col.label}</span>
-                <span className="pill pill-neutral">{col.leads.length}</span>
-              </div>
-              <span className="kanban-col-value">{formatCLP(col.total_value)}</span>
+            <div className={`pipeline-col-header pipeline-col-${STATUS_COL_KINDS[s]}`}>
+              <h4>{STATUS_HEADERS[s]}</h4>
+              <span className="pipeline-col-count">{columns[s].length}</span>
             </div>
-            <div
-              className={`kanban-col-body ${dragOverCol === col.status ? 'drag-over' : ''}`}
-            >
-              {col.leads.length === 0 ? (
-                <div className="kanban-empty">Arrastra leads aquí</div>
+            <div className="pipeline-col-body">
+              {columns[s].length === 0 ? (
+                <div className="pipeline-empty">Arrastra leads aquí</div>
               ) : (
-                col.leads.map((lead) => (
-                  <div
-                    key={lead.id}
-                    className="kanban-card"
+                columns[s].map((l) => (
+                  <article
+                    key={l.id}
+                    className="pipeline-card"
                     draggable
-                    onDragStart={() => setDragId(lead.id)}
+                    onDragStart={() => setDragId(l.id)}
                     onDragEnd={() => { setDragId(null); setDragOverCol(null); }}
-                    onClick={() => (window.location.href = `/admin/leads/${lead.id}`)}
-                    style={{ opacity: dragId === lead.id ? 0.4 : 1 }}
+                    data-id={l.id}
                   >
-                    <div className="kanban-card-header">
-                      <span className="kanban-card-priority" style={{ background: PRIORITY_COLORS[lead.priority] }} title={PRIORITY_LABELS[lead.priority]} />
-                      <span className="kanban-card-name">{lead.name}</span>
+                    <div className="pipeline-card-head">
+                      <span className="pipeline-card-name">{l.name}</span>
+                      <span
+                        className="pipeline-card-priority"
+                        style={{ background: PRIORITY_COLORS[l.priority] }}
+                        title={PRIORITY_LABELS[l.priority]}
+                      />
                     </div>
-                    {lead.company && <div className="kanban-card-company">{lead.company}</div>}
-                    <div className="kanban-card-tags">
-                      <span className="tag">{lead.service.replace(/-/g, ' ')}</span>
-                      <span className="tag">{lead.location.replace(/-/g, ' ')}</span>
+                    <div className="pipeline-card-service">{l.service.replace(/-/g, ' ')}</div>
+                    {l.location && <div className="pipeline-card-location">📍 {l.location.replace(/-/g, ' ')}</div>}
+                    <div className="pipeline-card-footer">
+                      <span>{l.value > 0 ? formatCLP(l.value) : '—'}</span>
+                      <a href={`/admin/leads/${l.id}`} className="row-action" onClick={(e) => e.stopPropagation()}>→</a>
                     </div>
-                    <div className="kanban-card-footer">
-                      <span className="kanban-card-value">{formatCLP(lead.value)}</span>
-                      <span className="kanban-card-owner">{lead.owner_email.split('@')[0]}</span>
-                    </div>
-                  </div>
+                  </article>
                 ))
               )}
             </div>

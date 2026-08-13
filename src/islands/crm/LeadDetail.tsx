@@ -1,93 +1,146 @@
-// LeadDetail — Lead 360°: info, timeline, tasks, notes, communications.
-// Recibe lead_id via props (inyectado desde Astro page).
-import { useState } from 'react';
+// LeadDetail — Lead 360° conectado a /api/leads/[id] (D1).
+// Carga real, mutaciones reales (status, priority, notes, assigned_to, value).
+// Tasks y communications: placeholders para v1.1 (la API no las soporta aún).
+import { useEffect, useState } from 'react';
 import {
-  crmLeads,
-  leadTimeline,
-  leadTasks,
-  leadNotes,
-  leadCommunications,
   STATUS_FLOW,
   STATUS_LABELS,
   STATUS_COLORS,
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   SOURCE_LABELS,
-  TASK_TYPE_LABELS,
-  ACTIVITY_LABELS,
   formatCLP,
   formatDate,
-  formatDateTime,
-  relativeTime,
-  type Note,
-  type Task,
+  type Lead,
+  type LeadStatus,
+  type LeadPriority,
 } from '../../lib/crm-data';
 
 interface Props {
   leadId: string;
 }
 
-type Tab = 'timeline' | 'tasks' | 'notes' | 'comms';
+interface ApiLeadFull {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  name: string;
+  email: string;
+  phone: string;
+  company?: string | null;
+  service: string;
+  location?: string | null;
+  sector?: string | null;
+  property_type?: string | null;
+  guards_count?: string | null;
+  message?: string | null;
+  status: LeadStatus;
+  priority: LeadPriority;
+  source: string;
+  value: number;
+  assigned_to?: string | null;
+  owner_email?: string | null;
+  admin_notes?: string | null;
+  ip_hash?: string | null;
+  user_agent?: string | null;
+  referer?: string | null;
+}
+
+function apiToLead(a: ApiLeadFull): Lead {
+  return {
+    id: a.id,
+    name: a.name,
+    email: a.email,
+    phone: a.phone,
+    company: a.company ?? undefined,
+    service: a.service,
+    location: a.location ?? '',
+    sector: a.sector ?? undefined,
+    property_type: a.property_type ?? undefined,
+    guards_count: a.guards_count ?? undefined,
+    message: a.message ?? undefined,
+    status: a.status,
+    priority: a.priority,
+    source: (a.source as Lead['source']) ?? 'web_contacto',
+    value: a.value,
+    created_at: a.created_at,
+    updated_at: a.updated_at,
+    owner_email: a.owner_email ?? undefined,
+  };
+}
+
+type Tab = 'info' | 'notas';
 
 export default function LeadDetail({ leadId }: Props) {
-  const lead = crmLeads.find((l) => l.id === leadId);
-  const [tab, setTab] = useState<Tab>('timeline');
-  const [newNote, setNewNote] = useState('');
-  const [notes, setNotes] = useState<Note[]>(() => leadNotes(leadId));
-  const [tasks, setTasks] = useState<Task[]>(() => leadTasks(leadId));
-  const [newTask, setNewTask] = useState({ title: '', type: 'call' as Task['type'], due_at: '' });
+  const [lead, setLead] = useState<Lead | null>(null);
+  const [adminNotes, setAdminNotes] = useState<string>('');
+  const [assignedTo, setAssignedTo] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState<Tab>('info');
 
-  if (!lead) {
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/leads/${leadId}`, { credentials: 'same-origin' });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
+      const full: ApiLeadFull = data.lead;
+      setLead(apiToLead(full));
+      setAdminNotes(full.admin_notes ?? '');
+      setAssignedTo(full.assigned_to ?? '');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leadId]);
+
+  const patch = async (body: Record<string, unknown>, successMsg?: string) => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/leads/${leadId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
+      if (successMsg) alert(successMsg);
+      await load();
+    } catch (err) {
+      alert('No se pudo guardar: ' + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="panel empty-panel"><p className="empty-state">Cargando lead…</p></div>;
+  }
+
+  if (error || !lead) {
     return (
-      <div className="panel">
-        <p className="empty-state">Lead no encontrado.</p>
+      <div className="panel" style={{ background: 'rgba(239,68,68,.1)', borderColor: 'rgba(239,68,68,.3)', color: 'var(--color-error)' }}>
+        <strong>Error cargando lead.</strong> {error}
+        <div style={{ marginTop: 12 }}>
+          <button className="admin-btn admin-btn-primary" onClick={load}>Reintentar</button>
+          <a className="admin-btn admin-btn-secondary" href="/admin/leads" style={{ marginLeft: 8 }}>← Volver al listado</a>
+        </div>
       </div>
     );
   }
 
-  const timeline = leadTimeline(leadId);
-  const comms = leadCommunications(leadId);
-
-  const addNote = () => {
-    if (!newNote.trim()) return;
-    const note: Note = {
-      id: `N${Date.now()}`,
-      lead_id: leadId,
-      body: newNote.trim(),
-      at: new Date().toISOString(),
-      by: 'admin@guardman.cl',
-    };
-    setNotes([note, ...notes]);
-    setNewNote('');
-  };
-
-  const addTask = () => {
-    if (!newTask.title.trim() || !newTask.due_at) return;
-    const task: Task = {
-      id: `T${Date.now()}`,
-      lead_id: leadId,
-      type: newTask.type,
-      title: newTask.title.trim(),
-      due_at: newTask.due_at,
-      status: 'pending',
-      assigned_to: lead.assigned_to,
-      created_at: new Date().toISOString(),
-    };
-    setTasks([task, ...tasks]);
-    setNewTask({ title: '', type: 'call', due_at: '' });
-  };
-
-  const toggleTask = (id: string) => {
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === id ? { ...t, status: t.status === 'done' ? 'pending' : 'done' } : t,
-      ),
-    );
-  };
-
   return (
     <div className="lead-detail-layout">
-      {/* Columna principal */}
       <div className="lead-detail-main">
         {/* Header */}
         <div className="panel lead-header-panel">
@@ -110,10 +163,9 @@ export default function LeadDetail({ leadId }: Props) {
           <h1 className="lead-header-name">{lead.name}</h1>
           {lead.company && <div className="lead-header-company">{lead.company}</div>}
           <div className="lead-header-meta">
-            <span>📥 {SOURCE_LABELS[lead.source]}</span>
+            <span>📥 {SOURCE_LABELS[lead.source] ?? lead.source}</span>
             <span>· Creado {formatDate(lead.created_at)}</span>
-            {lead.expected_close && <span>· Cierre esp. {formatDate(lead.expected_close)}</span>}
-            <span>· Asignado a {lead.owner_email}</span>
+            {lead.owner_email && <span>· Asignado a {lead.owner_email}</span>}
           </div>
           {lead.message && (
             <div className="lead-header-message">
@@ -121,12 +173,15 @@ export default function LeadDetail({ leadId }: Props) {
               <p>{lead.message}</p>
             </div>
           )}
+
           {/* Cambio de estado rápido */}
           <div className="lead-status-switcher">
             {STATUS_FLOW.map((s) => (
               <button
                 key={s}
                 className={`status-pill ${lead.status === s ? 'active' : ''}`}
+                disabled={saving}
+                onClick={() => patch({ status: s })}
                 style={lead.status === s ? { background: STATUS_COLORS[s], color: '#fff' } : { color: STATUS_COLORS[s], borderColor: STATUS_COLORS[s] }}
               >
                 {STATUS_LABELS[s]}
@@ -137,240 +192,166 @@ export default function LeadDetail({ leadId }: Props) {
 
         {/* Tabs */}
         <div className="tabs">
-          <button className={`tab ${tab === 'timeline' ? 'active' : ''}`} onClick={() => setTab('timeline')}>
-            📅 Timeline <span className="pill pill-neutral">{timeline.length}</span>
+          <button className={`tab ${tab === 'info' ? 'active' : ''}`} onClick={() => setTab('info')}>
+            📋 Información
           </button>
-          <button className={`tab ${tab === 'tasks' ? 'active' : ''}`} onClick={() => setTab('tasks')}>
-            ✓ Tareas <span className="pill pill-neutral">{tasks.length}</span>
-          </button>
-          <button className={`tab ${tab === 'notes' ? 'active' : ''}`} onClick={() => setTab('notes')}>
-            📝 Notas <span className="pill pill-neutral">{notes.length}</span>
-          </button>
-          <button className={`tab ${tab === 'comms' ? 'active' : ''}`} onClick={() => setTab('comms')}>
-            💬 Comunicación <span className="pill pill-neutral">{comms.length}</span>
+          <button className={`tab ${tab === 'notas' ? 'active' : ''}`} onClick={() => setTab('notas')}>
+            📝 Notas internas
           </button>
         </div>
 
-        {/* Tab content */}
-        {tab === 'timeline' && (
+        {tab === 'info' && (
           <div className="panel">
-            <div className="timeline">
-              {timeline.map((a) => (
-                <div className="timeline-item" key={a.id}>
-                  <div className="timeline-dot" style={{ background: STATUS_COLORS[lead.status] }} />
-                  <div className="timeline-body">
-                    <div className="timeline-title">{a.title}</div>
-                    {a.description && <div className="timeline-desc">{a.description}</div>}
-                    <div className="timeline-meta">
-                      <span>{ACTIVITY_LABELS[a.type]}</span>
-                      <span>· {formatDateTime(a.at)}</span>
-                      <span>· {a.by}</span>
-                    </div>
-                  </div>
+            <div className="info-grid">
+              <div className="info-row">
+                <span className="info-label">Email</span>
+                <a href={`mailto:${lead.email}`} className="info-value">{lead.email}</a>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Teléfono</span>
+                <a href={`tel:${lead.phone}`} className="info-value">{lead.phone}</a>
+              </div>
+              {lead.company && (
+                <div className="info-row">
+                  <span className="info-label">Empresa</span>
+                  <span className="info-value">{lead.company}</span>
                 </div>
-              ))}
-              {timeline.length === 0 && <p className="empty-state">Sin actividad registrada.</p>}
+              )}
+              <div className="info-row">
+                <span className="info-label">Servicio</span>
+                <span className="info-value">{lead.service.replace(/-/g, ' ')}</span>
+              </div>
+              {lead.location && (
+                <div className="info-row">
+                  <span className="info-label">Ubicación</span>
+                  <span className="info-value">{lead.location.replace(/-/g, ' ')}</span>
+                </div>
+              )}
+              {lead.property_type && (
+                <div className="info-row">
+                  <span className="info-label">Tipo propiedad</span>
+                  <span className="info-value">{lead.property_type}</span>
+                </div>
+              )}
+              {lead.guards_count && (
+                <div className="info-row">
+                  <span className="info-label">N° guardias</span>
+                  <span className="info-value">{lead.guards_count}</span>
+                </div>
+              )}
+              <div className="info-row">
+                <span className="info-label">Prioridad</span>
+                <select
+                  className="form-input"
+                  value={lead.priority}
+                  disabled={saving}
+                  onChange={(e) => patch({ priority: e.target.value as LeadPriority })}
+                  style={{ maxWidth: 200 }}
+                >
+                  {(['low', 'medium', 'high', 'urgent'] as const).map((p) => (
+                    <option key={p} value={p}>{PRIORITY_LABELS[p]}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Valor estimado (CLP)</span>
+                <input
+                  type="number"
+                  className="form-input"
+                  defaultValue={lead.value}
+                  disabled={saving}
+                  onBlur={(e) => {
+                    const v = Math.max(0, Math.floor(Number(e.target.value) || 0));
+                    if (v !== lead.value) patch({ value: v });
+                  }}
+                  style={{ maxWidth: 200 }}
+                />
+              </div>
+              <div className="info-row">
+                <span className="info-label">Asignado a</span>
+                <input
+                  type="email"
+                  className="form-input"
+                  placeholder="email@admin.cl"
+                  value={assignedTo}
+                  disabled={saving}
+                  onBlur={() => {
+                    if (assignedTo !== (lead.owner_email ?? '')) {
+                      patch({ assigned_to: assignedTo || null });
+                    }
+                  }}
+                  style={{ maxWidth: 300 }}
+                />
+              </div>
             </div>
           </div>
         )}
 
-        {tab === 'tasks' && (
+        {tab === 'notas' && (
           <div className="panel">
-            <div className="task-add">
-              <input
-                className="form-input"
-                placeholder="Nueva tarea…"
-                value={newTask.title}
-                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-              />
-              <select
-                className="form-input task-type-select"
-                value={newTask.type}
-                onChange={(e) => setNewTask({ ...newTask, type: e.target.value as Task['type'] })}
+            <textarea
+              className="form-input"
+              placeholder="Notas internas (solo el equipo las ve)…"
+              rows={10}
+              value={adminNotes}
+              disabled={saving}
+              onChange={(e) => setAdminNotes(e.target.value)}
+            />
+            <div style={{ marginTop: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
+              <button
+                className="admin-btn admin-btn-primary"
+                disabled={saving}
+                onClick={() => patch({ admin_notes: adminNotes }, 'Notas guardadas.')}
               >
-                <option value="call">📞 Llamar</option>
-                <option value="email">✉️ Email</option>
-                <option value="visit">📍 Visita</option>
-                <option value="meeting">👥 Reunión</option>
-                <option value="follow_up">🔄 Seguimiento</option>
-                <option value="document">📄 Documento</option>
-              </select>
-              <input
-                className="form-input task-due-input"
-                type="datetime-local"
-                value={newTask.due_at}
-                onChange={(e) => setNewTask({ ...newTask, due_at: e.target.value })}
-              />
-              <button className="admin-btn admin-btn-primary" onClick={addTask}>+ Agregar</button>
-            </div>
-            <div className="task-list">
-              {tasks.map((t) => (
-                <div className={`task-item ${t.status === 'done' ? 'task-done' : ''}`} key={t.id}>
-                  <input
-                    type="checkbox"
-                    checked={t.status === 'done'}
-                    onChange={() => toggleTask(t.id)}
-                  />
-                  <div className="task-icon" data-type={t.type}>
-                    {t.type === 'call' ? '📞' : t.type === 'visit' ? '📍' : t.type === 'meeting' ? '👥' : t.type === 'email' ? '✉️' : t.type === 'document' ? '📄' : '🔄'}
-                  </div>
-                  <div className="task-body">
-                    <div className="task-title">{t.title}</div>
-                    <div className="task-meta">
-                      <span>{TASK_TYPE_LABELS[t.type]}</span>
-                      <span>· Vence {formatDateTime(t.due_at)}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {tasks.length === 0 && <p className="empty-state">Sin tareas. Agrega la primera.</p>}
-            </div>
-          </div>
-        )}
-
-        {tab === 'notes' && (
-          <div className="panel">
-            <div className="note-add">
-              <textarea
-                className="form-input"
-                placeholder="Escribe una nota interna… (visible solo para el equipo)"
-                rows={3}
-                value={newNote}
-                onChange={(e) => setNewNote(e.target.value)}
-              />
-              <button className="admin-btn admin-btn-primary" onClick={addNote}>+ Guardar nota</button>
-            </div>
-            <div className="notes-list">
-              {notes.map((n) => (
-                <div className="note-item" key={n.id}>
-                  <div className="note-meta">
-                    <strong>{n.by.split('@')[0]}</strong>
-                    <span>· {relativeTime(n.at)}</span>
-                  </div>
-                  <p className="note-body">{n.body}</p>
-                </div>
-              ))}
-              {notes.length === 0 && <p className="empty-state">Sin notas. Agrega la primera.</p>}
-            </div>
-          </div>
-        )}
-
-        {tab === 'comms' && (
-          <div className="panel">
-            <div className="comms-list">
-              {comms.map((c) => (
-                <div className={`comm-item comm-${c.direction}`} key={c.id}>
-                  <div className="comm-icon">
-                    {c.channel === 'call' ? '📞' : c.channel === 'email' ? '✉️' : c.channel === 'whatsapp' ? '💬' : c.channel === 'visit' ? '📍' : '👥'}
-                  </div>
-                  <div className="comm-body">
-                    <div className="comm-header">
-                      <strong>{c.subject}</strong>
-                      <span className="comm-direction">{c.direction === 'inbound' ? '← Recibido' : '→ Enviado'}</span>
-                    </div>
-                    <p className="comm-summary">{c.summary}</p>
-                    <div className="comm-meta">
-                      <span>{formatDateTime(c.at)}</span>
-                      <span>· {c.by.split('@')[0]}</span>
-                      {c.duration_min && <span>· {c.duration_min} min</span>}
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {comms.length === 0 && <p className="empty-state">Sin comunicaciones registradas.</p>}
+                {saving ? 'Guardando…' : 'Guardar notas'}
+              </button>
+              <span style={{ fontSize: 12, color: 'var(--fg-dim)' }}>
+                Se guarda automáticamente como texto de hasta 4000 caracteres.
+              </span>
             </div>
           </div>
         )}
       </div>
 
-      {/* Sidebar info */}
+      {/* Sidebar */}
       <aside className="lead-detail-side">
         <div className="panel">
-          <div className="panel-header"><h3>Información</h3></div>
-          <div className="info-grid">
-            <div className="info-row">
-              <span className="info-label">Email</span>
-              <a href={`mailto:${lead.email}`} className="info-value">{lead.email}</a>
-            </div>
-            <div className="info-row">
-              <span className="info-label">Teléfono</span>
-              <a href={`tel:${lead.phone}`} className="info-value">{lead.phone}</a>
-            </div>
-            {lead.company && (
-              <div className="info-row">
-                <span className="info-label">Empresa</span>
-                <span className="info-value">{lead.company}</span>
-              </div>
-            )}
-            <div className="info-row">
-              <span className="info-label">Servicio</span>
-              <a href={`/admin/leads?service=${lead.service}`} className="info-value">{lead.service.replace(/-/g, ' ')}</a>
-            </div>
-            <div className="info-row">
-              <span className="info-label">Ubicación</span>
-              <a href={`/admin/leads?location=${lead.location}`} className="info-value">{lead.location.replace(/-/g, ' ')}</a>
-            </div>
-            {lead.sector && (
-              <div className="info-row">
-                <span className="info-label">Sector</span>
-                <span className="info-value">{lead.sector}</span>
-              </div>
-            )}
-            {lead.property_type && (
-              <div className="info-row">
-                <span className="info-label">Tipo propiedad</span>
-                <span className="info-value">{lead.property_type}</span>
-              </div>
-            )}
-            {lead.guards_count && (
-              <div className="info-row">
-                <span className="info-label">N° guardias</span>
-                <span className="info-value">{lead.guards_count}</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="panel">
-          <div className="panel-header"><h3>Valor</h3></div>
+          <div className="panel-header"><h3>Resumen</h3></div>
           <div className="value-block">
             <div className="value-row">
-              <span>Valor estimado</span>
+              <span className="info-label">ID</span>
+              <strong>{lead.id}</strong>
+            </div>
+            <div className="value-row">
+              <span className="info-label">Origen</span>
+              <strong>{SOURCE_LABELS[lead.source] ?? lead.source}</strong>
+            </div>
+            <div className="value-row">
+              <span className="info-label">Estado</span>
+              <strong>{STATUS_LABELS[lead.status]}</strong>
+            </div>
+            <div className="value-row">
+              <span className="info-label">Prioridad</span>
+              <strong>{PRIORITY_LABELS[lead.priority]}</strong>
+            </div>
+            <div className="value-row">
+              <span className="info-label">Valor</span>
               <strong>{formatCLP(lead.value)}</strong>
             </div>
-            {lead.monthly_value && (
-              <div className="value-row">
-                <span>Valor mensual</span>
-                <strong>{formatCLP(lead.monthly_value)}</strong>
-              </div>
-            )}
-            {lead.expected_close && (
-              <div className="value-row">
-                <span>Cierre esperado</span>
-                <strong>{formatDate(lead.expected_close)}</strong>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {lead.tags && lead.tags.length > 0 && (
-          <div className="panel">
-            <div className="panel-header"><h3>Etiquetas</h3></div>
-            <div className="tag-list">
-              {lead.tags.map((t) => <span className="tag" key={t}>{t}</span>)}
+            <div className="value-row">
+              <span className="info-label">Actualizado</span>
+              <strong>{formatDate(lead.updated_at)}</strong>
             </div>
           </div>
-        )}
-
-        <div className="panel">
-          <div className="panel-header"><h3>Acciones</h3></div>
-          <div className="side-actions">
-            <button className="admin-btn admin-btn-secondary">📅 Agendar visita</button>
-            <button className="admin-btn admin-btn-secondary">📤 Asignar a…</button>
-            <button className="admin-btn admin-btn-secondary">✉️ Enviar email</button>
-            <button className="admin-btn admin-btn-danger">✕ Marcar perdido</button>
-          </div>
         </div>
+        <div className="panel">
+          <div className="panel-header"><h3>Próximamente</h3></div>
+          <p style={{ fontSize: 13, color: 'var(--fg-dim)', margin: 0 }}>
+            Timeline, tareas programadas y registro de comunicaciones estarán disponibles en v1.1.
+            Por ahora el estado se gestiona con los botones de estado, prioridad y notas internas.
+          </p>
+        </div>
+        <a className="admin-btn admin-btn-secondary" href="/admin/leads" style={{ width: '100%', justifyContent: 'center' }}>← Volver al listado</a>
       </aside>
     </div>
   );

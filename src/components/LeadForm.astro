@@ -136,7 +136,7 @@ const sectionRows = (section: SectionType): RowItem[] => {
 
   <form
     id={id}
-    action={mode === 'lead' ? `${SITE.API_URL}/api/crm/leads/capture` : undefined}
+    action={mode === 'lead' ? '/api/leads/capture' : undefined}
     method={mode === 'lead' ? 'POST' : undefined}
     data-track={trackName}
     data-success-redirect={successRedirect}

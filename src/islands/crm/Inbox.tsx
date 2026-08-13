@@ -1,8 +1,7 @@
 // Inbox — leads capturados desde web (contacto/cotizacion), pendientes de contacto inicial.
-// Permite asignar, contactar, mover a pipeline, descartar.
-import { useMemo, useState } from 'react';
+// Conectado a /api/leads (D1). Permite asignar, contactar, mover a pipeline, descartar.
+import { useEffect, useMemo, useState } from 'react';
 import {
-  crmLeads,
   STATUS_LABELS,
   SOURCE_LABELS,
   PRIORITY_LABELS,
@@ -11,17 +10,86 @@ import {
   formatDate,
   relativeTime,
   type Lead,
+  type LeadStatus,
+  type LeadPriority,
 } from '../../lib/crm-data';
 
-const INBOX_STATUSES: Lead['status'][] = ['new', 'contacted'];
+const INBOX_STATUSES: LeadStatus[] = ['new', 'contacted'];
+
+interface ApiLead {
+  id: string;
+  created_at: string;
+  updated_at?: string;
+  name: string;
+  email: string;
+  phone: string;
+  company?: string | null;
+  service: string;
+  location?: string | null;
+  sector?: string | null;
+  property_type?: string | null;
+  guards_count?: string | null;
+  message?: string | null;
+  status: LeadStatus;
+  priority: LeadPriority;
+  source: string;
+  value: number;
+  assigned_to?: string | null;
+  owner_email?: string | null;
+}
+
+function apiToLead(a: ApiLead): Lead {
+  return {
+    id: a.id,
+    name: a.name,
+    email: a.email,
+    phone: a.phone,
+    company: a.company ?? undefined,
+    service: a.service,
+    location: a.location ?? '',
+    sector: a.sector ?? undefined,
+    property_type: a.property_type ?? undefined,
+    guards_count: a.guards_count ?? undefined,
+    message: a.message ?? undefined,
+    status: a.status,
+    priority: a.priority,
+    source: (a.source as Lead['source']) ?? 'web_contacto',
+    value: a.value,
+    created_at: a.created_at,
+    owner_email: a.owner_email ?? undefined,
+  };
+}
 
 export default function Inbox() {
-  const [leads, setLeads] = useState<Lead[]>(() =>
-    crmLeads.filter((l) => INBOX_STATUSES.includes(l.status)),
-  );
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'new' | 'contacted'>('all');
   const [selected, setSelected] = useState<Lead | null>(null);
   const [query, setQuery] = useState('');
+
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/leads?limit=200', { credentials: 'same-origin' });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error ?? `Error ${res.status}`);
+      }
+      const all: Lead[] = (data.leads ?? []).map(apiToLead);
+      // Inbox solo muestra status new/contacted
+      setLeads(all.filter((l) => INBOX_STATUSES.includes(l.status)));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const filtered = useMemo(() => {
     let r = leads;
@@ -48,10 +116,51 @@ export default function Inbox() {
     [leads],
   );
 
-  const move = (id: string, status: Lead['status']) => {
-    setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)));
-    setSelected((cur) => (cur && cur.id === id ? { ...cur, status } : cur));
+  const move = async (id: string, newStatus: LeadStatus) => {
+    const prev = leads;
+    setLeads((cur) => cur.map((l) => (l.id === id ? { ...l, status: newStatus } : l)));
+    setSelected((cur) => (cur && cur.id === id ? { ...cur, status: newStatus } : cur));
+    try {
+      const res = await fetch(`/api/leads/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error ?? `Error ${res.status}`);
+      }
+      // Si sale de inbox (status != new/contacted), refrescar lista
+      if (!INBOX_STATUSES.includes(newStatus)) {
+        setLeads((cur) => cur.filter((l) => l.id !== id));
+        setSelected(null);
+      }
+    } catch (err) {
+      // Revertir
+      setLeads(prev);
+      alert('No se pudo mover el lead: ' + (err instanceof Error ? err.message : String(err)));
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="panel empty-panel">
+        <p className="empty-state">Cargando bandeja…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="panel" style={{ background: 'rgba(239,68,68,.1)', borderColor: 'rgba(239,68,68,.3)', color: 'var(--color-error)' }}>
+        <strong>Error cargando bandeja.</strong> {error}
+        <div style={{ marginTop: 12 }}>
+          <button className="admin-btn admin-btn-primary" onClick={load}>Reintentar</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -73,6 +182,7 @@ export default function Inbox() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
+        <button className="admin-btn admin-btn-secondary" onClick={load} title="Refrescar">↻</button>
       </div>
 
       <div className="inbox-layout">
@@ -96,7 +206,7 @@ export default function Inbox() {
                     <div className="inbox-card-name">{lead.name}</div>
                     <div className="inbox-card-meta">
                       {lead.company && <span>{lead.company}</span>}
-                      <span>· {SOURCE_LABELS[lead.source]}</span>
+                      <span>· {SOURCE_LABELS[lead.source] ?? lead.source}</span>
                     </div>
                   </div>
                   <span className="pill" style={{ background: 'rgba(59,130,246,.15)', color: 'var(--color-accent)' }}>
@@ -107,7 +217,7 @@ export default function Inbox() {
                   {lead.message && <p className="inbox-card-msg">{lead.message}</p>}
                   <div className="inbox-card-tags">
                     <span className="tag">{lead.service.replace(/-/g, ' ')}</span>
-                    <span className="tag">{lead.location.replace(/-/g, ' ')}</span>
+                    {lead.location && <span className="tag">{lead.location.replace(/-/g, ' ')}</span>}
                     {lead.value > 0 && <span className="tag tag-value">{formatCLP(lead.value)}</span>}
                   </div>
                 </div>
@@ -141,7 +251,7 @@ function LeadInboxDetail({
   onMove,
 }: {
   lead: Lead;
-  onMove: (id: string, status: Lead['status']) => void;
+  onMove: (id: string, status: LeadStatus) => void;
 }) {
   return (
     <div className="panel">
@@ -153,7 +263,7 @@ function LeadInboxDetail({
           <h2 className="lead-name">{lead.name}</h2>
           {lead.company && <div className="lead-company">{lead.company}</div>}
           <div className="lead-meta">
-            <span>📥 {SOURCE_LABELS[lead.source]}</span>
+            <span>📥 {SOURCE_LABELS[lead.source] ?? lead.source}</span>
             <span>· {formatDate(lead.created_at)}</span>
           </div>
         </div>
@@ -172,10 +282,12 @@ function LeadInboxDetail({
           <span className="info-label">Servicio</span>
           <span className="info-value">{lead.service.replace(/-/g, ' ')}</span>
         </div>
-        <div className="info-row">
-          <span className="info-label">Ubicación</span>
-          <span className="info-value">{lead.location.replace(/-/g, ' ')}</span>
-        </div>
+        {lead.location && (
+          <div className="info-row">
+            <span className="info-label">Ubicación</span>
+            <span className="info-value">{lead.location.replace(/-/g, ' ')}</span>
+          </div>
+        )}
         {lead.property_type && (
           <div className="info-row">
             <span className="info-label">Tipo propiedad</span>
@@ -194,10 +306,12 @@ function LeadInboxDetail({
             <span className="info-value">{formatCLP(lead.value)}</span>
           </div>
         )}
-        <div className="info-row">
-          <span className="info-label">Asignado a</span>
-          <span className="info-value">{lead.owner_email}</span>
-        </div>
+        {lead.owner_email && (
+          <div className="info-row">
+            <span className="info-label">Asignado a</span>
+            <span className="info-value">{lead.owner_email}</span>
+          </div>
+        )}
       </div>
 
       {lead.message && (
