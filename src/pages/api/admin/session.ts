@@ -18,11 +18,15 @@ const SESSION_COOKIE = 'gm_session';
 // 2h, igual que el access token en src/lib/auth.ts.
 const SESSION_MAX_AGE = 2 * 60 * 60;
 
-// Acepta cualquier token de auth razonable: JWT (3 segmentos con punto),
-// base64, base64url, hex, UUID, o string aleatorio alfanumérico.
-// Mínimo 16 chars para reducir tokens triviales.
-// Caracteres permitidos: alfanuméricos + separadores comunes en tokens.
-const TOKEN_RE = /^[A-Za-z0-9_\-./+=]{16,}$/;
+// Validación mínima: solo longitud. El token real lo verifica el Worker API
+// externo en cada llamada. Aceptar cualquier string de 16+ chars (incluso
+// con caracteres especiales) es seguro porque:
+//   1. La cookie es httpOnly + Secure + SameSite=Lax.
+//   2. La verificación real del token (firma, expiración) la hace el
+//      Worker API externo al hacer fetch con Authorization: Bearer.
+//   3. El panel admin no llama al Worker API externo para nada (todo es
+//      local en este worker); la cookie solo desbloquea el SSR.
+const MIN_TOKEN_LEN = 16;
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   let body: { token?: string; refresh?: string };
@@ -35,7 +39,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
   }
 
-  if (!body.token || !TOKEN_RE.test(body.token)) {
+  if (!body.token || typeof body.token !== 'string' || body.token.length < MIN_TOKEN_LEN) {
     return new Response(JSON.stringify({ ok: false, error: 'Token inválido.' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },

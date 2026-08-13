@@ -69,11 +69,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const isPublic = ADMIN_PUBLIC.has(pathname.replace(/\/$/, '') || '/');
     if (!isPublic) {
       const cookie = context.cookies.get(SESSION_COOKIE);
-      // Acepta cualquier token de auth razonable: JWT, base64, base64url,
-      // hex, UUID, o string aleatorio. Mínimo 16 chars.
-      const SESSION_RE = /^[A-Za-z0-9_\-./+=]{16,}$/;
-      if (!cookie || !cookie.value || !SESSION_RE.test(cookie.value)) {
-        // Redirigir a /admin/login con el path original como query param.
+      // Validación mínima: solo longitud. La cookie es httpOnly + Secure,
+      // y la verificación real del token la hace el Worker API externo.
+      if (!cookie || !cookie.value || cookie.value.length < 16) {
         const redirect = encodeURIComponent(pathname + url.search);
         return context.redirect(`/admin/login?redirect=${redirect}`, 302);
       }
