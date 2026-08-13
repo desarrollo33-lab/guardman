@@ -1,26 +1,142 @@
 ---
-// /gracias — página post-formulario (migración 1:1).
+// /gracias — página post-formulario (cotización / contacto).
+// v2.0 — diseño visualmente fuerte con tracking ID, timeline y CTAs.
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../lib/constants';
 
 const type = Astro.url.searchParams.get('type') ?? 'contacto';
-const title = type === 'cotizacion' ? 'Cotización enviada' : 'Mensaje enviado';
+const leadId = Astro.url.searchParams.get('id') ?? null;
+const isQuote = type === 'cotizacion';
+
+const title = isQuote ? 'Cotización enviada' : 'Mensaje enviado';
+
+// Timeline de próximos pasos según el tipo
+const nextSteps = isQuote
+  ? [
+      { icon: 'check', label: 'Solicitud recibida', desc: 'Registramos tu requerimiento en nuestro sistema.' },
+      { icon: 'phone', label: 'Te contactaremos en menos de 24h hábiles', desc: 'Un ejecutivo comercial revisará tu caso y te llamará.' },
+      { icon: 'location', label: 'Visita técnica gratuita', desc: 'Evaluamos tu propiedad en terreno para diseñar la solución.' },
+      { icon: 'doc', label: 'Cotización formal', desc: 'Recibirás una propuesta personalizada sin compromiso.' },
+    ]
+  : [
+      { icon: 'check', label: 'Mensaje recibido', desc: 'Registramos tu consulta en nuestro sistema.' },
+      { icon: 'phone', label: 'Te responderemos pronto', desc: 'Nuestro equipo te contactará en menos de 24 horas hábiles.' },
+    ];
 ---
 
 <BaseLayout title={title} description="Gracias por contactar GuardMan Chile. Nuestro equipo le responderá en menos de 24 horas hábiles." noindex>
   <section class="thanks">
-    <div class="container-narrow thanks-card">
-      <div class="thanks-icon">✅</div>
-      <h1>¡Gracias por contactarnos!</h1>
-      <p>Hemos recibido su {type === 'cotizacion' ? 'solicitud de cotización' : 'mensaje'}. Nuestro equipo comercial lo revisará y le contactará en menos de 24 horas hábiles.</p>
-      <div class="thanks-actions">
-        <a href="/" class="btn btn-primary">Volver al inicio</a>
-        <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline">Llamar ahora: {SITE.PHONE}</a>
-      </div>
-      <div class="thanks-info">
-        <p>Para consultas inmediatas, contáctenos directamente:</p>
-        <p>📞 <a href={`tel:${SITE.PHONE_TEL}`}>{SITE.PHONE}</a> · ✉️ <a href={`mailto:${SITE.EMAIL_INFO}`}>{SITE.EMAIL_INFO}</a></p>
+    <div class="container-narrow">
+      <div class="thanks-card">
+        <div class="thanks-check" aria-hidden="true">
+          <svg viewBox="0 0 64 64" width="64" height="64">
+            <circle cx="32" cy="32" r="30" fill="none" stroke="currentColor" stroke-width="2" opacity="0.25" />
+            <circle cx="32" cy="32" r="22" fill="currentColor" opacity="0.12" />
+            <path d="M20 32 L29 41 L45 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+
+        <span class="thanks-eyebrow">{isQuote ? 'Cotización' : 'Contacto'} recibido</span>
+        <h1 class="thanks-title">¡Gracias por contactarnos!</h1>
+        <p class="thanks-sub">
+          Hemos recibido tu {isQuote ? 'solicitud de cotización' : 'mensaje'}.<br />
+          Nuestro equipo comercial la revisará y te contactará <strong>en menos de 24 horas hábiles</strong>.
+        </p>
+
+        {leadId && (
+          <div class="thanks-id-box">
+            <div class="thanks-id-label">Tu número de seguimiento</div>
+            <div class="thanks-id-row">
+              <code class="thanks-id-value" id="lead-tracking-id">{leadId}</code>
+              <button type="button" class="thanks-id-copy" id="lead-copy-btn" aria-label="Copiar número de seguimiento">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                <span>Copiar</span>
+              </button>
+            </div>
+            <p class="thanks-id-hint">Guarda este número para consultar el estado de tu solicitud.</p>
+          </div>
+        )}
+
+        <div class="thanks-divider"><span>¿Qué sigue ahora?</span></div>
+
+        <ol class="thanks-timeline">
+          {nextSteps.map((step, i) => (
+            <li class="thanks-step" data-step={i + 1}>
+              <div class="thanks-step-num">{i + 1}</div>
+              <div class="thanks-step-body">
+                <div class="thanks-step-label">{step.label}</div>
+                <div class="thanks-step-desc">{step.desc}</div>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <div class="thanks-actions">
+          <a href="/" class="btn btn-primary btn-lg">Volver al inicio</a>
+          <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline btn-lg">
+            <span class="btn-icon">📞</span> Llamar ahora
+          </a>
+        </div>
+
+        <div class="thanks-contact">
+          <p class="thanks-contact-label">Si necesitas atención inmediata:</p>
+          <div class="thanks-contact-channels">
+            <a href={`tel:${SITE.PHONE_TEL}`} class="thanks-channel">
+              <span class="thanks-channel-icon">📞</span>
+              <span class="thanks-channel-text">
+                <span class="thanks-channel-name">{SITE.PHONE}</span>
+                <span class="thanks-channel-meta">Línea comercial 24/7</span>
+              </span>
+            </a>
+            <a href={`mailto:${SITE.EMAIL_INFO}`} class="thanks-channel">
+              <span class="thanks-channel-icon">✉️</span>
+              <span class="thanks-channel-text">
+                <span class="thanks-channel-name">{SITE.EMAIL_INFO}</span>
+                <span class="thanks-channel-meta">Respuesta en horario hábil</span>
+              </span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<script is:inline>
+  (function () {
+    var btn = document.getElementById('lead-copy-btn');
+    var id = document.getElementById('lead-tracking-id');
+    if (!btn || !id) return;
+    btn.addEventListener('click', function () {
+      var text = id.textContent || '';
+      var done = function () {
+        var span = btn.querySelector('span');
+        if (span) {
+          var prev = span.textContent;
+          span.textContent = '¡Copiado!';
+          btn.classList.add('copied');
+          setTimeout(function () {
+            span.textContent = prev;
+            btn.classList.remove('copied');
+          }, 1800);
+        }
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () {
+          // Fallback al método viejo
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); done(); } catch (e) {}
+          document.body.removeChild(ta);
+        });
+      }
+    });
+  })();
+</script>

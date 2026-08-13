@@ -364,7 +364,14 @@ const sectionRows = (section: SectionType): RowItem[] => {
               body: JSON.stringify(raw),
             }).then(function (res) {
               if (res.ok) {
-                window.location.href = successRedirect;
+                return res.json().then(function (data) {
+                  var url = successRedirect;
+                  if (data && data.id) {
+                    var sep = url.indexOf('?') === -1 ? '?' : '&';
+                    url = url + sep + 'id=' + encodeURIComponent(data.id);
+                  }
+                  window.location.href = url;
+                });
               } else {
                 throw new Error('Error');
               }
