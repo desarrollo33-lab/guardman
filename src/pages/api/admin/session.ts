@@ -18,10 +18,11 @@ const SESSION_COOKIE = 'gm_session';
 // 2h, igual que el access token en src/lib/auth.ts.
 const SESSION_MAX_AGE = 2 * 60 * 60;
 
-// Acepta JWT (3 segmentos base64url separados por punto) o token opaco
-// (base64url alfanumérico, guiones, underscores). Mínimo 16 chars para
-// reducir tokens triviales. El Worker API externo usa tokens opacos.
-const TOKEN_RE = /^[A-Za-z0-9_.\-]{16,}$/;
+// Acepta cualquier token de auth razonable: JWT (3 segmentos con punto),
+// base64, base64url, hex, UUID, o string aleatorio alfanumérico.
+// Mínimo 16 chars para reducir tokens triviales.
+// Caracteres permitidos: alfanuméricos + separadores comunes en tokens.
+const TOKEN_RE = /^[A-Za-z0-9_\-./+=]{16,}$/;
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   let body: { token?: string; refresh?: string };
