@@ -4,7 +4,7 @@
 //   Valida, sanitiza, persiste en D1 y devuelve 201 con id.
 //
 //   Sin auth: el formulario público es anónimo.
-//   Anti-spam: rate limit por IP-hash (5/24h, igual que denuncias).
+//   Anti-spam: rate limit por IP-hash (10/24h, igual que denuncias).
 // ════════════════════════════════════════════════════════════════
 
 import type { APIRoute } from 'astro';
@@ -84,7 +84,7 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ ok: false, error: 'DB no configurada' }, 500, origin);
   }
 
-  // Anti-spam: 5 leads por IP-hash en 24h
+  // Anti-spam: 10 leads por IP-hash en 24h
   const ip =
     request.headers.get('cf-connecting-ip') ??
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
@@ -98,7 +98,7 @@ export const POST: APIRoute = async ({ request }) => {
       .prepare('SELECT COUNT(*) AS c FROM leads WHERE ip_hash = ? AND created_at >= ?')
       .bind(ip_hash, since24h)
       .first<{ c: number }>();
-    if (recent && recent.c >= 5) {
+    if (recent && recent.c >= 10) {
       return json(
         { ok: false, error: 'Has alcanzado el límite diario de consultas. Intenta mañana.' },
         429,

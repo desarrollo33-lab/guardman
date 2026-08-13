@@ -220,11 +220,10 @@ const hreflangs = hreflangTags(Astro.url.pathname);
     <link rel="mask-icon" href="/favicon.svg" color="#1A2744" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    {/* Preload Inter Variable (única fuente del sitio) — quita 5 TTF de la cadena crítica */}
-    <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin />
-
     {/* Preload del CSS legacy — baja el render-blocking efectivo (download en paralelo, ya en cache al aplicar) */}
     <link rel="preload" href="/styles/site.css?v=20260720" as="style" />
+    {/* Inter Variable se carga via @font-face en site.css; el preload aquí generaba warning de "unused" */}
+
 
     {/* CSS originales (preservados 1:1) */}
     <link rel="stylesheet" href="/styles/site.css?v=20260720" />

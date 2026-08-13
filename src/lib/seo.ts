@@ -396,6 +396,7 @@ export function geoMetaTags() {
     { name: 'ICBM', content: GEO.icbm },
     { name: 'theme-color', content: '#1A2744' },
     { name: 'format-detection', content: 'telephone=yes' },
+    { name: 'mobile-web-app-capable', content: 'yes' },
     { name: 'apple-mobile-web-app-capable', content: 'yes' },
     { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
   ];
