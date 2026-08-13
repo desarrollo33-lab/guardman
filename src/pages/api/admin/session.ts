@@ -18,8 +18,10 @@ const SESSION_COOKIE = 'gm_session';
 // 2h, igual que el access token en src/lib/auth.ts.
 const SESSION_MAX_AGE = 2 * 60 * 60;
 
-const isValidJwtShape = (t: string): boolean =>
-  /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(t);
+// Acepta JWT (3 segmentos base64url separados por punto) o token opaco
+// (base64url alfanumérico, guiones, underscores). Mínimo 16 chars para
+// reducir tokens triviales. El Worker API externo usa tokens opacos.
+const TOKEN_RE = /^[A-Za-z0-9_.\-]{16,}$/;
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   let body: { token?: string; refresh?: string };
@@ -32,7 +34,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
   }
 
-  if (!body.token || !isValidJwtShape(body.token)) {
+  if (!body.token || !TOKEN_RE.test(body.token)) {
     return new Response(JSON.stringify({ ok: false, error: 'Token inválido.' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },

@@ -28,7 +28,7 @@ const addSecurityHeaders = (response: Response, contentType: string | null): Res
   // Permissions-Policy: deshabilitar APIs sensibles que no usamos.
   headers.set(
     'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(self), interest-cohort=()',
+    'camera=(), microphone=(), geolocation=(self)',
   );
 
   // HSTS: solo si la respuesta es HTTPS. Cloudflare inyecta el request, así
@@ -69,13 +69,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const isPublic = ADMIN_PUBLIC.has(pathname.replace(/\/$/, '') || '/');
     if (!isPublic) {
       const cookie = context.cookies.get(SESSION_COOKIE);
-      if (!cookie || !cookie.value) {
+      // Acepta JWT (3 segmentos) o token opaco (base64url alfanumérico).
+      // Mínimo 16 chars para reducir tokens triviales.
+      const SESSION_RE = /^[A-Za-z0-9_.\-]{16,}$/;
+      if (!cookie || !cookie.value || !SESSION_RE.test(cookie.value)) {
         // Redirigir a /admin/login con el path original como query param.
-        const redirect = encodeURIComponent(pathname + url.search);
-        return context.redirect(`/admin/login?redirect=${redirect}`, 302);
-      }
-      // Validar formato básico del JWT (3 segmentos base64url separados por punto).
-      if (!/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(cookie.value)) {
         const redirect = encodeURIComponent(pathname + url.search);
         return context.redirect(`/admin/login?redirect=${redirect}`, 302);
       }
