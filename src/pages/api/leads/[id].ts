@@ -7,6 +7,7 @@
 
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
+import { isAdminRequest } from '../../../lib/auth-server';
 
 export const prerender = false;
 
@@ -42,15 +43,7 @@ const json = (body: unknown, status: number, origin: string | null) =>
   new Response(JSON.stringify(body), { status, headers: corsHeaders(origin) });
 
 function isAdmin(request: Request): boolean {
-  const cookieHeader = request.headers.get('cookie') ?? '';
-  const sessionMatch = /(?:^|;\s*)gm_session=([^;]+)/.exec(cookieHeader);
-  if (sessionMatch && /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(sessionMatch[1])) {
-    return true;
-  }
-  const adminToken = (env as { DENUNCIAS_ADMIN_TOKEN?: string }).DENUNCIAS_ADMIN_TOKEN;
-  const headerToken = request.headers.get('x-admin-token');
-  if (adminToken && headerToken === adminToken) return true;
-  return false;
+  return isAdminRequest(request);
 }
 
 const ID_RE = /^L-\d{8}-[A-HJ-NP-Z2-9]{4}$/;

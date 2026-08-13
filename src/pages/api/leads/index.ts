@@ -6,6 +6,7 @@
 
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
+import { isAdminRequest } from '../../../lib/auth-server';
 
 export const prerender = false;
 
@@ -40,18 +41,9 @@ const corsHeaders = (origin: string | null): HeadersInit => {
 const json = (body: unknown, status: number, origin: string | null) =>
   new Response(JSON.stringify(body), { status, headers: corsHeaders(origin) });
 
-// Auth: cookie gm_session válida (mismo patrón que denuncias)
+// Auth: cookie gm_session válida (helper compartido)
 function isAdmin(request: Request): boolean {
-  const cookieHeader = request.headers.get('cookie') ?? '';
-  const sessionMatch = /(?:^|;\s*)gm_session=([^;]+)/.exec(cookieHeader);
-  if (sessionMatch && /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(sessionMatch[1])) {
-    return true;
-  }
-  // Fallback: header X-Admin-Token (para integraciones externas / scripts)
-  const adminToken = (env as { DENUNCIAS_ADMIN_TOKEN?: string }).DENUNCIAS_ADMIN_TOKEN;
-  const headerToken = request.headers.get('x-admin-token');
-  if (adminToken && headerToken === adminToken) return true;
-  return false;
+  return isAdminRequest(request);
 }
 
 const VALID_STATUSES = ['new', 'contacted', 'visit', 'proposal', 'negotiation', 'won', 'lost'] as const;
