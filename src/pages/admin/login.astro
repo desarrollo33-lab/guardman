@@ -28,7 +28,7 @@ const redirect = Astro.url.searchParams.get('redirect') ?? '/admin';
 
       <div class="login-field">
         <label for="email">Correo electrónico</label>
-        <input id="email" type="email" name="email" value="admin@guardman.oficinadesarrollo33.workers.dev" required />
+        <input id="email" type="email" name="email" required autocomplete="username" />
       </div>
       <div class="login-field">
         <label for="password">Contraseña</label>
@@ -152,6 +152,23 @@ const redirect = Astro.url.searchParams.get('redirect') ?? '/admin';
             localStorage.setItem(REFRESH_KEY, refresh);
             localStorage.setItem(REFRESH_EXP, String(Date.now() + REFRESH_TTL));
           }
+
+          // Set cookie httpOnly server-side via nuestro endpoint, para que el
+          // middleware SSR pueda verificar la sesión en rutas /admin/*.
+          // Si este fetch falla, el usuario puede seguir usando el panel
+          // (login localStorage funciona), pero el SSR no tendrá cookie
+          // y la próxima request de página completa redirigirá a login.
+          try {
+            await fetch('/api/admin/session', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'same-origin',
+              body: JSON.stringify({ token: access, refresh: refresh ?? undefined }),
+            });
+          } catch {
+            // No bloqueamos el flujo. La cookie es una mejora defense-in-depth.
+          }
+
           clearAttempts();
           window.location.href = redirect;
         } catch (err) {
@@ -161,11 +178,21 @@ const redirect = Astro.url.searchParams.get('redirect') ?? '/admin';
         }
       });
 
-      // Si ya hay token válido, redirige automáticamente.
+      // Si ya hay token válido, asegúrate de que la cookie httpOnly esté seteada
+      // y redirige. Si la cookie no existe aún, fire-and-forget el endpoint.
       const existing = localStorage.getItem(ACCESS_KEY);
       const exp = Number(localStorage.getItem(ACCESS_EXP) ?? 0);
       if (existing && existing !== 'undefined' && exp > Date.now()) {
-        window.location.href = redirect;
+        fetch('/api/admin/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ token: existing }),
+        })
+          .catch(() => {})
+          .finally(() => {
+            window.location.href = redirect;
+          });
       }
     </script>
   </body>

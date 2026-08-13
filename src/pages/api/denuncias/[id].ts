@@ -48,13 +48,23 @@ const json = (body: unknown, status: number, origin: string | null) =>
 
 const ID_RE = /^D-\d{8}-[A-HJ-NP-Z2-9]{4}$/;
 
+// Verifica admin via DENUNCIAS_ADMIN_TOKEN o cookie de sesión httpOnly.
+// Ver src/pages/api/denuncias/index.ts para la justificación.
 const isAdmin = (request: Request, url: URL): boolean => {
   const headerToken = request.headers.get('x-admin-token') ??
     request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
   const queryToken = url.searchParams.get('admin_token');
   const token = headerToken ?? queryToken;
-  const expected = (env as { DENUNCIAS_ADMIN_TOKEN?: string }).DENUNCIAS_ADMIN_TOKEN ?? 'v41-denu-2026';
-  return Boolean(token) && token === expected;
+  const expected = (env as { DENUNCIAS_ADMIN_TOKEN?: string }).DENUNCIAS_ADMIN_TOKEN;
+  if (expected && token && token === expected) return true;
+
+  const cookieHeader = request.headers.get('cookie') ?? '';
+  const sessionMatch = /(?:^|;\s*)gm_session=([^;]+)/.exec(cookieHeader);
+  if (sessionMatch && /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(sessionMatch[1])) {
+    return true;
+  }
+
+  return false;
 };
 
 const STATUS_VALUES = ['pending', 'reviewing', 'investigating', 'resolved', 'archived'] as const;

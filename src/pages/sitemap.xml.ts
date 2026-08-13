@@ -10,8 +10,6 @@ const isExcluded = (path: string) =>
   path === '/admin' || path.startsWith('/admin/') ||
   path === '/api' || path.startsWith('/api/');
 
-const today = new Date().toISOString().slice(0, 10);
-
 type ChangeFreq = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
 
 interface SitemapUrl {
@@ -24,7 +22,7 @@ interface SitemapUrl {
 
 const cf = (s: string): ChangeFreq => s as ChangeFreq;
 
-const urls: SitemapUrl[] = [
+const buildUrls = (today: string): SitemapUrl[] => [
   { loc: '/', changefreq: cf('weekly'), priority: 1.0, lastmod: today, images: [`${SITE.URL}/images/hero-home.webp`] },
   { loc: '/servicios', changefreq: cf('weekly'), priority: 0.9, lastmod: today },
   { loc: '/ubicaciones', changefreq: cf('weekly'), priority: 0.8, lastmod: today },
@@ -77,7 +75,9 @@ const urls: SitemapUrl[] = [
 
 const hreflangs = HREFLANG;
 
-const xml = `<?xml version="1.0" encoding="UTF-8"?>
+const buildXml = (today: string): string => {
+  const urls = buildUrls(today);
+  return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
@@ -104,11 +104,16 @@ ${images}
   })
   .join('\n')}
 </urlset>`;
+};
 
-export const GET = () =>
-  new Response(xml, {
+export const GET = () => {
+  // Computar `today` en cada request, no al cargar el módulo. Cloudflare
+  // Workers mantiene isolates por horas, lo que congela constantes top-level.
+  const today = new Date().toISOString().slice(0, 10);
+  return new Response(buildXml(today), {
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
       'Cache-Control': 'public, max-age=3600',
     },
   });
+};

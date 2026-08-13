@@ -31,6 +31,7 @@ export const SITE = {
 
 export const STATS = {
   GUARDIAS: '200+',
+  EMPRESAS: '200+',
   COMUNAS: '14',
   ANOS: '10+',
 } as const;

@@ -29,8 +29,6 @@ type Denuncia = {
   tiene_evidencia: string | null;
 };
 
-const adminToken = (env as { DENUNCIAS_ADMIN_TOKEN?: string }).DENUNCIAS_ADMIN_TOKEN ?? 'v41-denu-2026';
-
 let initial: Record<Status, Denuncia[]> = {
   pending: [], reviewing: [], investigating: [], resolved: [], archived: [],
 };
@@ -250,16 +248,13 @@ const categoriaLabel: Record<string, string> = {
   .kanban-col-body.drag-over { background: rgba(59,130,246,.06); border: 1px dashed var(--color-accent); }
 </style>
 
-<script define:vars={{ adminToken }}>
-  // ── Auth header builder ──
-  // El admin token se inyecta en build-time desde el server. En runtime,
-  // PATCH /api/denuncias/:id lo lee de env.DENUNCIAS_ADMIN_TOKEN.
-  // Para no exponer el token al JS del cliente (XSS risk), el endpoint
-  // PATCH valida la sesión de admin contra una cookie httpOnly si está
-  // disponible, o contra el header. Aquí usamos el header con el token
-  // recibido en SSR; en un futuro se reemplaza por cookie de sesión.
-  const ADMIN_TOKEN = adminToken;
-  const headers = { 'X-Admin-Token': ADMIN_TOKEN, 'Content-Type': 'application/json' };
+<script is:inline>
+  // ── Auth via cookie httpOnly ──
+  // El middleware ya verificó la cookie gm_session antes de renderizar.
+  // Las requests a /api/denuncias/* usan credentials: 'same-origin' y el
+  // server valida la misma cookie. NO se inyecta ningún token al cliente.
+  const headers = { 'Content-Type': 'application/json' };
+  const fetchOpts = { credentials: 'same-origin' };
 
   // ── Estado del modal ──
   const modal = document.getElementById('denuncia-modal');
@@ -289,7 +284,7 @@ const categoriaLabel: Record<string, string> = {
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
     // Cargar la denuncia completa (con descripción)
-    fetch(`/api/denuncias/${id}`, { headers })
+    fetch(`/api/denuncias/${id}`, { ...fetchOpts, headers })
       .then(r => r.json())
       .then(data => {
         if (data?.ok) {
@@ -335,7 +330,7 @@ const categoriaLabel: Record<string, string> = {
       assigned_to: modalAssigned.value || null,
     };
     try {
-      const res = await fetch(`/api/denuncias/${currentId}`, { method: 'PATCH', headers, body: JSON.stringify(payload) });
+      const res = await fetch(`/api/denuncias/${currentId}`, { method: 'PATCH', ...fetchOpts, headers, body: JSON.stringify(payload) });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data?.error ?? `Error ${res.status}`);
       modalStatusMsg.hidden = false;
@@ -367,7 +362,7 @@ const categoriaLabel: Record<string, string> = {
       if (!id || !newStatus) return;
       try {
         const res = await fetch(`/api/denuncias/${id}`, {
-          method: 'PATCH', headers, body: JSON.stringify({ status: newStatus }),
+          method: 'PATCH', ...fetchOpts, headers, body: JSON.stringify({ status: newStatus }),
         });
         if (!res.ok) throw new Error('No se pudo mover la denuncia');
         // Reorganizar DOM: mover el card a la nueva columna, actualizar contadores

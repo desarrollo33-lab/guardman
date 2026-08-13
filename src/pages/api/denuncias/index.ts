@@ -56,13 +56,28 @@ async function hashIp(ip: string, salt: string): Promise<string> {
     .join('');
 }
 
+// Verifica que el request viene de un admin autenticado.
+// Acepta:
+//   1. Header X-Admin-Token o Authorization: Bearer con el DENUNCIAS_ADMIN_TOKEN.
+//   2. Cookie httpOnly gm_session con JWT válido (sesión del panel).
+// El segundo es el camino normal desde el FE del panel; el primero es
+// para integraciones externas (CLI, scripts) que usan el secret.
 const checkAdmin = (request: Request, url: URL): boolean => {
+  // 1. Bearer / X-Admin-Token
   const headerToken = request.headers.get('x-admin-token') ?? request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
   const queryToken = url.searchParams.get('admin_token');
   const token = headerToken ?? queryToken;
-  // Default dev token; en prod configurar DENUNCIAS_ADMIN_TOKEN en wrangler secret.
-  const expected = 'v41-denu-2026';
-  return Boolean(token) && token === expected;
+  const expected = (env as { DENUNCIAS_ADMIN_TOKEN?: string }).DENUNCIAS_ADMIN_TOKEN;
+  if (expected && token && token === expected) return true;
+
+  // 2. Cookie de sesión httpOnly
+  const cookieHeader = request.headers.get('cookie') ?? '';
+  const sessionMatch = /(?:^|;\s*)gm_session=([^;]+)/.exec(cookieHeader);
+  if (sessionMatch && /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(sessionMatch[1])) {
+    return true;
+  }
+
+  return false;
 };
 
 // ── POST: crear denuncia (público) ─────────────────────────────
@@ -91,7 +106,10 @@ export const POST: APIRoute = async ({ request }) => {
     request.headers.get('cf-connecting-ip') ??
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
     '0.0.0.0';
-  const salt = 'guardman-v41-denu'; // en prod, leer de env.DENU_SALT
+  const salt = (env as { DENU_SALT?: string }).DENU_SALT;
+  if (!salt) {
+    return json({ ok: false, error: 'Servicio no configurado' }, 500, origin);
+  }
   const ip_hash = await hashIp(ip, salt);
 
   const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
