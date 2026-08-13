@@ -74,7 +74,7 @@ const faq = [
       <h1>Canal de Denuncias</h1>
       <p>Denuncie de forma <strong>anónima</strong> infracciones al código de conducta, hechos constitutivos de los delitos de la Ley 20.393 y 21.595 (lavado, cohecho, soborno, receptación, negociación incompatible, administración desleal, corrupción entre privados, delitos económicos, ambientales, laborales, financieros, tributarios, etc.) o situaciones de <strong>acoso laboral, sexual o violencia en el trabajo</strong> de la Ley 21.643 (Karin). Confidencialidad garantizada y cero represalias.</p>
       <div class="hero-ctas">
-        <a href="#denuncia-form" class="btn btn-primary btn-lg">
+        <a href="#denuncia-form-section" class="btn btn-primary btn-lg">
           <Icon name="alert-triangle" size={16} />
           Denunciar ahora
         </a>
@@ -117,7 +117,7 @@ const faq = [
   </section>
 
   <!-- ═══════ FORMULARIO ═══════ -->
-  <section class="bg-white" id="denuncia-form" data-od-id="form">
+  <section class="bg-white" id="denuncia-form-section" data-od-id="form">
     <div class="container form-wrap">
       <LeadForm
         id="denuncia-form"
@@ -259,6 +259,12 @@ const faq = [
 <script>
   import { validateDenuncia } from '../lib/denuncias-validation';
 
+  // Mapa label→slug inyectado desde el frontmatter para que el script pueda
+  // convertir los values del <select> (que muestran el label) a slugs antes
+  // de enviar al backend (que valida contra slugs).
+  (window as unknown as { __DENUNCIA_CATS__?: unknown }).__DENUNCIA_CATS__ = DENUNCIA_CATEGORIES;
+  (window as unknown as { __DENUNCIA_RELS__?: unknown }).__DENUNCIA_RELS__ = DENUNCIA_RELACIONES;
+
   // ── Límite de fecha = hoy ──
   const fecha = document.getElementById('f-fecha') as HTMLInputElement | null;
   if (fecha) fecha.max = new Date().toISOString().slice(0, 10);
@@ -290,6 +296,15 @@ const faq = [
   const trackingEl = document.getElementById('denuncia-tracking-id');
   const copyBtn = document.getElementById('copy-tracking');
 
+  // Mapa label → slug para selects del form (validación espera slugs, no labels).
+  const labelToSlug: Record<string, string> = {};
+  for (const c of (window as unknown as { __DENUNCIA_CATS__?: Array<{ slug: string; label: string }> }).__DENUNCIA_CATS__ ?? []) {
+    labelToSlug[c.label] = c.slug;
+  }
+  for (const r of (window as unknown as { __DENUNCIA_RELS__?: Array<{ slug: string; label: string }> }).__DENUNCIA_RELS__ ?? []) {
+    labelToSlug[r.label] = r.slug;
+  }
+
   if (form) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -297,9 +312,12 @@ const faq = [
       const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
       if (!btn) return;
 
-      const raw = Object.fromEntries(new FormData(form));
+      const raw = Object.fromEntries(new FormData(form)) as Record<string, string>;
       // Quitar campos que no van al backend
-      delete (raw as Record<string, unknown>).acepta_terminos;
+      delete raw.acepta_terminos;
+      // Mapear label → slug para categoria y relacion
+      if (raw.categoria && labelToSlug[raw.categoria]) raw.categoria = labelToSlug[raw.categoria];
+      if (raw.relacion && labelToSlug[raw.relacion]) raw.relacion = labelToSlug[raw.relacion];
 
       const result = validateDenuncia(raw);
       if (!result.ok) {
