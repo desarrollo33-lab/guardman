@@ -202,11 +202,16 @@ body[data-theme='dark'].admin-shell {
 
 .panel {
   background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface-1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-top: 1px solid rgba(59, 130, 246, 0.25);
   border-radius: 14px;
   padding: 22px 24px;
   margin-bottom: 16px;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 4px 16px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.3) inset,
+    0 4px 20px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 .panel-header {
   display: flex;
@@ -231,14 +236,17 @@ body[data-theme='dark'].admin-shell {
 @media (max-width: 640px) { .kpi-row { grid-template-columns: 1fr; } }
 .kpi-card {
   background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 12px;
   padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   transition: all 150ms ease;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 2px 12px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.25) inset,
+    0 4px 14px rgba(0, 0, 0, 0.3);
 }
 .kpi-card:hover {
   border-color: rgba(59, 130, 246, 0.4);
@@ -564,12 +572,21 @@ select.form-input {
 .panel-full { grid-column: 1 / -1; }
 
 /* Funnel */
-.funnel { display: flex; flex-direction: column; gap: 10px; }
+.funnel { display: flex; flex-direction: column; gap: 8px; }
 .funnel-row {
   display: grid;
   grid-template-columns: 140px 1fr 160px;
   align-items: center;
   gap: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.funnel-row:hover {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.2);
 }
 .funnel-label {
   display: flex; align-items: center; gap: 8px;
@@ -589,6 +606,35 @@ select.form-input {
 }
 .funnel-count { color: var(--fg-muted); font-weight: 600; }
 .funnel-value { color: var(--fg-dim); font-family: var(--font-mono); }
+
+/* Recent leads (Dashboard) */
+.recent-leads { display: flex; flex-direction: column; gap: 6px; }
+.recent-lead {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(26, 39, 68, 0.5) 0%, rgba(19, 29, 51, 0.5) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 150ms ease;
+}
+.recent-lead:hover {
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.1) 0%, rgba(19, 29, 51, 0.5) 100%);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+.recent-lead-body { flex: 1; min-width: 0; }
+.recent-lead-name {
+  font-size: 13px; font-weight: 600; color: var(--fg);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.recent-lead-meta {
+  font-size: 11px; color: var(--fg-dim);
+  margin-top: 2px;
+  text-transform: capitalize;
+}
 
 /* Agenda */
 .agenda { display: flex; flex-direction: column; gap: 10px; }
@@ -660,13 +706,20 @@ select.form-input {
 }
 
 /* Ranked list */
-.ranked-list { display: flex; flex-direction: column; gap: 10px; }
+.ranked-list { display: flex; flex-direction: column; gap: 6px; }
 .ranked-item {
   display: flex; align-items: center; gap: 12px;
-  padding: 8px 4px;
-  border-bottom: 1px solid rgba(255,255,255,.04);
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  transition: all 150ms ease;
 }
-.ranked-item:last-child { border-bottom: none; }
+.ranked-item:hover {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.2);
+  transform: translateX(2px);
+}
 .ranked-pos {
   width: 24px; height: 24px;
   background: rgba(255,255,255,.06);
@@ -682,12 +735,18 @@ select.form-input {
 .ranked-meta { font-size: 11px; color: var(--fg-dim); }
 
 /* Source breakdown */
-.source-breakdown { display: flex; flex-direction: column; gap: 8px; }
+.source-breakdown { display: flex; flex-direction: column; gap: 6px; }
 .source-row {
   display: grid;
   grid-template-columns: 140px 1fr 160px;
   align-items: center; gap: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  transition: background 150ms ease;
 }
+.source-row:hover { background: rgba(59, 130, 246, 0.05); }
 .source-label { font-size: 12px; color: var(--fg-muted); }
 .source-bar-wrap {
   height: 20px; background: var(--surface-2);
@@ -767,7 +826,7 @@ select.form-input {
 }
 .inbox-card {
   background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface-1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 12px;
   padding: 14px;
   text-align: left;
@@ -775,7 +834,10 @@ select.form-input {
   color: inherit;
   font-family: inherit;
   transition: all 150ms ease;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset, 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.03) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.25) inset,
+    0 3px 10px rgba(0, 0, 0, 0.3);
 }
 .inbox-card:hover {
   border-color: var(--color-accent);
@@ -1107,13 +1169,14 @@ select.form-input {
   font-family: var(--font-mono);
 }
 .kanban-col-body {
-  background: linear-gradient(180deg, rgba(13, 21, 37, 0.4) 0%, rgba(13, 21, 37, 0.6) 100%);
+  background: linear-gradient(180deg, rgba(13, 21, 37, 0.6) 0%, rgba(13, 21, 37, 0.85) 100%);
   border-radius: 0 0 8px 8px;
   padding: 8px;
   min-height: 200px;
   display: flex; flex-direction: column; gap: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-top: none;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.3);
   transition: all 150ms ease;
 }
 .kanban-col-body.drag-over {
@@ -1130,12 +1193,15 @@ select.form-input {
 }
 .kanban-card {
   background: linear-gradient(180deg, var(--surface-2) 0%, rgba(19, 29, 51, 0.95) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   padding: 10px;
   cursor: grab;
   transition: all 150ms ease;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 2px 6px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.3) inset,
+    0 3px 8px rgba(0, 0, 0, 0.35);
 }
 .kanban-card:hover {
   border-color: var(--color-accent);
