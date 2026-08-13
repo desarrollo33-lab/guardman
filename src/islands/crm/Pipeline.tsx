@@ -21,14 +21,24 @@ const STATUS_HEADERS: Record<LeadStatus, string> = {
   lost: 'Perdidos',
 };
 
-const STATUS_COL_KINDS: Record<LeadStatus, string> = {
-  new: 'info',
-  contacted: 'success',
-  visit: 'warning',
-  proposal: 'accent',
-  negotiation: 'accent',
-  won: 'success',
-  lost: 'error',
+const STATUS_DOT_COLORS: Record<LeadStatus, string> = {
+  new: '#3B82F6',
+  contacted: '#10B981',
+  visit: '#F59E0B',
+  proposal: '#8B5CF6',
+  negotiation: '#8B5CF6',
+  won: '#10B981',
+  lost: '#EF4444',
+};
+
+const STATUS_HEADER_COLORS: Record<LeadStatus, string> = {
+  new: 'var(--color-accent)',
+  contacted: 'var(--color-success)',
+  visit: 'var(--color-warning)',
+  proposal: 'var(--color-accent)',
+  negotiation: 'var(--color-accent)',
+  won: 'var(--color-success)',
+  lost: 'var(--color-error)',
 };
 
 function exportCSV(leads: Lead[]) {
@@ -195,11 +205,11 @@ export default function Pipeline() {
         </div>
       </div>
 
-      <div className="pipeline-kanban">
+      <div className="kanban">
         {STATUSES.map((s) => (
           <div
             key={s}
-            className={`pipeline-col ${dragOverCol === s ? 'drag-over' : ''}`}
+            className="kanban-col"
             data-status={s}
             onDragOver={(e) => { e.preventDefault(); setDragOverCol(s); }}
             onDragLeave={() => setDragOverCol((cur) => (cur === s ? null : cur))}
@@ -212,35 +222,33 @@ export default function Pipeline() {
               }
             }}
           >
-            <div className={`pipeline-col-header pipeline-col-${STATUS_COL_KINDS[s]}`}>
-              <h4>{STATUS_HEADERS[s]}</h4>
-              <span className="pipeline-col-count">{columns[s].length}</span>
+            <div className="kanban-col-header" style={{ borderTopColor: STATUS_HEADER_COLORS[s] }}>
+              <div className="kanban-col-title">
+                <span className="kanban-dot" style={{ background: STATUS_DOT_COLORS[s] }} />
+                {STATUS_HEADERS[s]}
+              </div>
+              <span className="kanban-col-value">{columns[s].length}</span>
             </div>
-            <div className="pipeline-col-body">
+            <div className={`kanban-col-body ${dragOverCol === s ? 'drag-over' : ''}`}>
               {columns[s].length === 0 ? (
-                <div className="pipeline-empty">Arrastra leads aquí</div>
+                <div className="kanban-empty">Arrastra leads aquí</div>
               ) : (
                 columns[s].map((l) => (
                   <article
                     key={l.id}
-                    className="pipeline-card"
+                    className="kanban-card"
                     draggable
                     onDragStart={() => setDragId(l.id)}
                     onDragEnd={() => { setDragId(null); setDragOverCol(null); }}
                     data-id={l.id}
                   >
-                    <div className="pipeline-card-head">
-                      <span className="pipeline-card-name">{l.name}</span>
-                      <span
-                        className="pipeline-card-priority"
-                        style={{ background: PRIORITY_COLORS[l.priority] }}
-                        title={PRIORITY_LABELS[l.priority]}
-                      />
+                    <div className="kanban-card-header">
+                      <span className="kanban-card-priority" style={{ background: PRIORITY_COLORS[l.priority] }} title={PRIORITY_LABELS[l.priority]} />
+                      <span className="kanban-card-name">{l.name}</span>
                     </div>
-                    <div className="pipeline-card-service">{l.service.replace(/-/g, ' ')}</div>
-                    {l.location && <div className="pipeline-card-location">📍 {l.location.replace(/-/g, ' ')}</div>}
-                    <div className="pipeline-card-footer">
-                      <span>{l.value > 0 ? formatCLP(l.value) : '—'}</span>
+                    <div className="kanban-card-company">{l.service.replace(/-/g, ' ')}{l.location ? ` · ${l.location.replace(/-/g, ' ')}` : ''}</div>
+                    <div className="kanban-card-footer">
+                      <span className="kanban-card-value">{l.value > 0 ? formatCLP(l.value) : '—'}</span>
                       <a href={`/admin/leads/${l.id}`} className="row-action" onClick={(e) => e.stopPropagation()}>→</a>
                     </div>
                   </article>
