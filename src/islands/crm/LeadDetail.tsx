@@ -339,17 +339,14 @@ export default function LeadDetail({ leadId }: Props) {
               <strong>{formatCLP(lead.value)}</strong>
             </div>
             <div className="value-row">
+              <span className="info-label">Creado</span>
+              <strong>{formatDate(lead.created_at)}</strong>
+            </div>
+            <div className="value-row">
               <span className="info-label">Actualizado</span>
               <strong>{formatDate(lead.updated_at)}</strong>
             </div>
           </div>
-        </div>
-        <div className="panel">
-          <div className="panel-header"><h3>Próximamente</h3></div>
-          <p style={{ fontSize: 13, color: 'var(--fg-dim)', margin: 0 }}>
-            Timeline, tareas programadas y registro de comunicaciones estarán disponibles en v1.1.
-            Por ahora el estado se gestiona con los botones de estado, prioridad y notas internas.
-          </p>
         </div>
         <a className="admin-btn admin-btn-secondary" href="/admin/leads" style={{ width: '100%', justifyContent: 'center' }}>← Volver al listado</a>
       </aside>

@@ -1,6 +1,6 @@
 // Inbox — leads capturados desde web (contacto/cotizacion), pendientes de contacto inicial.
 // Conectado a /api/leads (D1). Permite asignar, contactar, mover a pipeline, descartar.
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   STATUS_LABELS,
   SOURCE_LABELS,
@@ -67,45 +67,52 @@ export default function Inbox() {
   const [filter, setFilter] = useState<'all' | 'new' | 'contacted'>('all');
   const [selected, setSelected] = useState<Lead | null>(null);
   const [query, setQuery] = useState('');
+  const filterRef = useRef(filter);
+  const queryRef = useRef(query);
 
-  const load = async () => {
-    setLoading(true);
-    setError(null);
+  const load = useCallback(async () => {
     try {
-      const res = await fetch('/api/leads?limit=200', { credentials: 'same-origin' });
+      const cur = filterRef.current;
+      const q = queryRef.current;
+      const params = new URLSearchParams();
+      params.set('limit', '200');
+      if (cur !== 'all') params.set('status', cur);
+      if (q) params.set('q', q);
+      const res = await fetch(`/api/leads?${params.toString()}`, { credentials: 'same-origin' });
       const data = await res.json();
       if (!res.ok || !data.ok) {
         throw new Error(data.error ?? `Error ${res.status}`);
       }
-      const all: Lead[] = (data.leads ?? []).map(apiToLead);
-      // Inbox solo muestra status new/contacted
-      setLeads(all.filter((l) => INBOX_STATUSES.includes(l.status)));
+      let list: Lead[] = (data.leads ?? []).map(apiToLead);
+      // Si "all", filtrar localmente a los status del inbox
+      if (cur === 'all') list = list.filter((l) => INBOX_STATUSES.includes(l.status));
+      setLeads(list);
+      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    load();
   }, []);
 
-  const filtered = useMemo(() => {
-    let r = leads;
-    if (filter !== 'all') r = r.filter((l) => l.status === filter);
-    if (query) {
-      const q = query.toLowerCase();
-      r = r.filter(
-        (l) =>
-          l.name.toLowerCase().includes(q) ||
-          l.email.toLowerCase().includes(q) ||
-          l.phone.includes(q) ||
-          (l.company ?? '').toLowerCase().includes(q),
-      );
-    }
-    return r.sort((a, b) => b.created_at.localeCompare(a.created_at));
-  }, [leads, filter, query]);
+  useEffect(() => { filterRef.current = filter; queryRef.current = query; load(); }, [filter, query, load]);
+
+  // Refresh auto 30s, pausa en tab oculta
+  useEffect(() => {
+    let id: ReturnType<typeof setInterval> | null = null;
+    const start = () => { if (!id) id = setInterval(() => { if (!document.hidden) load(); }, 30000); };
+    const stop = () => { if (id) { clearInterval(id); id = null; } };
+    const onVis = () => { if (document.hidden) stop(); else { load(); start(); } };
+    start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
+  }, [load]);
+
+  // Los datos ya vienen filtrados por la API. Solo ordenamos por fecha.
+  const filtered = useMemo(
+    () => [...leads].sort((a, b) => b.created_at.localeCompare(a.created_at)),
+    [leads],
+  );
 
   const counts = useMemo(
     () => ({
@@ -116,40 +123,53 @@ export default function Inbox() {
     [leads],
   );
 
-  const move = async (id: string, newStatus: LeadStatus) => {
-    const prev = leads;
-    setLeads((cur) => cur.map((l) => (l.id === id ? { ...l, status: newStatus } : l)));
-    setSelected((cur) => (cur && cur.id === id ? { ...cur, status: newStatus } : cur));
-    try {
-      const res = await fetch(`/api/leads/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({ status: newStatus }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error ?? `Error ${res.status}`);
-      }
-      // Si sale de inbox (status != new/contacted), refrescar lista
-      if (!INBOX_STATUSES.includes(newStatus)) {
-        setLeads((cur) => cur.filter((l) => l.id !== id));
-        setSelected(null);
+  const move = async (id: string, newStatus: LeadStatus, { skipConfirm = false } = {}) => {
+    const doMove = async () => {
+      const prev = leads;
+      setLeads((cur) => cur.map((l) => (l.id === id ? { ...l, status: newStatus } : l)));
+      setSelected((cur) => (cur && cur.id === id ? { ...cur, status: newStatus } : cur));
+      try {
+        const res = await fetch(`/api/leads/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ status: newStatus }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error ?? `Error ${res.status}`);
+        }
+        if (!INBOX_STATUSES.includes(newStatus)) {
+          setLeads((cur) => cur.filter((l) => l.id !== id));
+          setSelected(null);
+          (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
+            type: 'success',
+            title: 'Lead movido',
+            msg: `Estado actualizado a ${newStatus}`,
+          });
+        }
+      } catch (err) {
+        setLeads(prev);
         (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
-          type: 'success',
-          title: 'Lead movido',
-          msg: `Estado actualizado a ${newStatus}`,
+          type: 'error',
+          title: 'No se pudo mover',
+          msg: err instanceof Error ? err.message : String(err),
         });
       }
-    } catch (err) {
-      // Revertir
-      setLeads(prev);
-      (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
-        type: 'error',
-        title: 'No se pudo mover',
-        msg: err instanceof Error ? err.message : String(err),
+    };
+
+    // Confirmación para estados destructivos
+    if (!skipConfirm && newStatus === 'lost') {
+      (window as unknown as { gmConfirm?: (o: unknown) => void }).gmConfirm?.({
+        title: '¿Marcar como perdido?',
+        msg: 'El lead saldrá de la bandeja. Se puede revertir manualmente.',
+        danger: true,
+        confirmLabel: 'Sí, marcar como perdido',
+        onConfirm: doMove,
       });
+      return;
     }
+    await doMove();
   };
 
   // En mobile, abrir el detalle como bottom sheet (toggle clase .is-open)
@@ -168,8 +188,24 @@ export default function Inbox() {
 
   if (loading) {
     return (
-      <div className="panel empty-panel">
-        <p className="empty-state">Cargando bandeja…</p>
+      <div>
+        <div className="inbox-toolbar">
+          <div className="filter-tabs">
+            <div className="skeleton" style={{ width: 100, height: 32, borderRadius: 8 }} />
+            <div className="skeleton" style={{ width: 100, height: 32, borderRadius: 8 }} />
+            <div className="skeleton" style={{ width: 120, height: 32, borderRadius: 8 }} />
+          </div>
+          <div className="skeleton" style={{ flex: 1, maxWidth: 320, height: 38 }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="panel" style={{ padding: 14 }}>
+              <div className="skeleton" style={{ height: 18, width: '40%', marginBottom: 8 }} />
+              <div className="skeleton" style={{ height: 12, width: '70%', marginBottom: 6 }} />
+              <div className="skeleton" style={{ height: 12, width: '50%' }} />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -205,14 +241,28 @@ export default function Inbox() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <button className="admin-btn admin-btn-secondary" onClick={load} title="Refrescar">↻</button>
+        <button className="admin-btn admin-btn-secondary" onClick={load} title="Refrescar" aria-label="Refrescar">↻</button>
+        <span className="auto-refresh-hint muted-cell" style={{ fontSize: 11 }}>
+          <span className="auto-refresh-dot" /> auto 30s
+        </span>
       </div>
 
       <div className="inbox-layout">
         <div className="inbox-list">
           {filtered.length === 0 ? (
             <div className="panel empty-panel">
-              <p className="empty-state">🎉 Bandeja vacía. Todos los leads han sido procesados.</p>
+              <div className="empty-state-graphic">🎉</div>
+              <p className="empty-state-title">Bandeja vacía</p>
+              <p className="empty-state-msg">
+                {query
+                  ? 'No hay leads que coincidan con tu búsqueda.'
+                  : 'Todos los leads han sido procesados. ¡Buen trabajo!'}
+              </p>
+              {query && (
+                <button className="admin-btn admin-btn-secondary" onClick={() => setQuery('')}>
+                  Limpiar búsqueda
+                </button>
+              )}
             </div>
           ) : (
             filtered.map((lead) => (
@@ -260,7 +310,9 @@ export default function Inbox() {
             <LeadInboxDetail lead={selected} onMove={move} />
           ) : (
             <div className="panel empty-panel">
-              <p className="empty-state">Selecciona un lead para ver detalle.</p>
+              <div className="empty-state-graphic">👈</div>
+              <p className="empty-state-title">Selecciona un lead</p>
+              <p className="empty-state-msg">Toca una tarjeta para ver el detalle completo, llamar o cambiar estado.</p>
             </div>
           )}
         </div>

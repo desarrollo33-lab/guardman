@@ -1,7 +1,7 @@
 ---
 // /admin/login — página de login (sin AdminLayout para evitar auth guard).
 import '../../styles/global.css';
-import { SITE } from '../../lib/constants';
+import { SITE, BUNDLE_VERSION } from '../../lib/constants';
 
 const redirect = Astro.url.searchParams.get('redirect') ?? '/admin';
 ---
@@ -22,7 +22,7 @@ const redirect = Astro.url.searchParams.get('redirect') ?? '/admin';
         <span>GuardMan Admin</span>
       </div>
       <h2>Bienvenido</h2>
-      <p class="sub">Panel de Administración v2.1</p>
+      <p class="sub">Panel de Administración {BUNDLE_VERSION}</p>
 
       <div id="login-error" class="login-error" hidden></div>
 

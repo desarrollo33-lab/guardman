@@ -1,7 +1,7 @@
 ---
 // /admin/settings — ajustes del CRM. Astro puro, sin isla React.
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import { SITE } from '../../lib/constants';
+import { SITE, BUNDLE_VERSION } from '../../lib/constants';
 ---
 
 <AdminLayout title="Configuración" section="settings">
@@ -41,7 +41,7 @@ import { SITE } from '../../lib/constants';
         </div>
         <div style="display: flex; justify-content: space-between;">
           <span>Versión:</span>
-          <code style="color: var(--fg);">v4.0.0 (CRM-only + Lead Capture)</code>
+          <code style="color: var(--fg);">{BUNDLE_VERSION} (CRM + Lead Capture)</code>
         </div>
         <div style="display: flex; justify-content: space-between;">
           <span>Stack:</span>

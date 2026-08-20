@@ -86,6 +86,9 @@ const categoriaLabel: Record<string, string> = {
           Refrescar
         </button>
         <a href="/canal-de-denuncias" target="_blank" class="admin-btn admin-btn-secondary">Ver canal público ↗</a>
+        <span class="auto-refresh-hint muted-cell" style="font-size: 11px;">
+          <span class="auto-refresh-dot"></span> auto 60s
+        </span>
       </div>
     </div>
 
@@ -419,6 +422,32 @@ const categoriaLabel: Record<string, string> = {
     currentStatus = btn.dataset.status;
   });
 
+  // Intercepta click en "Archivada" desde el modal → confirmar antes de aplicar
+  // (usamos una flag para evitar loops: re-entrada del capture si re-dispatchamos)
+  let _gmSaveBypass = false;
+  modalSave.addEventListener('click', async (e) => {
+    if (_gmSaveBypass) return; // ya confirmado, dejar pasar
+    if (currentStatus !== 'archived') return;
+    e.stopImmediatePropagation();
+    const confirmed = await new Promise((resolve) => {
+      if (window.gmConfirm) {
+        window.gmConfirm({
+          title: '¿Archivar denuncia?',
+          msg: 'La denuncia se moverá a Archivadas. Se puede revertir manualmente.',
+          danger: true,
+          confirmLabel: 'Sí, archivar',
+          onConfirm: () => resolve(true),
+          onCancel: () => resolve(false),
+        });
+      } else {
+        resolve(window.confirm('¿Archivar esta denuncia?'));
+      }
+    });
+    if (!confirmed) return;
+    _gmSaveBypass = true;
+    modalSave.click();
+  }, true);
+
   // ── Guardar cambios ──
   modalSave.addEventListener('click', async () => {
     if (!currentId) return;
@@ -511,10 +540,26 @@ const categoriaLabel: Record<string, string> = {
       items,
       onSelect: (item) => {
         if (item.disabled || item.value === currentStatus) return;
-        // Llama al endpoint y refresca
-        fetch(`/api/denuncias/${id}`, { method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: item.value }) })
-          .then((r) => { if (!r.ok) throw new Error('No se pudo mover'); window.location.reload(); })
-          .catch((err) => { window.gmToast?.({ type: 'error', title: 'Error', msg: err.message }); });
+        const doMove = () => {
+          fetch(`/api/denuncias/${id}`, { method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: item.value }) })
+            .then((r) => { if (!r.ok) throw new Error('No se pudo mover'); window.location.reload(); })
+            .catch((err) => { window.gmToast?.({ type: 'error', title: 'Error', msg: err.message }); });
+        };
+        if (item.value === 'archived') {
+          if (window.gmConfirm) {
+            window.gmConfirm({
+              title: '¿Archivar denuncia?',
+              msg: 'La denuncia se moverá a Archivadas. Se puede revertir manualmente.',
+              danger: true,
+              confirmLabel: 'Sí, archivar',
+              onConfirm: doMove,
+            });
+          } else {
+            doMove();
+          }
+        } else {
+          doMove();
+        }
       },
     });
   };
@@ -543,4 +588,21 @@ const categoriaLabel: Record<string, string> = {
 
   // ── Refrescar ──
   document.getElementById('refresh-btn').addEventListener('click', () => window.location.reload());
+
+  // ── Auto-refresh: 30s, pausa en tab oculta ──
+  let _autoRefreshId = null;
+  const startAutoRefresh = () => {
+    if (_autoRefreshId) return;
+    _autoRefreshId = setInterval(() => {
+      if (!document.hidden) window.location.reload();
+    }, 60000); // 60s para denuncias (más conservador, son menos urgentes)
+  };
+  const stopAutoRefresh = () => {
+    if (_autoRefreshId) { clearInterval(_autoRefreshId); _autoRefreshId = null; }
+  };
+  const onVisDenuncias = () => { if (document.hidden) stopAutoRefresh(); else startAutoRefresh(); };
+  startAutoRefresh();
+  document.addEventListener('visibilitychange', onVisDenuncias);
+  // Limpia cuando el user navega fuera
+  window.addEventListener('beforeunload', () => { stopAutoRefresh(); document.removeEventListener('visibilitychange', onVisDenuncias); });
 </script>

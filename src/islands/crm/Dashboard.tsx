@@ -1,5 +1,5 @@
 // Dashboard — KPIs calculados en cliente desde /api/leads (D1).
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   STATUS_LABELS,
   PRIORITY_LABELS,
@@ -58,24 +58,32 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const load = async () => {
-    setLoading(true);
-    setError(null);
+  const load = useCallback(async () => {
     try {
       const res = await fetch('/api/leads?limit=200', { credentials: 'same-origin' });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
       setLeads((data.leads ?? []).map(apiToLead));
+      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    load();
   }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  // Refresh auto 30s, pausa en tab oculta
+  useEffect(() => {
+    let id: ReturnType<typeof setInterval> | null = null;
+    const start = () => { if (!id) id = setInterval(() => { if (!document.hidden) load(); }, 30000); };
+    const stop = () => { if (id) { clearInterval(id); id = null; } };
+    const onVis = () => { if (document.hidden) stop(); else { load(); start(); } };
+    start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
+  }, [load]);
 
   const kpis = useMemo(() => {
     const now = Date.now();
@@ -158,7 +166,24 @@ export default function Dashboard() {
   );
 
   if (loading) {
-    return <div className="panel empty-panel"><p className="empty-state">Cargando dashboard…</p></div>;
+    return (
+      <div className="crm-dashboard">
+        <div className="kpi-row">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="kpi-card">
+              <div className="kpi-top"><div className="skeleton" style={{ width: 32, height: 32, borderRadius: 8 }} /></div>
+              <div className="skeleton kpi-skeleton" />
+              <div className="skeleton kpi-label-skel" />
+              <div className="skeleton kpi-sub-skel" />
+            </div>
+          ))}
+        </div>
+        <div className="dashboard-grid">
+          <div className="panel"><div className="skeleton" style={{ height: 200 }} /></div>
+          <div className="panel"><div className="skeleton" style={{ height: 200 }} /></div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {

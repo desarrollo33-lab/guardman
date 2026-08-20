@@ -127,6 +127,17 @@ export default function Pipeline() {
     load();
   }, []);
 
+  // Refresh auto 30s, pausa en tab oculta
+  useEffect(() => {
+    let id: ReturnType<typeof setInterval> | null = null;
+    const start = () => { if (!id) id = setInterval(() => { if (!document.hidden) load(); }, 30000); };
+    const stop = () => { if (id) { clearInterval(id); id = null; } };
+    const onVis = () => { if (document.hidden) stop(); else { load(); start(); } };
+    start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
+  }, []);
+
   const filteredLeads = useMemo(() => {
     if (!query) return leads;
     const q = query.toLowerCase();
@@ -151,31 +162,45 @@ export default function Pipeline() {
     return map;
   }, [filteredLeads]);
 
-  const moveLead = useCallback(async (leadId: string, toStatus: LeadStatus) => {
-    const prev = leads;
-    setLeads((cur) => cur.map((l) => (l.id === leadId ? { ...l, status: toStatus, updated_at: new Date().toISOString() } : l)));
-    try {
-      const res = await fetch(`/api/leads/${leadId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({ status: toStatus }),
+  const moveLead = useCallback(async (leadId: string, toStatus: LeadStatus, { skipConfirm = false } = {}) => {
+    const doMove = async () => {
+      const prev = leads;
+      setLeads((cur) => cur.map((l) => (l.id === leadId ? { ...l, status: toStatus, updated_at: new Date().toISOString() } : l)));
+      try {
+        const res = await fetch(`/api/leads/${leadId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ status: toStatus }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
+        (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
+          type: 'success',
+          title: 'Lead movido',
+          msg: `Estado actualizado a ${toStatus}`,
+        });
+      } catch (err) {
+        setLeads(prev);
+        (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
+          type: 'error',
+          title: 'No se pudo mover',
+          msg: err instanceof Error ? err.message : String(err),
+        });
+      }
+    };
+
+    if (!skipConfirm && toStatus === 'lost') {
+      (window as unknown as { gmConfirm?: (o: unknown) => void }).gmConfirm?.({
+        title: '¿Marcar como perdido?',
+        msg: 'El lead se moverá a la columna "Perdidos". Se puede revertir manualmente.',
+        danger: true,
+        confirmLabel: 'Sí, marcar como perdido',
+        onConfirm: doMove,
       });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
-      (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
-        type: 'success',
-        title: 'Lead movido',
-        msg: `Estado actualizado a ${toStatus}`,
-      });
-    } catch (err) {
-      setLeads(prev);
-      (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
-        type: 'error',
-        title: 'No se pudo mover',
-        msg: err instanceof Error ? err.message : String(err),
-      });
+      return;
     }
+    await doMove();
   }, [leads]);
 
   // Touch/click handler: muestra menú para mover de columna.
@@ -222,7 +247,29 @@ export default function Pipeline() {
   const totalValue = filteredLeads.reduce((s, l) => s + l.value, 0);
 
   if (loading) {
-    return <div className="panel empty-panel"><p className="empty-state">Cargando pipeline…</p></div>;
+    return (
+      <div>
+        <div className="pipeline-toolbar">
+          <div className="skeleton" style={{ flex: 1, maxWidth: 360, height: 38 }} />
+          <div className="skeleton" style={{ width: 120, height: 38 }} />
+        </div>
+        <div className="kanban">
+          {STATUSES.map((s) => (
+            <div key={s} className="kanban-col">
+              <div className="kanban-col-header" style={{ borderTopColor: STATUS_HEADER_COLORS[s] }}>
+                <div className="skeleton" style={{ width: 80, height: 14 }} />
+                <div className="skeleton" style={{ width: 18, height: 14 }} />
+              </div>
+              <div className="kanban-col-body" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="skeleton" style={{ height: 70, opacity: 1 - i * 0.2 }} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (error) {
@@ -248,7 +295,10 @@ export default function Pipeline() {
         <button className="admin-btn admin-btn-secondary" onClick={() => exportCSV(filteredLeads)}>
           📤 Exportar CSV
         </button>
-        <button className="admin-btn admin-btn-secondary" onClick={load} title="Refrescar">↻</button>
+        <button className="admin-btn admin-btn-secondary" onClick={load} title="Refrescar" aria-label="Refrescar">↻</button>
+        <span className="auto-refresh-hint muted-cell" style={{ fontSize: 11 }}>
+          <span className="auto-refresh-dot" /> auto 30s
+        </span>
         <div className="pipeline-summary">
           <span><strong>{filteredLeads.length}</strong> leads</span>
           <span><strong>{formatCLP(totalValue)}</strong> total</span>

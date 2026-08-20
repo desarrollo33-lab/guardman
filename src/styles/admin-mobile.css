@@ -474,5 +474,122 @@
    - window.gmLongPress(el, handler): long-press detector
    - window.gmMoveMenu({ lead|denuncia, statuses, onSelect }): menu touch
    ════════════════════════════════════════════════════════════════ */
-</content>
-</invoke>
+
+/* ── Loading skeletons (shimmer) ──────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.10) 50%,
+    rgba(255, 255, 255, 0.04) 100%);
+  background-size: 200% 100%;
+  border-radius: 6px;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  display: block;
+  width: 100%;
+}
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
+
+/* ── Empty states consistentes ────────────────────────── */
+.empty-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 56px 24px;
+  min-height: 240px;
+  gap: 12px;
+}
+.empty-state-graphic {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 4px;
+  filter: grayscale(0.2);
+  opacity: 0.85;
+}
+.empty-state-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fg);
+  margin: 0;
+}
+.empty-state-msg {
+  font-size: 13px;
+  color: var(--fg-muted);
+  max-width: 420px;
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+.empty-state-msg + .admin-btn { margin-top: 4px; }
+@media (max-width: 480px) {
+  .empty-panel { padding: 40px 18px; min-height: 180px; }
+  .empty-state-graphic { font-size: 44px; }
+  .empty-state-title { font-size: 15px; }
+  .empty-state-msg { font-size: 12px; }
+}
+
+/* ── Bulk bar mejorada ───────────────────────────────── */
+.bulk-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(59,130,246,.1);
+  border: 1px solid rgba(59,130,246,.3);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--color-accent);
+}
+.bulk-bar-count strong { font-family: var(--font-mono); font-size: 14px; }
+.bulk-status-select {
+  width: auto;
+  min-width: 180px;
+  padding: 8px 32px 8px 12px !important;
+  font-size: 12px !important;
+  min-height: 36px;
+}
+@media (max-width: 768px) {
+  .bulk-bar { padding: 10px 12px; gap: 6px; }
+  .bulk-status-select { min-width: 0; flex: 1; }
+  .bulk-bar .admin-btn { padding: 7px 10px; font-size: 12px; }
+}
+
+/* ── Card: stats Dashboard (mini cards) ──────────────── */
+.kpi-card .kpi-skeleton {
+  height: 28px;
+  width: 60%;
+  margin-bottom: 6px;
+}
+.kpi-card .kpi-label-skel {
+  height: 11px;
+  width: 80%;
+  margin-top: 6px;
+}
+.kpi-card .kpi-sub-skel {
+  height: 10px;
+  width: 50%;
+  margin-top: 4px;
+}
+
+/* ── Auto-refresh indicator (dot en topbar o toolbars) ─ */
+.auto-refresh-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-success);
+  margin-right: 4px;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
