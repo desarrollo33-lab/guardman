@@ -114,10 +114,10 @@ export default function LeadDetail({ leadId }: Props) {
       });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
-      if (successMsg) alert(successMsg);
+      if (successMsg) (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({ type: 'success', title: 'Guardado', msg: successMsg });
       await load();
     } catch (err) {
-      alert('No se pudo guardar: ' + (err instanceof Error ? err.message : String(err)));
+      (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({ type: 'error', title: 'No se pudo guardar', msg: err instanceof Error ? err.message : String(err) });
     } finally {
       setSaving(false);
     }

@@ -1,0 +1,364 @@
+---
+// MobileNav v1.0 — Drawer de navegación para mobile (<768px).
+// Mismo contenido que AdminSidebar, pero en drawer deslizable controlado
+// por el botón hamburger del AdminTopbar. Sin JavaScript de framework:
+// usa <details>/<summary> para colapsar grupos + un script inline para
+// cerrar al navegar o tocar backdrop, más atajo Escape.
+import { ADMIN_NAV_GROUPS } from '../../lib/constants';
+import { ICONS } from '../../lib/icons';
+
+interface Props {
+  active: string;
+}
+const { active } = Astro.props;
+
+const iconMap: Record<string, string> = {
+  gauge: ICONS.gauge,
+  inbox: ICONS.inbox,
+  pipeline: ICONS.pipeline,
+  users: ICONS.users,
+  doc: ICONS.doc,
+  shield: ICONS.shield,
+  edit: ICONS.edit,
+  image: ICONS.image,
+  radar: ICONS.radar,
+  dna: ICONS.dna,
+  settings: ICONS.settings,
+  calendar: ICONS.calendar,
+  chat: ICONS.chat,
+};
+---
+
+<div id="mobile-nav-backdrop" class="mobile-nav-backdrop" hidden></div>
+
+<aside id="mobile-nav" class="mobile-nav" aria-hidden="true" data-state="closed">
+  <div class="mobile-nav-header">
+    <a href="/admin" class="mobile-nav-logo" aria-label="GuardMan Admin — Inicio">
+      <span set:html={ICONS.shield} />
+      <span>GuardMan Admin</span>
+    </a>
+    <button id="mobile-nav-close" class="mobile-nav-close" aria-label="Cerrar menú" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="mobile-nav-body" aria-label="Navegación principal">
+    {ADMIN_NAV_GROUPS.map((group) => (
+      <div class="mobile-nav-group">
+        <div class="mobile-nav-group-label">{group.label}</div>
+        <div class="mobile-nav-group-items">
+          {group.items.map((item) => (
+            <a
+              href={item.href}
+              class:list={['mobile-nav-item', { active: active === item.id }]}
+              aria-current={active === item.id ? 'page' : undefined}
+              data-nav-link
+            >
+              <span class="mobile-nav-item-icon" set:html={iconMap[item.icon]} />
+              <span class="mobile-nav-item-label">{item.label}</span>
+              {item.id === 'inbox' && <span class="mobile-nav-item-badge" data-badge="inbox">3</span>}
+            </a>
+          ))}
+        </div>
+      </div>
+    ))}
+  </nav>
+
+  <div class="mobile-nav-footer">
+    <a href="/admin/settings" class:list={['mobile-nav-item', { active: active === 'settings' }]} data-nav-link>
+      <span class="mobile-nav-item-icon" set:html={ICONS.settings} />
+      <span class="mobile-nav-item-label">Configuración</span>
+    </a>
+    <button id="mobile-nav-logout" class="mobile-nav-logout" type="button">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      <span>Cerrar sesión</span>
+    </button>
+  </div>
+</aside>
+
+<style>
+  /* MobileNav: solo visible < 768px. En desktop, el sidebar nativo toma el control. */
+  .mobile-nav-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+    z-index: 90;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+  .mobile-nav-backdrop[data-state="open"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(86vw, 320px);
+    background: var(--surface-3);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 240ms cubic-bezier(0.32, 0.72, 0, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  }
+  .mobile-nav[data-state="open"] {
+    transform: translateX(0);
+  }
+  .mobile-nav[data-state="closed"] {
+    transform: translateX(-100%);
+  }
+
+  .mobile-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+  }
+  .mobile-nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--fg);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .mobile-nav-logo :global(svg) {
+    width: 22px;
+    height: 22px;
+    color: var(--color-accent);
+  }
+  .mobile-nav-close {
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    color: var(--fg-muted);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease;
+  }
+  .mobile-nav-close:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--fg);
+  }
+
+  .mobile-nav-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-nav-group {
+    margin-bottom: 18px;
+  }
+  .mobile-nav-group-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fg-dim);
+    padding: 0 12px;
+    margin-bottom: 6px;
+  }
+  .mobile-nav-group-items {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mobile-nav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 150ms ease, color 150ms ease;
+    min-height: 44px;
+  }
+  .mobile-nav-item:hover,
+  .mobile-nav-item:active {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--fg);
+  }
+  .mobile-nav-item.active {
+    color: var(--fg);
+    background: rgba(59, 130, 246, 0.14);
+  }
+  .mobile-nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 10px;
+    bottom: 10px;
+    width: 3px;
+    background: var(--color-accent);
+    border-radius: 0 2px 2px 0;
+  }
+  .mobile-nav-item-icon {
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  .mobile-nav-item-icon :global(svg) {
+    width: 20px;
+    height: 20px;
+  }
+  .mobile-nav-item-label {
+    flex: 1;
+  }
+  .mobile-nav-item-badge {
+    background: var(--color-error);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 999px;
+    min-width: 18px;
+    text-align: center;
+  }
+
+  .mobile-nav-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .mobile-nav-logout {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    color: var(--fg-muted);
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    min-height: 44px;
+    transition: background 150ms ease, color 150ms ease;
+  }
+  .mobile-nav-logout:hover,
+  .mobile-nav-logout:active {
+    background: rgba(239, 68, 68, 0.08);
+    color: var(--color-error);
+  }
+
+  /* En desktop el drawer queda completamente oculto. */
+  @media (min-width: 769px) {
+    .mobile-nav,
+    .mobile-nav-backdrop {
+      display: none !important;
+    }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const nav = document.getElementById('mobile-nav');
+    const backdrop = document.getElementById('mobile-nav-backdrop');
+    const openBtn = document.getElementById('hamburger-btn');
+    const closeBtn = document.getElementById('mobile-nav-close');
+    const logoutBtn = document.getElementById('mobile-nav-logout');
+
+    if (!nav || !backdrop) return;
+
+    const setOpen = (open) => {
+      nav.setAttribute('data-state', open ? 'open' : 'closed');
+      nav.setAttribute('aria-hidden', open ? 'false' : 'true');
+      backdrop.hidden = !open;
+      // pequeño delay para que la transition del backdrop se vea
+      requestAnimationFrame(() => {
+        backdrop.setAttribute('data-state', open ? 'open' : 'closed');
+      });
+      document.body.style.overflow = open ? 'hidden' : '';
+    };
+
+    openBtn?.addEventListener('click', () => setOpen(true));
+    closeBtn?.addEventListener('click', () => setOpen(false));
+    backdrop.addEventListener('click', () => setOpen(false));
+
+    // Cerrar al tocar cualquier link de navegación
+    nav.querySelectorAll('[data-nav-link]').forEach((a) => {
+      a.addEventListener('click', () => setOpen(false));
+    });
+
+    // Escape para cerrar
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.getAttribute('data-state') === 'open') {
+        setOpen(false);
+      }
+    });
+
+    // Swipe-right para cerrar (touch)
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+    nav.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      startX = t.clientX;
+      startY = t.clientY;
+      tracking = true;
+    }, { passive: true });
+    nav.addEventListener('touchmove', (e) => {
+      if (!tracking) return;
+      const t = e.touches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      if (dx > 60 && Math.abs(dy) < 40) {
+        setOpen(false);
+        tracking = false;
+      }
+    }, { passive: true });
+    nav.addEventListener('touchend', () => { tracking = false; }, { passive: true });
+
+    // Logout (mismo flujo que settings)
+    logoutBtn?.addEventListener('click', () => {
+      try {
+        localStorage.removeItem('gm_token');
+        localStorage.removeItem('gm_token_expires_at');
+        localStorage.removeItem('gm_refresh_token');
+        localStorage.removeItem('gm_refresh_expires_at');
+      } catch {}
+      fetch('/api/admin/session', { method: 'DELETE', credentials: 'same-origin' })
+        .catch(() => {})
+        .finally(() => {
+          window.location.href = '/admin/login';
+        });
+    });
+  })();
+</script>
+</content>
+</invoke>

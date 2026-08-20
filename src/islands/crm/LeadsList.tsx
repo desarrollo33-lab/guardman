@@ -197,8 +197,8 @@ export default function LeadsList() {
           <tbody>
             {filtered.map((l) => (
               <tr key={l.id} className={selected.has(l.id) ? 'row-selected' : ''}>
-                <td><input type="checkbox" checked={selected.has(l.id)} onChange={() => toggleOne(l.id)} aria-label={`Seleccionar ${l.name}`} /></td>
-                <td>
+                <td data-label=""><input type="checkbox" checked={selected.has(l.id)} onChange={() => toggleOne(l.id)} aria-label={`Seleccionar ${l.name}`} /></td>
+                <td data-label="Lead">
                   <a href={`/admin/leads/${l.id}`} className="lead-link">
                     <div className="lead-cell">
                       <strong>{l.name}</strong>
@@ -206,28 +206,28 @@ export default function LeadsList() {
                     </div>
                   </a>
                 </td>
-                <td>
+                <td data-label="Contacto">
                   <div className="contact-cell">
                     <a href={`mailto:${l.email}`}>{l.email}</a>
                     <a href={`tel:${l.phone}`} className="contact-phone">{l.phone}</a>
                   </div>
                 </td>
-                <td><span className="tag">{l.service.replace(/-/g, ' ')}</span></td>
-                <td><span className="tag">{(l.location ?? '').replace(/-/g, ' ')}</span></td>
-                <td>
+                <td data-label="Servicio"><span className="tag">{l.service.replace(/-/g, ' ')}</span></td>
+                <td data-label="Ubicación"><span className="tag">{(l.location ?? '').replace(/-/g, ' ')}</span></td>
+                <td data-label="Estado">
                   <span className="status-chip" style={{ background: STATUS_COLORS[l.status], color: '#fff' }}>
                     {STATUS_LABELS[l.status]}
                   </span>
                 </td>
-                <td>
+                <td data-label="Prioridad">
                   <span className="priority-chip" style={{ background: PRIORITY_COLORS[l.priority], color: '#fff' }}>
                     {PRIORITY_LABELS[l.priority]}
                   </span>
                 </td>
-                <td className="num value-cell">{formatCLP(l.value)}</td>
-                <td className="muted-cell">{relativeTime(l.updated_at)}</td>
-                <td>
-                  <a href={`/admin/leads/${l.id}`} className="row-action">→</a>
+                <td data-label="Valor" className="num value-cell">{formatCLP(l.value)}</td>
+                <td data-label="Actualizado" className="muted-cell">{relativeTime(l.updated_at)}</td>
+                <td data-label="">
+                  <a href={`/admin/leads/${l.id}`} className="row-action" aria-label="Ver lead">→</a>
                 </td>
               </tr>
             ))}

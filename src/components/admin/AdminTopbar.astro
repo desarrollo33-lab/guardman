@@ -1,5 +1,5 @@
 ---
-// AdminTopbar v3.0 — breadcrumbs, búsqueda global, notif, user menu.
+// AdminTopbar v3.1 — breadcrumbs, búsqueda, user menu, hamburger (mobile).
 interface Props {
   title: string;
   section: string;
@@ -26,6 +26,13 @@ const bc = SECTIONS[section] ?? 'Dashboard';
 
 <header id="topbar">
   <div class="topbar-left">
+    <button id="hamburger-btn" class="hamburger-btn" type="button" aria-label="Abrir menú de navegación">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
     <div class="breadcrumb" aria-label="Breadcrumb">
       <a href="/admin">Admin</a>
       <span class="bc-sep">/</span>
@@ -45,22 +52,58 @@ const bc = SECTIONS[section] ?? 'Dashboard';
       <span class="search-icon" aria-hidden="true">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </span>
-      <input type="search" placeholder="Buscar leads, clientes, cotizaciones…" aria-label="Buscar" />
+      <input type="search" id="topbar-search-input" placeholder="Buscar leads, clientes, cotizaciones…" aria-label="Buscar" autocomplete="off" />
       <kbd>/</kbd>
     </div>
-    <button class="icon-btn" aria-label="Notificaciones">
+    <button id="topbar-search-btn" class="icon-btn search-trigger" type="button" aria-label="Buscar" title="Buscar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+    <button class="icon-btn notif-btn" type="button" aria-label="Notificaciones" title="Notificaciones">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span class="notif-dot"></span>
     </button>
-    <a href="/admin/settings" class="user-chip" title="admin@guardman.cl">
-      <span class="user-avatar">AD</span>
-      <span class="user-name">Admin</span>
-    </a>
-    <a href="/" target="_blank" class="icon-btn" aria-label="Ver sitio" title="Ver sitio público">
+    <div class="user-menu-wrap">
+      <button id="user-menu-btn" class="user-chip" type="button" title="admin@guardman.cl" aria-haspopup="true" aria-expanded="false">
+        <span class="user-avatar">AD</span>
+        <span class="user-name">Admin</span>
+        <svg class="user-menu-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div id="user-menu" class="user-menu" hidden>
+        <a href="/admin/settings" class="user-menu-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Configuración
+        </a>
+        <a href="/" target="_blank" class="user-menu-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Ver sitio público
+        </a>
+        <div class="user-menu-sep"></div>
+        <button id="topbar-logout-btn" type="button" class="user-menu-item user-menu-danger">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+    <a href="/" target="_blank" class="icon-btn site-link" aria-label="Ver sitio" title="Ver sitio público">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
     </a>
   </div>
 </header>
+
+<!-- Modal de búsqueda global (full-screen en mobile) -->
+<div id="topbar-search-modal" class="search-modal" hidden>
+  <div class="search-modal-backdrop" data-search-close></div>
+  <div class="search-modal-card" role="dialog" aria-modal="true" aria-label="Búsqueda global">
+    <div class="search-modal-input">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" id="topbar-search-modal-input" placeholder="Buscar leads por nombre, email, teléfono…" autocomplete="off" />
+      <button class="search-modal-close" type="button" data-search-close aria-label="Cerrar">×</button>
+    </div>
+    <div id="topbar-search-results" class="search-modal-results">
+      <p class="search-hint">Empieza a escribir para buscar en tus leads. Mínimo 2 caracteres.</p>
+    </div>
+  </div>
+</div>
 
 <style>
   #topbar {
@@ -71,9 +114,10 @@ const bc = SECTIONS[section] ?? 'Dashboard';
     align-items: center;
     padding: 0 20px;
     gap: 16px;
-    z-index: 20;
+    z-index: 30;
+    position: relative;
   }
-  .topbar-left { flex: 1; min-width: 0; }
+  .topbar-left { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; }
   .breadcrumb {
     display: flex;
     align-items: center;
@@ -81,6 +125,9 @@ const bc = SECTIONS[section] ?? 'Dashboard';
     font-size: 12px;
     color: var(--fg-dim);
     margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .breadcrumb a { color: var(--fg-muted); text-decoration: none; transition: color 150ms ease; }
   .breadcrumb a:hover { color: var(--fg); }
@@ -91,13 +138,33 @@ const bc = SECTIONS[section] ?? 'Dashboard';
     font-weight: 600;
     margin: 0;
     color: var(--fg);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .topbar-actions {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
   }
+
+  .hamburger-btn {
+    display: none;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--fg-muted);
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease;
+    flex-shrink: 0;
+  }
+  .hamburger-btn:hover { background: var(--surface-2); color: var(--fg); }
 
   .search-box {
     position: relative;
@@ -164,6 +231,9 @@ const bc = SECTIONS[section] ?? 'Dashboard';
     border: 2px solid var(--surface-3);
   }
 
+  .user-menu-wrap {
+    position: relative;
+  }
   .user-chip {
     display: flex;
     align-items: center;
@@ -172,7 +242,9 @@ const bc = SECTIONS[section] ?? 'Dashboard';
     background: var(--surface-2);
     border: 1px solid rgba(255,255,255,0.04);
     border-radius: 999px;
-    text-decoration: none;
+    color: inherit;
+    font-family: inherit;
+    cursor: pointer;
     transition: all 150ms ease;
   }
   .user-chip:hover { border-color: rgba(255,255,255,0.1); }
@@ -192,12 +264,317 @@ const bc = SECTIONS[section] ?? 'Dashboard';
     font-weight: 500;
     color: var(--fg);
   }
+  .user-menu-caret {
+    color: var(--fg-dim);
+    transition: transform 150ms ease;
+  }
+  .user-chip[aria-expanded="true"] .user-menu-caret {
+    transform: rotate(180deg);
+  }
+
+  .user-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 200px;
+    background: var(--surface-2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .user-menu[hidden] { display: none; }
+  .user-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 6px;
+    color: var(--fg);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    width: 100%;
+    transition: background 150ms ease;
+  }
+  .user-menu-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .user-menu-item svg { color: var(--fg-dim); flex-shrink: 0; }
+  .user-menu-item:hover svg { color: var(--fg); }
+  .user-menu-sep {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+    margin: 4px 0;
+  }
+  .user-menu-danger { color: var(--color-error); }
+  .user-menu-danger svg { color: var(--color-error); }
+  .user-menu-danger:hover { background: rgba(239, 68, 68, 0.08); }
+
+  .search-trigger { display: none; }
+
+  .search-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 110;
+    display: grid;
+    place-items: start center;
+    padding-top: 8vh;
+  }
+  .search-modal[hidden] { display: none; }
+  .search-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+  }
+  .search-modal-card {
+    position: relative;
+    width: min(640px, calc(100vw - 32px));
+    background: var(--surface-1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    color: var(--fg);
+  }
+  .search-modal-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--fg-dim);
+  }
+  .search-modal-input input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--fg);
+    font-size: 16px;
+    outline: none;
+    font-family: inherit;
+    min-width: 0;
+  }
+  .search-modal-input input::placeholder { color: var(--fg-dim); }
+  .search-modal-close {
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: none;
+    color: var(--fg-muted);
+    border-radius: 6px;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .search-modal-close:hover { background: rgba(255, 255, 255, 0.06); color: var(--fg); }
+  .search-modal-results {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+  .search-hint {
+    padding: 24px 18px;
+    color: var(--fg-dim);
+    font-size: 13px;
+    text-align: center;
+    margin: 0;
+  }
+  .search-result {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    text-decoration: none;
+    color: var(--fg);
+    transition: background 150ms ease;
+    border-left: 3px solid transparent;
+  }
+  .search-result:hover,
+  .search-result:focus {
+    background: rgba(255, 255, 255, 0.04);
+    border-left-color: var(--color-accent);
+    outline: none;
+  }
+  .search-result-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .search-result-body { flex: 1; min-width: 0; }
+  .search-result-name { font-size: 14px; font-weight: 600; }
+  .search-result-meta { font-size: 12px; color: var(--fg-dim); }
+  .search-result-pill {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
 
   @media (max-width: 1024px) {
     .search-box { width: 200px; }
   }
+  /* ── MOBILE ───────────────────────────────────────────────── */
   @media (max-width: 768px) {
+    .hamburger-btn { display: flex; }
+    .topbar-left { gap: 8px; }
+    .topbar-title { font-size: 14px; }
+    .breadcrumb { display: none; }
     .search-box { display: none; }
-    .user-name { display: none; }
+    .search-trigger { display: grid; }
+    .user-name,
+    .user-menu-caret { display: none; }
+    .user-chip { padding: 4px; }
+    .site-link { display: none; }
+    #topbar { padding: 0 12px; gap: 8px; }
+    .topbar-actions { gap: 4px; }
+    .user-menu { right: -8px; }
   }
 </style>
+
+<script is:inline>
+  (() => {
+    // ── User menu dropdown ──────────────────────────────────
+    const userBtn = document.getElementById('user-menu-btn');
+    const userMenu = document.getElementById('user-menu');
+    if (userBtn && userMenu) {
+      const closeMenu = () => {
+        userMenu.hidden = true;
+        userBtn.setAttribute('aria-expanded', 'false');
+      };
+      const toggleMenu = () => {
+        const open = userMenu.hidden;
+        userMenu.hidden = !open;
+        userBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      };
+      userBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+      });
+      document.addEventListener('click', (e) => {
+        if (!userMenu.hidden && !userMenu.contains(e.target) && e.target !== userBtn) {
+          closeMenu();
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !userMenu.hidden) closeMenu();
+      });
+    }
+
+    // ── Topbar logout ───────────────────────────────────────
+    const topbarLogout = document.getElementById('topbar-logout-btn');
+    topbarLogout?.addEventListener('click', () => {
+      try {
+        localStorage.removeItem('gm_token');
+        localStorage.removeItem('gm_token_expires_at');
+        localStorage.removeItem('gm_refresh_token');
+        localStorage.removeItem('gm_refresh_expires_at');
+      } catch {}
+      fetch('/api/admin/session', { method: 'DELETE', credentials: 'same-origin' })
+        .catch(() => {})
+        .finally(() => { window.location.href = '/admin/login'; });
+    });
+
+    // ── Search modal (global) ───────────────────────────────
+    const searchInput = document.getElementById('topbar-search-input');
+    const searchTrigger = document.getElementById('topbar-search-btn');
+    const searchModal = document.getElementById('topbar-search-modal');
+    const searchModalInput = document.getElementById('topbar-search-modal-input');
+    const searchResults = document.getElementById('topbar-search-results');
+    let searchTimer = null;
+    let lastQuery = '';
+
+    const openSearch = () => {
+      if (!searchModal) return;
+      searchModal.hidden = false;
+      setTimeout(() => searchModalInput?.focus(), 50);
+    };
+    const closeSearch = () => {
+      if (!searchModal) return;
+      searchModal.hidden = true;
+      if (searchModalInput) searchModalInput.value = '';
+      if (searchResults) searchResults.innerHTML = '<p class="search-hint">Empieza a escribir para buscar en tus leads. Mínimo 2 caracteres.</p>';
+    };
+    searchTrigger?.addEventListener('click', openSearch);
+    searchInput?.addEventListener('focus', openSearch);
+    searchInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); openSearch(); }
+    });
+    searchModal?.querySelectorAll('[data-search-close]').forEach((el) => {
+      el.addEventListener('click', closeSearch);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && searchModal && !searchModal.hidden) closeSearch();
+      if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        openSearch();
+      }
+    });
+
+    const STATUS_COLORS = { new: '#3B82F6', contacted: '#10B981', visit: '#F59E0B', proposal: '#8B5CF6', negotiation: '#8B5CF6', won: '#10B981', lost: '#EF4444' };
+    const STATUS_LABELS = { new: 'Nuevo', contacted: 'Contactado', visit: 'Visita', proposal: 'Cotización', negotiation: 'Negociación', won: 'Ganado', lost: 'Perdido' };
+
+    const renderResults = (leads) => {
+      if (!searchResults) return;
+      if (!leads.length) {
+        searchResults.innerHTML = '<p class="search-hint">No se encontraron leads.</p>';
+        return;
+      }
+      searchResults.innerHTML = leads.slice(0, 8).map((l) => {
+        const color = STATUS_COLORS[l.status] || '#3B82F6';
+        const initial = (l.name || '?').slice(0, 2).toUpperCase();
+        return `<a class="search-result" href="/admin/leads/${l.id}">
+          <span class="search-result-avatar" style="background:${color}">${initial}</span>
+          <span class="search-result-body">
+            <span class="search-result-name">${l.name || '(sin nombre)'}</span>
+            <span class="search-result-meta">${l.email || ''}${l.phone ? ' · ' + l.phone : ''}</span>
+          </span>
+          <span class="search-result-pill" style="background:${color}22; color:${color}">${STATUS_LABELS[l.status] || l.status}</span>
+        </a>`;
+      }).join('');
+    };
+
+    const runSearch = async (q) => {
+      if (q === lastQuery) return;
+      lastQuery = q;
+      if (q.length < 2) {
+        if (searchResults) searchResults.innerHTML = '<p class="search-hint">Empieza a escribir para buscar en tus leads. Mínimo 2 caracteres.</p>';
+        return;
+      }
+      try {
+        const res = await fetch(`/api/leads?q=${encodeURIComponent(q)}&limit=20`, { credentials: 'same-origin' });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || 'Error');
+        renderResults(data.leads || []);
+      } catch (err) {
+        if (searchResults) searchResults.innerHTML = `<p class="search-hint">Error: ${err.message}</p>`;
+      }
+    };
+
+    searchModalInput?.addEventListener('input', (e) => {
+      clearTimeout(searchTimer);
+      const q = e.target.value.trim();
+      searchTimer = setTimeout(() => runSearch(q), 220);
+    });
+  })();
+</script>
+</content>
+</invoke>

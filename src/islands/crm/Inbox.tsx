@@ -135,12 +135,35 @@ export default function Inbox() {
       if (!INBOX_STATUSES.includes(newStatus)) {
         setLeads((cur) => cur.filter((l) => l.id !== id));
         setSelected(null);
+        (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
+          type: 'success',
+          title: 'Lead movido',
+          msg: `Estado actualizado a ${newStatus}`,
+        });
       }
     } catch (err) {
       // Revertir
       setLeads(prev);
-      alert('No se pudo mover el lead: ' + (err instanceof Error ? err.message : String(err)));
+      (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
+        type: 'error',
+        title: 'No se pudo mover',
+        msg: err instanceof Error ? err.message : String(err),
+      });
     }
+  };
+
+  // En mobile, abrir el detalle como bottom sheet (toggle clase .is-open)
+  const isMobile = () => typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+  const openDetail = (lead: Lead) => {
+    setSelected(lead);
+    if (isMobile()) {
+      requestAnimationFrame(() => {
+        document.querySelector('.inbox-detail')?.classList.add('is-open');
+      });
+    }
+  };
+  const closeDetailSheet = () => {
+    document.querySelector('.inbox-detail')?.classList.remove('is-open');
   };
 
   if (loading) {
@@ -196,7 +219,7 @@ export default function Inbox() {
               <button
                 key={lead.id}
                 className={`inbox-card ${selected?.id === lead.id ? 'active' : ''}`}
-                onClick={() => setSelected(lead)}
+                onClick={() => openDetail(lead)}
               >
                 <div className="inbox-card-header">
                   <div className="inbox-avatar" style={{ background: PRIORITY_COLORS[lead.priority] }}>
@@ -255,6 +278,14 @@ function LeadInboxDetail({
 }) {
   return (
     <div className="panel">
+      <button
+        type="button"
+        className="inbox-detail-back"
+        onClick={() => document.querySelector('.inbox-detail')?.classList.remove('is-open')}
+        aria-label="Volver al listado"
+      >
+        ← Volver al listado
+      </button>
       <div className="lead-detail-header">
         <div className="inbox-avatar lg" style={{ background: PRIORITY_COLORS[lead.priority] }}>
           {lead.name.slice(0, 2).toUpperCase()}

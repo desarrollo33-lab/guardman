@@ -163,11 +163,61 @@ export default function Pipeline() {
       });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
+      (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
+        type: 'success',
+        title: 'Lead movido',
+        msg: `Estado actualizado a ${toStatus}`,
+      });
     } catch (err) {
       setLeads(prev);
-      alert('No se pudo mover: ' + (err instanceof Error ? err.message : String(err)));
+      (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
+        type: 'error',
+        title: 'No se pudo mover',
+        msg: err instanceof Error ? err.message : String(err),
+      });
     }
   }, [leads]);
+
+  // Touch/click handler: muestra menú para mover de columna.
+  // Funciona en desktop (botón ⋮ o click derecho) y mobile (long-press o tap en ⋮).
+  const openMoveMenu = (lead: Lead, e: { clientX: number; clientY: number }) => {
+    const items: Array<{ id: LeadStatus; label: string; color: string }> = STATUSES
+      .filter((s) => s !== lead.status)
+      .map((s) => ({ id: s, label: STATUS_HEADERS[s], color: STATUS_DOT_COLORS[s] }));
+    items.push({ id: lead.status, label: '— (actual) —', color: 'var(--fg-dim)' });
+    // Reordenar: actual al final
+    const reordered = items.filter((i) => i.id !== lead.status).concat(items.filter((i) => i.id === lead.status));
+    (window as unknown as { gmMoveMenu?: (o: unknown) => void }).gmMoveMenu?.({
+      x: e.clientX,
+      y: e.clientY,
+      items: reordered.map((it) => ({
+        label: it.label,
+        color: it.color,
+        value: it.id,
+        disabled: it.id === lead.status,
+      })),
+      onSelect: (item: { value: LeadStatus; disabled?: boolean }) => {
+        if (item.disabled || item.value === lead.status) return;
+        moveLead(lead.id, item.value);
+      },
+    });
+  };
+
+  // Adjuntar long-press a cada card después del render
+  useEffect(() => {
+    if (!loading && leads.length > 0) {
+      const cards = document.querySelectorAll<HTMLElement>('[data-pipeline-card]');
+      const leadMap = new Map<string, Lead>();
+      leads.forEach((l) => leadMap.set(l.id, l));
+      cards.forEach((card) => {
+        const id = card.dataset.pipelineCard;
+        if (!id) return;
+        const lead = leadMap.get(id);
+        if (!lead) return;
+        (window as unknown as { gmLongPress?: (el: HTMLElement, h: (e: { clientX: number; clientY: number }) => void) => void }).gmLongPress?.(card, (e) => openMoveMenu(lead, e));
+      });
+    }
+  }, [leads, loading]);
 
   const totalValue = filteredLeads.reduce((s, l) => s + l.value, 0);
 
@@ -241,10 +291,18 @@ export default function Pipeline() {
                     onDragStart={() => setDragId(l.id)}
                     onDragEnd={() => { setDragId(null); setDragOverCol(null); }}
                     data-id={l.id}
+                    data-pipeline-card={l.id}
                   >
                     <div className="kanban-card-header">
                       <span className="kanban-card-priority" style={{ background: PRIORITY_COLORS[l.priority] }} title={PRIORITY_LABELS[l.priority]} />
                       <span className="kanban-card-name">{l.name}</span>
+                      <button
+                        type="button"
+                        className="kanban-card-menu-btn"
+                        aria-label="Mover lead"
+                        title="Mover a otra etapa"
+                        onClick={(e) => { e.stopPropagation(); openMoveMenu(l, e); }}
+                      >⋮</button>
                     </div>
                     <div className="kanban-card-company">{l.service.replace(/-/g, ' ')}{l.location ? ` · ${l.location.replace(/-/g, ' ')}` : ''}</div>
                     <div className="kanban-card-footer">

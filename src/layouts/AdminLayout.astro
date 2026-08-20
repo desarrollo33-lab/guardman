@@ -1,9 +1,12 @@
 ---
-// AdminLayout v3.0 — shell del panel admin. Astro puro + islas React.
+// AdminLayout v3.1 — shell del panel admin. Astro puro + islas React.
+// v3.1: incluye MobileNav drawer + helpers JS mobile (toasts, long-press, move menu).
 import '../styles/design-tokens.css';
 import '../styles/global.css';
+import '../styles/admin-mobile.css';
 import AdminSidebar from '../components/admin/AdminSidebar.astro';
 import AdminTopbar from '../components/admin/AdminTopbar.astro';
+import MobileNav from '../components/admin/MobileNav.astro';
 
 interface Props {
   title: string;
@@ -18,12 +21,14 @@ const { title, section, requireAuth = true, breadcrumb = [] } = Astro.props;
 <html lang="es-CL">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>{title} — GuardMan Admin</title>
     <meta name="robots" content="noindex,nofollow" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="theme-color" content="#1A2744" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   </head>
   <body data-theme="dark" class="admin-shell">
     {requireAuth && <script is:inline src="/scripts/admin-auth-guard.js"></script>}
@@ -36,5 +41,203 @@ const { title, section, requireAuth = true, breadcrumb = [] } = Astro.props;
         </div>
       </main>
     </div>
+    <MobileNav active={section} />
+
+    <div id="gm-toast-stack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
+
+    <script is:inline>
+      // ══════════════════════════════════════════════════════════
+      // GuardMan Admin — Mobile helpers globales
+      //   • window.gmToast({ type, title, msg, duration })
+      //   • window.gmMoveMenu({ x, y, items, onSelect, onCancel })
+      //   • window.gmConfirm({ title, msg, danger, onConfirm, onCancel })
+      // Reemplazan alert()/confirm() con componentes accesibles y mobile-friendly.
+      // ══════════════════════════════════════════════════════════
+      (() => {
+        const stack = document.getElementById('gm-toast-stack');
+
+        window.gmToast = ({ type = 'info', title = '', msg = '', duration = 3500 } = {}) => {
+          if (!stack) return;
+          const icons = { success: '✓', error: '✕', warning: '!', info: 'i' };
+          const t = document.createElement('div');
+          t.className = 'toast ' + type;
+          t.setAttribute('role', type === 'error' ? 'alert' : 'status');
+          t.innerHTML = `
+            <span class="toast-icon">${icons[type] || icons.info}</span>
+            <span class="toast-body">
+              ${title ? `<div class="toast-title"></div>` : ''}
+              <div class="toast-msg"></div>
+            </span>
+            <button class="toast-close" type="button" aria-label="Cerrar">×</button>
+          `;
+          if (title) t.querySelector('.toast-title').textContent = title;
+          t.querySelector('.toast-msg').textContent = msg;
+          const close = () => {
+            t.classList.add('leaving');
+            setTimeout(() => t.remove(), 200);
+          };
+          t.querySelector('.toast-close').addEventListener('click', close);
+          stack.appendChild(t);
+          if (duration > 0) setTimeout(close, duration);
+        };
+
+        let activeMenu = null;
+        const closeActiveMenu = () => {
+          if (!activeMenu) return;
+          activeMenu.backdrop?.remove();
+          activeMenu.menu?.remove();
+          activeMenu = null;
+        };
+
+        window.gmMoveMenu = ({ x = 0, y = 0, items = [], onSelect, onCancel } = {}) => {
+          closeActiveMenu();
+          const backdrop = document.createElement('div');
+          backdrop.className = 'lp-menu-backdrop';
+          const menu = document.createElement('div');
+          menu.className = 'lp-menu';
+          menu.setAttribute('role', 'menu');
+
+          items.forEach((it) => {
+            if (it.sep) {
+              const sep = document.createElement('div');
+              sep.className = 'lp-menu-sep';
+              menu.appendChild(sep);
+              return;
+            }
+            const btn = document.createElement('button');
+            btn.className = 'lp-menu-item';
+            btn.type = 'button';
+            btn.setAttribute('role', 'menuitem');
+            btn.innerHTML = `
+              ${it.color ? `<span class="lp-menu-dot" style="background:${it.color}"></span>` : ''}
+              <span class="lp-menu-label"></span>
+            `;
+            btn.querySelector('.lp-menu-label').textContent = it.label;
+            btn.addEventListener('click', () => {
+              closeActiveMenu();
+              onSelect?.(it);
+            });
+            menu.appendChild(btn);
+          });
+
+          const cancel = document.createElement('button');
+          cancel.className = 'lp-menu-item lp-menu-cancel';
+          cancel.type = 'button';
+          cancel.textContent = 'Cancelar';
+          cancel.addEventListener('click', () => {
+            closeActiveMenu();
+            onCancel?.();
+          });
+          menu.appendChild(cancel);
+
+          document.body.appendChild(backdrop);
+          document.body.appendChild(menu);
+
+          // Posicionar dentro del viewport
+          const margin = 8;
+          const rect = menu.getBoundingClientRect();
+          const vw = window.innerWidth;
+          const vh = window.innerHeight;
+          let left = x;
+          let top = y;
+          if (left + rect.width + margin > vw) left = vw - rect.width - margin;
+          if (top + rect.height + margin > vh) top = vh - rect.height - margin;
+          if (left < margin) left = margin;
+          if (top < margin) top = margin;
+          menu.style.left = left + 'px';
+          menu.style.top = top + 'px';
+
+          backdrop.addEventListener('click', () => {
+            closeActiveMenu();
+            onCancel?.();
+          });
+          activeMenu = { backdrop, menu };
+        };
+
+        window.gmLongPress = (el, handler, { ms = 500 } = {}) => {
+          if (!el) return;
+          let timer = null;
+          let triggered = false;
+          let startX = 0, startY = 0;
+          const start = (e) => {
+            const t = e.touches ? e.touches[0] : e;
+            startX = t.clientX;
+            startY = t.clientY;
+            triggered = false;
+            timer = setTimeout(() => {
+              triggered = true;
+              if (navigator.vibrate) navigator.vibrate(20);
+              handler({ x: startX, y: startY });
+            }, ms);
+          };
+          const cancel = () => {
+            clearTimeout(timer);
+            timer = null;
+          };
+          const move = (e) => {
+            if (!timer) return;
+            const t = e.touches ? e.touches[0] : e;
+            if (Math.abs(t.clientX - startX) > 10 || Math.abs(t.clientY - startY) > 10) cancel();
+          };
+          el.addEventListener('touchstart', start, { passive: true });
+          el.addEventListener('touchend', cancel, { passive: true });
+          el.addEventListener('touchmove', move, { passive: true });
+          el.addEventListener('touchcancel', cancel, { passive: true });
+          // Para desktop con click derecho o ctrl+click también
+          el.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            handler({ x: e.clientX, y: e.clientY });
+          });
+        };
+
+        window.gmConfirm = ({ title = '¿Confirmar?', msg = '', danger = false, confirmLabel = 'Confirmar', onConfirm, onCancel } = {}) => {
+          closeActiveMenu();
+          const backdrop = document.createElement('div');
+          backdrop.className = 'lp-menu-backdrop';
+          const menu = document.createElement('div');
+          menu.className = 'lp-menu';
+          menu.setAttribute('role', 'alertdialog');
+          menu.style.minWidth = '280px';
+          menu.style.maxWidth = 'calc(100vw - 32px)';
+          menu.innerHTML = `
+            <div style="padding:14px 16px 6px;">
+              <div class="toast-title" style="font-size:15px;margin-bottom:4px;"></div>
+              <div class="toast-msg" style="font-size:13px;"></div>
+            </div>
+            <div class="lp-menu-sep"></div>
+            <button type="button" class="lp-menu-item" data-act="confirm" style="color:${danger ? 'var(--color-error)' : 'var(--color-accent)'};justify-content:center;font-weight:600;"></button>
+            <button type="button" class="lp-menu-item lp-menu-cancel" data-act="cancel">Cancelar</button>
+          `;
+          menu.querySelector('.toast-title').textContent = title;
+          menu.querySelector('.toast-msg').textContent = msg;
+          menu.querySelector('[data-act="confirm"]').textContent = confirmLabel;
+          menu.querySelector('[data-act="confirm"]').addEventListener('click', () => {
+            closeActiveMenu();
+            onConfirm?.();
+          });
+          menu.querySelector('[data-act="cancel"]').addEventListener('click', () => {
+            closeActiveMenu();
+            onCancel?.();
+          });
+          backdrop.addEventListener('click', () => {
+            closeActiveMenu();
+            onCancel?.();
+          });
+          document.body.appendChild(backdrop);
+          document.body.appendChild(menu);
+          const vw = window.innerWidth, vh = window.innerHeight;
+          const r = menu.getBoundingClientRect();
+          menu.style.left = Math.max(8, (vw - r.width) / 2) + 'px';
+          menu.style.top  = Math.max(8, (vh - r.height) / 3) + 'px';
+          activeMenu = { backdrop, menu };
+        };
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && activeMenu) closeActiveMenu();
+        });
+      })();
+    </script>
   </body>
 </html>
+</content>
+</invoke>
