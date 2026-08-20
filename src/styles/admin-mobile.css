@@ -556,10 +556,47 @@
   font-size: 12px !important;
   min-height: 36px;
 }
+.bulk-assign-form {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+.bulk-assign-input {
+  flex: 1;
+  min-width: 180px;
+  max-width: 320px;
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  min-height: 36px;
+}
 @media (max-width: 768px) {
   .bulk-bar { padding: 10px 12px; gap: 6px; }
   .bulk-status-select { min-width: 0; flex: 1; }
   .bulk-bar .admin-btn { padding: 7px 10px; font-size: 12px; }
+  .bulk-assign-form { width: 100%; }
+  .bulk-assign-input { max-width: none; }
+}
+
+/* ── Inbox: estado "lead movido" con CTAs (reemplaza dead-end) ─ */
+.moved-state {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.06) 0%, var(--surface-1) 100%);
+}
+.moved-state .empty-state-graphic { filter: none; opacity: 1; }
+.moved-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 360px;
+  margin-top: 4px;
+}
+.moved-cta .admin-btn { justify-content: center; width: 100%; }
+@media (max-width: 768px) {
+  .moved-cta { max-width: none; }
 }
 
 /* ── Card: stats Dashboard (mini cards) ──────────────── */

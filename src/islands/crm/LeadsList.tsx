@@ -94,6 +94,7 @@ export default function LeadsList() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkAssignValue, setBulkAssignValue] = useState('');
   const [bulkStatusValue, setBulkStatusValue] = useState<LeadStatus | ''>('');
+  const [bulkAssignOpen, setBulkAssignOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const queryRef = useRef(query);
   const statusRef = useRef(statusFilter);
@@ -207,10 +208,18 @@ export default function LeadsList() {
 
   const onBulkAssign = () => {
     if (selected.size === 0) return;
-    const email = window.prompt(`Asignar ${selected.size} lead(s) a (email):`, bulkAssignValue || '');
-    if (!email) return;
-    setBulkAssignValue(email);
-    runBulkPatch('assigned_to', email.trim() || null);
+    if (!bulkAssignOpen) {
+      setBulkAssignOpen(true);
+      return;
+    }
+    if (!bulkAssignValue.trim()) {
+      TOAST({ type: 'warning', title: 'Email requerido', msg: 'Ingresa un email para asignar.' });
+      return;
+    }
+    const email = bulkAssignValue.trim();
+    runBulkPatch('assigned_to', email || null);
+    setBulkAssignOpen(false);
+    setBulkAssignValue('');
   };
 
   const onBulkStatus = () => {
@@ -286,9 +295,30 @@ export default function LeadsList() {
       {selected.size > 0 && (
         <div className="bulk-bar">
           <span className="bulk-bar-count"><strong>{selected.size}</strong> seleccionados</span>
-          <button className="admin-btn admin-btn-secondary" onClick={onBulkAssign} disabled={busy} title="Asignar a un comercial">
-            👤 Asignar
-          </button>
+          {bulkAssignOpen ? (
+            <div className="bulk-assign-form">
+              <input
+                type="email"
+                className="form-input bulk-assign-input"
+                placeholder="email@comercial.cl"
+                value={bulkAssignValue}
+                onChange={(e) => setBulkAssignValue(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') onBulkAssign(); }}
+                autoFocus
+                aria-label="Email del comercial"
+              />
+              <button className="admin-btn admin-btn-primary" onClick={onBulkAssign} disabled={busy || !bulkAssignValue.trim()}>
+                Asignar
+              </button>
+              <button className="admin-btn admin-btn-secondary" onClick={() => { setBulkAssignOpen(false); setBulkAssignValue(''); }} disabled={busy}>
+                Cancelar
+              </button>
+            </div>
+          ) : (
+            <button className="admin-btn admin-btn-secondary" onClick={onBulkAssign} disabled={busy} title="Asignar a un comercial">
+              👤 Asignar
+            </button>
+          )}
           <select
             className="form-input bulk-status-select"
             value={bulkStatusValue}

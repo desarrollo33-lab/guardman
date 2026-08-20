@@ -2,6 +2,9 @@
 // Permite mover leads entre columnas con persistencia real.
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import {
+  STATUS_FLOW,
+  STATUS_LABELS,
+  STATUS_COLORS,
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   formatCLP,
@@ -9,9 +12,10 @@ import {
   type LeadStatus,
 } from '../../lib/crm-data';
 
-const STATUSES: LeadStatus[] = ['new', 'contacted', 'visit', 'proposal', 'negotiation', 'won', 'lost'];
-
-const STATUS_HEADERS: Record<LeadStatus, string> = {
+// Alias para mantener semántica del componente (kanban = columns de status).
+// Etiquetas del header (acentos para mostrar en columnas): minúsculas con
+// primera mayúscula, singular para que se vea natural ("Visita", "Cotización").
+const KANBAN_HEADER: Record<LeadStatus, string> = {
   new: 'Nuevos',
   contacted: 'Contactados',
   visit: 'Visita',
@@ -21,17 +25,8 @@ const STATUS_HEADERS: Record<LeadStatus, string> = {
   lost: 'Perdidos',
 };
 
-const STATUS_DOT_COLORS: Record<LeadStatus, string> = {
-  new: '#3B82F6',
-  contacted: '#10B981',
-  visit: '#F59E0B',
-  proposal: '#8B5CF6',
-  negotiation: '#8B5CF6',
-  won: '#10B981',
-  lost: '#EF4444',
-};
-
-const STATUS_HEADER_COLORS: Record<LeadStatus, string> = {
+// Colores del borde superior de cada columna (acentos visuales por etapa).
+const KANBAN_HEADER_COLOR: Record<LeadStatus, string> = {
   new: 'var(--color-accent)',
   contacted: 'var(--color-success)',
   visit: 'var(--color-warning)',
@@ -156,7 +151,7 @@ export default function Pipeline() {
     for (const l of filteredLeads) {
       if (map[l.status]) map[l.status].push(l);
     }
-    for (const s of STATUSES) {
+    for (const s of STATUS_FLOW) {
       map[s].sort((a, b) => b.created_at.localeCompare(a.created_at));
     }
     return map;
@@ -206,9 +201,9 @@ export default function Pipeline() {
   // Touch/click handler: muestra menú para mover de columna.
   // Funciona en desktop (botón ⋮ o click derecho) y mobile (long-press o tap en ⋮).
   const openMoveMenu = (lead: Lead, e: { clientX: number; clientY: number }) => {
-    const items: Array<{ id: LeadStatus; label: string; color: string }> = STATUSES
+    const items: Array<{ id: LeadStatus; label: string; color: string }> = STATUS_FLOW
       .filter((s) => s !== lead.status)
-      .map((s) => ({ id: s, label: STATUS_HEADERS[s], color: STATUS_DOT_COLORS[s] }));
+      .map((s) => ({ id: s, label: KANBAN_HEADER[s], color: STATUS_COLORS[s] }));
     items.push({ id: lead.status, label: '— (actual) —', color: 'var(--fg-dim)' });
     // Reordenar: actual al final
     const reordered = items.filter((i) => i.id !== lead.status).concat(items.filter((i) => i.id === lead.status));
@@ -254,9 +249,9 @@ export default function Pipeline() {
           <div className="skeleton" style={{ width: 120, height: 38 }} />
         </div>
         <div className="kanban">
-          {STATUSES.map((s) => (
+          {STATUS_FLOW.map((s) => (
             <div key={s} className="kanban-col">
-              <div className="kanban-col-header" style={{ borderTopColor: STATUS_HEADER_COLORS[s] }}>
+              <div className="kanban-col-header" style={{ borderTopColor: KANBAN_HEADER_COLOR[s] }}>
                 <div className="skeleton" style={{ width: 80, height: 14 }} />
                 <div className="skeleton" style={{ width: 18, height: 14 }} />
               </div>
@@ -306,7 +301,7 @@ export default function Pipeline() {
       </div>
 
       <div className="kanban">
-        {STATUSES.map((s) => (
+        {STATUS_FLOW.map((s) => (
           <div
             key={s}
             className="kanban-col"
@@ -322,10 +317,10 @@ export default function Pipeline() {
               }
             }}
           >
-            <div className="kanban-col-header" style={{ borderTopColor: STATUS_HEADER_COLORS[s] }}>
+            <div className="kanban-col-header" style={{ borderTopColor: KANBAN_HEADER_COLOR[s] }}>
               <div className="kanban-col-title">
-                <span className="kanban-dot" style={{ background: STATUS_DOT_COLORS[s] }} />
-                {STATUS_HEADERS[s]}
+                <span className="kanban-dot" style={{ background: STATUS_COLORS[s] }} />
+                {KANBAN_HEADER[s]}
               </div>
               <span className="kanban-col-value">{columns[s].length}</span>
             </div>

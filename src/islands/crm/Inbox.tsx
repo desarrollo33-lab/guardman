@@ -66,6 +66,11 @@ export default function Inbox() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'new' | 'contacted'>('all');
   const [selected, setSelected] = useState<Lead | null>(null);
+  // Tras mover un lead fuera de inbox (visit/won/lost), guardamos el lead
+  // por un instante para mostrar un estado contextual con CTAs, en vez de
+  // un dead-end "selecciona un lead". Esto evita la fricción que reportó
+  // Kammler al agendar visita: la pantalla quedaba en blanco con el empty state.
+  const [recentlyMoved, setRecentlyMoved] = useState<{ lead: Lead; toStatus: LeadStatus } | null>(null);
   const [query, setQuery] = useState('');
   const filterRef = useRef(filter);
   const queryRef = useRef(query);
@@ -141,11 +146,12 @@ export default function Inbox() {
         }
         if (!INBOX_STATUSES.includes(newStatus)) {
           setLeads((cur) => cur.filter((l) => l.id !== id));
-          setSelected(null);
+          // Mostrar estado contextual con CTAs en vez de un dead-end vacío
+          setRecentlyMoved({ lead: prev.find((l) => l.id === id)!, toStatus: newStatus });
           (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
             type: 'success',
             title: 'Lead movido',
-            msg: `Estado actualizado a ${newStatus}`,
+            msg: `${prev.find((l) => l.id === id)?.name ?? 'Lead'} → ${STATUS_LABELS[newStatus] ?? newStatus}`,
           });
         }
       } catch (err) {
@@ -176,15 +182,16 @@ export default function Inbox() {
   const isMobile = () => typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
   const openDetail = (lead: Lead) => {
     setSelected(lead);
+    setRecentlyMoved(null);
     if (isMobile()) {
       requestAnimationFrame(() => {
         document.querySelector('.inbox-detail')?.classList.add('is-open');
       });
     }
   };
-  const closeDetailSheet = () => {
-    document.querySelector('.inbox-detail')?.classList.remove('is-open');
-  };
+  // El bottom sheet se cierra con un click handler inline en
+  // LeadInboxDetail (botón "← Volver al listado"). Definido inline
+  // porque vive en otro componente y no queremos prop-drilling.
 
   if (loading) {
     return (
@@ -308,6 +315,20 @@ export default function Inbox() {
         <div className="inbox-detail">
           {selected ? (
             <LeadInboxDetail lead={selected} onMove={move} />
+          ) : recentlyMoved ? (
+            <div className="panel empty-panel moved-state">
+              <div className="empty-state-graphic">✅</div>
+              <p className="empty-state-title">{recentlyMoved.lead.name} salió de la bandeja</p>
+              <p className="empty-state-msg">
+                Movido a <strong>{STATUS_LABELS[recentlyMoved.toStatus] ?? recentlyMoved.toStatus}</strong>.
+                Ya no aparecerá aquí — sigue su flujo en el Pipeline o su ficha 360°.
+              </p>
+              <div className="moved-cta">
+                <a className="admin-btn admin-btn-primary" href="/admin/pipeline">Ver Pipeline →</a>
+                <a className="admin-btn admin-btn-secondary" href={`/admin/leads/${recentlyMoved.lead.id}`}>Ver ficha 360° →</a>
+                <button className="admin-btn admin-btn-secondary" onClick={() => { setRecentlyMoved(null); }}>← Volver a la bandeja</button>
+              </div>
+            </div>
           ) : (
             <div className="panel empty-panel">
               <div className="empty-state-graphic">👈</div>
@@ -333,7 +354,10 @@ function LeadInboxDetail({
       <button
         type="button"
         className="inbox-detail-back"
-        onClick={() => document.querySelector('.inbox-detail')?.classList.remove('is-open')}
+        onClick={() => {
+          // Mobile: cierra el bottom sheet. Desktop: no hace nada (panel siempre visible).
+          document.querySelector('.inbox-detail')?.classList.remove('is-open');
+        }}
         aria-label="Volver al listado"
       >
         ← Volver al listado

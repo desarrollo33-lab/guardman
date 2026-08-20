@@ -1,6 +1,7 @@
 // LeadDetail — Lead 360° conectado a /api/leads/[id] (D1).
-// Carga real, mutaciones reales (status, priority, notes, assigned_to, value).
-// Tasks y communications: placeholders para v1.1 (la API no las soporta aún).
+// Carga real, mutaciones reales: status, priority, value, assigned_to, admin_notes.
+// Soporta tabs: info + notas internas (textarea). Sin timeline/tasks/communications
+// — esos módulos fueron removidos en v4.0 "CRM-only + Lead Capture".
 import { useEffect, useState } from 'react';
 import {
   STATUS_FLOW,
