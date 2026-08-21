@@ -1,4 +1,4 @@
--- Seed guardpod_questions vv1 — 62 preguntas — generado 2026-08-21T03:37:52.235Z
+-- Seed guardpod_questions vv1 — 60 preguntas — generado 2026-08-21T03:59:54.166Z
 DELETE FROM guardpod_questions WHERE version = 'v1';
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -371,20 +371,6 @@ INSERT INTO guardpod_questions
     ('v1', 'ventas.tasa_conversion', 'ventas', 7, 5,
      'select', 'Aproximadamente, ¿qué porcentaje de leads cierra como cliente?', 'Queremos conocer la tasa de conversión real. Aunque sea estimado.', NULL,
      0, 0, '["Menos del 5%","5–10%","10–20%","20–40%","Más del 40%","No lo sé con certeza"]', 0);
-INSERT INTO guardpod_questions
-    (version, question_key, section, section_order, question_order, question_type, label,
-     help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
-  VALUES
-    ('v1', 'ventas.alianzas', 'ventas', 7, 6,
-     'textarea', '¿Qué alianzas reales (con proyecto concreto) tienes?', 'Queremos conocer las alianzas con proyecto concreto, no solo contactos.', 'Constructora, fundo, productor de eventos, etc. con proyecto real en los últimos 12 meses',
-     0, 0, NULL, 0);
-INSERT INTO guardpod_questions
-    (version, question_key, section, section_order, question_order, question_type, label,
-     help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
-  VALUES
-    ('v1', 'ventas.ferias', 'ventas', 7, 7,
-     'multiselect', '¿En qué ferias del rubro participás?', 'Queremos conocer los puntos de contacto presencial.', NULL,
-     0, 0, '["Expo Seguridad Chile","Mining Convention (Expomin)","Feria Edifica (construcción)","Sago Fisur (agrícola)","Otra del rubro","Ninguna por ahora"]', 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)

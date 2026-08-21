@@ -449,22 +449,6 @@ const QUESTIONS = [
     options: ['Menos del 5%', '5–10%', '10–20%', '20–40%', 'Más del 40%', 'No lo sé con certeza'],
     required: 0,
   },
-  {
-    section: 'ventas', section_order: 7, question_order: 6,
-    key: 'ventas.alianzas', type: 'textarea',
-    label: '¿Qué alianzas reales (con proyecto concreto) tienes?',
-    help: 'Queremos conocer las alianzas con proyecto concreto, no solo contactos.',
-    prompt: 'Constructora, fundo, productor de eventos, etc. con proyecto real en los últimos 12 meses',
-    required: 0,
-  },
-  {
-    section: 'ventas', section_order: 7, question_order: 7,
-    key: 'ventas.ferias', type: 'multiselect',
-    label: '¿En qué ferias del rubro participás?',
-    help: 'Queremos conocer los puntos de contacto presencial.',
-    options: ['Expo Seguridad Chile', 'Mining Convention (Expomin)', 'Feria Edifica (construcción)', 'Sago Fisur (agrícola)', 'Otra del rubro', 'Ninguna por ahora'],
-    required: 0,
-  },
 
   // ══════════════ 9 — LEGAL Y COMPLIANCE (4) ══════════════
   {

@@ -2,6 +2,11 @@
 
 Todas las versiones relevantes del proyecto. Formato basado en [Keep a Changelog](https://keepachangelog.com/).
 
+## [5.5.4] - 2026-08-20
+
+### Resumen
+Eliminadas las 2 preguntas restantes de origen "canales" (ventas.alianzas, ventas.ferias). 62 → 60 preguntas. La sección "ventas" queda con 5 preguntas sobre objeciones, truco de cierre, follow-up, fuentes de lead y tasa de conversión — todo lo que el admin SÍ puede responder. Sin alianzas, sin ferias, sin tono de blog ni ideas editoriales.
+
 ## [5.5.3] - 2026-08-20
 
 ### Resumen

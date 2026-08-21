@@ -53,7 +53,7 @@ export const GET: APIRoute = async ({ request }) => {
   const body = {
     ok,
     service: 'guardman-astro',
-    version: '5.5.3',
+    version: '5.5.4',
     hosting: 'cloudflare-workers',
     features: [
       'crm-only-admin',
