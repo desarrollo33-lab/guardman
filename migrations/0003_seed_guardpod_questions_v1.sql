@@ -1,4 +1,4 @@
--- Seed guardpod_questions vv1 — 69 preguntas — generado 2026-08-21T03:16:43.625Z
+-- Seed guardpod_questions vv1 — 62 preguntas — generado 2026-08-21T03:37:52.235Z
 DELETE FROM guardpod_questions WHERE version = 'v1';
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -11,28 +11,14 @@ INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
-    ('v1', 'identidad.frase_corta', 'identidad', 1, 2,
-     'text', 'Si tuvieras que explicar Guardpod en una frase corta (≤80 chars), ¿cuál sería?', 'Queremos conocer la frase que tú repetirías si alguien te pregunta "¿qué es Guardpod?" mientras caminas. La versión cruda, no la pulida.', 'Como si se la explicaras a alguien en un ascensor',
-     1, 1, NULL, 0);
-INSERT INTO guardpod_questions
-    (version, question_key, section, section_order, question_order, question_type, label,
-     help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
-  VALUES
-    ('v1', 'identidad.claim_diferenciador', 'identidad', 1, 3,
+    ('v1', 'identidad.claim_diferenciador', 'identidad', 1, 2,
      'textarea', '¿Qué tiene Guardpod que no tiene ningún otro producto similar en Chile?', 'Queremos conocer la razón por la que un cliente elegiría Guardpod por sobre cualquier alternativa. No marketing: la diferencia concreta y verificable. Si la respuesta requiere datos técnicos, dejala a nivel de concepto.', 'Pensá en la última vez que un cliente te dijo "¿y por qué no la otra?". La respuesta que diste es la que va acá.',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
-    ('v1', 'identidad.tres_palabras_cliente', 'identidad', 1, 4,
-     'text', '¿Con qué 3 palabras el cliente típico describe Guardpod a su familia o a su socio?', 'Queremos conocer el vocabulario que usa la gente real, no el de la página web. Las 3 palabras que un cliente usa cuando le cuenta a otro lo que contrató.', 'Lo que el cliente repite cuando habla de ustedes',
-     1, 1, NULL, 0);
-INSERT INTO guardpod_questions
-    (version, question_key, section, section_order, question_order, question_type, label,
-     help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
-  VALUES
-    ('v1', 'identidad.confusiones_tipicas', 'identidad', 1, 5,
+    ('v1', 'identidad.confusiones_tipicas', 'identidad', 1, 3,
      'textarea', '¿Con qué confunden Guardpod los clientes antes de entenderlo?', 'Queremos conocer las confusiones más comunes. Sirven para que la página web las aclare antes de que el cliente pierda tiempo.', 'Las veces que un cliente llegó creyendo que era otra cosa',
      0, 0, NULL, 0);
 INSERT INTO guardpod_questions
@@ -389,56 +375,21 @@ INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
-    ('v1', 'ventas.cinco_keywords', 'ventas', 7, 6,
-     'text', 'Si tuvieras que aparecer primero en Google para 5 búsquedas, ¿cuáles serían?', 'Queremos conocer las 5 frases exactas que tú pondrías en Google si fueras un cliente buscando Guardpod.', 'Las 5 búsquedas reales que haría un cliente',
-     1, 1, NULL, 0);
-INSERT INTO guardpod_questions
-    (version, question_key, section, section_order, question_order, question_type, label,
-     help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
-  VALUES
-    ('v1', 'ventas.alianzas', 'ventas', 7, 7,
+    ('v1', 'ventas.alianzas', 'ventas', 7, 6,
      'textarea', '¿Qué alianzas reales (con proyecto concreto) tienes?', 'Queremos conocer las alianzas con proyecto concreto, no solo contactos.', 'Constructora, fundo, productor de eventos, etc. con proyecto real en los últimos 12 meses',
      0, 0, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
-    ('v1', 'ventas.pregunta_google', 'ventas', 7, 8,
-     'text', '¿Cuál es la pregunta de Google que más te gustaría que la página web responda primera?', 'Queremos conocer la pregunta exacta, larga, con comuna si aplica.', 'La pregunta que un cliente real pondría en Google hoy',
-     1, 1, NULL, 0);
-INSERT INTO guardpod_questions
-    (version, question_key, section, section_order, question_order, question_type, label,
-     help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
-  VALUES
-    ('v1', 'canales.ferias', 'canales', 8, 1,
+    ('v1', 'ventas.ferias', 'ventas', 7, 7,
      'multiselect', '¿En qué ferias del rubro participás?', 'Queremos conocer los puntos de contacto presencial.', NULL,
      0, 0, '["Expo Seguridad Chile","Mining Convention (Expomin)","Feria Edifica (construcción)","Sago Fisur (agrícola)","Otra del rubro","Ninguna por ahora"]', 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
-    ('v1', 'canales.tono_blog', 'canales', 8, 2,
-     'select', '¿Qué tono quieres para el blog de Guardpod?', 'Queremos conocer el registro. Para que el contenido sea coherente con el cliente.', NULL,
-     0, 1, '["Técnico y detallado","Casos de estudio reales","Noticias del rubro","Guías prácticas","Mixto"]', 0);
-INSERT INTO guardpod_questions
-    (version, question_key, section, section_order, question_order, question_type, label,
-     help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
-  VALUES
-    ('v1', 'canales.tres_ideas_blog', 'canales', 8, 3,
-     'textarea', 'Tres ideas concretas de artículos para el blog', 'Queremos conocer los temas que conectan con clientes. Las preguntas que te hacen en reuniones convertidas en títulos.', 'Las preguntas que te hacen en reuniones convertidas en títulos de artículo',
-     0, 0, NULL, 0);
-INSERT INTO guardpod_questions
-    (version, question_key, section, section_order, question_order, question_type, label,
-     help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
-  VALUES
-    ('v1', 'canales.influencers', 'canales', 8, 4,
-     'text', 'Tres cuentas o personas que podrían amplificar Guardpod', 'Queremos conocer a quién acercarse para amplificar el mensaje.', 'Cuentas técnicas, gremios, periodistas, etc.',
-     0, 0, NULL, 0);
-INSERT INTO guardpod_questions
-    (version, question_key, section, section_order, question_order, question_type, label,
-     help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
-  VALUES
-    ('v1', 'legal.cumple_ley_21659', 'legal', 9, 1,
+    ('v1', 'legal.cumple_ley_21659', 'legal', 8, 1,
      'textarea', '¿Cómo cumple GuardMan con la Ley 21.659 de Seguridad Privada?', 'Queremos conocer el cumplimiento. Número de inscripción en el Registro Nacional si lo tienen, sino anotar "pendiente" o "no estoy seguro".', 'Número de inscripción, alcance, o "pendiente"',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
@@ -466,7 +417,7 @@ INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
-    ('v1', 'vis.vision_3_anios', 'vision', 10, 1,
+    ('v1', 'vis.vision_3_anios', 'vision', 9, 1,
      'textarea', '¿Cómo te imaginás Guardpod en 3 años?', 'Queremos conocer la visión cruda. Cifras, geografías, productos concretos.', 'Lo que le dirías a un socio escéptico en 60 segundos',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions

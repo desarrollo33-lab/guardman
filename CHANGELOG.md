@@ -2,6 +2,11 @@
 
 Todas las versiones relevantes del proyecto. Formato basado en [Keep a Changelog](https://keepachangelog.com/).
 
+## [5.5.3] - 2026-08-20
+
+### Resumen
+Eliminadas 7 preguntas editoriales (decisiones de copy/SEO que no son del admin). 69 → 62 preguntas, 10 → 9 secciones. Preguntas quitadas: 1.2 frase corta, 1.4 tres palabras del cliente, 7.6 cinco keywords, 7.8 pregunta Google top, 8.2 tono blog, 8.3 ideas blog, 8.4 influencers. Sección "canales" absorbida por "ventas" (queda 1 pregunta de ferias). El admin responde sobre el producto/cliente/mercado; el equipo editorial decide copy, keywords y tono después.
+
 ## [5.5.2] - 2026-08-20
 
 ### Resumen

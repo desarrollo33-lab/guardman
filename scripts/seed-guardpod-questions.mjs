@@ -24,14 +24,6 @@ const QUESTIONS = [
   },
   {
     section: 'identidad', section_order: 1, question_order: 2,
-    key: 'identidad.frase_corta', type: 'text',
-    label: 'Si tuvieras que explicar Guardpod en una frase corta (≤80 chars), ¿cuál sería?',
-    help: 'Queremos conocer la frase que tú repetirías si alguien te pregunta "¿qué es Guardpod?" mientras caminas. La versión cruda, no la pulida.',
-    prompt: 'Como si se la explicaras a alguien en un ascensor',
-    real_world_required: 1, required: 1,
-  },
-  {
-    section: 'identidad', section_order: 1, question_order: 3,
     key: 'identidad.claim_diferenciador', type: 'textarea',
     label: '¿Qué tiene Guardpod que no tiene ningún otro producto similar en Chile?',
     help: 'Queremos conocer la razón por la que un cliente elegiría Guardpod por sobre cualquier alternativa. No marketing: la diferencia concreta y verificable. Si la respuesta requiere datos técnicos, dejala a nivel de concepto.',
@@ -39,15 +31,7 @@ const QUESTIONS = [
     real_world_required: 1, required: 1,
   },
   {
-    section: 'identidad', section_order: 1, question_order: 4,
-    key: 'identidad.tres_palabras_cliente', type: 'text',
-    label: '¿Con qué 3 palabras el cliente típico describe Guardpod a su familia o a su socio?',
-    help: 'Queremos conocer el vocabulario que usa la gente real, no el de la página web. Las 3 palabras que un cliente usa cuando le cuenta a otro lo que contrató.',
-    prompt: 'Lo que el cliente repite cuando habla de ustedes',
-    real_world_required: 1, required: 1,
-  },
-  {
-    section: 'identidad', section_order: 1, question_order: 5,
+    section: 'identidad', section_order: 1, question_order: 3,
     key: 'identidad.confusiones_tipicas', type: 'textarea',
     label: '¿Con qué confunden Guardpod los clientes antes de entenderlo?',
     help: 'Queremos conocer las confusiones más comunes. Sirven para que la página web las aclare antes de que el cliente pierda tiempo.',
@@ -467,14 +451,6 @@ const QUESTIONS = [
   },
   {
     section: 'ventas', section_order: 7, question_order: 6,
-    key: 'ventas.cinco_keywords', type: 'text',
-    label: 'Si tuvieras que aparecer primero en Google para 5 búsquedas, ¿cuáles serían?',
-    help: 'Queremos conocer las 5 frases exactas que tú pondrías en Google si fueras un cliente buscando Guardpod.',
-    prompt: 'Las 5 búsquedas reales que haría un cliente',
-    real_world_required: 1, required: 1,
-  },
-  {
-    section: 'ventas', section_order: 7, question_order: 7,
     key: 'ventas.alianzas', type: 'textarea',
     label: '¿Qué alianzas reales (con proyecto concreto) tienes?',
     help: 'Queremos conocer las alianzas con proyecto concreto, no solo contactos.',
@@ -482,51 +458,17 @@ const QUESTIONS = [
     required: 0,
   },
   {
-    section: 'ventas', section_order: 7, question_order: 8,
-    key: 'ventas.pregunta_google', type: 'text',
-    label: '¿Cuál es la pregunta de Google que más te gustaría que la página web responda primera?',
-    help: 'Queremos conocer la pregunta exacta, larga, con comuna si aplica.',
-    prompt: 'La pregunta que un cliente real pondría en Google hoy',
-    real_world_required: 1, required: 1,
-  },
-
-  // ══════════════ 8 — CANALES Y ALIANZAS (4) ══════════════
-  {
-    section: 'canales', section_order: 8, question_order: 1,
-    key: 'canales.ferias', type: 'multiselect',
+    section: 'ventas', section_order: 7, question_order: 7,
+    key: 'ventas.ferias', type: 'multiselect',
     label: '¿En qué ferias del rubro participás?',
     help: 'Queremos conocer los puntos de contacto presencial.',
     options: ['Expo Seguridad Chile', 'Mining Convention (Expomin)', 'Feria Edifica (construcción)', 'Sago Fisur (agrícola)', 'Otra del rubro', 'Ninguna por ahora'],
     required: 0,
   },
-  {
-    section: 'canales', section_order: 8, question_order: 2,
-    key: 'canales.tono_blog', type: 'select',
-    label: '¿Qué tono quieres para el blog de Guardpod?',
-    help: 'Queremos conocer el registro. Para que el contenido sea coherente con el cliente.',
-    options: ['Técnico y detallado', 'Casos de estudio reales', 'Noticias del rubro', 'Guías prácticas', 'Mixto'],
-    required: 1,
-  },
-  {
-    section: 'canales', section_order: 8, question_order: 3,
-    key: 'canales.tres_ideas_blog', type: 'textarea',
-    label: 'Tres ideas concretas de artículos para el blog',
-    help: 'Queremos conocer los temas que conectan con clientes. Las preguntas que te hacen en reuniones convertidas en títulos.',
-    prompt: 'Las preguntas que te hacen en reuniones convertidas en títulos de artículo',
-    required: 0,
-  },
-  {
-    section: 'canales', section_order: 8, question_order: 4,
-    key: 'canales.influencers', type: 'text',
-    label: 'Tres cuentas o personas que podrían amplificar Guardpod',
-    help: 'Queremos conocer a quién acercarse para amplificar el mensaje.',
-    prompt: 'Cuentas técnicas, gremios, periodistas, etc.',
-    required: 0,
-  },
 
   // ══════════════ 9 — LEGAL Y COMPLIANCE (4) ══════════════
   {
-    section: 'legal', section_order: 9, question_order: 1,
+    section: 'legal', section_order: 8, question_order: 1,
     key: 'legal.cumple_ley_21659', type: 'textarea',
     label: '¿Cómo cumple GuardMan con la Ley 21.659 de Seguridad Privada?',
     help: 'Queremos conocer el cumplimiento. Número de inscripción en el Registro Nacional si lo tienen, sino anotar "pendiente" o "no estoy seguro".',
@@ -560,7 +502,7 @@ const QUESTIONS = [
 
   // ══════════════ 10 — VISIÓN Y ROADMAP (3) ══════════════
   {
-    section: 'vision', section_order: 10, question_order: 1,
+    section: 'vision', section_order: 9, question_order: 1,
     key: 'vis.vision_3_anios', type: 'textarea',
     label: '¿Cómo te imaginás Guardpod en 3 años?',
     help: 'Queremos conocer la visión cruda. Cifras, geografías, productos concretos.',
