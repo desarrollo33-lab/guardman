@@ -1,4 +1,4 @@
--- Seed guardpod_questions vv1 — 69 preguntas — generado 2026-08-21T03:11:23.924Z
+-- Seed guardpod_questions vv1 — 69 preguntas — generado 2026-08-21T03:16:43.625Z
 DELETE FROM guardpod_questions WHERE version = 'v1';
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -47,21 +47,21 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'cliente.caso_top_1', 'cliente_mercado', 2, 2,
-     'textarea', 'Describí un caso real del rubro más vendido (contexto concreto, no genérico).', 'Queremos conocer un caso real: tipo de faena, metros cuadrados o superficie, etapa, horario crítico, materiales o activos en riesgo. Mientras más concreto, mejor.', 'Ej: Obra de 4.000 m² en etapa de obra gruesa en Quilicura, fines de semana largo, riesgo de robo de cobre y herramientas. Concreto, no genérico.',
+     'textarea', 'Describir un caso real del rubro más vendido (contexto concreto, no genérico).', 'Queremos conocer un caso real: tipo de faena, metros cuadrados o superficie, etapa, horario crítico, materiales o activos en riesgo. Mientras más concreto, mejor.', 'Ej: Obra de 4.000 m² en etapa de obra gruesa en Quilicura, fines de semana largo, riesgo de robo de cobre y herramientas. Concreto, no genérico.',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'cliente.caso_top_2', 'cliente_mercado', 2, 3,
-     'textarea', 'Describí un caso real del segundo rubro más vendido.', 'Mismo nivel de detalle que el anterior. Caso concreto, no descripción genérica.', 'Caso concreto del segundo rubro más importante',
+     'textarea', 'Describir un caso real del segundo rubro más vendido.', 'Mismo nivel de detalle que el anterior. Caso concreto, no descripción genérica.', 'Caso concreto del segundo rubro más importante',
      1, 0, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'cliente.caso_top_3', 'cliente_mercado', 2, 4,
-     'textarea', 'Describí un caso real del tercer rubro más vendido.', 'Mismo nivel de detalle. Caso concreto.', 'Caso concreto del tercer rubro más importante',
+     'textarea', 'Describir un caso real del tercer rubro más vendido.', 'Mismo nivel de detalle. Caso concreto.', 'Caso concreto del tercer rubro más importante',
      1, 0, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -201,7 +201,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'casos.cliente_migrado_competencia', 'casos_vividos', 4, 4,
-     'textarea', '¿Tuviste algún cliente que se cambió de la competencia a Guardpod? Contá la historia.', 'Queremos conocer la historia de la migración. Contexto: qué tenía la competencia, qué le faltaba, qué le ofreció Guardpod.', 'La historia completa del cambio',
+     'textarea', '¿Tuviste algún cliente que se cambió de la competencia a Guardpod? Contar la historia.', 'Queremos conocer la historia de la migración. Contexto: qué tenía la competencia, qué le faltaba, qué le ofreció Guardpod.', 'La historia completa del cambio',
      1, 0, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -439,7 +439,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'legal.cumple_ley_21659', 'legal', 9, 1,
-     'textarea', '¿Cómo cumple GuardMan con la Ley 21.659 de Seguridad Privada?', 'Queremos conocer el cumplimiento. Número de inscripción en el Registro Nacional si lo tienen, sino anotá "pendiente" o "no estoy seguro".', 'Número de inscripción, alcance, o "pendiente"',
+     'textarea', '¿Cómo cumple GuardMan con la Ley 21.659 de Seguridad Privada?', 'Queremos conocer el cumplimiento. Número de inscripción en el Registro Nacional si lo tienen, sino anotar "pendiente" o "no estoy seguro".', 'Número de inscripción, alcance, o "pendiente"',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -460,7 +460,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'legal.proteccion_datos', 'legal', 9, 4,
-     'textarea', '¿La grabación de video cumple con la Ley 19.628 de protección de datos?', 'Queremos conocer el protocolo real. Si no hay, anotá "no definido" — esa es información honesta y útil.', 'Protocolo actual o "no definido" si no existe',
+     'textarea', '¿La grabación de video cumple con la Ley 19.628 de protección de datos?', 'Queremos conocer el protocolo real. Si no hay, anotar "no definido" — esa es información honesta y útil.', 'Protocolo actual o "no definido" si no existe',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,

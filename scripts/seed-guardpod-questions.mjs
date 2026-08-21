@@ -67,7 +67,7 @@ const QUESTIONS = [
   {
     section: 'cliente_mercado', section_order: 2, question_order: 2,
     key: 'cliente.caso_top_1', type: 'textarea',
-    label: 'Describí un caso real del rubro más vendido (contexto concreto, no genérico).',
+    label: 'Describir un caso real del rubro más vendido (contexto concreto, no genérico).',
     help: 'Queremos conocer un caso real: tipo de faena, metros cuadrados o superficie, etapa, horario crítico, materiales o activos en riesgo. Mientras más concreto, mejor.',
     prompt: 'Ej: Obra de 4.000 m² en etapa de obra gruesa en Quilicura, fines de semana largo, riesgo de robo de cobre y herramientas. Concreto, no genérico.',
     real_world_required: 1, required: 1,
@@ -75,7 +75,7 @@ const QUESTIONS = [
   {
     section: 'cliente_mercado', section_order: 2, question_order: 3,
     key: 'cliente.caso_top_2', type: 'textarea',
-    label: 'Describí un caso real del segundo rubro más vendido.',
+    label: 'Describir un caso real del segundo rubro más vendido.',
     help: 'Mismo nivel de detalle que el anterior. Caso concreto, no descripción genérica.',
     prompt: 'Caso concreto del segundo rubro más importante',
     real_world_required: 1,
@@ -83,7 +83,7 @@ const QUESTIONS = [
   {
     section: 'cliente_mercado', section_order: 2, question_order: 4,
     key: 'cliente.caso_top_3', type: 'textarea',
-    label: 'Describí un caso real del tercer rubro más vendido.',
+    label: 'Describir un caso real del tercer rubro más vendido.',
     help: 'Mismo nivel de detalle. Caso concreto.',
     prompt: 'Caso concreto del tercer rubro más importante',
     real_world_required: 1,
@@ -246,7 +246,7 @@ const QUESTIONS = [
   {
     section: 'casos_vividos', section_order: 4, question_order: 4,
     key: 'casos.cliente_migrado_competencia', type: 'textarea',
-    label: '¿Tuviste algún cliente que se cambió de la competencia a Guardpod? Contá la historia.',
+    label: '¿Tuviste algún cliente que se cambió de la competencia a Guardpod? Contar la historia.',
     help: 'Queremos conocer la historia de la migración. Contexto: qué tenía la competencia, qué le faltaba, qué le ofreció Guardpod.',
     prompt: 'La historia completa del cambio',
     real_world_required: 1,
@@ -529,7 +529,7 @@ const QUESTIONS = [
     section: 'legal', section_order: 9, question_order: 1,
     key: 'legal.cumple_ley_21659', type: 'textarea',
     label: '¿Cómo cumple GuardMan con la Ley 21.659 de Seguridad Privada?',
-    help: 'Queremos conocer el cumplimiento. Número de inscripción en el Registro Nacional si lo tienen, sino anotá "pendiente" o "no estoy seguro".',
+    help: 'Queremos conocer el cumplimiento. Número de inscripción en el Registro Nacional si lo tienen, sino anotar "pendiente" o "no estoy seguro".',
     prompt: 'Número de inscripción, alcance, o "pendiente"',
     real_world_required: 1, required: 1,
   },
@@ -553,7 +553,7 @@ const QUESTIONS = [
     section: 'legal', section_order: 9, question_order: 4,
     key: 'legal.proteccion_datos', type: 'textarea',
     label: '¿La grabación de video cumple con la Ley 19.628 de protección de datos?',
-    help: 'Queremos conocer el protocolo real. Si no hay, anotá "no definido" — esa es información honesta y útil.',
+    help: 'Queremos conocer el protocolo real. Si no hay, anotar "no definido" — esa es información honesta y útil.',
     prompt: 'Protocolo actual o "no definido" si no existe',
     real_world_required: 1, required: 1,
   },

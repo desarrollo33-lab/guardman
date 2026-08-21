@@ -2,6 +2,11 @@
 
 Todas las versiones relevantes del proyecto. Formato basado en [Keep a Changelog](https://keepachangelog.com/).
 
+## [5.5.2] - 2026-08-20
+
+### Resumen
+Corrección de voseo residual: 6 instancias de imperativos voseantes reemplazadas por infinitivo. "Describí" → "Describir", "Contá" → "Contar", "anotá" → "anotar". 100% español neutro verificado con grep de patrones voseantes completos (incluyendo terminaciones -í/-á/-é/-ite/-ate).
+
 ## [5.5.1] - 2026-08-20
 
 ### Resumen

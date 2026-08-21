@@ -290,4 +290,4 @@ export const SOCIAL_PROFILES = [
 ] as const;
 
 // Versión del bundle (para cache-busting).
-export const BUNDLE_VERSION = 'v5.5.1';
+export const BUNDLE_VERSION = 'v5.5.2';
