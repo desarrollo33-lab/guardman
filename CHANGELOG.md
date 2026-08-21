@@ -2,6 +2,18 @@
 
 Todas las versiones relevantes del proyecto. Formato basado en [Keep a Changelog](https://keepachangelog.com/).
 
+## [5.5.1] - 2026-08-20
+
+### Resumen
+Cuestionario Guardpod reducido y reenfocado: 131 → 69 preguntas (-47%). Eliminadas las preguntas técnicas que pedían datos del manual (megapíxeles, modelos, IP rating, latencia, número de serie). Las respuestas técnicas se capturan en una fase posterior de investigación contra la ficha técnica del producto. El cuestionario queda enfocado solo en lo que el admin SÍ sabe: cliente, mercado, casos vividos, objeciones, competencia, ventas, visión. Corregidos 4 voseos argentinos residuales (decís, tenés, querés).
+
+### Cambios
+- Reorganización: 14 → 10 secciones.
+- 40 preguntas marcadas como `real_world_required=1` (no aceptan "no sé / saltar").
+- 0 preguntas técnicas de hardware/software detallado. Lo que requiere el manual se investiga después.
+- Filosofía explícita en el seed: "capturar lo que solo el admin sabe, no datos técnicos del manual".
+- Idioma: 100% español neutro verificado con grep de voseo (vos, tenés, querés, decís, etc.).
+
 ## [5.5.0] - 2026-08-20
 
 ### Resumen
