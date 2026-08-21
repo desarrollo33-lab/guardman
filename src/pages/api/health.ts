@@ -53,7 +53,7 @@ export const GET: APIRoute = async ({ request }) => {
   const body = {
     ok,
     service: 'guardman-astro',
-    version: '5.3.0',
+    version: '5.5.0',
     hosting: 'cloudflare-workers',
     features: [
       'crm-only-admin',
@@ -64,6 +64,7 @@ export const GET: APIRoute = async ({ request }) => {
       'canal-denuncias-anonimo',
       'd1-bound',
       'ssr-auth-middleware',
+      'guardpod-questionnaire',
     ],
     checks: {
       d1: dbOk ? 'ok' : `fail: ${dbError}`,

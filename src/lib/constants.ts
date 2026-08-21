@@ -16,7 +16,7 @@ export const SITE = {
   PHONE_TEL: '+56930000010',
   EMAIL_INFO: 'info@guardman.cl',
   EMAIL_VENTAS: 'ventas@guardman.cl',
-  ADDRESS: 'Av. Américo Vespucio Norte 1980, Providencia, Santiago, Chile',
+  ADDRESS: 'Av. Américo Vespucio 1940, Oficina 301-01, Núcleo Vespucio',
   RUT: '77.123.456-7',
   FOUNDED_YEAR: 2014,
   INSTAGRAM_URL: 'https://www.instagram.com/grupo_guardman',
@@ -213,7 +213,7 @@ export const DENUNCIA_RELACIONES = [
   { slug: 'anonimo', label: 'Prefiero no decirlo' },
 ] as const;
 
-// Nav admin v4.1 - CRM + Canal de Denuncias.
+// Nav admin v5.5 - CRM + Compliance + Producto (GuardPod).
 export const ADMIN_NAV_GROUPS = [
   {
     id: 'crm',
@@ -223,6 +223,13 @@ export const ADMIN_NAV_GROUPS = [
       { id: 'inbox', label: 'Bandeja de Leads', href: '/admin/inbox', icon: 'inbox' },
       { id: 'pipeline', label: 'Pipeline', href: '/admin/pipeline', icon: 'pipeline' },
       { id: 'leads', label: 'Todos los Leads', href: '/admin/leads', icon: 'users' },
+    ],
+  },
+  {
+    id: 'producto',
+    label: 'Producto',
+    items: [
+      { id: 'guardpod', label: 'Guardpod', href: '/admin/guardpod', icon: 'shield' },
     ],
   },
   {
@@ -249,17 +256,18 @@ export const API_TIMEOUT_MS = 15_000;
 // ────────────────────────────────────────────────────────────────
 
 export const GEO = {
-  // Coordenadas oficina principal (Providencia)
-  lat: -33.4189,
-  lng: -70.6068,
+  // Coordenadas oficina principal (Núcleo Vespucio, Conchalí)
+  // Aproximadas (±50m). Verificar con pin Google Maps si hace falta precisión quirúrgica.
+  lat: -33.389,
+  lng: -70.644,
   // ISO 3166-2 cl-region + comuna
   region: 'CL-RM',
   regionName: 'Región Metropolitana de Santiago',
   country: 'Chile',
   countryCode: 'CL',
   city: 'Santiago',
-  placeName: 'Santiago, Providencia, Chile',
-  icbm: '-33.4189, -70.6068',
+  placeName: 'Santiago, Conchalí, Chile',
+  icbm: '-33.389, -70.644',
   // Box de cobertura aproximada RM
   coverageBox: {
     north: -33.20,
@@ -282,4 +290,4 @@ export const SOCIAL_PROFILES = [
 ] as const;
 
 // Versión del bundle (para cache-busting).
-export const BUNDLE_VERSION = 'v5.2.0';
+export const BUNDLE_VERSION = 'v5.5.0';

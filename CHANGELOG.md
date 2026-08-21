@@ -1,8 +1,39 @@
-# Changelog — GuardMan Chile
+# Changelog - GuardMan Chile
 
 Todas las versiones relevantes del proyecto. Formato basado en [Keep a Changelog](https://keepachangelog.com/).
 
-## [5.2.0] — 2026-07-17
+## [5.5.0] - 2026-08-20
+
+### Resumen
+Cuestionario profundo del producto GuardPod en `/admin/guardpod`. 131 preguntas versionadas en 14 secciones, autoguardado por pregunta (debounce 1.5s), help tooltips con icono `?`, banner "conocimiento real" y exportación JSON. Base de conocimiento para construir `guardpod.cl` y dominar la categoría "vigilancia autónoma" en Chile.
+
+### Schema D1 (migración 0003)
+- 4 tablas nuevas: `guardpod_questions` (131 preguntas v1), `guardpod_sessions` (1 por admin), `guardpod_answers` (1 fila por respuesta, UPSERT idempotente), `guardpod_answer_history` (auditoría de cambios).
+- Columnas clave: `help_text` (qué queremos conocer de GuardPod), `real_world_prompt` (placeholder crítico que fuerza respuesta basada en experiencia real), `real_world_required` (impide "no sé / saltar" en preguntas críticas).
+
+### API (5 endpoints)
+- `GET /api/guardpod/session` — crea/lee sesión, devuelve preguntas + respuestas agrupadas por sección.
+- `POST /api/guardpod/answer` — guarda una respuesta (UPSERT, recalcula progreso).
+- `POST /api/guardpod/answer/batch` — guarda hasta 200 respuestas en una llamada (flush al cerrar pestaña).
+- `GET /api/guardpod/export` — descarga JSON con todas las respuestas, agrupadas por sección + flat.
+- `GET /api/guardpod/progress` — solo % progreso (chequeo ligero).
+
+### UI admin (`/admin/guardpod`)
+- Wizard React island con sidebar 14 secciones (progreso por sección).
+- 131 preguntas con help tooltips (icono `?`).
+- Banner sticky "Responde con tu experiencia real".
+- Pantalla de bienvenida obligatoria al primer load.
+- Indicador visual de autoguardado por pregunta ("Guardado ✓ 14:32").
+- `Ctrl+S` = flush de respuestas pendientes.
+- Flush automático con `navigator.sendBeacon` al cerrar pestaña.
+- Botón "Export JSON" para descargar todas las respuestas.
+
+### Reglas y criterios
+- Idioma: español neutro, sin voseo. Regla guardada en user memory.
+- Las preguntas críticas (`real_world_required=1`, 22 preguntas) NO aceptan "no sé / saltar".
+- Help text NO contiene SEO ni tecnicismos. Solo explica qué queremos conocer de GuardPod.
+
+## [5.2.0] - 2026-07-17
 
 ### Resumen
 Normalización profunda de layouts Astro, unificación del sistema de diseño Guardman, reescritura del copy en español neutro y reforzamiento del producto exclusivo Guardpod como diferenciador competitivo. Conserva intactos orden de secciones, estructura, imágenes y colores de fondo del v5.1.
