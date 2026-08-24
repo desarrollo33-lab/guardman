@@ -29,6 +29,10 @@ gm_test.json
 .cache/
 coverage/
 
+# playwright
+test-results/
+playwright-report/
+
 # local artifacts (auto-generated, no versionar)
 .backups/
 .backup-*/

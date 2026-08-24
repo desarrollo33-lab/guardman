@@ -2,6 +2,11 @@
 
 Todas las versiones relevantes del proyecto. Formato basado en [Keep a Changelog](https://keepachangelog.com/).
 
+## [5.5.6] - 2026-08-24
+
+### Resumen
+Fix bug crítico en el cuestionario Guardpod: las respuestas se guardaban con 1 char short del valor real (ej: "GuardPo" en vez de "GuardPod", "...vide" en vez de "...video"). Causa raíz: `saveOne`/`flushAll`/`beforeunload` leían `drafts[key]` del closure de la renderización anterior — la última pulsación quedaba atrapada en el state de React que aún no se aplicaba al render que disparó el `setTimeout`. Fix: nuevo `draftsRef` (`useRef`) como source-of-truth síncrono, actualizado en `onChange` antes del `setDrafts`, leído por los 3 handlers async. Validado con test e2e Playwright (10.5s, pasa) que tipea 60 chars char-by-char contra el deploy live y verifica el valor completo vía `/api/guardpod/export`.
+
 ## [5.5.5] - 2026-08-24
 
 ### Resumen

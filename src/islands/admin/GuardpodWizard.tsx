@@ -67,6 +67,11 @@ export default function GuardpodWizard() {
   const [helpOpenKey, setHelpOpenKey] = useState<string | null>(null);
   const debounceRef = useRef<Record<string, number>>({});
   const dirtyRef = useRef<Set<string>>(new Set());
+  // draftsRef: source-of-truth síncrono para evitar closure stale de React
+  // cuando saveOne / flushAll / beforeunload leen drafts via setTimeout.
+  // El `useState` `drafts` se mantiene para re-render, pero los handlers
+  // async leen SIEMPRE de este ref (sincrónico, no se desfasa por renders).
+  const draftsRef = useRef<Record<string, string>>({});
 
   // Carga inicial
   useEffect(() => {
@@ -91,6 +96,7 @@ export default function GuardpodWizard() {
           initialStates[k] = 'saved';
           initialSavedAt[k] = a.updated_at;
         }
+        draftsRef.current = { ...initialDrafts };
         setDrafts(initialDrafts);
         setSaveStates(initialStates);
         setLastSavedAt(initialSavedAt);
@@ -125,7 +131,7 @@ export default function GuardpodWizard() {
         session_id: data.session.id,
         answers: Array.from(dirtyRef.current).map((k) => {
           const q = findQuestion(data.sections, k);
-          return q ? { question_key: k, value: drafts[k] ?? '', answer_type: q.type } : null;
+          return q ? { question_key: k, value: draftsRef.current[k] ?? '', answer_type: q.type } : null;
         }).filter(Boolean),
       };
       try {
@@ -137,7 +143,10 @@ export default function GuardpodWizard() {
     };
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
-  }, [data, drafts]);
+    // Sin `drafts` en deps: leemos de draftsRef (síncrono). Antes este useEffect
+    // se re-ejecutaba con cada keystroke y perdíamos 1 char de la última
+    // pulsación si el cierre ocurría entre renders.
+  }, [data]);
 
   // Ctrl+S = save now
   useEffect(() => {
@@ -174,7 +183,8 @@ export default function GuardpodWizard() {
     if (!data) return;
     const q = findQuestion(data.sections, key);
     if (!q) return;
-    const value = drafts[key] ?? '';
+    // Leer de draftsRef (síncrono) en vez de `drafts` (closure stale de render anterior).
+    const value = draftsRef.current[key] ?? '';
     setSaveStates((s) => ({ ...s, [key]: 'saving' }));
     try {
       const res = await fetch('/api/guardpod/answer', {
@@ -216,7 +226,7 @@ export default function GuardpodWizard() {
       session_id: data.session.id,
       answers: dirty.map((k) => {
         const q = findQuestion(data.sections, k);
-        return q ? { question_key: k, value: drafts[k] ?? '', answer_type: q.type } : null;
+        return q ? { question_key: k, value: draftsRef.current[k] ?? '', answer_type: q.type } : null;
       }).filter(Boolean),
     };
     for (const k of dirty) setSaveStates((s) => ({ ...s, [k]: 'saving' }));
@@ -252,6 +262,9 @@ export default function GuardpodWizard() {
   }
 
   function onChange(key: string, value: string) {
+    // Refrescar el ref ANTES de setDrafts: saveOne/flushAll/beforeunload
+    // siempre leen de draftsRef (no del state de React).
+    draftsRef.current[key] = value;
     setDrafts((d) => ({ ...d, [key]: value }));
     setSaveStates((s) => ({ ...s, [key]: 'idle' }));
     dirtyRef.current.add(key);
