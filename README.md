@@ -1,214 +1,36 @@
-# GuardMan Chile - Astro 6 v4.0.0 (Cloudflare Workers)
+# GuardMan Chile — Astro 6 v0.1.0 (Cloudflare Workers)
 
-Migración 1:1 de `guardman-admin v1.0.0` (Cloudflare Worker monolítico + Vite/React SPA) a **Astro 6** desplegado en **Cloudflare Workers** (no Pages). Mantiene **todo** el contenido, el design system y la integración con el Worker API existente.
-
-**v4.0.0 — Admin CRM-only + Copy/SEO/GEO optimizado para captura de leads.**
+Sitio público + panel admin de GuardMan Chile, la empresa de seguridad privada OS-10 más grande de la Región Metropolitana. Producto estrella: **Guardpod** (vigilancia autónoma 360° + IA, sin infraestructura).
 
 ## Stack
 
-- **Framework:** Astro 6 (SSR + adapter `@astrojs/cloudflare` en `mode: 'advanced'`, `output: 'server'`)
-- **Hosting:** **Cloudflare Workers** (no Pages) - Worker con bindings completos
-- **UI interactiva:** React 19 (islas con `client:only="react"`)
-- **CSS:** Tailwind v4 + los 3 CSS vanilla del original (`site.css`, `dark.css`, `main.css`) preservados 1:1
-- **Backend:** Worker API existente (no se toca D1, R2, KV, DO, Workflows)
+- **Framework:** Astro 6 (SSR, `output: 'server'`, adapter `@astrojs/cloudflare` en `mode: 'advanced'`)
+- **Hosting:** Cloudflare Workers (no Pages) — Worker `guardman-astro`
+- **Islands interactivas:** React 19 (`client:only="react"`)
+- **CSS:** design system propio (vanilla CSS + custom properties, no Tailwind)
+- **DB:** D1 (`guardman-v2-db`)
+- **KV:** namespace `SESSION` (auth cookies)
+- **Imágenes:** Cloudflare Images binding
+- **TypeScript:** strict
 
-## Deploy actual
+## Deploy
 
-- **Versión:** v4.0.0
-- **Version ID:** `f07b3527-7771-41ca-8a01-60c7aafbdb14`
+- **Versión:** v0.1.0 (master baseline)
 - **URL live:** https://guardman-astro.oficinadesarrollo33.workers.dev
-- **Custom domain:** `guardman.cl` sigue en Google App Engine (no migrado)
-- **Build:** server 18.6s · **Tests:** 27/27 · **Type check:** 0 errors
-
-## Cambios v3.0.0 → v4.0.0 (resumen)
-
-### Sitio público — restauración + mejora
-- **3 componentes restaurados** (perdidos en el deploy v3.0.0-live): `HowItWorks`, `LeadCTA` (5 variantes), `TrustSignals`.
-- **`index.astro` reescrito**: FAQPage schema integrado, hero con trust badges, 4 secciones adicionales de conversión (HowItWorks + LeadCTA inline + TrustSignals + LeadCTA footer).
-- **Title home**: "GuardMan Chile | Seguridad Privada OS-10 en Santiago — Cotización en 24h".
-
-### Admin — limpieza CRM-only
-- **17 archivos eliminados** (no usados): CMSEditor, LazyCMS, MediaEditor, LazyMedia, CRMView, Clients, Quotes, Reports, Team (componentes) + clients, cms, crm, media, quotes, reports, team (páginas admin) + mocks.ts.
-- **`ADMIN_NAV_GROUPS` reducido** a solo CRM (Dashboard, Bandeja, Pipeline, Todos los Leads).
-- **`api.ts` simplificado** a `auth + crm + imageUrl` (eliminado namespaces `cms`/`media`).
-- **Tests actualizados** (`api.test.ts`): reescrito de `cms.*` a `crm.leads.*`.
-
-### SEO / GEO
-- Sitemap crece 170 → 186 URLs.
-- `/api/health` reporta `version: 4.0.0` + `crm-only-admin`, `lead-capture-optimized`.
-- Fix: `BUNDLE_VERSION` v3.0.0 → v4.0.0 (stale string).
-
-## Cambios v2.1.0 → v3.0.0 (resumen)
-
-### Admin — CRM-first (núcleo del release)
-- **9 componentes CRM nuevos** en `src/islands/crm/`: `Dashboard`, `Inbox`, `Pipeline`, `LeadsList`, `LeadDetail`, `Quotes`, `Reports`, `Clients`, `Team`
-- **9 páginas admin nuevas** en `src/pages/admin/`: `dashboard`, `inbox`, `pipeline`, `leads`, `leads/[id]`, `quotes`, `clients`, `reports`, `team`
-- **Data layer** completo en `src/lib/crm-data.ts` (834 LOC): `Lead`, `Activity`, `Task`, `Note`, `Communication`, `Quote`, `Client`, `User` con mock data realista
-- **AdminLayout rediseñado**: grid shell + sidebar agrupado (CRM / Contenido / Inteligencia) + topbar con breadcrumbs, búsqueda global, notificaciones, user chip
-- **CSS de admin expandido**: sistema `.panel`, `.kpi-card`, `.form-group`, `.data-table`, `.tabs`, `.pill`, `.admin-btn`, `.spinner`
-
-### SEO / GEO ready
-- **`src/lib/seo.ts`** nuevo (9 schemas): Organization, LocalBusiness (con aggregateRating + reviews), Service, ServiceArea, Place, BreadcrumbList, FAQPage, Article, WebSite (con SearchAction), Speakable
-- **Sitemap expandido** de ~10 a **170 URLs**: home, 9 servicios, 14 ubicaciones, 7 sectores, 126 combos servicio × ubicación, con lastmod, priority, changefreq, hreflang alternates, image extensions
-- **robots.txt v3**: bots específicos (Googlebot, Bingbot, Slurp, DuckDuckBot, Baiduspider), Disallow /admin + /api + tracking params, bloqueo de scrapers (Semrush, Ahrefs, DotBot, MJ12bot)
-- **Hreflang multi-región** inyectado en todas las páginas públicas (es-cl / es / es-419 / x-default)
-- **Geo meta tags**: `geo.region`, `geo.placename`, `geo.position`, `ICBM`
-
-### Linking interno
-- **`src/components/RelatedLinks.astro`** nuevo: cluster de links relacionados (variantes `servicios | ubicaciones | sectores | servicio | ubicacion | sector`)
-- **`src/components/Icon.astro`** nuevo: punto único para todos los SVG iconos del sitio público
-
-### Páginas públicas — nuevas
-- `src/pages/servicios/[slug].astro` — landing por servicio
-- `src/pages/servicios/[service]/[location].astro` — combos servicio × ubicación (126 páginas)
-- `src/pages/sectores/[slug].astro` — landing por sector
-- `src/pages/ubicaciones/[slug].astro` — landing por ubicación con mapa Leaflet
-
-### Estilos — overhaul
-- `src/styles/global.css`: 14KB → 37KB (tokens dark, sistema de admin completo, clusters de linking)
-- `src/components/Footer.astro`: rediseñado (+4.5KB)
-- `src/lib/constants.ts`: +2.8KB (ADMIN_NAV_GROUPS, SERVICE_DESCRIPTIONS, ZONE_CONTEXT, HREFLANG, GEO)
-- `src/lib/icons.ts`: +2.8KB (más iconos admin)
-
-### Fix aplicado
-- `src/pages/admin/leads/[id].astro`: migrado de `getStaticPaths` (modo static, no soportado) a `Astro.params.id` (correcto para `output: 'server'`) + redirect a `/admin/leads` cuando el ID no existe
-
-## Estructura
-
-```
-guardman-astro/
-├── STATUS.md                  # Snapshot único actualizado al último deploy
-├── CHANGELOG.md               # Historial de versiones
-├── PLAN_DE_TRABAJO.md         # Plan ejecutado v3.0.0 + pendiente v3.1
-├── AUDITORIA_POST_PLAN.md     # Estado final del deploy v3.0.0
-├── PROMPT_CA.md               # Brief para Coding Agent (próximas tareas v3.1+)
-├── AUDITORA_FORENSE.md        # Auditoría original consolidada
-├── AUDITORIA_COMPLETA.md      # Auditoría completa
-├── README.md                  # Este archivo
-├── astro.config.mjs           # Astro + Cloudflare Workers (output: 'server')
-├── tsconfig.json
-├── package.json               # v3.0.0
-├── wrangler.jsonc             # Worker config (no Pages)
-├── env.d.ts
-├── .env.example
-├── .env.production
-├── public/
-│   ├── favicon.svg / .ico
-│   ├── fonts/inter-*.ttf      # Inter (5 pesos)
-│   ├── styles/                # CSS vanilla originales preservados 1:1
-│   │   ├── site.css           # 318 líneas - design system público
-│   │   ├── dark.css           # 78 líneas - override para Guard Pod / Ajax
-│   │   └── main.css           # 155 líneas - legacy
-│   ├── scripts/
-│   │   ├── main.js            # JS vanilla del original
-│   │   └── admin-auth-guard.js # Auth redirect si no hay token
-│   ├── _headers               # Cloudflare cache rules
-│   ├── _redirects
-│   └── images/                # WebP, OG, sectores
-├── src/
-│   ├── styles/global.css      # Tailwind v4 + admin shell (37KB)
-│   ├── lib/
-│   │   ├── constants.ts       # SITE, servicios, ubicaciones, sectores, ADMIN_NAV_GROUPS, ZONE_CONTEXT, HREFLANG, GEO
-│   │   ├── api.ts             # Cliente HTTP unificado
-│   │   ├── auth.ts            # JWT con access + refresh token
-│   │   ├── crm-data.ts        # ⭐ NUEVO v3.0 — Data layer CRM completo
-│   │   ├── seo.ts             # ⭐ NUEVO v3.0 — Helpers Schema.org + GEO + hreflang
-│   │   ├── content.ts         # Contenido del sitio
-│   │   ├── icons.ts           # ICONS + SERVICE_ICONS + SECTOR_ICONS
-│   │   ├── validation.ts      # Validación forms
-│   │   └── mocks.ts           # Mocks CRM legacy
-│   ├── types/index.ts
-│   ├── layouts/
-│   │   ├── BaseLayout.astro   # Shell público (Header + Footer + main.js)
-│   │   └── AdminLayout.astro  # ⭐ REDISEÑADO v3.0 — Grid shell + sidebar + topbar
-│   ├── components/
-│   │   ├── Header.astro       # Dropdowns Servicios/Ubicaciones/Sectores
-│   │   ├── Footer.astro       # ⭐ REDISEÑADO v3.0
-│   │   ├── CoverageMap.astro  # Mapa Leaflet reutilizable
-│   │   ├── Icon.astro         # ⭐ NUEVO v3.0
-│   │   ├── RelatedLinks.astro # ⭐ NUEVO v3.0 — Cluster de links SEO interno
-│   │   ├── Analytics.astro
-│   │   └── admin/
-│   │       ├── AdminSidebar.astro  # ⭐ REDISEÑADO v3.0 — CRM-first agrupado
-│   │       └── AdminTopbar.astro   # ⭐ REDISEÑADO v3.0 — Breadcrumbs + búsqueda + notif + user
-│   ├── islands/               # React (client:only)
-│   │   ├── cms/CMSEditor.tsx
-│   │   ├── media/MediaEditor.tsx
-│   │   ├── media/LazyMedia.tsx
-│   │   ├── intel/IntelView.tsx
-│   │   ├── brand/BrandEditor.tsx
-│   │   ├── chat/ChatView.tsx
-│   │   └── crm/               # ⭐ NUEVO v3.0 — 9 componentes CRM
-│   │       ├── Dashboard.tsx
-│   │       ├── Inbox.tsx
-│   │       ├── Pipeline.tsx
-│   │       ├── LeadsList.tsx
-│   │       ├── LeadDetail.tsx
-│   │       ├── Quotes.tsx
-│   │       ├── Reports.tsx
-│   │       ├── Clients.tsx
-│   │       └── Team.tsx
-│   └── pages/
-│       ├── index.astro
-│       ├── nosotros.astro
-│       ├── guard-pod.astro    # Dark theme
-│       ├── ajax-systems.astro # Dark theme
-│       ├── contacto.astro     # Form que POST a /api/crm/leads/capture
-│       ├── cotizacion.astro
-│       ├── gracias.astro
-│       ├── privacidad.astro
-│       ├── terminos.astro
-│       ├── 404.astro
-│       ├── robots.txt.ts      # ⭐ ACTUALIZADO v3.0
-│       ├── sitemap.xml.ts     # ⭐ ACTUALIZADO v3.0 (170 URLs)
-│       ├── api/health.ts      # ⭐ Devuelve version + features en JSON
-│       ├── servicios/
-│       │   ├── index.astro
-│       │   ├── [slug].astro           # ⭐ NUEVO v3.0
-│       │   └── [service]/
-│       │       └── [location].astro   # ⭐ NUEVO v3.0 — 126 combos
-│       ├── ubicaciones/
-│       │   ├── index.astro
-│       │   └── [slug].astro           # ⭐ NUEVO v3.0
-│       ├── sectores/
-│       │   ├── index.astro
-│       │   └── [slug].astro           # ⭐ NUEVO v3.0
-│       └── admin/
-│           ├── login.astro
-│           ├── index.astro    # Dashboard
-│           ├── clients.astro  # ⭐ NUEVO v3.0
-│           ├── crm.astro
-│           ├── cms.astro      # ⭐ NUEVO v3.0
-│           ├── inbox.astro    # ⭐ NUEVO v3.0
-│           ├── leads.astro    # ⭐ NUEVO v3.0
-│           ├── leads/[id].astro # ⭐ NUEVO v3.0 (SSR con Astro.params.id)
-│           ├── pipeline.astro # ⭐ NUEVO v3.0
-│           ├── quotes.astro   # ⭐ NUEVO v3.0
-│           ├── reports.astro  # ⭐ NUEVO v3.0
-│           ├── team.astro     # ⭐ NUEVO v3.0
-│           ├── media.astro
-│           └── settings.astro
-├── tests/
-│   ├── api.test.ts
-│   ├── auth.test.ts
-│   ├── constants.test.ts
-│   ├── validation.test.ts
-│   └── e2e/
-│       ├── public.spec.ts
-│       └── admin.spec.ts
-└── scripts/
-    └── lighthouse-audit.mjs
-```
+- **Custom domain:** `guardman.cl` — NO apunta a este worker (sigue en Google Sites, pendiente de migrar DNS)
+- **Build:** `npm run build`
+- **Deploy:** `npx wrangler deploy`
+- **Wrangler auth:** oficinadesarrollo33@gmail.com (account `b3a89fc9524552b7ab3202269f1ab6f3`)
 
 ## Comandos
 
 ```bash
-npm run dev         # Desarrollo local
-npm run build       # Build producción (~37s)
-npm run check       # Type checking
-npm run test        # Vitest (27 tests, ~600ms)
+npm run dev         # Dev server (Astro)
+npm run build       # Build producción (~15-30s)
+npm run check       # astro check (type checking)
+npm run test        # vitest (unit tests)
 npm run test:e2e    # Playwright E2E
-npm run preview     # Preview con Wrangler
+npm run preview     # wrangler dev
 npm run deploy      # astro build && wrangler deploy
 npm run lighthouse  # Auditoría Lighthouse
 ```
@@ -216,54 +38,120 @@ npm run lighthouse  # Auditoría Lighthouse
 ## Variables de Entorno
 
 ```bash
-# .env (desarrollo local)
+# .env (dev local)
 PUBLIC_API_URL=https://guardman.oficinadesarrollo33.workers.dev
 PUBLIC_SITE_URL=http://localhost:4321
 
-# .env.production / wrangler.jsonc vars
+# Producción (wrangler.jsonc vars)
 PUBLIC_API_URL=https://guardman.oficinadesarrollo33.workers.dev
 PUBLIC_SITE_URL=https://guardman.cl
 ```
 
 ## Bindings Cloudflare (verificados en deploy)
 
-- `env.SESSION` (KV Namespace)
-- `env.IMAGES` (Images binding)
-- `env.ASSETS` (Assets)
-- `env.PUBLIC_API_URL` = `https://guardman.oficinadesarrollo33.workers.dev`
-- `env.PUBLIC_SITE_URL` = `https://guardman.cl`
+- `env.DB` → D1 database `guardman-v2-db`
+- `env.SESSION` → KV Namespace
+- `env.IMAGES` → Images binding
+- `env.ASSETS` → Assets
+- `env.PUBLIC_API_URL`, `env.PUBLIC_SITE_URL` → vars
 
-## Smoke test post-deploy v3.0.0
+## Estructura
 
-| Endpoint | HTTP | Size | Notas |
-|---|---|---|---|
-| `/` | 200 | 68KB | Homepage con 43 schemas JSON-LD |
-| `/servicios/guardias-de-seguridad/` | 200 | 51KB | Service + BreadcrumbList + FAQ |
-| `/ubicaciones/las-condes/` | 200 | 49KB | ServiceArea + Place + BreadcrumbList |
-| `/sectores/residencial/` | 200 | 47KB | 42 schemas |
-| `/servicios/guardias-de-seguridad/las-condes/` | 200 | 54KB | Combo servicio×ubicación (60 schemas) |
-| `/guard-pod` | 200 | 43KB | Dark theme |
-| `/ajax-systems` | 200 | 43KB | Dark theme |
-| `/admin` | 200 | 14KB | Shell dark + sidebar CRM-first |
-| `/admin/leads/L001` | 200 | 14KB | Lead 360° (timeline + tasks + notes) |
-| `/admin/leads/L999` | 200 redirect | - | → /admin/leads (ID no existe) |
-| `/sitemap.xml` | 200 | 108KB | 170 URLs |
-| `/robots.txt` | 200 | 758B | v3.0 con bots específicos + Sitemap |
-| `/api/health` | 200 | 126B | `{"ok":true, "version":"3.0.0"}` |
+```
+guardman/
+├── STATUS.md                  # Snapshot único (fuente de verdad operativa)
+├── CHANGELOG.md               # Historial de versiones
+├── AGENTS.md                  # Contexto operativo (deploy, logo, tareas)
+├── README.md                  # Este archivo
+├── astro.config.mjs           # Astro + Cloudflare Workers
+├── wrangler.jsonc             # Worker config
+├── tsconfig.json
+├── package.json
+├── env.d.ts / .env.example
+├── public/
+│   ├── images/                # WebP, OG, sectores, productos
+│   ├── styles/                # CSS vanilla (site, dark, main)
+│   ├── scripts/               # JS legacy
+│   ├── videos/                # MP4s guardpod
+│   ├── fonts/                 # Inter Variable
+│   ├── _headers / _redirects  # Cloudflare config
+│   └── favicon.* + apple-touch-icon.png
+├── src/
+│   ├── styles/                # design-tokens, global, components
+│   ├── lib/                   # api, auth, content, crm-data, seo, validation, icons
+│   ├── layouts/               # BaseLayout, AdminLayout
+│   ├── components/            # Astro componentes públicos + admin
+│   ├── islands/               # React islands (admin/, crm/)
+│   ├── pages/                 # rutas + api/*
+│   │   ├── index.astro
+│   │   ├── servicios/  sectores/  ubicaciones/
+│   │   ├── guard-pod.astro  ajax-systems.astro
+│   │   ├── nosotros.astro  contacto.astro  cotizacion.astro
+│   │   ├── canal-de-denuncias.astro + estado/[id].astro
+│   │   ├── admin/            # login + dashboard + leads + pipeline + ...
+│   │   └── api/              # health, leads, denuncias, guardpod, analytics
+│   └── types/
+├── migrations/                # D1 SQL schemas (0001, 0002, 0003...)
+├── tests/                     # vitest (api, auth, constants, validation)
+│   └── e2e/                   # playwright (public, admin, guardpod-wizard)
+├── logo/                      # original logo assets
+├── imagenes guardman/         # original image assets
+└── scripts/                   # lighthouse-audit
+```
 
-## Pendiente para v3.1+
+## Funcionalidad
 
-- [ ] Decisión sobre custom domain: ¿migrar `guardman.cl` a Cloudflare Workers?
-- [ ] Ejecutar Playwright E2E suite completo
-- [ ] Lighthouse audit en homepage + servicio + ubicación
-- [ ] Verificar que las páginas admin nuevas tienen `<title>` único
-- [ ] Backend Worker `guardman.oficinadesarrollo33.workers.dev` — endpoints CRM (leads, clients, quotes)
-- [ ] Evaluar migración a D1 si los mocks se quedan
+### Público (`src/pages/*.astro` + sub-rutas)
+- Home con hero, clusters SEO, sectores, servicios, ubicaciones, guardpod
+- `/servicios/[slug]` + `/servicios/[service]/[location]` (combo SEO long-tail)
+- `/sectores/[slug]`, `/ubicaciones/[slug]`
+- `/guard-pod` (dark theme, producto estrella)
+- `/ajax-systems` (dark theme, alarmas)
+- `/nosotros` (institucional + timeline + FAQ)
+- `/cotizacion`, `/contacto`, `/canal-de-denuncias` (+ estado/[id])
+- `/privacidad`, `/terminos`, `/gracias`, `/404`
 
-## Docs relacionados
+### Admin (`/admin/*`, requiere auth)
+- Login (cookie `gm_session` + localStorage `gm_token`)
+- Dashboard CRM, Leads (+ `[id]`), Pipeline, Inbox
+- Canal de denuncias
+- Cuestionario Guardpod (60 preguntas, autoguardado, export JSON)
+- Settings
 
-- `STATUS.md` — Snapshot único actualizado al último deploy
-- `CHANGELOG.md` — Historial de versiones detallado
-- `PLAN_DE_TRABAJO.md` — Plan ejecutado + pendiente
-- `AUDITORIA_POST_PLAN.md` — Estado final del deploy con métricas
-- `PROMPT_CA.md` — Brief para Coding Agent en próximas tareas
+### APIs (`src/pages/api/*`)
+- `GET /api/health`
+- `POST /api/leads/capture`, `GET/POST /api/leads`, `GET /api/leads/[id]`
+- `POST /api/denuncias`, `GET /api/denuncias/[id]`
+- `GET/POST /api/guardpod/session`, `POST /api/guardpod/answer`, `POST /api/guardpod/answer/batch`, `GET /api/guardpod/export`, `GET /api/guardpod/progress`
+- `POST /api/analytics/pageview`
+- `GET/POST /api/admin/session`
+
+## Auth
+
+- Cookie `gm_session` con token (>= 16 chars)
+- `localStorage.gm_token` + `gm_token_expires_at` (client-side guard, `public/scripts/admin-auth-guard.js`)
+- API endpoints: `isAdminRequest()` chequea cookie O `x-admin-token` / `Authorization: Bearer` contra secret `DENUNCIAS_ADMIN_TOKEN`
+
+## D1 (guardman-v2-db)
+
+- `leads` — captura cotizaciones
+- `denuncias` + `denuncias_updates` — canal de denuncias
+- `pageviews` — analytics
+- `guardpod_questions` — cuestionario versionado (v1: 60 preguntas)
+- `guardpod_sessions` — 1 sesión por admin
+- `guardpod_answers` — 1 fila por respuesta
+- `guardpod_answer_history` — auditoría de cambios
+
+## Convenciones operativas
+
+- **Español neutro** — sin voseo, sin regionales argentinos/rioplatenses.
+- **No Service Worker / PWA** en landings agencia.
+- **Sin Mavis/minimax en copy público** — solo "equipo Millalobo Agencia" o "DEV33".
+- **Ediciones quirúrgicas** — no re-arquitectura.
+- **CSS/visual = código + `Invoke-WebRequest` + `npm run build`**, no dev server.
+- **git status antes de declarar "terminé todo"**.
+- **Merge committed ≠ production deployed** — verificar con curl.
+- **Audit factual antes de planear**.
+
+Ver [STATUS.md](./STATUS.md) para el snapshot completo del estado actual.  
+Ver [AGENTS.md](./AGENTS.md) para el contexto operativo (deploy, logo, gotchas).

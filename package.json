@@ -1,7 +1,7 @@
 {
   "name": "guardman-astro",
-  "version": "5.5.7",
-  "description": "GuardMan Chile — Astro 6 en Cloudflare Workers. v5.2: normalización de layouts, design system unificado, copy/SEO en español neutro, Guardpod reforzado.",
+  "version": "0.1.0",
+  "description": "GuardMan Chile — Astro 6 SSR en Cloudflare Workers. v0.1.0 master baseline.",
   "type": "module",
   "scripts": {
     "dev": "astro dev",
