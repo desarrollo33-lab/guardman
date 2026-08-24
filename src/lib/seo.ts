@@ -33,10 +33,10 @@ export function organizationSchema() {
     faxNumber: undefined,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Av. Américo Vespucio Norte 1980, Providencia',
-      addressLocality: 'Providencia',
+      streetAddress: 'Av. Américo Vespucio 1940, Oficina 301-01, Núcleo Vespucio',
+      addressLocality: 'Conchalí',
       addressRegion: 'Región Metropolitana',
-      postalCode: '7500000',
+      postalCode: '8560027',
       addressCountry: 'CL',
     },
     geo: {
@@ -105,10 +105,10 @@ export function localBusinessSchema() {
     paymentAccepted: 'Efectivo, Transferencia, Tarjeta de Crédito',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Av. Américo Vespucio Norte 1980',
-      addressLocality: 'Providencia',
+      streetAddress: 'Av. Américo Vespucio 1940, Oficina 301-01, Núcleo Vespucio',
+      addressLocality: 'Conchalí',
       addressRegion: 'Región Metropolitana',
-      postalCode: '7500000',
+      postalCode: '8560027',
       addressCountry: 'CL',
     },
     geo: {
@@ -396,9 +396,6 @@ export function geoMetaTags() {
     { name: 'ICBM', content: GEO.icbm },
     { name: 'theme-color', content: '#1A2744' },
     { name: 'format-detection', content: 'telephone=yes' },
-    { name: 'mobile-web-app-capable', content: 'yes' },
-    { name: 'apple-mobile-web-app-capable', content: 'yes' },
-    { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
   ];
 }
 

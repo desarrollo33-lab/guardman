@@ -85,7 +85,7 @@ const {
   title,
   description = SITE.DESCRIPTION,
   canonical,
-  ogImage = '/images/og-default.jpg',
+  ogImage = '/images/og-default-v2.jpg',
   noindex = false,
   theme = 'light',
   loadDarkCss = false,
@@ -156,6 +156,13 @@ const hreflangs = hreflangTags(Astro.url.pathname);
 <!doctype html>
 <html lang="es-CL">
   <head>
+    {/* Forzar scroll a top en cada navegación/recarga (preserva links con #hash). */}
+    <script is:inline>
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      addEventListener('pageshow', function () {
+        if (!location.hash) scrollTo(0, 0);
+      });
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{fullTitle}</title>
@@ -214,12 +221,10 @@ const hreflangs = hreflangTags(Astro.url.pathname);
     <meta name="twitter:label2" content="Tiempo de lectura" />
     <meta name="twitter:data2" content="3 min" />
 
-    {/* Icons + PWA */}
+    {/* Icons */}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="mask-icon" href="/favicon.svg" color="#1A2744" />
-    <link rel="manifest" href="/site.webmanifest" />
 
     {/* Preload del CSS legacy — baja el render-blocking efectivo (download en paralelo, ya en cache al aplicar) */}
     <link rel="preload" href="/styles/site.css?v=20260720" as="style" />

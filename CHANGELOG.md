@@ -2,6 +2,11 @@
 
 Todas las versiones relevantes del proyecto. Formato basado en [Keep a Changelog](https://keepachangelog.com/).
 
+## [5.5.5] - 2026-08-24
+
+### Resumen
+Eliminada la PWA de guardman.cl. Borrado `public/site.webmanifest`, removido `<link rel="manifest">` y `<link rel="apple-touch-icon">` de `BaseLayout.astro`, removidas las meta `apple-mobile-web-app-*` de `AdminLayout.astro`. Sin service worker, sin manifest, sin iOS install hints. La razón: alineado con la regla cross-project de Kammler de no usar Service Worker / PWA offline en landings de Millalobo Agencia.
+
 ## [5.5.4] - 2026-08-20
 
 ### Resumen

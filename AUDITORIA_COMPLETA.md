@@ -177,7 +177,6 @@
 1. Dashboard de analytics
 2. Sistema de roles y permisos
 3. Multi-idioma (es/en)
-4. PWA para admin
 
 ---
 

@@ -167,11 +167,6 @@
     - Si se quiere atender mercado LATAM (es-419), traducir contenido
     - Decisión de scope con Kammler
 
-13. **PWA completa**
-    - `site.webmanifest` existe pero falta service worker
-    - Agregar service worker para offline + push notifications
-    - Output esperado: PWA instalable desde Chrome
-
 ---
 
 ## Archivos Clave

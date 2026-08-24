@@ -92,9 +92,8 @@ Eres un senior full-stack developer. Tu objetivo es ejecutar las tareas pendient
 ### P2 — backlog (cuando haya tiempo)
 
 7. **Evaluar D1 vs mocks para CRM data** — los `crmLeads` son estáticos, si el operador los usa de verdad hay que migrar a D1 o R2
-8. **PWA completa** — service worker + push notifications (manifest ya existe)
-9. **Imágenes optimizadas con Astro Image** — reemplazar `<img>` por `<Image>` de astro/assets
-10. **Code splitting admin** — `React.lazy()` + `Suspense` para CMSEditor, MediaEditor, IntelView
+8. **Imágenes optimizadas con Astro Image** — reemplazar `<img>` por `<Image>` de astro/assets
+9. **Code splitting admin** — `React.lazy()` + `Suspense` para CMSEditor, MediaEditor, IntelView
 
 ### P3 — nice to have
 

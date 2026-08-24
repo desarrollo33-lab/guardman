@@ -64,9 +64,6 @@ Migración 1:1 de `guardman-admin v1.0.0` (Cloudflare Worker monolítico + Vite/
 - `src/pages/sectores/[slug].astro` — landing por sector
 - `src/pages/ubicaciones/[slug].astro` — landing por ubicación con mapa Leaflet
 
-### PWA
-- `public/site.webmanifest` — manifest PWA
-
 ### Estilos — overhaul
 - `src/styles/global.css`: 14KB → 37KB (tokens dark, sistema de admin completo, clusters de linking)
 - `src/components/Footer.astro`: rediseñado (+4.5KB)
@@ -97,7 +94,6 @@ guardman-astro/
 ├── .env.production
 ├── public/
 │   ├── favicon.svg / .ico
-│   ├── site.webmanifest       # PWA
 │   ├── fonts/inter-*.ttf      # Inter (5 pesos)
 │   ├── styles/                # CSS vanilla originales preservados 1:1
 │   │   ├── site.css           # 318 líneas - design system público
