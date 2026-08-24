@@ -189,7 +189,7 @@ export const SERVICES: Record<string, ServiceContent> = {
     features: [
       { title: 'Planificación según tipo y tamaño', description: 'Diseño de protocolos de seguridad personalizados según el tipo de evento, número de asistentes y características del recinto.' },
       { title: 'Control de accesos y gestión de aforo', description: 'Registro de invitados, control de aforo y coordinación de flujos para evitar aglomeraciones y accesos no autorizados.' },
-      { title: 'Unidades Guardpod para perímetro', description: 'Vigilancia autónoma perimetral con cámaras PTZ y detección IA, ideal para eventos al aire libre o en recintos sin infraestructura.' },
+      { title: 'Unidades Guardpod para perímetro', description: 'Vigilancia autónoma perimetral con cámaras 360° y detección IA, ideal para eventos al aire libre o en recintos sin infraestructura.' },
       { title: 'Coordinación con Carabineros', description: 'Protocolos de coordinación directa con Carabineros para eventos de alta concurrencia y gestión de vías públicas.' },
       { title: 'Personal capacitado en emergencias', description: 'Guardias con formación en primeros auxilios, manejo de multitudes y evacuación de recintos.' },
       { title: 'Reporte post-evento con recomendaciones', description: 'Informe detallado de incidencias, tiempos de respuesta y recomendaciones de mejora para futuros eventos.' },
@@ -307,11 +307,11 @@ export const SERVICES: Record<string, ServiceContent> = {
     name: 'Guardpod',
     shortDesc: 'Unidades móviles de vigilancia 24/7 con tecnología avanzada',
     longDesc:
-      'Unidades autónomas de vigilancia con cámaras PTZ 360° y detección IA para zonas sin infraestructura.',
+      'Unidades autónomas de vigilancia con cámaras 360° y detección IA para zonas sin infraestructura.',
     heroBadge: 'Tecnología Propia GuardMan',
     heroTitle: 'Guardpod, vigilancia autónoma sin infraestructura',
     heroSub:
-      'Sistema autónomo de vigilancia con cámaras PTZ 360° con detección IA y monitoreo 24/7. Desarrollado durante 15 meses de I+D, sin necesidad de infraestructura eléctrica ni personal permanente.',
+      'Sistema autónomo de vigilancia con cámaras 360° y detección IA, monitoreo 24/7. Desarrollado durante 15 meses de I+D, sin necesidad de infraestructura eléctrica ni personal permanente.',
     features: [
       { title: 'Detección de intrusos con inteligencia artificial', description: 'Sensores avanzados que distinguen entre personas, vehículos y animales, reduciendo falsas alarmas y enviando alertas precisas.' },
       { title: 'Alimentación autónoma con baterías de litio', description: 'Baterías de alta capacidad que garantizan operación continua hasta 72 horas sin recarga. Recarga automática cuando vuelve a haber sol.' },
@@ -815,7 +815,7 @@ export const SECTORS: Record<string, SectorContent> = {
     intro: 'Las obras de construcción presentan vulnerabilidades únicas: perímetros abiertos, herramientas y materiales de alto valor expuestos, y períodos prolongados sin actividad. GuardMan Chile ofrece soluciones específicas para faenas, desde guardias presenciales hasta unidades Guardpod autónomas para terrenos sin infraestructura eléctrica.',
     features: [
       { title: 'Guardias con experiencia en faenas', description: 'Personal formado en la dinámica de obras de construcción, con conocimiento de riesgos específicos del rubro.' },
-      { title: 'Unidades Guardpod para terrenos sin infraestructura', description: 'Vigilancia autónoma con cámaras PTZ y detección IA para obras en terrenos baldíos o zonas sin electricidad.' },
+      { title: 'Unidades Guardpod para terrenos sin infraestructura', description: 'Vigilancia autónoma con cámaras 360° y detección IA para obras en terrenos baldíos o zonas sin electricidad.' },
       { title: 'Control de acceso con registro de trabajadores', description: 'Registro digital de entrada y salida de trabajadores, visitantes y vehículos autorizados en la faena.' },
       { title: 'Protección de bodegaje y maquinaria', description: 'Vigilancia de zonas donde se almacenan herramientas, materiales y equipos de alto valor.' },
       { title: 'Planes de emergencia para obras', description: 'Protocolos de evacuación y respuesta adaptados a las características específicas de cada proyecto en construcción.' },
@@ -866,7 +866,7 @@ export const SECTORS: Record<string, SectorContent> = {
     features: [
       { title: 'Planificación según tipo de evento', description: 'Diseño de protocolos personalizados para eventos corporativos, sociales, deportivos y culturales según tamaño y complejidad.' },
       { title: 'Control de accesos y gestión de aforo', description: 'Registro de invitados, control de aforo y coordinación de flujos para evitar aglomeraciones y accesos no autorizados.' },
-      { title: 'Unidades Guardpod para perímetro', description: 'Vigilancia autónoma con cámaras PTZ y detección IA para eventos al aire libre o en recintos sin infraestructura.' },
+      { title: 'Unidades Guardpod para perímetro', description: 'Vigilancia autónoma con cámaras 360° y detección IA para eventos al aire libre o en recintos sin infraestructura.' },
       { title: 'Coordinación con Carabineros', description: 'Protocolos de coordinación directa para eventos de alta concurrencia, desvíos de tránsito y permisos municipales.' },
       { title: 'Personal con formación en emergencias', description: 'Guardias capacitados en primeros auxilios, manejo de multitudes y evacuación de recintos.' },
       { title: 'Reporte post-evento', description: 'Informe detallado de incidencias, tiempos de respuesta y recomendaciones de mejora para futuros eventos.' },
@@ -1016,7 +1016,7 @@ export const NOSOTROS_TIMELINE = [
   { year: '2017', title: 'Consolidación en el mercado metropolitano', text: 'Tras sus primeros años, la empresa consolida su presencia en la Región Metropolitana, sumando sus primeros clientes corporativos y residenciales y fortaleciendo su academia interna de capacitación.' },
   { year: '2020', title: 'Inauguración del central de monitoreo', text: 'Se instala un central de monitoreo propio con tecnología de punta, permitiendo supervisión en tiempo real y respuesta inmediata, elevando los estándares de seguridad para los clientes.' },
   { year: '2023', title: 'Expansión a 200+ guardias y 14 comunas', text: 'GuardMan Chile supera los 200 guardias certificados OS-10, cubriendo 14 comunas de la Región Metropolitana, posicionándose como un actor relevante en la seguridad privada local.' },
-  { year: '2024', title: 'Lanzamiento de Guardpod', text: 'Se introduce Guardpod, un sistema autónomo de vigilancia que integra cámaras PTZ, detección por inteligencia artificial y alimentación autónoma, optimizando la gestión de seguridad para clientes.' },
+  { year: '2024', title: 'Lanzamiento de Guardpod', text: 'Se introduce Guardpod, un sistema autónomo de vigilancia que integra cámaras 360°, detección por inteligencia artificial y alimentación autónoma, optimizando la gestión de seguridad para clientes.' },
 ];
 
 // ─── Zonas (cobertura) ────────────────────────────────────────────

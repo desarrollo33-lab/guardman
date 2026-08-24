@@ -62,7 +62,7 @@ export const SERVICE_DESCRIPTIONS: Record<string, string> = {
   'seguridad-deportiva': 'Cobertura de seguridad OS-10 para recintos y eventos deportivos: control de acceso por tribuna, vigilancia perimetral, manejo de hinchadas y coordinación con Carabineros.',
   'seguridad-industrial': 'Vigilancia perimetral con rondas programadas y control de carga para plantas, bodegas y centros de distribución.',
   'auditoria-seguridad': 'Inspección en terreno de perímetros, CCTV, alarmas e iluminación con informe ejecutivo y plan de acción priorizado.',
-  'guard-pod': 'Sistema autónomo de vigilancia con cámaras PTZ 360°, detección de intrusos por IA y monitoreo 24/7 sin infraestructura eléctrica.',
+  'guard-pod': 'Sistema autónomo de vigilancia con cámaras 360°, detección de intrusos por IA y monitoreo 24/7 sin infraestructura eléctrica.',
   aseo: 'Servicio de aseo con personal uniformado, productos certificados y planes diurnos, nocturnos o de fin de semana.',
 };
 

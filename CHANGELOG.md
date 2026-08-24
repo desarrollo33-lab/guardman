@@ -2,6 +2,11 @@
 
 Todas las versiones relevantes del proyecto. Formato basado en [Keep a Changelog](https://keepachangelog.com/).
 
+## [5.5.7] - 2026-08-24
+
+### Resumen
+Corrección de copy: eliminadas 17 referencias a "cámaras PTZ" en 6 archivos. Las cámaras de Guardpod no son PTZ (pan-tilt-zoom). Reemplazo: "cámaras 360°" donde aplica (la cobertura 360° sigue siendo un claim válido, asumiendo implementación via lentes fijas gran angular o multi-cámara). Reescrita también la descripción del feature que mencionaba "movimiento horizontal, vertical y zoom" (específico de PTZ, ahora dice "cobertura 360°"). Archivos tocados: `src/lib/constants.ts`, `src/lib/content.ts`, `src/pages/guard-pod.astro`, `src/pages/index.astro`, `src/pages/nosotros.astro`, `docs/auditoria/fase-a-inventario.md`. Verificado live con curl: 0 matches de PTZ en /, /guard-pod, /nosotros, /servicios/guard-pod.
+
 ## [5.5.6] - 2026-08-24
 
 ### Resumen

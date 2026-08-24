@@ -23,7 +23,7 @@ const values = [
 ];
 
 const differentiators = [
-  { icon: 'bolt', title: 'Guardpod, tecnología propia con 15 meses de I+D', text: 'Sistema autónomo de vigilancia con cámaras PTZ 360° y detección por IA. Único en el mercado chileno, sustituye guardias presenciales a una fracción del costo en faenas, terrenos y eventos temporales sin infraestructura eléctrica ni personal permanente.' },
+  { icon: 'bolt', title: 'Guardpod, tecnología propia con 15 meses de I+D', text: 'Sistema autónomo de vigilancia con cámaras 360° y detección por IA. Único en el mercado chileno, sustituye guardias presenciales a una fracción del costo en faenas, terrenos y eventos temporales sin infraestructura eléctrica ni personal permanente.' },
   { icon: 'radar', title: 'Central de monitoreo propia 24/7', text: 'Operamos nuestra propia central de vigilancia, sin tercerizar. Supervisión en tiempo real, redundancia de sistemas y respuesta inmediata ante cada evento validado.' },
   { icon: 'shield', title: 'Certificación OS-10 vigente', text: 'Acreditación oficial de la Prefectura de Seguridad Privada de Carabineros de Chile, que respalda nuestro cumplimiento de la Ley 21.659 de seguridad privada.' },
   { icon: 'clock', title: 'Más de 10 años de trayectoria', text: 'Desde 2014 protegemos hogares, empresas e instituciones en la Región Metropolitana y Valparaíso, con un equipo estable y clientes recurrentes.' },
@@ -41,7 +41,7 @@ const faqs = [
   { question: '¿Cuántos años de experiencia tiene GuardMan Chile en seguridad privada?', answer: 'Operamos de forma continua desde 2014. Más de 10 años nos respaldan en la protección de hogares, empresas e instituciones en la Región Metropolitana y Valparaíso.' },
   { question: '¿Qué certificaciones y cumplimiento legal tienen sus guardias?', answer: 'Cada guardia cuenta con certificación OS-10 vigente, exigida por la Prefectura de Seguridad Privada de Carabineros de Chile, y nuestra operación cumple con la Ley 21.659 de seguridad privada vigente desde 2024.' },
   { question: '¿GuardMan tiene central de monitoreo propia?', answer: 'Sí. Operamos nuestra propia central de monitoreo 24/7, sin tercerizar el servicio. Esto nos permite supervisar en tiempo real cada alerta, validar eventos y coordinar respuesta con Carabineros o equipos en terreno cuando corresponde.' },
-  { question: '¿Qué es Guardpod y por qué es un diferenciador de GuardMan?', answer: 'Guardpod es un sistema autónomo de vigilancia desarrollado por GuardMan Chile durante 15 meses de I+D. Integra cámaras PTZ 360°, detección por inteligencia artificial y conexión a nuestra central propia, sin requerir infraestructura eléctrica ni personal permanente. Ninguna otra empresa de seguridad en Chile ofrece un sistema equivalente.' },
+  { question: '¿Qué es Guardpod y por qué es un diferenciador de GuardMan?', answer: 'Guardpod es un sistema autónomo de vigilancia desarrollado por GuardMan Chile durante 15 meses de I+D. Integra cámaras 360°, detección por inteligencia artificial y conexión a nuestra central propia, sin requerir infraestructura eléctrica ni personal permanente. Ninguna otra empresa de seguridad en Chile ofrece un sistema equivalente.' },
   { question: '¿En qué comunas y regiones opera GuardMan?', answer: 'Tenemos cobertura operativa directa en 14 comunas de la Región Metropolitana, además de Los Andes y San Felipe en la Región de Valparaíso, con capacidad de respuesta coordinada entre zonas.' },
   { question: '¿Puedo contratar solo guardias OS-10 sin monitoreo?', answer: 'Sí. Ofrecemos esquemas flexibles: guardias OS-10 con supervisión propia, monitoreo 24/7 desde nuestra central, unidades Guardpod para perímetros sin infraestructura, o combinaciones de estos servicios según las necesidades de cada cliente.' },
 ];
@@ -81,16 +81,30 @@ const faqs = [
           </div>
         </div>
         <div class="hero-visual">
-          <div class="hero-product">
-            <iframe
-              src="https://www.youtube.com/embed/mqpLsKrwjAI?autoplay=1&mute=1&rel=0&playsinline=1&controls=1&modestbranding=1&loop=1&playlist=mqpLsKrwjAI"
-              title="GuardMan Chile - Seguridad privada desde 2014"
+          <a
+            href="https://www.youtube.com/watch?v=mqpLsKrwjAI"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hero-product yt-lite"
+            data-yt="mqpLsKrwjAI"
+            aria-label="Ver video de GuardMan Chile en YouTube"
+            style="display:block;cursor:pointer;background-image:url('/images/nosotros-hero.jpg');background-size:cover;background-position:center"
+          >
+            <img
+              src="/images/nosotros-hero.jpg"
+              alt="GuardMan Chile - Seguridad privada desde 2014"
               loading="lazy"
-              allow="autoplay; encrypted-media; picture-in-picture"
-              allowfullscreen
-              style="position:absolute;inset:0;width:100%;height:100%;border:0"
-            ></iframe>
-          </div>
+              style="width:100%;height:100%;object-fit:cover;display:block;opacity:1"
+            />
+            <span
+              aria-hidden="true"
+              style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.25);transition:background .2s"
+            >
+              <span style="width:84px;height:60px;background:#ff0000;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.4)">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              </span>
+            </span>
+          </a>
         </div>
       </div>
     </div>

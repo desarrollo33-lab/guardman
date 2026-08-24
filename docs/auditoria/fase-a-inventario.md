@@ -17,7 +17,7 @@
 | 6 | `/ubicaciones/[slug]` | GET | SSR | No | Detalle de comuna con features, FAQs, mapa |
 | 7 | `/sectores` | GET | SSR | No | Índice de sectores industriales (10 sectores) |
 | 8 | `/sectores/[slug]` | GET | SSR | No | Detalle de sector (residencial, comercial, etc.) |
-| 9 | `/guard-pod` | GET | SSR | No | Landing Guardpod (vigilancia autónoma PTZ + IA) |
+| 9 | `/guard-pod` | GET | SSR | No | Landing Guardpod (vigilancia autónoma 360° + IA) |
 | 10 | `/ajax-systems` | GET | SSR | No | Landing Ajax Systems (alarmas, instalador oficial) |
 | 11 | `/nosotros` | GET | SSR | No | Página institucional: historia, valores, equipo |
 | 12 | `/contacto` | GET | SSR | No | Formulario de contacto (captura lead → CRM) |
