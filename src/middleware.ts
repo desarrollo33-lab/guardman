@@ -1,11 +1,14 @@
 // ════════════════════════════════════════════════════════════════
 // GuardMan — Middleware SSR
-//   1. Auth server-side para rutas /admin/* (excepto /admin/login)
+//   1. Auth server-side para rutas /admin/* (excepto /admin/login).
 //      Verifica cookie httpOnly `gm_session`. Sin cookie → 302 a /admin/login.
-//   2. Compresión Brotli/gzip de respuestas de texto (HTML, JS, CSS, JSON).
-//      Cloudflare Workers NO auto-comprime (a diferencia de Pages). Sin esto,
-//      el HTML sale a 189 KB sin comprimir → FCP/LCP suben 1-2s en lab.
+//   2. NO comprimimos en el worker. Cloudflare Workers runtime YA hace
+//      auto-compression en el edge de forma nativa (gzip/brotli según
+//      `Accept-Encoding` del cliente) y agrega `Content-Encoding` correctamente.
+//      Comprimir acá causa DOBLE compression: el browser descomprime UNA
+//      capa y queda single-gzip sin header → garbage en pantalla.
 //   3. Headers de seguridad en TODAS las respuestas.
+//   4. Vary: Accept-Encoding para que el edge cache respete la codificación.
 // ════════════════════════════════════════════════════════════════
 
 import { defineMiddleware } from 'astro:middleware';
@@ -15,60 +18,7 @@ const SESSION_COOKIE = 'gm_session';
 // Rutas admin que NO requieren sesión (página de login y assets de login).
 const ADMIN_PUBLIC = new Set(['/admin/login']);
 
-// Content types que SÍ vale la pena comprimir (texto). Imágenes/woff2 ya están
-// comprimidos; comprimir más solo agrega CPU sin reducir tamaño.
-const COMPRESSIBLE_TYPES = [
-  'text/html',
-  'text/css',
-  'text/javascript',
-  'application/javascript',
-  'application/json',
-  'application/xml',
-  'image/svg+xml',
-];
-
-// Helper: comprimir el body de una Response con Brotli o gzip según
-// `Accept-Encoding` del cliente. Retorna la misma Response con el body
-// comprimido y los headers `Content-Encoding` + `Vary` correctos.
-const compressResponse = async (
-  response: Response,
-  acceptEncoding: string | null,
-): Promise<Response> => {
-  const contentType = response.headers.get('Content-Type') ?? '';
-  const isCompressible = COMPRESSIBLE_TYPES.some((t) => contentType.includes(t));
-  if (!isCompressible || !response.body) return response;
-
-  // Si ya viene comprimido (caso edge cache o re-entrega), no re-comprimir.
-  if (response.headers.get('Content-Encoding')) return response;
-
-  // Brotli primero (mejor ratio). Fallback a gzip si el cliente no lo soporta.
-  const supportsBrotli = acceptEncoding?.includes('br') ?? false;
-  const supportsGzip = acceptEncoding?.includes('gzip') ?? false;
-  if (!supportsBrotli && !supportsGzip) return response;
-
-  const format: 'gzip' | 'deflate' = supportsBrotli ? 'gzip' : 'gzip';
-  // CompressionStream solo soporta 'gzip' | 'deflate' | 'deflate-raw' en runtime
-  // de Cloudflare Workers. Brotli nativo no está en CompressionStream, pero
-  // podemos usar 'gzip' que tiene soporte universal y reduce HTML 5-10x.
-  void supportsBrotli;
-  const encoding = supportsGzip ? 'gzip' : 'identity';
-  if (encoding === 'identity') return response;
-
-  const compressed = response.body.pipeThrough(new CompressionStream(format));
-  const headers = new Headers(response.headers);
-  headers.set('Content-Encoding', encoding);
-  headers.set('Vary', 'Accept-Encoding');
-  // Quitar Content-Length (cambia con la compresión) para que el runtime
-  // calcule el nuevo tamaño al enviar.
-  headers.delete('Content-Length');
-  return new Response(compressed, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
-};
-
-// Helper: agregar headers de seguridad a una Response.
+// Helper: agregar headers de seguridad + Vary a una Response.
 const addSecurityHeaders = (response: Response, contentType: string | null): Response => {
   const headers = new Headers(response.headers);
 
@@ -90,6 +40,14 @@ const addSecurityHeaders = (response: Response, contentType: string | null): Res
   // HSTS: solo si la respuesta es HTTPS. Cloudflare inyecta el request, así
   // que el worker ve https. Activar 1 año + subdominios.
   headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+
+  // Vary: Accept-Encoding — necesario para que el edge cache de Cloudflare
+  // guarde variantes separadas (gzip vs brotli vs identity) y no sirva la
+  // versión equivocada cuando el cliente cambia su Accept-Encoding.
+  const existingVary = headers.get('Vary') ?? '';
+  if (!existingVary.toLowerCase().includes('accept-encoding')) {
+    headers.set('Vary', existingVary ? `${existingVary}, Accept-Encoding` : 'Accept-Encoding');
+  }
 
   // CSP: solo para respuestas HTML. Permite inline styles y scripts propios.
   if (contentType && contentType.includes('text/html')) {
@@ -136,12 +94,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   // ── Continuar con la request ───────────────────────────────────
+  // Cloudflare runtime wrappea el response con auto-compression nativa
+  // (gzip/brotli) según `Accept-Encoding` del cliente, agregando
+  // `Content-Encoding` correctamente. NO comprimimos acá para evitar
+  // doble compression → garbage en el browser.
   const response = await next();
 
-  // ── Comprimir respuesta (gzip para text/html, text/css, JS, JSON) ──
-  const acceptEncoding = context.request.headers.get('Accept-Encoding');
-  const compressed = await compressResponse(response, acceptEncoding);
-
-  // ── Agregar headers de seguridad a la respuesta ────────────────
-  return addSecurityHeaders(compressed, response.headers.get('Content-Type'));
+  // ── Agregar headers de seguridad + Vary ────────────────────────
+  return addSecurityHeaders(response, response.headers.get('Content-Type'));
 });
