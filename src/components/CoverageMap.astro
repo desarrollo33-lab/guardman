@@ -62,7 +62,13 @@ const captionColor = variant === 'dark' ? 'rgba(255,255,255,.75)' : 'var(--muted
 <script is:inline define:vars={{ id, centerLat, centerLng, zoom, markers, showMarkers }}>
   (function () {
     var d = document.getElementById(id);
-    if (!d || typeof L === 'undefined') return;
+    if (!d) return;
+      // Init lazy: difiere el cost de L.map + tile loading hasta que el contenedor entre al viewport.
+      // CSS y JS de Leaflet ya están cargados sync arriba, así que L está disponible globalmente.
+      var io = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect();
+        if (typeof L === 'undefined') return;
     var map = L.map(d, {
       center: [centerLat, centerLng],
       zoom: zoom,
@@ -105,5 +111,7 @@ const captionColor = variant === 'dark' ? 'rgba(255,255,255,.75)' : 'var(--muted
         .bindPopup('<strong>GuardMan Chile</strong>')
         .openPopup();
     }
+      }, { rootMargin: '200px' });
+      io.observe(d);
   })();
 </script>

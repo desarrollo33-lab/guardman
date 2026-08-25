@@ -334,10 +334,17 @@ const markers = LOCATIONS.map((l) => {
   <!-- MAPA Leaflet + scripts -->
   <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="" />
   <script is:inline src="/vendor/leaflet/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin=""></script>
-  <script is:inline define:vars={{ markers }}>
+
+<script is:inline define:vars={{ markers }}>
     (function () {
       var d = document.getElementById('map-home');
-      if (!d || typeof L === 'undefined') return;
+      if (!d) return;
+      // Init lazy: difiere el cost de L.map + tile loading hasta que el contenedor entre al viewport.
+      // CSS y JS de Leaflet ya están cargados sync arriba, así que L está disponible globalmente.
+      var io = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect();
+        if (typeof L === 'undefined') return;
       var map = L.map(d, {
         center: [-33.45, -70.65],
         zoom: 10,
@@ -369,6 +376,8 @@ const markers = LOCATIONS.map((l) => {
       if (markers.length > 0) {
         map.fitBounds(bounds.pad(0.15));
       }
+      }, { rootMargin: '200px' });
+      io.observe(d);
     })();
   </script>
 

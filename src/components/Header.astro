@@ -20,7 +20,7 @@ const sectors = Object.entries(SECTOR_NAMES).map(([slug, name]) => ({ slug, name
 <header class={`site-header${darkClass}`} data-od-id="header">
   <div class="header-inner">
     <a href="/" class="logo" aria-label={SITE.NAME}>
-      <img src="/images/logo-byn.png" alt={SITE.NAME} class="logo-img" width="680" height="250" />
+      <img src="/images/logo-byn.png" srcset="/images/logo-byn-1x.png 1x, /images/logo-byn-2x.png 2x" sizes="(max-width: 768px) 120px, 181px" alt={SITE.NAME} class="logo-img" width="680" height="250" />
     </a>
     <nav id="nav-links">
       <div class="dropdown">

@@ -226,14 +226,21 @@ const hreflangs = hreflangTags(Astro.url.pathname);
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="mask-icon" href="/favicon.svg" color="#1A2744" />
 
-    {/* Preload del CSS legacy — baja el render-blocking efectivo (download en paralelo, ya en cache al aplicar) */}
+    {/* Preload LCP image (hero) — baja resource load delay 360ms → ~0 */}
+    <link rel="preload" as="image" href="/images/hero-home.webp" fetchpriority="high" />
+
+    {/* CSS: preload para descarga en paralelo + stylesheet sync.
+        El patrón async (`media="print" onload="this.media='all'"`) causa FOUC
+        y dispara CLS 0.9+ porque todo el <main> salta cuando el CSS aplica.
+        Mantener stylesheet sync preserva el primer paint estable. */}
     <link rel="preload" href="/styles/site.css?v=20260720" as="style" />
-    {/* Inter Variable se carga via @font-face en site.css; el preload aquí generaba warning de "unused" */}
-
-
-    {/* CSS originales (preservados 1:1) */}
     <link rel="stylesheet" href="/styles/site.css?v=20260720" />
-    {loadDarkCss && <link rel="stylesheet" href="/styles/dark.css?v=20260720" />}
+    {loadDarkCss && (
+      <>
+        <link rel="preload" href="/styles/dark.css?v=20260720" as="style" />
+        <link rel="stylesheet" href="/styles/dark.css?v=20260720" />
+      </>
+    )}
 
     {/* JSON-LD structured data — todos los schemas */}
     {allSchemas.map((schema) => (
