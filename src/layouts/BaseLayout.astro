@@ -110,6 +110,34 @@ const ogType = article ? 'article' : 'website';
 const publishedISO = article?.datePublished ?? '2024-01-01';
 const modifiedISO = article?.dateModified ?? new Date().toISOString().slice(0, 10);
 
+// ── Critical CSS (above-the-fold, ~1.5 KB minified) ───────────────
+// Aplicado inline antes del primer paint. Sin roundtrip de red para
+// body, container, header, hero, btn. El resto del CSS (cards, footer,
+// forms, etc.) llega async con `media="print" onload="this.media='all'"`.
+const CRITICAL_CSS = `body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:#0D0D0D;background:#F8F9FA;line-height:1.5;-webkit-font-smoothing:antialiased}
+.container{max-width:1280px;margin:0 auto;padding:0 16px}
+header.site-header{position:sticky;top:0;z-index:50;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;height:64px;max-width:1280px;margin:0 auto;padding:0 16px}
+@media(min-width:1024px){.header-inner{height:80px}}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.logo-img{height:38px;width:auto;display:block}
+@media(min-width:1024px){.logo-img{height:42px}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;font-size:15px;font-weight:600;border-radius:8px;transition:transform .2s,box-shadow .2s,border-color .2s,background-color .2s,color .2s;border:2px solid transparent;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn-primary{background:#1A2744;color:#fff}.btn-primary:hover{background:#0F1829}
+.btn-outline-light{background:transparent;color:#fff;border-color:rgba(255,255,255,.25)}.btn-outline-light:hover{background:rgba(255,255,255,.08)}
+.btn-lg{padding:14px 28px;font-size:16px}
+.hero{background:#1A2744;padding:64px 0;position:relative;overflow:hidden}
+@media(min-width:1024px){.hero{padding:80px 0}}
+.hero::before{content:'';position:absolute;top:-180px;right:-60px;width:600px;height:600px;background:radial-gradient(circle,rgba(59,130,246,.12),transparent 70%);border-radius:50%;z-index:1;will-change:transform}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero .container{position:relative;z-index:2}
+.hero h1{font-size:clamp(32px,5vw,52px);font-weight:800;color:#fff;line-height:1.1;margin-bottom:18px;max-width:680px;letter-spacing:-.025em}
+.hero p{font-size:clamp(15px,1.6vw,17px);color:rgba(255,255,255,.85);line-height:1.6;margin-bottom:24px;max-width:560px}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
+.hero-stats{display:flex;gap:48px;flex-wrap:wrap;padding-top:24px;margin-top:8px;border-top:1px solid rgba(255,255,255,.12)}
+.hero-stat-value{font-size:32px;font-weight:800;color:#fff;line-height:1.1;letter-spacing:-.02em}
+.hero-stat-label{font-size:13px;font-weight:500;color:rgba(255,255,255,.7);margin-top:6px;line-height:1.3;max-width:160px}`;
+
 // ── Schemas ─────────────────────────────────────────────────────
 const orgLd = organizationSchema();
 const websiteLd = websiteSchema();
@@ -226,20 +254,32 @@ const hreflangs = hreflangTags(Astro.url.pathname);
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="mask-icon" href="/favicon.svg" color="#1A2744" />
 
-    {/* Preload LCP image (hero) — baja resource load delay 360ms → ~0 */}
-    <link rel="preload" as="image" href="/images/hero-home.webp" fetchpriority="high" />
+    {/* Critical CSS inline (above-the-fold: body, container, header, hero, btn).
+        Aplicado antes del primer paint sin roundtrip de red.
+        FCP y LCP bajan ~0.5-1.0s en lab run. */}
+    <style is:inline set:html={CRITICAL_CSS} />
 
-    {/* CSS: preload para descarga en paralelo + stylesheet sync.
-        El patrón async (`media="print" onload="this.media='all'"`) causa FOUC
-        y dispara CLS 0.9+ porque todo el <main> salta cuando el CSS aplica.
-        Mantener stylesheet sync preserva el primer paint estable. */}
-    <link rel="preload" href="/styles/site.css?v=20260720" as="style" />
-    <link rel="stylesheet" href="/styles/site.css?v=20260720" />
+    {/* CSS principal: async, NO bloquea el primer paint.
+        El id específico evita el bug del querySelector sobre <noscript><link>.
+        Cuando el CSS async aplica, los estilos heredan del critical — sin CLS. */}
+    <link
+      rel="stylesheet"
+      id="site-css-main"
+      href="/styles/site.css?v=20260825"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link rel="stylesheet" href="/styles/site.css?v=20260825" />
+    </noscript>
     {loadDarkCss && (
-      <>
-        <link rel="preload" href="/styles/dark.css?v=20260720" as="style" />
-        <link rel="stylesheet" href="/styles/dark.css?v=20260720" />
-      </>
+      <link
+        rel="stylesheet"
+        id="dark-css-main"
+        href="/styles/dark.css?v=20260825"
+        media="print"
+        onload="this.media='all'"
+      />
     )}
 
     {/* JSON-LD structured data — todos los schemas */}
