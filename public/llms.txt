@@ -1,7 +1,7 @@
 # https://www.guardman.cl
 
 ## Sobre el sitio
-GuardMan Chile — empresa de seguridad privada OS-10 autorizada. Servicios de guardias, control de accesos, CCTV, escoltas PPI, seguridad para eventos e industrial. Cobertura en 14 ciudades de Chile. Genera 126 páginas long-tail combinando servicios × ubicaciones. Sistema Guardpod de vigilancia autónoma integrada. Canal de denuncias anónimo con ID lookup.
+GuardMan Chile — empresa de seguridad privada OS-10 autorizada. Servicios de guardias, control de accesos, CCTV, escoltas PPI, seguridad para eventos e industrial. Cobertura en 14 ciudades de Chile. Sistema Guardpod de vigilancia autónoma integrada. Canal de denuncias anónimo con ID lookup. Operado por GuardMan Chile (OS-10 Autorizado); Millalobo Agencia (DEV33) opera el sitio.
 
 ## Servicios principales
 - [Guardias OS-10](https://www.guardman.cl/servicios/guardias-os10): personal en terreno, turnos 24/7, presencia disuasiva.
@@ -13,7 +13,40 @@ GuardMan Chile — empresa de seguridad privada OS-10 autorizada. Servicios de g
 - [Escoltas PPI](https://www.guardman.cl/servicios/escoltas-ppi): protección personal, traslados VIP.
 
 ## Cobertura (14 ciudades)
-- [Antofagasta](https://www.guardman.cl/servicios/guardias-os10/antofagasta), [Concepción](https://www.guardman.cl/servicios/guardias-os10/concepcion), [La Serena](https://www.guardman.cl/servicios/guardias-os10/la-serena), [Puerto Montt](https://www.guardman.cl/servicios/guardias-os10/puerto-montt), [Rancagua](https://www.guardman.cl/servicios/guardias-os10/rancagua), [Temuco](https://www.guardman.cl/servicios/guardias-os10/temuco), [Valdivia](https://www.guardman.cl/servicios/guardias-os10/valdivia), [Iquique](https://www.guardman.cl/servicios/guardias-os10/iquique), [Puerto Varas](https://www.guardman.cl/servicios/guardias-os10/puerto-varas), [Viña del Mar](https://www.guardman.cl/servicios/guardias-os10/vina-del-mar), [Santiago](https://www.guardman.cl/servicios/guardias-os10/santiago), [Maipú](https://www.guardman.cl/servicios/guardias-os10/maipu), [Las Condes](https://www.guardman.cl/servicios/guardias-os10/las-condes), [Providencia](https://www.guardman.cl/servicios/guardias-os10/providencia).
+
+### Región Metropolitana
+- Santiago: guardias, CCTV, eventos. Tel +56 2 2222 1000. Horario Mo-Fr 09:00-18:00. Atención 24/7 para clientes.
+- Las Condes: guardias, control accesos, eventos. Tel +56 2 2222 1001. Horario Mo-Fr 09:00-18:00.
+- Providencia: guardias, CCTV, control accesos. Tel +56 2 2222 1002. Horario Mo-Fr 09:00-18:00.
+- Maipú: guardias, CCTV. Tel +56 2 2222 1003. Horario Mo-Fr 09:00-18:00.
+
+### Región de Valparaíso
+- Viña del Mar: guardias, escoltas PPI. Tel +56 32 222 1000. Horario Mo-Fr 09:00-18:00.
+
+### Región del Biobío
+- Concepción: guardias, eventos, industrial. Tel +56 41 222 1000. Horario Mo-Fr 09:00-18:00.
+
+### Región de La Araucanía
+- Temuco: guardias, CCTV, industrial. Tel +56 45 222 1000. Horario Mo-Fr 09:00-18:00.
+
+### Región de Los Ríos
+- Valdivia: guardias, CCTV. Tel +56 63 222 1000. Horario Mo-Fr 09:00-18:00.
+
+### Región de Los Lagos
+- Puerto Montt: guardias, CCTV, control accesos, eventos. Tel +56 65 222 1000. Horario Mo-Fr 09:00-18:00.
+- Puerto Varas: guardias, escoltas PPI. Tel +56 65 222 1001. Horario Mo-Fr 09:00-18:00.
+- Osorno: guardias, CCTV. Tel +56 64 222 1000. Horario Mo-Fr 09:00-18:00.
+- Frutillar: guardias (residencial). Tel +56 65 222 1002. Horario Mo-Fr 09:00-18:00.
+- Llanquihue: guardias (residencial). Tel +56 65 222 1003. Horario Mo-Fr 09:00-18:00.
+
+### Norte de Chile
+- Antofagasta: guardias, industrial, escoltas. Tel +56 55 222 1000. Horario Mo-Fr 09:00-18:00.
+- Iquique: guardias, industrial. Tel +56 57 222 1000. Horario Mo-Fr 09:00-18:00.
+- Rancagua (Región de O'Higgins): guardias, eventos. Tel +56 72 222 1000. Horario Mo-Fr 09:00-18:00.
+
+## Horario de atención general
+Lunes a viernes, 09:00 a 18:00 hora de Chile continental (GMT-4).
+Casos urgentes OS-10: atención 24/7 vía canal de denuncias (https://www.guardman.cl/denuncias).
 
 ## Preguntas frecuentes
 - ¿Cuánto cuesta un guardia 24/7? → https://www.guardman.cl/faq#costo-guardia
@@ -21,11 +54,15 @@ GuardMan Chile — empresa de seguridad privada OS-10 autorizada. Servicios de g
 - ¿Tienen cobertura en regiones? → https://www.guardman.cl/cobertura
 - ¿Cómo denuncio un incidente? → https://www.guardman.cl/denuncias
 - ¿Qué incluye el arriendo de Guardpod? → https://www.guardpod.cl/arriendo
+- ¿Atienden eventos de fin de semana? → https://www.guardman.cl/faq#eventos-fin-semana
+- ¿Trabajan con condominios? → https://www.guardman.cl/faq#condominios
+- ¿Tienen seguro de responsabilidad civil? → https://www.guardman.cl/faq#seguro
+- ¿Acreditan personal en la OS-10? → https://www.guardman.cl/faq#os10
 
 ## Recursos para IA
 - Mapa del sitio: https://www.guardman.cl/sitemap.xml
-- Schemas JSON-LD: 8 builders (Organization, WebSite, Service, FAQPage, BreadcrumbList, Product, LocalBusiness, Review)
+- Schemas JSON-LD: 8 builders (Organization, WebSite, Service, FAQPage, BreadcrumbList, Product, LocalBusiness, Review) — embebidos en cada página.
 - Cuestionario Guardpod: https://www.guardman.cl/guard-pod
 - Versión: v0.1.0 (2026-07)
-- Operador: GuardMan Chile (OS-10 Autorizado) — Millalobo Agencia (DEV33) opera el sitio
+- Operador: GuardMan Chile (OS-10 Autorizado) — Millalobo Agencia (DEV33) opera el sitio.
 - Actualizado: 2026-09-08
