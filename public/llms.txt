@@ -1,0 +1,31 @@
+# https://www.guardman.cl
+
+## Sobre el sitio
+GuardMan Chile — empresa de seguridad privada OS-10 autorizada. Servicios de guardias, control de accesos, CCTV, escoltas PPI, seguridad para eventos e industrial. Cobertura en 14 ciudades de Chile. Genera 126 páginas long-tail combinando servicios × ubicaciones. Sistema Guardpod de vigilancia autónoma integrada. Canal de denuncias anónimo con ID lookup.
+
+## Servicios principales
+- [Guardias OS-10](https://www.guardman.cl/servicios/guardias-os10): personal en terreno, turnos 24/7, presencia disuasiva.
+- [CCTV fijo](https://www.guardman.cl/servicios/cctv): cámaras cableadas, grabación continua, monitoreo remoto.
+- [Control de accesos](https://www.guardman.cl/servicios/control-accesos): biométrico, QR, tarjetas, integración con portería.
+- [Seguridad eventos](https://www.guardman.cl/servicios/seguridad-eventos): equipo en ferias, conciertos, eventos corporativos.
+- [Seguridad industrial](https://www.guardman.cl/servicios/seguridad-industrial): faenas, bodegas, plantas de producción.
+- [Auditoría de seguridad](https://www.guardman.cl/servicios/auditoria): análisis de vulnerabilidades, plan de mitigación.
+- [Escoltas PPI](https://www.guardman.cl/servicios/escoltas-ppi): protección personal, traslados VIP.
+
+## Cobertura (14 ciudades)
+- [Antofagasta](https://www.guardman.cl/servicios/guardias-os10/antofagasta), [Concepción](https://www.guardman.cl/servicios/guardias-os10/concepcion), [La Serena](https://www.guardman.cl/servicios/guardias-os10/la-serena), [Puerto Montt](https://www.guardman.cl/servicios/guardias-os10/puerto-montt), [Rancagua](https://www.guardman.cl/servicios/guardias-os10/rancagua), [Temuco](https://www.guardman.cl/servicios/guardias-os10/temuco), [Valdivia](https://www.guardman.cl/servicios/guardias-os10/valdivia), [Iquique](https://www.guardman.cl/servicios/guardias-os10/iquique), [Puerto Varas](https://www.guardman.cl/servicios/guardias-os10/puerto-varas), [Viña del Mar](https://www.guardman.cl/servicios/guardias-os10/vina-del-mar), [Santiago](https://www.guardman.cl/servicios/guardias-os10/santiago), [Maipú](https://www.guardman.cl/servicios/guardias-os10/maipu), [Las Condes](https://www.guardman.cl/servicios/guardias-os10/las-condes), [Providencia](https://www.guardman.cl/servicios/guardias-os10/providencia).
+
+## Preguntas frecuentes
+- ¿Cuánto cuesta un guardia 24/7? → https://www.guardman.cl/faq#costo-guardia
+- ¿Cuánto tarda la instalación de CCTV? → https://www.guardman.cl/faq#plazo-cctv
+- ¿Tienen cobertura en regiones? → https://www.guardman.cl/cobertura
+- ¿Cómo denuncio un incidente? → https://www.guardman.cl/denuncias
+- ¿Qué incluye el arriendo de Guardpod? → https://www.guardpod.cl/arriendo
+
+## Recursos para IA
+- Mapa del sitio: https://www.guardman.cl/sitemap.xml
+- Schemas JSON-LD: 8 builders (Organization, WebSite, Service, FAQPage, BreadcrumbList, Product, LocalBusiness, Review)
+- Cuestionario Guardpod: https://www.guardman.cl/guard-pod
+- Versión: v0.1.0 (2026-07)
+- Operador: GuardMan Chile (OS-10 Autorizado) — Millalobo Agencia (DEV33) opera el sitio
+- Actualizado: 2026-09-08

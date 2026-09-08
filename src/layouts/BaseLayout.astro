@@ -287,6 +287,8 @@ const hreflangs = hreflangTags(Astro.url.pathname);
       <script type="application/ld+json" set:html={JSON.stringify(schema)} />
     ))}
 
+    <link rel="llms-txt" href="/llms.txt" type="text/markdown" />
+
     <slot name="head" />
   </head>
   <body data-theme={theme} class:list={[theme === 'dark' && 'dark-page']}>
