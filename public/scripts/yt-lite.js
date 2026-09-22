@@ -23,7 +23,10 @@
 
   document.addEventListener('click', function (e) {
     var el = e.target.closest('.yt-lite');
-    if (el) activate(el);
+    if (!el) return;
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    activate(el);
   });
 
   document.addEventListener('keydown', function (e) {

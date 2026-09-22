@@ -21,7 +21,10 @@
     "head_sampling_rate": 1
   },
   "vars": {
-    "PUBLIC_API_URL": "https://guardman.oficinadesarrollo33.workers.dev",
+    // Login / refresh / logout viven en este mismo worker (consolidación
+    // 2026-09-22 — antes apuntaban a `guardman.oficinadesarrollo33.workers.dev`
+    // que está muerto). Same-origin resuelve CORS y CSP de un plumazo.
+    "PUBLIC_API_URL": "",
     "PUBLIC_SITE_URL": "https://guardman.cl"
   },
   "d1_databases": [

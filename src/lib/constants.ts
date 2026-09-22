@@ -11,11 +11,14 @@ export const SITE = {
   DESCRIPTION:
     'GuardMan Chile - Seguridad privada con certificación OS-10. Guardias, CCTV, control de accesos, PPI (Protección de Personas Importantes), monitoreo 24/7, Guardpod y Ajax Systems. Cobertura en 14 comunas de la Región Metropolitana y zona de Valparaíso.',
   URL: import.meta.env.PUBLIC_SITE_URL ?? 'https://guardman.cl',
-  API_URL: import.meta.env.PUBLIC_API_URL ?? 'https://guardman.oficinadesarrollo33.workers.dev',
+  // Login / refresh / logout viven en este mismo worker (same-origin).
+  // Fallback cadena vacía = `${apiUrl}/api/login` se vuelve `/api/login`
+  // (ruta relativa, sin CORS, sin CSP extra).
+  API_URL: import.meta.env.PUBLIC_API_URL ?? '',
   PHONE: '+56 9 300 000 10',
   PHONE_TEL: '+56930000010',
   EMAIL_INFO: 'info@guardman.cl',
-  EMAIL_VENTAS: 'ventas@guardman.cl',
+  EMAIL_VENTAS: 'info@guardman.cl',
   ADDRESS: 'Av. Américo Vespucio 1940, Oficina 301-01, Núcleo Vespucio',
   RUT: '77.123.456-7',
   FOUNDED_YEAR: 2014,

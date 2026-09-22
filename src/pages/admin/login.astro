@@ -1,7 +1,7 @@
 ---
 // /admin/login — página de login (sin AdminLayout para evitar auth guard).
 import '../../styles/global.css';
-import { SITE, BUNDLE_VERSION } from '../../lib/constants';
+import { SITE } from '../../lib/constants';
 
 const redirect = Astro.url.searchParams.get('redirect') ?? '/admin';
 ---
@@ -16,33 +16,85 @@ const redirect = Astro.url.searchParams.get('redirect') ?? '/admin';
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body data-theme="dark" class="login-body">
-    <form id="login-form" class="login-card">
-      <div class="login-logo">
-        <div class="shield">🛡️</div>
-        <span>GuardMan Admin</span>
-      </div>
-      <h2>Bienvenido</h2>
-      <p class="sub">Panel de Administración {BUNDLE_VERSION}</p>
+    <div class="login-shell">
+      <!-- ═══════ Panel de marca (desktop) ═══════ -->
+      <aside class="login-brand" aria-hidden="true">
+        <div class="brand-grid"></div>
+        <div class="brand-glow"></div>
+        <div class="brand-inner">
+          <div class="brand-mark">
+            <img src="/images/logo-icon.png" alt="" class="brand-logo" />
+            <span class="brand-name">GuardMan</span>
+          </div>
+          <h1 class="brand-headline">Centro de Operaciones</h1>
+        </div>
+      </aside>
 
-      <div id="login-error" class="login-error" hidden></div>
+      <!-- ═══════ Formulario ═══════ -->
+      <main class="login-panel">
+        <form id="login-form" class="login-card" novalidate>
+          <div class="login-mobile-brand">
+            <img src="/images/logo-icon.png" alt="" class="brand-logo" />
+            <span>GuardMan</span>
+          </div>
+          <header class="login-header">
+            <h2>Bienvenido</h2>
+            <p class="sub">Ingresa tus credenciales para acceder al panel.</p>
+          </header>
 
-      <div class="login-field">
-        <label for="email">Correo electrónico</label>
-        <input id="email" type="email" name="email" required autocomplete="username" />
-      </div>
-      <div class="login-field">
-        <label for="password">Contraseña</label>
-        <input id="password" type="password" name="password" placeholder="••••••••" required />
-      </div>
+          <div id="login-error" class="login-error" role="alert" hidden></div>
 
-      <button type="submit" id="login-btn" class="login-btn">
-        <span id="login-btn-text">Iniciar Sesión</span>
-      </button>
+          <div class="login-field">
+            <label for="email">Correo electrónico</label>
+            <div class="login-input-wrap">
+              <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 16.5v-9Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="m4 8 8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <input id="email" type="email" name="email" required autocomplete="username" placeholder="tu@correo.cl" />
+            </div>
+          </div>
 
-      <div class="login-cert">
-        <span class="cert-badge">OS-10 Autorizado</span>
-      </div>
-    </form>
+          <div class="login-field">
+            <label for="password">Contraseña</label>
+            <div class="login-input-wrap">
+              <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="12" cy="15" r="1.2" fill="currentColor"/>
+              </svg>
+              <input id="password" type="password" name="password" placeholder="••••••••" required autocomplete="current-password" />
+              <button type="button" id="toggle-pass" class="login-pass-toggle" aria-label="Mostrar contraseña" aria-pressed="false">
+                <svg class="eye-show" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                <svg class="eye-hide" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M3 3l18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M10.6 6.2A10.7 10.7 0 0 1 12 6c6.5 0 10 6 10 6a17.6 17.6 0 0 1-3.1 3.9M6.6 6.6A17.6 17.6 0 0 0 2 12s3.5 6 10 6c1.5 0 2.9-.3 4.1-.8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="login-btn" class="login-btn">
+            <span id="login-btn-text">Iniciar sesión</span>
+            <svg class="login-btn-arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="login-meta">
+            <span class="cert-badge">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.5 9.4 8 11 4.5-1.6 8-6 8-11V5l-8-3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              OS-10 autorizado
+            </span>
+            <span class="cert-sep">·</span>
+            <span class="cert-text">Acceso restringido</span>
+          </div>
+        </form>
+      </main>
+    </div>
 
     <script is:inline define:vars={{ redirect, apiUrl: SITE.API_URL }}>
       // ════════════════════════════════════════════════════════════
@@ -87,16 +139,40 @@ const redirect = Astro.url.searchParams.get('redirect') ?? '/admin';
       const errBox = document.getElementById('login-error');
       const btn = document.getElementById('login-btn');
       const btnText = document.getElementById('login-btn-text');
+      const btnArrow = btn?.querySelector('.login-btn-arrow');
 
       const showError = (msg) => {
         errBox.hidden = false;
-        errBox.textContent = '⚠️ ' + msg;
+        errBox.textContent = '⚠ ' + msg;
+        errBox.classList.remove('shake');
+        // restart animation
+        void errBox.offsetWidth;
+        errBox.classList.add('shake');
       };
 
       const lockUI = () => {
         btn.disabled = true;
         btnText.textContent = 'Bloqueado — espera ' + lockSeconds() + 's';
+        if (btnArrow) btnArrow.style.display = 'none';
       };
+
+      const unlockUI = () => {
+        btn.disabled = false;
+        btnText.textContent = 'Iniciar sesión';
+        if (btnArrow) btnArrow.style.display = '';
+      };
+
+      // Password visibility toggle
+      const passInput = document.getElementById('password');
+      const passToggle = document.getElementById('toggle-pass');
+      if (passToggle && passInput) {
+        passToggle.addEventListener('click', () => {
+          const shown = passInput.type === 'text';
+          passInput.type = shown ? 'password' : 'text';
+          passToggle.setAttribute('aria-pressed', String(!shown));
+          passToggle.setAttribute('aria-label', shown ? 'Mostrar contraseña' : 'Ocultar contraseña');
+        });
+      }
 
       // If already locked on load, disable the form
       if (isLocked()) {
@@ -104,8 +180,7 @@ const redirect = Astro.url.searchParams.get('redirect') ?? '/admin';
         showError('Demasiados intentos. Espera ' + lockSeconds() + 's antes de reintentar.');
         setInterval(() => {
           if (!isLocked()) {
-            btn.disabled = false;
-            btnText.textContent = 'Iniciar Sesión';
+            unlockUI();
             errBox.hidden = true;
           } else {
             btnText.textContent = 'Bloqueado — espera ' + lockSeconds() + 's';
@@ -123,7 +198,8 @@ const redirect = Astro.url.searchParams.get('redirect') ?? '/admin';
         }
 
         btn.disabled = true;
-        btnText.innerHTML = '<span class="spinner"></span> Conectando...';
+        btnText.textContent = 'Conectando…';
+        if (btnArrow) btnArrow.style.display = 'none';
 
         try {
           const email = form.email.value;
@@ -170,11 +246,17 @@ const redirect = Astro.url.searchParams.get('redirect') ?? '/admin';
           }
 
           clearAttempts();
+          btnText.textContent = 'Acceso concedido';
+          if (btnArrow) btnArrow.style.display = '';
           window.location.href = redirect;
         } catch (err) {
           showError(err.message);
           btn.disabled = isLocked();
-          btnText.textContent = isLocked() ? 'Bloqueado' : 'Iniciar Sesión';
+          if (isLocked()) {
+            lockUI();
+          } else {
+            unlockUI();
+          }
         }
       });
 

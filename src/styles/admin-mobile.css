@@ -425,20 +425,23 @@
   .settings-grid { grid-template-columns: 1fr; gap: 12px; }
 }
 
-/* ── Login: padding más amigable ──────────────────────── */
+/* ── Login: padding más amigable en mobile ───────────── */
 @media (max-width: 480px) {
   .login-card {
     padding: 32px 22px 28px;
     border-radius: 14px;
   }
-  .login-card h2 { font-size: 18px; }
-  .login-card .sub { font-size: 12px; margin-bottom: 18px; }
-  .login-logo { margin-bottom: 20px; }
-  .login-logo span { font-size: 13px; }
+  .login-card h2 { font-size: 20px; }
+  .login-card .sub { font-size: 13px; }
+  .login-mobile-brand { font-size: 14px; }
+  .login-mobile-brand .brand-logo { width: 20px; height: 20px; }
   .login-field label { font-size: 11px; }
-  .login-field input { font-size: 15px; padding: 10px 12px; }
-  .login-btn { padding: 11px 16px; font-size: 14px; }
-  .login-cert { margin-top: 14px; }
+  .login-input-wrap input { font-size: 15px; padding: 11px 12px 11px 38px; }
+  .login-input-icon { left: 11px; width: 16px; height: 16px; }
+  .login-btn { padding: 12px 16px; font-size: 14px; }
+  .login-meta { font-size: 10px; gap: 6px; }
+  .login-meta .cert-badge { font-size: 10px; padding: 3px 8px; }
+  .login-meta .cert-badge svg { width: 11px; height: 11px; }
 }
 
 /* ── Touch targets: 44px mínimo para inputs/botones ──── */
