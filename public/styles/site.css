@@ -74,7 +74,7 @@ nav{display:none;align-items:center;gap:32px}@media(min-width:1024px){nav{displa
 
 /* ── Section labels / titles ── */
 section{padding:80px 0}@media(max-width:767px){section{padding:56px 0}}
-.section-label{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);margin-bottom:8px}
+.section-label{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--accent-text);margin-bottom:8px}
 .section-title{font-size:clamp(28px,4vw,40px);font-weight:800;color:var(--fg);line-height:1.15;margin-bottom:12px;letter-spacing:-0.015em}
 .section-subtitle{font-size:18px;color:var(--muted);max-width:600px;line-height:1.5}
 
@@ -209,7 +209,7 @@ footer.site-footer{background:var(--fg);color:#fff;padding:64px 0 32px}
 .card-tag{position:absolute;top:12px;right:12px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:var(--radius-full);text-transform:uppercase;letter-spacing:.03em}
 .card-body{padding:20px;flex:1;display:flex;flex-direction:column}.card-body h3{font-size:18px;font-weight:700;margin-bottom:8px;line-height:1.3}
 .card-body p{font-size:15px;color:var(--muted);line-height:1.55;flex:1}
-.card-link{margin-top:14px;font-size:13px;font-weight:600;color:var(--accent);display:inline-flex;align-items:center;gap:4px}.card-link:hover{color:var(--accent-hover)}.card-link svg{width:16px;height:16px;transition:transform .2s var(--ease)}.card-link:hover svg{transform:translateX(4px)}
+.card-link{margin-top:14px;font-size:13px;font-weight:600;color:var(--accent-text);display:inline-flex;align-items:center;gap:4px}.card-link:hover{color:var(--accent-hover)}.card-link svg{width:16px;height:16px;transition:transform .2s var(--ease)}.card-link:hover svg{transform:translateX(4px)}
 .card-icon{width:40px;height:40px;border-radius:var(--radius-md);background:var(--primary-pale);display:flex;align-items:center;justify-content:center;margin-bottom:12px;color:var(--primary)}.card-icon svg{width:20px;height:20px}
 
 /* ── Tags ── */

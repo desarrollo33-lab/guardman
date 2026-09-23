@@ -522,17 +522,17 @@ main { display: block; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--gm-accent);
+  color: var(--gm-accent-text);
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
   padding: 8px 16px;
-  border: 1px solid var(--gm-accent);
+  border: 1px solid var(--gm-accent-text);
   border-radius: 999px;
   transition: all 200ms ease;
 }
 .step-cta:hover {
-  background: var(--gm-accent);
+  background: var(--gm-accent-text);
   color: #fff;
 }
 .step-arrow {

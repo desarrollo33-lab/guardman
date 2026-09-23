@@ -15,6 +15,9 @@
   --gm-accent: #3B82F6;
   --gm-accent-hover: #2563EB;
   --gm-accent-soft: rgba(59, 130, 246, 0.1);
+  /* Accent on light text — ≥4.5:1 over white (WCAG AA normal text).
+     Use for section-label, card-link, step-cta, etc. — not for borders/hovers. */
+  --gm-accent-text: #1D4ED8;
 
   /* Semantic */
   --gm-success: #10B981;
@@ -137,6 +140,7 @@
   --primary-dark: var(--gm-primary-dark);
   --accent: var(--gm-accent);
   --accent-hover: var(--gm-accent-hover);
+  --accent-text: var(--gm-accent-text);
   --success: var(--gm-success);
   --warning: var(--gm-warning);
   --error: var(--gm-error);

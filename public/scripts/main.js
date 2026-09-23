@@ -23,7 +23,11 @@
   document.querySelectorAll('.faq-item').forEach(function(item) {
     item.addEventListener('toggle', function() {
       if (item.open) {
-        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // Wrap in rAF to avoid forced reflow on the toggle handler (was 380ms desktop).
+        // Browser flushes layout on next frame instead of synchronously here.
+        requestAnimationFrame(function() {
+          item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
       }
     });
   });

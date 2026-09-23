@@ -10,10 +10,15 @@ import LeadCTA from '../components/LeadCTA.astro';
 import TrustSignals from '../components/TrustSignals.astro';
 import HowItWorks from '../components/HowItWorks.astro';
 
+// srcset only when source >= 732w; small assets (<500w) ship as-is
+// (re-encoding makes them larger — verified via sharp).
+const SRCSET_SLUGS = new Set(['aseo', 'guard-pod', 'guard-pod-intro', 'seguridad-deportiva']);
+
 const servicios = Object.entries(SERVICE_NAMES).map(([slug, name]) => ({
   slug,
   name,
   description: SERVICES[slug].shortDesc,
+  hasSrcset: SRCSET_SLUGS.has(slug),
   icon: SERVICE_ICONS[slug] ?? '',
 }));
 
@@ -166,7 +171,14 @@ const markers = LOCATIONS.map((l) => {
         {servicios.map((s) => (
           <a href={`/servicios/${s.slug}`} class="card">
             <div class="card-image">
-              <img src={`/images/service-${s.slug}.webp`} alt={s.name} loading="lazy" decoding="async" width="400" height="240" onerror="this.src='/images/hero-home.webp';this.onerror=null" />
+              <img
+                src={s.hasSrcset ? `/images/service-${s.slug}-732.webp` : `/images/service-${s.slug}.webp`}
+                srcset={s.hasSrcset ? `/images/service-${s.slug}-400.webp 400w, /images/service-${s.slug}-732.webp 732w` : undefined}
+                sizes={s.hasSrcset ? "(min-width: 768px) 366px, 100vw" : undefined}
+                alt={s.name}
+                loading="lazy" decoding="async"
+                width="400" height="240"
+                onerror="this.src='/images/hero-1280.webp';this.onerror=null" />
             </div>
             <div class="card-body">
               <div class="card-icon">
