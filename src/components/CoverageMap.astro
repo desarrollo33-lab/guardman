@@ -4,26 +4,33 @@
 // Modos:
 // - showMarkers=true (default): renderiza los 14 markers de LOCATIONS
 //                              (home / hub /ubicaciones).
-// - showMarkers=false:         un solo marker centrado en (centerLat, centerLng)
+// - showMarkers=false:         un solo marker centrado en (centerLat/centerLng)
 //                              con `singleName` y `singleColor` (paginas /ubicaciones/[slug]).
 //
-// Carga y ejecucion: Vite bundlea este script como chunk separado (verificado:
-// `_astro/CoverageMap.<hash>.js`). La pagina solo descarga ese chunk si este
-// componente esta presente. Por eso la home (sin este componente) NO descarga
-// Leaflet (~161 KiB).
+// DATA FLOW:
+// - Pasamos los parametros del frontmatter via un <script type="application/json">
+//   (NO via `define:vars`). Astro inlinea el JSON, y el script modulo del
+//   componente lo lee con JSON.parse. Esto evita el problema de `<script
+//   is:inline define:vars>` (que es un classic script, sin modulo, donde
+//   `import('leaflet')` falla silenciosamente en runtime).
 //
-// Lazy init dentro del componente: IntersectionObserver dispara L.map() cuando
-// el contenedor entra al viewport (rootMargin 200px). Antes de eso, el bloque
-// de tiles ni se pide.
+// CARGA Y EJECUCION:
+// - El <script> sin is:inline es procesado por Vite como modulo. Vite emite
+//   un chunk separado (_astro/CoverageMap.<hash>.js) y un sub-chunk para
+//   leaflet (cuando la pagina usa el componente). La pagina que NO usa este
+//   componente NO descarga Leaflet en absoluto.
+// - El script usa `await import('leaflet')` (dynamic) — Vite code-splittea
+//   leaflet en otro chunk. Asi Leaflet (~140 KB) se descarga solo cuando
+//   la pagina entra al viewport (IntersectionObserver) y solo si hay mapa.
+// - IntersectionObserver con rootMargin 200px: el contenedor del mapa
+//   (no la pagina) es el observado. Antes de eso, ni L.map() ni tiles se piden.
 //
 // SRI: con import() de Vite ya no necesitamos integrity manual — Vite firma
 // los chunks que emite. Antes el bundle local en /vendor/leaflet/ llevaba
 // sha384 hardcoded que se invalidaba cada vez que se actualizaba Leaflet.
 //
 // Scope reducido: este componente renderiza SOLO el <figure> + <figcaption>.
-// El section, h2, subtitle y demas los pone la pagina padre. Esto permite
-// reusarlo dentro de distintos <section> de cada layout (no forzamos una
-// section nueva).
+// El section, h2, subtitle y demas los pone la pagina padre.
 import { LOCATIONS, ZONE_COLORS, ZONE_DOT_COLORS, type Location } from '../lib/constants';
 
 interface Props {
@@ -65,98 +72,139 @@ const captionColor = variant === 'dark' ? 'rgba(255,255,255,.75)' : 'var(--muted
 const captionText = showMarkers
   ? 'GuardMan Chile — cobertura verificada en <strong>14 comunas</strong> de la Región Metropolitana.'
   : `${singleName} — cobertura operativa verificada.`;
+
+// Empaquetamos la data en JSON para que el script modulo la lea. Esto evita
+// `is:inline define:vars` que no soporta `import()` dinamico de Leaflet.
+const data = {
+  id,
+  centerLat,
+  centerLng,
+  zoom,
+  markers,
+  showMarkers,
+  singleName,
+  singleColor,
+};
+const dataJson = JSON.stringify(data);
 ---
 
 <figure class="coverage-map">
   <div
     id={id}
+    class="coverage-map-canvas"
+    data-coverage-map
     style={`height:${height}px;border-radius:var(--radius-xl);border:1px solid ${borderColor};background:${bg}`}
   ></div>
   <figcaption style={`font-size:13px;color:${captionColor};margin-top:8px`} set:html={captionText} />
 </figure>
 
-<script
-  is:inline
-  define:vars={{
-    id,
-    centerLat,
-    centerLng,
-    zoom,
-    markers,
-    showMarkers,
-    singleName,
-    singleColor,
-  }}
->
-  (function () {
-    var d = document.getElementById(id);
-    if (!d) return;
-    if (typeof window === 'undefined') return;
+<!-- Data del mapa como JSON inline. El script modulo lo lee via getElementById. -->
+<script type="application/json" id={`${id}-data`} set:html={dataJson} />
 
-    // Lazy load del bundle de Leaflet + CSS SOLO si este componente esta en
-    // el DOM y entra al viewport. Vite emite este script en un chunk separado
-    // (_astro/CoverageMap.<hash>.js). Aqui adentro hacemos import() dinamico
-    // para que Leaflet NO se descargue hasta que el contenedor sea visible.
-    var inited = false;
-    var io = new IntersectionObserver(function (entries) {
-      if (inited || !entries[0].isIntersecting) return;
-      inited = true;
-      io.disconnect();
-      init();
-    }, { rootMargin: '200px' });
-    io.observe(d);
+<script>
+  // Script MODULO (NO is:inline). Procesado por Vite:
+  // - chunk separado: _astro/CoverageMap.<hash>.js
+  // - dynamic import() code-splittea leaflet en su propio chunk
+  // - Solo se incluye en paginas que importan este componente.
+  //
+  // Flujo:
+  // 1. IO observa cada [data-coverage-map] y dispara init() cuando entra
+  //    al viewport (rootMargin 200px).
+  // 2. init() hace await import() de leaflet + su CSS.
+  // 3. Lee la data del <script type="application/json"> correspondiente.
+  // 4. L.map() + markers (o single marker).
+  //
+  // Errores se loguean a consola para diagnosticar en produccion.
 
-    function init() {
-      Promise.all([
-        import('leaflet'),
-        import('leaflet/dist/leaflet.css'),
-      ]).then(function (mods) {
-        var L = mods[0].default || mods[0];
-        var map = L.map(d, {
-          center: [centerLat, centerLng],
-          zoom: zoom,
-          scrollWheelZoom: false,
-          zoomControl: true,
-          attributionControl: false,
-        });
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 18,
-          attribution: '&copy; OpenStreetMap',
-        }).addTo(map);
+  async function initMap(canvas: HTMLElement): Promise<void> {
+    const id = canvas.id;
+    const dataScript = document.getElementById(`${id}-data`);
+    if (!dataScript || !dataScript.textContent) {
+      console.error('[CoverageMap] data script not found for', id);
+      return;
+    }
+    const data = JSON.parse(dataScript.textContent);
 
-        if (showMarkers && markers.length > 0) {
-          var bounds = L.latLngBounds([]);
-          for (var i = 0; i < markers.length; i++) {
-            var m = markers[i];
-            L.circleMarker([m.lat, m.lng], {
-              radius: 8,
-              fillColor: m.color,
-              color: '#fff',
-              weight: 2,
-              fillOpacity: 1,
-            })
-              .addTo(map)
-              .bindPopup(
-                '<strong>' + m.name + '</strong><br><a href="/ubicaciones/' + m.slug + '" style="font-size:12px;font-weight:600;color:#3B82F6">Ver cobertura &rarr;</a>',
-              );
-            bounds.extend([m.lat, m.lng]);
-          }
-          map.fitBounds(bounds.pad(0.15));
-        } else {
-          L.circleMarker([centerLat, centerLng], {
-            radius: 10,
-            fillColor: singleColor,
+    try {
+      const L = (await import('leaflet')).default;
+      // Importar el CSS de Leaflet para que se aplique a los tiles.
+      await import('leaflet/dist/leaflet.css');
+
+      const map = L.map(canvas, {
+        center: [data.centerLat, data.centerLng],
+        zoom: data.zoom,
+        scrollWheelZoom: false,
+        zoomControl: true,
+        attributionControl: false,
+      });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap',
+      }).addTo(map);
+
+      if (data.showMarkers && Array.isArray(data.markers) && data.markers.length > 0) {
+        const bounds = L.latLngBounds([]);
+        for (const m of data.markers) {
+          L.circleMarker([m.lat, m.lng], {
+            radius: 8,
+            fillColor: m.color,
             color: '#fff',
             weight: 2,
-            fillOpacity: 0.9,
+            fillOpacity: 1,
           })
             .addTo(map)
-            .bindPopup('<strong>' + (singleName || 'GuardMan Chile') + '</strong>')
-            .openPopup();
+            .bindPopup(
+              `<strong>${m.name}</strong><br><a href="/ubicaciones/${m.slug}" style="font-size:12px;font-weight:600;color:#3B82F6">Ver cobertura &rarr;</a>`,
+            );
+          bounds.extend([m.lat, m.lng]);
         }
-      }).catch(function (e) {
-        console.error('[CoverageMap] failed to load Leaflet:', e);
-      });
+        map.fitBounds(bounds.pad(0.15));
+      } else {
+        L.circleMarker([data.centerLat, data.centerLng], {
+          radius: 10,
+          fillColor: data.singleColor || '#3B82F6',
+          color: '#fff',
+          weight: 2,
+          fillOpacity: 0.9,
+        })
+          .addTo(map)
+          .bindPopup(`<strong>${data.singleName || 'GuardMan Chile'}</strong>`)
+          .openPopup();
+      }
+    } catch (e) {
+      console.error('[CoverageMap] failed to initialize Leaflet map:', e);
     }
-  })();
+  }
+
+  function setupObserver(): void {
+    const canvases = document.querySelectorAll<HTMLElement>('[data-coverage-map]');
+    if (canvases.length === 0) return;
+
+    if (!('IntersectionObserver' in window)) {
+      // Fallback: init todos los mapas inmediatamente si no hay IO.
+      canvases.forEach((c) => initMap(c));
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const canvas = entry.target as HTMLElement;
+            initMap(canvas);
+            io.unobserve(canvas);
+          }
+        }
+      },
+      { rootMargin: '200px' },
+    );
+
+    canvases.forEach((c) => io.observe(c));
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupObserver);
+  } else {
+    setupObserver();
+  }
 </script>
