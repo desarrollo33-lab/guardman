@@ -288,26 +288,34 @@ const hreflangs = hreflangTags(Astro.url.pathname);
       crossorigin="anonymous"
     />
 
-    {/* CSS principal: async, NO bloquea el primer paint.
-        El id específico evita el bug del querySelector sobre <noscript><link>.
-        Cuando el CSS async aplica, los estilos heredan del critical — sin CLS. */}
+    {/* CSS principal: render-blocking.
+        Por que NO usamos media="print" + onload=async:
+        - El dato de Lighthouse 13 muestra que site.css llega ANTES del primer
+          paint (~50-130 ms). El patron async ahorra ~0 ms de FCP pero abre
+          una ventana de 50-100 ms entre el primer paint (con critical inline)
+          y la aplicacion de site.css. En esa ventana el critical inline
+          (2.8 KB) no tiene varias reglas above-the-fold que site.css si
+          tiene (header height, nav display, .header-actions, .mobile-toggle,
+          .hero-badge). Resultado: el nav sin estilar empuja al toggle fuera
+          del viewport, y cuando site.css aplica el toggle "aparece" desde
+          [0,0,0,0] a (356,12) -> distancia fantasma 605 px -> CLS 0.682.
+        - Con render-blocking el primer layout ES el layout final: CLS 0
+          por construccion, inmune a futuras derivas del critical inline.
+        - El preload de la fuente (mas arriba) sigue siendo independiente
+          y no se ve afectado.
+        Nota: si en el futuro site.css crece tanto que vale la pena async,
+        la condicion es que el critical inline tenga TODAS las reglas
+        above-the-fold o se invierta el flujo a render-blocking permanente. */}
     <link
       rel="stylesheet"
       id="site-css-main"
       href="/styles/site.css?v=20260925"
-      media="print"
-      onload="this.media='all'"
     />
-    <noscript>
-      <link rel="stylesheet" href="/styles/site.css?v=20260925" />
-    </noscript>
     {loadDarkCss && (
       <link
         rel="stylesheet"
         id="dark-css-main"
         href="/styles/dark.css?v=20260925"
-        media="print"
-        onload="this.media='all'"
       />
     )}
 
