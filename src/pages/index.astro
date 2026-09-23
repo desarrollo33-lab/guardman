@@ -83,7 +83,15 @@ const markers = LOCATIONS.map((l) => {
   <!-- HERO -->
   <section class="hero" data-od-id="hero">
     <div class="hero-bg">
-      <img src="/images/hero-home.webp" alt="Seguridad Privada GuardMan Chile — Guardias OS-10" fetchpriority="high" decoding="async" width="1920" height="1080" onerror="this.style.display='none'" />
+      <img src="/images/hero-824.webp"
+           srcset="/images/hero-480.webp 480w,
+                   /images/hero-824.webp 824w,
+                   /images/hero-1280.webp 1280w,
+                   /images/hero-1920.webp 1920w"
+           sizes="100vw"
+           alt="Seguridad Privada GuardMan Chile — Guardias OS-10"
+           fetchpriority="high" decoding="sync" width="1920" height="1080"
+           onerror="this.style.display='none'" />
       <div class="hero-bg-overlay"></div>
     </div>
     <div class="container">
