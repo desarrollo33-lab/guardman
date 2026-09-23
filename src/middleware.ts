@@ -55,11 +55,11 @@ const addSecurityHeaders = (response: Response, contentType: string | null): Res
       'Content-Security-Policy',
       [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline'",
+        "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: https:",
         "font-src 'self' data:",
-        "connect-src 'self' https://guardman.oficinadesarrollo33.workers.dev",
+        "connect-src 'self' https://guardman.oficinadesarrollo33.workers.dev https://static.cloudflareinsights.com",
         "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
         "frame-ancestors 'self'",
         "base-uri 'self'",

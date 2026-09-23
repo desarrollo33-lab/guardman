@@ -26,7 +26,7 @@ import {
   hreflangTags,
   type BreadcrumbItem,
 } from '../lib/seo';
-import type { Location } from '../lib/constants';
+import { INTER_FONT_URL, type Location } from '../lib/constants';
 
 interface Props {
   title: string;
@@ -110,11 +110,26 @@ const ogType = article ? 'article' : 'website';
 const publishedISO = article?.datePublished ?? '2024-01-01';
 const modifiedISO = article?.dateModified ?? new Date().toISOString().slice(0, 10);
 
-// ── Critical CSS (above-the-fold, ~1.5 KB minified) ───────────────
+// ── Critical CSS (above-the-fold, ~2.0 KB minified) ───────────────
 // Aplicado inline antes del primer paint. Sin roundtrip de red para
-// body, container, header, hero, btn. El resto del CSS (cards, footer,
-// forms, etc.) llega async con `media="print" onload="this.media='all'"`.
-const CRITICAL_CSS = `body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:#0D0D0D;background:#F8F9FA;line-height:1.5;-webkit-font-smoothing:antialiased}
+// @font-face Inter + Inter Fallback, body, container, header, hero, btn.
+// El resto del CSS (cards, footer, forms, etc.) llega async con
+// `media="print" onload="this.media='all'"`.
+//
+// Por que ambas @font-face inline:
+// 1. Si la fuente preloadeada llega a tiempo -> el primer paint usa Inter
+//    directamente, sin swap, sin CLS.
+// 2. Si la fuente llega tarde (cold cache / 4G) -> el primer paint cae a
+//    Inter Fallback que tiene las metricas de Inter (size-adjust canonico
+//    Next.js 107.40%). Cuando llega Inter, swap invisible. Sin esto, el
+//    primer paint cae a system-ui crudo, sin size-adjust, y al swap
+//    siguiente hay reflow de ~0.5 en CLS.
+//
+// Las dos definiciones usan INTER_FONT_URL (single source desde constants.ts)
+// para que el browser dedupique por URL exacta. Si difieren, descarga doble.
+const CRITICAL_CSS = `@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;src:url('${INTER_FONT_URL}') format('woff2-variations');font-display:swap}
+@font-face{font-family:'Inter Fallback';src:local('Arial'),local('Liberation Sans'),local('Helvetica Neue'),local('Helvetica');size-adjust:107.40%;ascent-override:90.20%;descent-override:22.48%;line-gap-override:0%;font-weight:100 900;font-style:normal;font-display:swap}
+body{font-family:'Inter','Inter Fallback',system-ui,-apple-system,sans-serif;color:#0D0D0D;background:#F8F9FA;line-height:1.5;-webkit-font-smoothing:antialiased}
 .container{max-width:1280px;margin:0 auto;padding:0 16px}
 header.site-header{position:sticky;top:0;z-index:1100;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.05)}
 .header-inner{display:flex;align-items:center;justify-content:space-between;height:64px;max-width:1280px;margin:0 auto;padding:0 16px}
@@ -259,26 +274,48 @@ const hreflangs = hreflangTags(Astro.url.pathname);
         FCP y LCP bajan ~0.5-1.0s en lab run. */}
     <style is:inline set:html={CRITICAL_CSS} />
 
-    {/* CSS principal: async, NO bloquea el primer paint.
-        El id específico evita el bug del querySelector sobre <noscript><link>.
-        Cuando el CSS async aplica, los estilos heredan del critical — sin CLS. */}
+    {/* Preload Inter Variable para que el browser levante el woff2 en paralelo
+        al primer paint y no haya FOUT visible en el hero. crossorigin es obligatorio
+        aunque same-origin porque el browser exige credenciales para una fuente.
+        IMPORTANTE: la URL debe matchar exactamente la del @font-face en
+        public/styles/site.css (mismo ?v=FONT_VERSION). Si difiere, el browser
+        hace doble GET y los 344 KB se duplican a 689 KB. */}
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={INTER_FONT_URL}
+      crossorigin="anonymous"
+    />
+
+    {/* CSS principal: render-blocking.
+        Por que NO usamos media="print" + onload=async:
+        - El dato de Lighthouse 13 muestra que site.css llega ANTES del primer
+          paint (~50-130 ms). El patron async ahorra ~0 ms de FCP pero abre
+          una ventana de 50-100 ms entre el primer paint (con critical inline)
+          y la aplicacion de site.css. En esa ventana el critical inline
+          (2.8 KB) no tiene varias reglas above-the-fold que site.css si
+          tiene (header height, nav display, .header-actions, .mobile-toggle,
+          .hero-badge). Resultado: el nav sin estilar empuja al toggle fuera
+          del viewport, y cuando site.css aplica el toggle "aparece" desde
+          [0,0,0,0] a (356,12) -> distancia fantasma 605 px -> CLS 0.682.
+        - Con render-blocking el primer layout ES el layout final: CLS 0
+          por construccion, inmune a futuras derivas del critical inline.
+        - El preload de la fuente (mas arriba) sigue siendo independiente
+          y no se ve afectado.
+        Nota: si en el futuro site.css crece tanto que vale la pena async,
+        la condicion es que el critical inline tenga TODAS las reglas
+        above-the-fold o se invierta el flujo a render-blocking permanente. */}
     <link
       rel="stylesheet"
       id="site-css-main"
-      href="/styles/site.css?v=20260825"
-      media="print"
-      onload="this.media='all'"
+      href="/styles/site.css?v=20260926"
     />
-    <noscript>
-      <link rel="stylesheet" href="/styles/site.css?v=20260825" />
-    </noscript>
     {loadDarkCss && (
       <link
         rel="stylesheet"
         id="dark-css-main"
-        href="/styles/dark.css?v=20260825"
-        media="print"
-        onload="this.media='all'"
+        href="/styles/dark.css?v=20260926"
       />
     )}
 

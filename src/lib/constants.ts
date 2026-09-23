@@ -255,6 +255,22 @@ export const ADMIN_NAV = [
 export const API_TIMEOUT_MS = 15_000;
 
 // ────────────────────────────────────────────────────────────────
+// Asset versioning
+// ────────────────────────────────────────────────────────────────
+// Single source of truth para la versión de assets estáticos.
+// Regla: si una URL lleva `?v=FONT_VERSION`, **todas las referencias**
+// al mismo recurso deben usar el mismo valor — `<link rel="preload">`
+// en BaseLayout, `@font-face { src:url(...) }` en public/styles/site.css,
+// y cualquier llamada desde JS. Si solo cambia uno, el browser hace
+// doble GET (689 KB de Inter por primera vista en vez de 344 KB).
+// Bumpear cuando se regenera public/fonts/InterVariable.woff2.
+// ────────────────────────────────────────────────────────────────
+export const FONT_VERSION = '20260925';
+/** URL completa del woff2 de Inter Variable con cache-bust. */
+export const INTER_FONT_URL = `/fonts/InterVariable.woff2?v=${FONT_VERSION}`;
+
+
+// ────────────────────────────────────────────────────────────────
 // SEO + GEO metadata (v3.0)
 // ────────────────────────────────────────────────────────────────
 
