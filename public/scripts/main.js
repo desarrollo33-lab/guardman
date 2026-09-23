@@ -12,7 +12,10 @@
       nav.classList.toggle('open');
       const expanded = nav.classList.contains('open');
       toggle.setAttribute('aria-expanded', String(expanded));
-      toggle.textContent = expanded ? '✕' : '☰';
+      // El swap entre menu/close se hace via CSS [aria-expanded] en site.css.
+      // No usar toggle.textContent aqui: reintroduce glifos U+2715/U+2630
+      // que no estan en el subset de Inter y producen CLS al cambiar entre
+      // estados. Ver Header.astro: dos SVG con .icon-menu y .icon-close.
     });
   }
 
