@@ -32,6 +32,14 @@
 // Scope reducido: este componente renderiza SOLO el <figure> + <figcaption>.
 // El section, h2, subtitle y demas los pone la pagina padre.
 import { LOCATIONS, ZONE_COLORS, ZONE_DOT_COLORS, type Location } from '../lib/constants';
+// Import del CSS de Leaflet como string via `?raw` de Vite. Lo inlineamos en
+// el HTML con `<style is:inline set:html={leafletCSS}>`. Esto es robusto:
+// - Funciona independientemente de Vite/Astro code-splitting (que no emite
+//   chunk CSS para `await import(...css)` ni para static imports de CSS
+//   en componentes Astro cuando se combinan con `await import('leaflet')`).
+// - El CSS viaja en el HTML SSR (14 KB una sola vez por pagina con mapa).
+// - Se beneficia del cache HIT del HTML completo cuando CF lo sirve.
+import leafletCSS from 'leaflet/dist/leaflet.css?raw';
 
 interface Props {
   id?: string;
@@ -98,6 +106,9 @@ const dataJson = JSON.stringify(data);
   <figcaption style={`font-size:13px;color:${captionColor};margin-top:8px`} set:html={captionText} />
 </figure>
 
+{/* CSS de Leaflet inlineado (14 KB una sola vez por pagina con mapa). */}
+<style is:inline set:html={leafletCSS} />
+
 <!-- Data del mapa como JSON inline. El script modulo lo lee via getElementById. -->
 <script type="application/json" id={`${id}-data`} set:html={dataJson} />
 
@@ -127,8 +138,6 @@ const dataJson = JSON.stringify(data);
 
     try {
       const L = (await import('leaflet')).default;
-      // Importar el CSS de Leaflet para que se aplique a los tiles.
-      await import('leaflet/dist/leaflet.css');
 
       const map = L.map(canvas, {
         center: [data.centerLat, data.centerLng],
