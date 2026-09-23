@@ -6,6 +6,7 @@ import { LOCATIONS, SERVICE_NAMES, SECTOR_NAMES } from '../../lib/constants';
 import { LOCATIONS as LOC_CONTENT } from '../../lib/content';
 import Icon from '../../components/Icon.astro';
 import StaffSection from '../../components/StaffSection.astro';
+import CoverageMap from '../../components/CoverageMap.astro';
 
 export const prerender = true;
 
@@ -174,59 +175,24 @@ const dotColor = zoneColorMap[zone] ?? '#3B82F6';
         </aside>
       </div>
     </div>
-  </section>
-
   <!-- MAPA -->
-  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="" />
   <section class="bg-white" data-od-id="block-map">
     <div class="container">
       <span class="section-label">Mapa</span>
       <h2 class="section-title">Mapa de cobertura</h2>
-      <figure class="coverage-map">
-        <div id={`map-${slug}`} style="height:360px;border-radius:var(--radius-xl);border:1px solid var(--border)"></div>
-        <figcaption style="font-size:13px;color:var(--muted);margin-top:8px;text-align:center">
-          {name} — zona {zone}. Cobertura operativa verificada.
-        </figcaption>
-      </figure>
+      <CoverageMap
+        id={`map-${slug}`}
+        height={360}
+        showMarkers={false}
+        singleName={name}
+        singleColor={dotColor}
+        centerLat={lat}
+        centerLng={lng}
+        zoom={13}
+        variant="light"
+      />
     </div>
   </section>
-  <script is:inline src="/vendor/leaflet/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin=""></script>
-
-<script is:inline define:vars={{ mapId: `map-${slug}`, lat, lng, name, dotColor }}>
-    (function () {
-      var d = document.getElementById(mapId);
-      if (!d) return;
-      // Init lazy: difiere el cost de L.map + tile loading hasta que el contenedor entre al viewport.
-      // CSS y JS de Leaflet ya están cargados sync arriba, así que L está disponible globalmente.
-      var io = new IntersectionObserver(function (entries) {
-        if (!entries[0].isIntersecting) return;
-        io.disconnect();
-        if (typeof L === 'undefined') return;
-      var map = L.map(d, {
-        center: [lat, lng],
-        zoom: 13,
-        scrollWheelZoom: false,
-        zoomControl: true,
-        attributionControl: false,
-      });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '&copy; OpenStreetMap',
-      }).addTo(map);
-      L.circleMarker([lat, lng], {
-        radius: 12,
-        fillColor: dotColor,
-        color: '#fff',
-        weight: 3,
-        fillOpacity: 0.9,
-      })
-        .addTo(map)
-        .bindPopup('<strong>GuardMan Chile — ' + name + '</strong><br>Cobertura operativa verificada.')
-        .openPopup();
-      }, { rootMargin: '200px' });
-      io.observe(d);
-    })();
-  </script>
 
   <!-- TAMBIÉN TE PUEDE INTERESAR -->
   <section class="bg-neutral-section" data-od-id="block-related">

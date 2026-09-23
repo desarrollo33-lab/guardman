@@ -1,117 +1,162 @@
 ---
-// CoverageMap — mapa Leaflet con marcadores de las 14 comunas.
-// Replicación 1:1 del `renderMap()` + `buildHomeMapScript()` del original.
-// Carga Leaflet 1.9.4 desde unpkg.
+// CoverageMap — `<figure>` con mapa Leaflet.
+//
+// Modos:
+// - showMarkers=true (default): renderiza los 14 markers de LOCATIONS
+//                              (home / hub /ubicaciones).
+// - showMarkers=false:         un solo marker centrado en (centerLat, centerLng)
+//                              con `singleName` y `singleColor` (paginas /ubicaciones/[slug]).
+//
+// Carga y ejecucion: Vite bundlea este script como chunk separado (verificado:
+// `_astro/CoverageMap.<hash>.js`). La pagina solo descarga ese chunk si este
+// componente esta presente. Por eso la home (sin este componente) NO descarga
+// Leaflet (~161 KiB).
+//
+// Lazy init dentro del componente: IntersectionObserver dispara L.map() cuando
+// el contenedor entra al viewport (rootMargin 200px). Antes de eso, el bloque
+// de tiles ni se pide.
+//
+// SRI: con import() de Vite ya no necesitamos integrity manual — Vite firma
+// los chunks que emite. Antes el bundle local en /vendor/leaflet/ llevaba
+// sha384 hardcoded que se invalidaba cada vez que se actualizaba Leaflet.
+//
+// Scope reducido: este componente renderiza SOLO el <figure> + <figcaption>.
+// El section, h2, subtitle y demas los pone la pagina padre. Esto permite
+// reusarlo dentro de distintos <section> de cada layout (no forzamos una
+// section nueva).
 import { LOCATIONS, ZONE_COLORS, ZONE_DOT_COLORS, type Location } from '../lib/constants';
 
 interface Props {
   id?: string;
   height?: number;
-  showMarkers?: boolean;
   zoom?: number;
   centerLat?: number;
   centerLng?: number;
   variant?: 'light' | 'dark';
+  /** Si false, renderiza solo un marker centrado en centerLat/centerLng con `singleName` y `singleColor`. */
+  showMarkers?: boolean;
+  singleName?: string;
+  singleColor?: string;
 }
 
 const {
-  id = 'map-home',
+  id = 'map-coverage',
   height = 420,
-  showMarkers = true,
   zoom = 10,
   centerLat = -33.45,
   centerLng = -70.65,
   variant = 'light',
+  showMarkers = true,
+  singleName = '',
+  singleColor = '#3B82F6',
 } = Astro.props;
 
-// Marcadores derivados de LOCATIONS (con coordenadas exactas).
-const markers = LOCATIONS.map((l: Location) => {
-  const zoneColorClass = ZONE_COLORS[l.zone] ?? 'blue';
-  const color = ZONE_DOT_COLORS[zoneColorClass] ?? '#3B82F6';
-  return { name: l.name, lat: l.lat, lng: l.lng, color, slug: l.slug };
-});
+const markers = showMarkers
+  ? (LOCATIONS as Location[]).map((l) => {
+      const zoneColorClass = ZONE_COLORS[l.zone] ?? 'blue';
+      const color = ZONE_DOT_COLORS[zoneColorClass] ?? '#3B82F6';
+      return { name: l.name, lat: l.lat, lng: l.lng, color, slug: l.slug };
+    })
+  : [];
 
 const borderColor = variant === 'dark' ? 'rgba(255,255,255,.12)' : 'var(--border)';
 const bg = variant === 'dark' ? '#1a1a2e' : '#f8f9fa';
 const captionColor = variant === 'dark' ? 'rgba(255,255,255,.75)' : 'var(--muted)';
+const captionText = showMarkers
+  ? 'GuardMan Chile — cobertura verificada en <strong>14 comunas</strong> de la Región Metropolitana.'
+  : `${singleName} — cobertura operativa verificada.`;
 ---
 
-<link rel="stylesheet" href="/vendor/leaflet/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="" />
+<figure class="coverage-map">
+  <div
+    id={id}
+    style={`height:${height}px;border-radius:var(--radius-xl);border:1px solid ${borderColor};background:${bg}`}
+  ></div>
+  <figcaption style={`font-size:13px;color:${captionColor};margin-top:8px`} set:html={captionText} />
+</figure>
 
-<section class="bg-neutral" data-od-id="block-map">
-  <div class="container">
-    <h2 class="section-title" style="margin-bottom:8px">Mapa de cobertura</h2>
-    <p class="section-subtitle" style="margin-bottom:32px">Presencia operativa verificada en 14 comunas de la Región Metropolitana más Los Andes y San Felipe.</p>
-    <figure class="coverage-map">
-      <div
-        id={id}
-        style={`height:${height}px;border-radius:var(--radius-xl);border:1px solid ${borderColor};background:${bg}`}
-        data-lat={centerLat}
-        data-lng={centerLng}
-        data-zoom={zoom}
-      ></div>
-      <figcaption style={`font-size:13px;color:${captionColor};margin-top:8px`}>
-        GuardMan Chile — cobertura verificada en <strong>14 comunas</strong> de la Región Metropolitana.
-      </figcaption>
-    </figure>
-  </div>
-</section>
-
-<script is:inline src="/vendor/leaflet/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin=""></script>
-
-<script is:inline define:vars={{ id, centerLat, centerLng, zoom, markers, showMarkers }}>
+<script
+  is:inline
+  define:vars={{
+    id,
+    centerLat,
+    centerLng,
+    zoom,
+    markers,
+    showMarkers,
+    singleName,
+    singleColor,
+  }}
+>
   (function () {
     var d = document.getElementById(id);
     if (!d) return;
-      // Init lazy: difiere el cost de L.map + tile loading hasta que el contenedor entre al viewport.
-      // CSS y JS de Leaflet ya están cargados sync arriba, así que L está disponible globalmente.
-      var io = new IntersectionObserver(function (entries) {
-        if (!entries[0].isIntersecting) return;
-        io.disconnect();
-        if (typeof L === 'undefined') return;
-    var map = L.map(d, {
-      center: [centerLat, centerLng],
-      zoom: zoom,
-      scrollWheelZoom: false,
-      zoomControl: true,
-      attributionControl: false,
-    });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      attribution: '&copy; OpenStreetMap',
-    }).addTo(map);
+    if (typeof window === 'undefined') return;
 
-    if (showMarkers && markers.length > 0) {
-      var bounds = L.latLngBounds([]);
-      for (var i = 0; i < markers.length; i++) {
-        var m = markers[i];
-        var mk = L.circleMarker([m.lat, m.lng], {
-          radius: 8,
-          fillColor: m.color,
-          color: '#fff',
-          weight: 2,
-          fillOpacity: 1,
-        })
-          .addTo(map)
-          .bindPopup(
-            '<strong>' + m.name + '</strong><br><a href="/ubicaciones/' + m.slug + '" style="font-size:12px;font-weight:600;color:#3B82F6">Ver cobertura &rarr;</a>',
-          );
-        bounds.extend([m.lat, m.lng]);
-      }
-      map.fitBounds(bounds.pad(0.15));
-    } else {
-      L.circleMarker([centerLat, centerLng], {
-        radius: 10,
-        fillColor: '#3B82F6',
-        color: '#fff',
-        weight: 2,
-        fillOpacity: 0.9,
-      })
-        .addTo(map)
-        .bindPopup('<strong>GuardMan Chile</strong>')
-        .openPopup();
+    // Lazy load del bundle de Leaflet + CSS SOLO si este componente esta en
+    // el DOM y entra al viewport. Vite emite este script en un chunk separado
+    // (_astro/CoverageMap.<hash>.js). Aqui adentro hacemos import() dinamico
+    // para que Leaflet NO se descargue hasta que el contenedor sea visible.
+    var inited = false;
+    var io = new IntersectionObserver(function (entries) {
+      if (inited || !entries[0].isIntersecting) return;
+      inited = true;
+      io.disconnect();
+      init();
+    }, { rootMargin: '200px' });
+    io.observe(d);
+
+    function init() {
+      Promise.all([
+        import('leaflet'),
+        import('leaflet/dist/leaflet.css'),
+      ]).then(function (mods) {
+        var L = mods[0].default || mods[0];
+        var map = L.map(d, {
+          center: [centerLat, centerLng],
+          zoom: zoom,
+          scrollWheelZoom: false,
+          zoomControl: true,
+          attributionControl: false,
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          attribution: '&copy; OpenStreetMap',
+        }).addTo(map);
+
+        if (showMarkers && markers.length > 0) {
+          var bounds = L.latLngBounds([]);
+          for (var i = 0; i < markers.length; i++) {
+            var m = markers[i];
+            L.circleMarker([m.lat, m.lng], {
+              radius: 8,
+              fillColor: m.color,
+              color: '#fff',
+              weight: 2,
+              fillOpacity: 1,
+            })
+              .addTo(map)
+              .bindPopup(
+                '<strong>' + m.name + '</strong><br><a href="/ubicaciones/' + m.slug + '" style="font-size:12px;font-weight:600;color:#3B82F6">Ver cobertura &rarr;</a>',
+              );
+            bounds.extend([m.lat, m.lng]);
+          }
+          map.fitBounds(bounds.pad(0.15));
+        } else {
+          L.circleMarker([centerLat, centerLng], {
+            radius: 10,
+            fillColor: singleColor,
+            color: '#fff',
+            weight: 2,
+            fillOpacity: 0.9,
+          })
+            .addTo(map)
+            .bindPopup('<strong>' + (singleName || 'GuardMan Chile') + '</strong>')
+            .openPopup();
+        }
+      }).catch(function (e) {
+        console.error('[CoverageMap] failed to load Leaflet:', e);
+      });
     }
-      }, { rootMargin: '200px' });
-      io.observe(d);
   })();
 </script>
