@@ -259,6 +259,17 @@ const hreflangs = hreflangTags(Astro.url.pathname);
         FCP y LCP bajan ~0.5-1.0s en lab run. */}
     <style is:inline set:html={CRITICAL_CSS} />
 
+    {/* Preload Inter Variable para que el browser levante el woff2 en paralelo
+        al primer paint y no haya FOUT visible en el hero. crossorigin es obligatorio
+        aunque same-origin porque el browser exige credenciales para una fuente. */}
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/InterVariable.woff2?v=20260923"
+      crossorigin="anonymous"
+    />
+
     {/* CSS principal: async, NO bloquea el primer paint.
         El id específico evita el bug del querySelector sobre <noscript><link>.
         Cuando el CSS async aplica, los estilos heredan del critical — sin CLS. */}
