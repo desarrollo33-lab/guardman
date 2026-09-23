@@ -217,9 +217,49 @@ const markers = LOCATIONS.map((l) => {
         </a>
       </div>
       <div class="split-image">
-        <video src="/videos/guardpod-home.mp4" autoplay loop muted playsinline preload="auto" aria-label="Guardpod, sistema autónomo de vigilancia"></video>
+        <video
+          src="/videos/guardpod-home.mp4"
+          poster="/videos/guardpod-home-poster.webp"
+          width="1280"
+          height="720"
+          autoplay
+          loop
+          muted
+          playsinline
+          preload="none"
+          aria-label="Guardpod, sistema autónomo de vigilancia"
+        ></video>
         <div class="split-image-badge">Disponible en arriendo</div>
       </div>
+      {/*
+        Video lazy via IntersectionObserver. El video esta abajo del fold (~750px
+        en mobile); con preload="none" el browser no hace fetch hasta que este
+        cerca del viewport. threshold 0.5 garantiza que no se gatille si solo
+        asoma el borde. play() en intersect, pause() al salir. catch el
+        AbortError que lanza Safari cuando el video se pausa antes de cargar.
+        prefers-reduced-motion: reduce -> no autoplay (accesibilidad barata).
+      */}
+      <script is:inline>
+        (function () {
+          var video = document.querySelector('.split-image video');
+          if (!video) return;
+          var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (reduce || !('IntersectionObserver' in window)) return;
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                var p = video.play();
+                if (p && typeof p.catch === 'function') {
+                  p.catch(function (e) { /* AbortError normal cuando pausa antes de cargar */ });
+                }
+              } else {
+                video.pause();
+              }
+            });
+          }, { threshold: 0.5 });
+          io.observe(video);
+        })();
+      </script>
     </div>
   </section>
 
