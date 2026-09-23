@@ -265,7 +265,7 @@ export const API_TIMEOUT_MS = 15_000;
 // doble GET (689 KB de Inter por primera vista en vez de 344 KB).
 // Bumpear cuando se regenera public/fonts/InterVariable.woff2.
 // ────────────────────────────────────────────────────────────────
-export const FONT_VERSION = '20260924';
+export const FONT_VERSION = '20260925';
 /** URL completa del woff2 de Inter Variable con cache-bust. */
 export const INTER_FONT_URL = `/fonts/InterVariable.woff2?v=${FONT_VERSION}`;
 

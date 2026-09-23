@@ -4,15 +4,30 @@
 
 /* ── Inter Font (variable WOFF2, 1 archivo reemplaza 5 TTF) ── */
 /* Subset latin-essentials + tipograficos es-CL + opsz pinned a 14 = ~41 KB
-   (original 344 KB). Subset regenerado 2026-09-24 — si lo regenere de nuevo,
+   (original 344 KB). Subset regenerado 2026-09-25 — si lo regenere de nuevo,
    bump FONT_VERSION en src/lib/constants.ts y mantener el ?v= sincronizado
    con el href del <link rel="preload" as="font"> en BaseLayout.astro.
-   Format("woff2-variations") cubre todos los browsers modernos; el segundo
-   src+format() duplicado de la version original era dead code de Chrome 2017. */
-@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;src:url('/fonts/InterVariable.woff2?v=20260924') format('woff2-variations');font-display:swap}
+   Format("woff2-variations") cubre todos los browsers modernos. */
+
+/* 1. Inter real — woff2 subset latin-essentials. */
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;src:url('/fonts/InterVariable.woff2?v=20260925') format('woff2-variations');font-display:swap}
+
+/* 2. Inter Fallback — usa el system font del SO escalado a las metricas de
+   Inter. Cuando el woff2 esta cacheado, el browser pinta Inter y nunca toca
+   este fallback. Cuando no esta (cold cache / visita nueva / push notification
+   fonts off), el browser pinta con Arial/Liberation Sans escalado y NO hay
+   reflow cuando llega Inter — el "size-adjust + ascent/descent override"
+   hace que ambos tengan la misma caja vertical. Sin esto, el texto se mueve
+   al cargar la fuente y suma al CLS.
+   Valores canonicos de Next.js: par Inter/Arial battleado en millones de
+   sitios. Order importa: 'Inter Fallback' va DESPUES de 'Inter' y ANTES
+   de system-ui, si no nunca se usa.
+   font-weight:100 900 cubre los 4 pesos en uso (500/600/700/800) sintetizando
+   desde Arial mientras dura el swap. */
+@font-face{font-family:'Inter Fallback';src:local('Arial'),local('Liberation Sans'),local('Helvetica Neue'),local('Helvetica');size-adjust:107.40%;ascent-override:90.20%;descent-override:22.48%;line-gap-override:0%;font-weight:100 900;font-style:normal;font-display:swap}
 
 /* ── Tokens ── */
-:root{--primary:#1A2744;--primary-light:#1A3A5C;--primary-lighter:#5F7A96;--primary-pale:#E8ECF1;--primary-dark:#0F1829;--fg:#0D0D0D;--muted:#6C757D;--muted-light:#ADB5BD;--border:#E5E7EB;--bg:#F8F9FA;--surface:#FFFFFF;--accent:#3B82F6;--accent-hover:#2563EB;--success:#10B981;--warning:#F59E0B;--error:#EF4444;--radius-sm:4px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;--radius-2xl:24px;--radius-full:9999px;--font:'Inter',system-ui,-apple-system,sans-serif;--shadow-sm:0 1px 2px rgba(0,0,0,.05);--shadow-md:0 4px 6px -1px rgba(0,0,0,.1);--shadow-lg:0 10px 15px -3px rgba(0,0,0,.1);--shadow-xl:0 20px 25px -5px rgba(0,0,0,.1);--ease:cubic-bezier(0.4,0,0.2,1)}
+:root{--primary:#1A2744;--primary-light:#1A3A5C;--primary-lighter:#5F7A96;--primary-pale:#E8ECF1;--primary-dark:#0F1829;--fg:#0D0D0D;--muted:#6C757D;--muted-light:#ADB5BD;--border:#E5E7EB;--bg:#F8F9FA;--surface:#FFFFFF;--accent:#3B82F6;--accent-hover:#2563EB;--success:#10B981;--warning:#F59E0B;--error:#EF4444;--radius-sm:4px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;--radius-2xl:24px;--radius-full:9999px;--font:'Inter','Inter Fallback',system-ui,-apple-system,sans-serif;--shadow-sm:0 1px 2px rgba(0,0,0,.05);--shadow-md:0 4px 6px -1px rgba(0,0,0,.1);--shadow-lg:0 10px 15px -3px rgba(0,0,0,.1);--shadow-xl:0 20px 25px -5px rgba(0,0,0,.1);--ease:cubic-bezier(0.4,0,0.2,1)}
 
 /* ── Reset ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
