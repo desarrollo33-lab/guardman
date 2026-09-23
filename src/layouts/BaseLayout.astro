@@ -26,7 +26,7 @@ import {
   hreflangTags,
   type BreadcrumbItem,
 } from '../lib/seo';
-import type { Location } from '../lib/constants';
+import { INTER_FONT_URL, type Location } from '../lib/constants';
 
 interface Props {
   title: string;
@@ -261,12 +261,15 @@ const hreflangs = hreflangTags(Astro.url.pathname);
 
     {/* Preload Inter Variable para que el browser levante el woff2 en paralelo
         al primer paint y no haya FOUT visible en el hero. crossorigin es obligatorio
-        aunque same-origin porque el browser exige credenciales para una fuente. */}
+        aunque same-origin porque el browser exige credenciales para una fuente.
+        IMPORTANTE: la URL debe matchar exactamente la del @font-face en
+        public/styles/site.css (mismo ?v=FONT_VERSION). Si difiere, el browser
+        hace doble GET y los 344 KB se duplican a 689 KB. */}
     <link
       rel="preload"
       as="font"
       type="font/woff2"
-      href="/fonts/InterVariable.woff2?v=20260923"
+      href={INTER_FONT_URL}
       crossorigin="anonymous"
     />
 
