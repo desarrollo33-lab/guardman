@@ -87,9 +87,20 @@
   secreto `DENUNCIAS_ADMIN_TOKEN`.
 
 ## AEO / descubrimiento para agentes
-- `/llms.txt` y `/.well-known/ai-catalog.json` se **generan** desde `src/lib/constants.ts`.
-  No editarlos a mano: si el sitio cambia, se desincronizan (ya pasó, ver el comentario de
-  `src/pages/llms.txt.ts`).
+- `/llms.txt`, `/.well-known/ard.json` y `/.well-known/ai-catalog.json` se **generan** desde
+  `src/lib/constants.ts` (el manifiesto, desde `src/lib/ai-catalog.ts`). No editarlos a mano: si el
+  sitio cambia, se desincronizan (ya pasó, ver el comentario de `src/pages/llms.txt.ts`).
+- **El manifiesto se valida contra el esquema oficial en `tests/ai-catalog.test.ts`.** El esquema
+  está vendorizado en `tests/fixtures/ard-ai-catalog.schema.json` (spec `ards-project/ard-spec`) y
+  también sirve `node scripts/validate-ai-catalog.mjs <archivo>` contra un archivo ya publicado.
+  Dos reglas que rompimos el 2026-10-02 y hay que respetar al agregar entradas:
+  `host` es `additionalProperties:false` (solo displayName, identifier, documentationUrl, logoUrl,
+  trustManifest) y cada entrada lleva `url` **XOR** `data`, nunca ambos.
+- El tipo de media de una entrada no lo restringe el esquema, pero el validador de
+  "Agent Discoverability" solo acepta los tipos estándar de ARD. `text/html` y
+  `application/json` quedan fuera de esa lista a propósito: son los tipos honestos de páginas
+  públicas y de catálogos propios, y etiquetarlos como `application/ai-catalog+json` haría que un
+  consumidor conforme intente parsearlos como manifiesto y falle.
 - `Link:` headers en respuestas HTML salen de `src/middleware.ts`, no de `public/_headers`:
   ese archivo solo aplica a assets estáticos y nunca aparece en páginas SSR.
 - `robots.txt` declara `ai-train=no, search=yes, ai-input=yes`: GuardMan quiere ser citado por

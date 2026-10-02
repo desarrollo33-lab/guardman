@@ -22,6 +22,16 @@
 //
 // `specVersion: "1.0"` es la versión del **data model de AI Catalog**, no la
 // del spec ARD. ARD lee el campo como definido por transporte y lo ignora.
+//
+// CONFORMIDAD: este manifiesto se valida contra el esquema oficial
+// (tests/fixtures/ard-ai-catalog.schema.json, descargado de
+// ards-project/ard-spec) en `tests/ai-catalog.test.ts`. Dos reglas del esquema
+// que ya rompimos una vez y hay que respetar al agregar entradas:
+//   1. `host` es additionalProperties:false — sólo displayName, identifier,
+//      documentationUrl, logoUrl y trustManifest.
+//   2. Cada entrada lleva `url` XOR `data` (Strict Value-or-Reference), nunca
+//      ambos y nunca ninguno.
+// Para revalidar contra producción: `node scripts/validate-ai-catalog.mjs`.
 // ════════════════════════════════════════════════════════════════
 
 import {
@@ -49,6 +59,8 @@ export interface ArdEntry {
   url?: string;
   data?: unknown;
   representativeQueries: string[];
+  /** Extensiones propias. El esquema sólo admite string/number/boolean/null. */
+  metadata?: Record<string, string | number | boolean | null>;
 }
 
 const serviceEntries = Object.keys(SERVICE_NAMES).map((slug) => ({
@@ -73,19 +85,13 @@ export function buildArdManifest() {
       // Requisito duro de conformidad: sin `host.identifier` el manifiesto
       // no valida. `did:web` anclado al dominio, sin esquema ni path.
       identifier: `did:web:${PUBLISHER_DOMAIN}`,
-      url: SITE.URL,
-      founded: SITE.FOUNDED_YEAR,
-      description: `${SITE.TAGLINE}. Cobertura en ${COVERAGE_TOTAL} comunas de la Región Metropolitana y Valparaíso.`,
-      // El teléfono y el horario son los dos datos que un asistente más
-      // necesita y menos suele acertar. Se declaran acá para que no dependan
-      // de que el agente raspe el HTML.
-      contactPoint: {
-        telephone: SITE.PHONE,
-        email: SITE.EMAIL_INFO,
-        availableHours: `${OPENING_HOURS_TEXT} (${TIMEZONE_LABEL})`,
-        address: `${SITE.ADDRESS}, ${SITE.ADDRESS_LOCALITY}, ${SITE.ADDRESS_REGION}`,
-      },
-      sameAs: [SITE.INSTAGRAM_URL, SITE.YOUTUBE_URL],
+      // `host` es `additionalProperties: false` en el esquema: solo admite
+      // displayName, identifier, documentationUrl, logoUrl y trustManifest.
+      // Los datos que antes vivían acá —teléfono, horario, dirección, redes—
+      // NO se pierden: están en `metadata` de la entrada de llms.txt, que el
+      // esquema sí permite, y en /llms.txt y en el JSON-LD ContactPoint.
+      documentationUrl: `${SITE.URL}/llms.txt`,
+      logoUrl: `${SITE.URL}/images/logo-byn.png`,
     },
     entries: [
       {
@@ -100,6 +106,19 @@ export function buildArdManifest() {
           'en qué comunas de Santiago trabaja GuardMan',
           'cuál es el teléfono y el horario de GuardMan',
         ],
+        // El teléfono y el horario son los dos datos que un asistente más
+        // necesita y menos suele acertar. Se declaran acá —y no en `host`,
+        // que es additionalProperties:false— para que no dependan de que el
+        // agente raspe el HTML.
+        metadata: {
+          telefono: SITE.PHONE,
+          email: SITE.EMAIL_INFO,
+          horario: `${OPENING_HOURS_TEXT} (${TIMEZONE_LABEL})`,
+          direccion: `${SITE.ADDRESS}, ${SITE.ADDRESS_LOCALITY}, ${SITE.ADDRESS_REGION}`,
+          fundacion: String(SITE.FOUNDED_YEAR),
+          instagram: SITE.INSTAGRAM_URL,
+          youtube: SITE.YOUTUBE_URL,
+        },
       },
       {
         identifier: `urn:air:${PUBLISHER_DOMAIN}:content:services`,
@@ -124,7 +143,10 @@ export function buildArdManifest() {
         type: 'application/json',
         description:
           'Guías de referencia sobre certificación OS-10, Ley 21.659 de Seguridad Privada, facultades y límites de un guardia, y funciones de vigilancia en condominios. Cada guía declara la norma vigente, la fecha de vigencia y enlaza la fuente oficial. Es la referencia pública de GuardMan sobre el marco regulatorio del rubro.',
-        url: `${SITE.URL}/seguridad-privada/`,
+        // Estricta value-or-reference: `url` XOR `data`, nunca ambos. Acá va el
+        // `data` porque el contenido indexado (normativa + guías con sus
+        // fuentes oficiales) es más útil para un asistente que la página HTML,
+        // que además obliga a rascarla. La URL pública queda en metadata.
         data: {
           normativa: {
             ley: 'Ley 21.659 sobre Seguridad Privada',
@@ -151,6 +173,7 @@ export function buildArdManifest() {
           'diferencia entre guardia de seguridad y vigilante privado',
           'qué funciones tiene un guardia en un condominio',
         ],
+        metadata: { paginaPublica: `${SITE.URL}/seguridad-privada/` },
       },
       {
         identifier: `urn:air:${PUBLISHER_DOMAIN}:content:guias-dotacion`,
@@ -158,7 +181,7 @@ export function buildArdManifest() {
         type: 'application/json',
         description:
           'Método de dimensionamiento de puestos de seguridad (acceso, riesgo y horario) y puntos a verificar antes de contratar. GuardMan publica el método y no los ratios de dotación.',
-        url: `${SITE.URL}/guias/`,
+        // `data` y no `url`: el índice de guías es lo que consume el agente.
         data: {
           guias: GUIDES.map((g) => ({
             titulo: g.title,
@@ -172,6 +195,7 @@ export function buildArdManifest() {
           'cómo elegir una empresa de seguridad privada en Chile',
           'turnos y cobertura 24/7 en seguridad',
         ],
+        metadata: { paginaPublica: `${SITE.URL}/guias/` },
       },
       {
         identifier: `urn:air:${PUBLISHER_DOMAIN}:content:coverage`,
