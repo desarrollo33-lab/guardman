@@ -1,5 +1,17 @@
-// /robots.txt v3.1 — crawl-delay, sitemap multi-región, Content Signals y
-// puntero de descubrimiento para agentes (Agentmap, ARD §"Publishing").
+// /robots.txt v3.1 — crawl-delay, sitemap multi-región y Content Signals.
+//
+// ARD (descubrimiento para agentes) NO se anuncia con la directiva `Agentmap`
+// de robots.txt, aunque el spec la permita: Googlebot no la implementa y la
+// reporta como Error en GSC. Iba además antes de los grupos que bloquean
+// Semrush/Ahrefs/DotBot/MJ12 y antes del `Sitemap:`. Google sigue parseando
+// igual, pero un parser estricto de terceros puede abortar en esa línea y
+// perder todo lo que viene después. El descubrimiento ya está anunciado por
+// tres vías que Googlebot sí entiende: /.well-known/ard.json (el well-known
+// URI, que es el mecanismo primario del spec), <link rel="ard"> en BaseLayout
+// y el header `Link: rel="ard"` en middleware.ts.
+//
+// No reintroducir `Agentmap` para "quedarse a mano" con ARD: el mecanismo
+// primario ya está cubierto y la línea solo aporta error en Search Console.
 import { SITE } from '../lib/constants';
 
 const robots = `# GuardMan Chile — robots.txt v3.1
@@ -20,13 +32,8 @@ Crawl-delay: 1
 # ai-input=yes: los asistentes SÍ pueden leer y citar el contenido. Es la
 # intención del sitio — de hecho /llms.txt existe justo para eso.
 # ai-train=no: no se autoriza usar el contenido para entrenar modelos.
-# search=yes: los buscadores traditional siguen\indexando normal.
+# search=yes: los buscadores tradicionales siguen/indexando normal.
 Content-Signal: ai-train=no, search=yes, ai-input=yes
-
-# Manifiesto de capacidades para agentes (ARD). Un consumidor debe ir a
-# /.well-known/ard.json; la ruta /ai-catalog.json se sirve como cortesía
-# de la versión previa del data model.
-Agentmap: ${SITE.URL}/.well-known/ard.json
 
 # Bots específicos
 User-agent: Googlebot
