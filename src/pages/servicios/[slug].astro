@@ -27,11 +27,19 @@ const relacionados = Object.entries(SERVICE_NAMES)
   .filter(([s]) => s !== slug)
   .slice(0, 3)
   .map(([s, n]) => ({ slug: s, name: n }));
+
+// OS-10 / central de monitoreo / Guardpod solo aplican a servicios de
+// vigilancia. Para aseo se emiten título y descripción propios. Verificado 2026-10-02.
+const certified = svc.certified !== false;
+const seoTitle = certified ? `${name} con Certificación OS-10` : name;
+const seoDescription = certified
+  ? `${name} con certificación OS-10 en 14 comunas: 12 en la Región Metropolitana y 2 en Valparaíso. Personal propio, central de monitoreo 24/7 y tecnología Guardpod. Cotización personalizada en 24 horas.`
+  : `${svc.shortDesc}. Servicio en 14 comunas: 12 en la Región Metropolitana y 2 en Valparaíso, con personal uniformado y supervisión de terreno. Cotización personalizada en 24 horas.`;
 ---
 
 <BaseLayout
-  title={`${name} con Certificación OS-10`}
-  description={`${name} con certificación OS-10 en 14 comunas: 12 en la Región Metropolitana y 2 en Valparaíso. Personal propio, central de monitoreo 24/7 y tecnología Guardpod. Cotización personalizada en 24 horas.`}
+  title={seoTitle}
+  description={seoDescription}
   breadcrumb={name}
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Servicios', url: '/servicios' }, { name, url: `/servicios/${slug}` }]}
   service={{
@@ -68,9 +76,13 @@ const relacionados = Object.entries(SERVICE_NAMES)
       <div class="detail-content-grid">
         <div class="article-body">
           <div class="block" data-od-id="block-intro">
-            <h2>Seguridad privada de confianza para su propiedad</h2>
+            <h2>{certified ? 'Seguridad privada de confianza para su propiedad' : 'Un servicio de aseo con supervision permanente'}</h2>
             <p>{svc.longDesc}</p>
-            <p>Al contratar este servicio accede a un equipo de profesionales certificados OS-10 con más de 10 años de trayectoria, respaldado por nuestra central de monitoreo propia 24/7 y por el sistema autónomo Guardpod cuando el caso requiere vigilancia en zonas sin infraestructura.</p>
+            {certified ? (
+              <p>Al contratar este servicio accede a un equipo de profesionales certificados OS-10 con más de 10 años de trayectoria, respaldado por nuestra central de monitoreo propia 24/7 y por el sistema autónomo Guardpod cuando el caso requiere vigilancia en zonas sin infraestructura.</p>
+            ) : (
+              <p>Cada cuenta tiene un supervisor de terreno asignado, responsable de la calidad del servicio y del contacto directo con el administrador de la propiedad. Entregamos un reporte mensual con el detalle de actividades ejecutadas, incidencias y horas.</p>
+            )}
           </div>
 
           <div class="block" data-od-id="block-features">

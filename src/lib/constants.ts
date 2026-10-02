@@ -146,6 +146,8 @@ export const LOCATIONS: Location[] = [
   { slug: 'quilicura', name: 'Quilicura', lat: -33.3586, lng: -70.7406, zone: 'Norte', region: 'RM', qid: 'Q51612' },
   { slug: 'la-reina', name: 'La Reina', lat: -33.4473, lng: -70.5459, zone: 'Oriente', region: 'RM', qid: 'Q14466' },
   { slug: 'las-condes', name: 'Las Condes', lat: -33.4189, lng: -70.5464, zone: 'Oriente', region: 'RM', qid: 'Q14484' },
+  { slug: 'providencia', name: 'Providencia', lat: -33.4362, lng: -70.6090, zone: 'Oriente', region: 'RM', qid: 'Q51587' },
+  { slug: 'nunoa', name: 'Ñuñoa', lat: -33.4593, lng: -70.6003, zone: 'Oriente', region: 'RM', qid: 'Q201076' },
   { slug: 'lo-barnechea', name: 'Lo Barnechea', lat: -33.3536, lng: -70.5219, zone: 'Oriente', region: 'RM', qid: 'Q14502' },
   { slug: 'vitacura', name: 'Vitacura', lat: -33.4028, lng: -70.5969, zone: 'Oriente', region: 'RM', qid: 'Q201036' },
   { slug: 'conchali', name: 'Conchalí', lat: -33.3917, lng: -70.6658, zone: 'Poniente', region: 'RM', qid: 'Q3851' },
@@ -210,6 +212,10 @@ export const LOCATION_NAMES: Record<string, string> = Object.fromEntries(
 export const ZONE_CONTEXT: Record<string, string> = {
   'las-condes':
     'comuna del sector oriente con alta concentración de embajadas, oficinas corporativas, clínicas privadas y centros comerciales como Parque Arauco y Costanera Center',
+  providencia:
+    'comuna del sector oriente con el Parque Bicentenario, el Costanera Center, el Barrio Italia y una alta concentración de oficinas, comercios y restaurantes a lo largo de Avenida Providencia',
+  nunoa:
+    'comuna del sector oriente con el Estadio Nacional y su parque deportivo, el Campus Islae de la Pontificia Universidad Católica, barrios residenciales consolidados y un sector de comercio local activo',
   vitacura:
     'comuna residencial de alto valor con parques como Bicentenario y Juan Pablo II, sedes diplomáticas y centros de diseño y arquitectura',
   'santiago-centro':
