@@ -2,6 +2,7 @@
 // TrustSignals — Bloque de señales de confianza para conversión.
 // Stats + certificaciones.
 import Icon from './Icon.astro';
+import { FAQ_HOME } from '../lib/constants';
 
 const certifications = [
   { label: 'Certificación OS-10', desc: 'Vigente, autorizada por Carabineros de Chile', icon: 'shield' },
@@ -10,32 +11,10 @@ const certifications = [
   { label: 'Central de monitoreo propia', desc: 'Operación 24/7 con redundancia de sistemas', icon: 'monitor' },
 ];
 
-const faqs = [
-  {
-    q: '¿Cuánto demora la cotización?',
-    a: 'Nuestro equipo comercial le contacta en menos de 24 horas hábiles. Para urgencias, llame al +56 9 3000 0010 y atendemos en el acto, todos los días del año.',
-  },
-  {
-    q: '¿Cuál es el mínimo de guardias que puedo contratar?',
-    a: 'No hay mínimo. Diseñamos planes desde un guardia con turno parcial hasta operaciones 24/7 con múltiples puestos. Cada cotización se ajusta a sus necesidades reales.',
-  },
-  {
-    q: '¿Los guardias están realmente certificados?',
-    a: 'Sí, todos nuestros guardias acreditan certificación OS-10 vigente emitida por la Prefectura de Seguridad Privada de Carabineros. Verificamos antecedentes penales, laborales y referencias.',
-  },
-  {
-    q: '¿Qué comunas de Santiago cubren?',
-    a: 'Cubrimos 14 comunas de la Región Metropolitana: Las Condes, Vitacura, Lo Barnechea, La Reina, Providencia, Santiago Centro, Huechuraba, Quilicura, Conchalí, Renca, Pudahuel, La Pintana y Lampa. También Los Andes y San Felipe en la Región de Valparaíso.',
-  },
-  {
-    q: '¿Pueden combinar guardias con tecnología?',
-    a: 'Sí. Integramos guardias OS-10 con CCTV, control de accesos biométrico, Ajax Systems (somos instaladores oficiales) y el sistema autónomo Guardpod para vigilancia en zonas sin infraestructura. La cotización incluye la combinación óptima para su propiedad.',
-  },
-  {
-    q: '¿Qué pasa si necesito reemplazar un guardia?',
-    a: 'Contamos con un sistema de respaldo garantizado. Si un guardia se ausenta, enviamos reemplazo certificado en menos de 4 horas, sin costo adicional para el cliente.',
-  },
-];
+// La FAQ visible y el JSON-LD FAQPage deben ser el MISMO texto: Google exige
+// que el contenido marcado sea visible. Se leen de la misma constante
+// (constants.ts → FAQ_HOME) para que no puedan divergir de nuevo.
+const faqs = FAQ_HOME;
 ---
 
 <section class="trust-section" data-od-id="trust-signals">

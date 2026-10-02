@@ -4,12 +4,28 @@
 // Article, BreadcrumbList enriquecido, GeoCoordinates, etc.
 // ════════════════════════════════════════════════════════════════
 
-import { SITE, GEO, LOCATIONS, SERVICE_NAMES, SECTOR_NAMES } from './constants';
+import { SITE, GEO, LOCATIONS, SERVICE_NAMES, SECTOR_NAMES, SITE_DESCRIPTION, OPENING_HOURS } from './constants';
 import type { Location } from './constants';
 
 export interface BreadcrumbItem {
   name: string;
   url: string;
+}
+
+/**
+ * PostalAddress única. Estaba duplicada literal en `organizationSchema` y
+ * `localBusinessSchema`; cualquier corrección had que hacerse dos veces y
+ * es exactamente el tipo de valor que se desincroniza del resto.
+ */
+function postalAddress() {
+  return {
+    '@type': 'PostalAddress',
+    streetAddress: SITE.ADDRESS,
+    addressLocality: SITE.ADDRESS_LOCALITY,
+    addressRegion: SITE.ADDRESS_REGION,
+    postalCode: SITE.ADDRESS_POSTAL_CODE,
+    addressCountry: SITE.ADDRESS_COUNTRY,
+  };
 }
 
 /** Schema Organization base, enriquecido con geo + sameAs. */
@@ -31,14 +47,7 @@ export function organizationSchema() {
     telephone: SITE.PHONE,
     email: SITE.EMAIL_INFO,
     faxNumber: undefined,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Av. Américo Vespucio 1940, Oficina 301-01, Núcleo Vespucio',
-      addressLocality: 'Conchalí',
-      addressRegion: 'Región Metropolitana',
-      postalCode: '8560027',
-      addressCountry: 'CL',
-    },
+    address: postalAddress(),
     geo: {
       '@type': 'GeoCoordinates',
       latitude: GEO.lat,
@@ -53,7 +62,11 @@ export function organizationSchema() {
     areaServed: LOCATIONS.map((l) => ({
       '@type': 'City',
       name: l.name,
-      sameAs: `https://www.wikidata.org/wiki/Q${l.slug.length * 7}`,
+      // QID verificado contra la API de Wikidata (P31=Q1840161, "comuna de
+      // Chile"). Antes se calculaba como `Q${slug.length * 7}`, que repetía
+      // Q56 en cuatro comunas y Q70 en otras tres: un modelo no podía
+      // distinguir las entidades. `l.qid` es dato curado, no derivado.
+      sameAs: `https://www.wikidata.org/wiki/${l.qid}`,
     })),
     knowsAbout: [
       'Seguridad Privada',
@@ -95,7 +108,7 @@ export function localBusinessSchema() {
     '@id': `${SITE.URL}/#localbusiness`,
     name: SITE.NAME,
     legalName: SITE.LEGAL_NAME,
-    description: SITE.DESCRIPTION,
+    description: SITE_DESCRIPTION,
     image: [`${SITE.URL}/images/hero-home.webp`, `${SITE.URL}/favicon.svg`],
     url: SITE.URL,
     telephone: SITE.PHONE,
@@ -103,60 +116,30 @@ export function localBusinessSchema() {
     priceRange: '$$',
     currenciesAccepted: 'CLP',
     paymentAccepted: 'Efectivo, Transferencia, Tarjeta de Crédito',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Av. Américo Vespucio 1940, Oficina 301-01, Núcleo Vespucio',
-      addressLocality: 'Conchalí',
-      addressRegion: 'Región Metropolitana',
-      postalCode: '8560027',
-      addressCountry: 'CL',
-    },
+    address: postalAddress(),
     geo: {
       '@type': 'GeoCoordinates',
       latitude: GEO.lat,
       longitude: GEO.lng,
     },
     hasMap: `https://www.google.com/maps/search/?api=1&query=${GEO.lat},${GEO.lng}`,
-    openingHoursSpecification: [
-      {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-        opens: '08:00',
-        closes: '20:00',
-      },
-      {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Saturday', 'Sunday'],
-        opens: '00:00',
-        closes: '23:59',
-        description: 'Monitoreo 24/7 (centro de operaciones)',
-      },
-    ],
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: '127',
-      bestRating: '5',
-      worstRating: '1',
-    },
-    review: [
-      {
-        '@type': 'Review',
-        reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
-        author: { '@type': 'Person', name: 'Roberto Fuentes' },
-        datePublished: '2026-05-10',
-        reviewBody: 'Excelente servicio de monitoreo 24/7. Reducción del 80% en incidentes desde que contratamos a GuardMan.',
-        publisher: { '@type': 'Organization', name: 'Mall Premium' },
-      },
-      {
-        '@type': 'Review',
-        reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
-        author: { '@type': 'Person', name: 'Ana Vergara' },
-        datePublished: '2026-04-22',
-        reviewBody: 'Guardias OS-10 profesionalistas. Cumplen protocolos al pie de la letra. Recomendados.',
-        publisher: { '@type': 'Organization', name: 'Banco Regional' },
-      },
-    ],
+    openingHoursSpecification: OPENING_HOURS.map((h) => ({
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [...h.days],
+      opens: h.opens,
+      closes: h.closes,
+      ...(h.note ? { description: h.note } : {}),
+    })),
+    // Sin `aggregateRating` ni `review`.
+    //
+    // El markup declaraba 4,9/5 sobre 127 reseñas y dos reseñas firmadas
+    // ("Roberto Fuentes" / "Mall Premium", "Ana Vergara" / "Banco Regional")
+    // que no existen en ninguna plataforma de reseñas verificable y no están
+    // visibles en la página. Eso es dos cosas a la vez: una acción manual de
+    // Google por structured data no confiable, y un riesgo legal por reseñas
+    // embebidas que la empresa no puede respaldar. No se reemplaza con un
+    // número inventado: se elimina. Para volver a declararlo hace falta una
+    // fuente real y verificable.
     sameAs: [SITE.INSTAGRAM_URL, SITE.YOUTUBE_URL],
     parentOrganization: { '@type': 'Organization', name: SITE.LEGAL_NAME, '@id': `${SITE.URL}/#organization` },
   };
@@ -352,8 +335,19 @@ export function articleSchema(opts: {
   };
 }
 
-/** Schema Speakable para asistentes de voz. */
-export function speakableSchema(url: string, selectors: string[] = ['.hero h1', '.hero p', 'h2']) {
+/**
+ * Schema Speakable para asistentes de voz.
+ *
+ * El default anterior era `['.hero h1', '.hero p', 'h2']`. Un `h2` pelado
+ * selecciona TODOS los encabezados de nivel 2 del documento — no es un bloque
+ * hablable, es el esqueleto de la página. Los asistentes de voz terminarían
+ * leyendo la lista de sections en vez del mensaje principal. Se acota a la
+ * prosa del hero: el titular y su párrafo de entrada.
+ */
+export function speakableSchema(
+  url: string,
+  selectors: string[] = ['.hero h1', '.hero .hero-lead'],
+) {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
@@ -373,7 +367,7 @@ export function websiteSchema() {
     '@id': `${SITE.URL}/#website`,
     url: SITE.URL,
     name: SITE.NAME,
-    description: SITE.DESCRIPTION,
+    description: SITE_DESCRIPTION,
     publisher: { '@type': 'Organization', '@id': `${SITE.URL}/#organization` },
     inLanguage: 'es-CL',
     potentialAction: {
@@ -399,13 +393,19 @@ export function geoMetaTags() {
   ];
 }
 
-/** Hreflang tags para multi-región (Chile/LatAm/España/global default). */
+/**
+ * Hreflang. Sólo `es-cl` (el idioma real del sitio) y `x-default`.
+ *
+ * Antes declaraba además `es` y `es-419`. No existe ninguna página /en/ ni
+ * /es/, así que los cuatro alternates apuntaban a la misma URL: Google
+ * recibe "esta página es la versión es, es-419, es-cl y x-default a la vez",
+ * que es hreflang contradictorio y una fuga de signals. El sitemap emite
+ * los mismos alternates por URL, así que el duplicado iba a 190 páginas.
+ */
 export function hreflangTags(path: string = '/') {
   const base = SITE.URL;
   return [
     { hreflang: 'es-cl', href: `${base}${path}` },
-    { hreflang: 'es', href: `${base}${path}` },
-    { hreflang: 'es-419', href: `${base}${path}` },
     { hreflang: 'x-default', href: `${base}${path}` },
   ];
 }

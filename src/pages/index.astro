@@ -2,7 +2,7 @@
 // Homepage v4.0 — Optimizada para captura de leads.
 // Hero persuasivo + trust signals + cómo funciona + CTA inline + cluster.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SERVICE_NAMES, LOCATIONS, ZONE_COLORS } from '../lib/constants';
+import { SERVICE_NAMES, LOCATIONS, ZONE_COLORS, FAQ_HOME, SITE } from '../lib/constants';
 import { ICONS, SERVICE_ICONS } from '../lib/icons';
 import { SERVICES, ZONAS } from '../lib/content';
 import Icon from '../components/Icon.astro';
@@ -74,16 +74,11 @@ const markers = LOCATIONS.map((l) => {
 
 <BaseLayout
   title="Seguridad Privada OS-10 Santiago"
-  description="Seguridad privada OS-10 en 14 comunas de Santiago y Valparaíso. Guardias, CCTV, monitoreo 24/7, Guardpod y Ajax Systems. Cotización en 24h."
+  description="Seguridad privada OS-10 en 14 comunas: 12 en la Región Metropolitana y 2 en Valparaíso. Guardias, CCTV, monitoreo 24/7, Guardpod y Ajax Systems. Cotización en 24h."
   localBusiness={true}
   showCluster={true}
   clusterType="servicios"
-  faq={[
-    { question: '¿Cuánto demora la cotización de seguridad privada?', answer: 'Nuestro equipo comercial le contacta en menos de 24 horas hábiles. Para urgencias, llame al +56 9 3000 0010 y atendemos en el acto, todos los días del año.' },
-    { question: '¿Cubren todas las comunas de Santiago?', answer: 'Cubrimos 14 comunas de la Región Metropolitana: Las Condes, Vitacura, Lo Barnechea, La Reina, Providencia, Santiago Centro, Huechuraba, Quilicura, Conchalí, Renca, Pudahuel, La Pintana y Lampa. También Los Andes y San Felipe en la Región de Valparaíso.' },
-    { question: '¿Los guardias están certificados OS-10?', answer: 'Sí, todos nuestros guardias acreditan certificación OS-10 vigente emitida por la Prefectura de Seguridad Privada de Carabineros de Chile. Verificamos antecedentes penales, laborales y referencias antes de asignarlos a un cliente.' },
-    { question: '¿Cuál es el costo de un guardia de seguridad en Chile?', answer: 'El valor depende del número de guardias, turnos, ubicación y servicios complementarios. Cotizamos sin compromiso en 24 horas, con planes desde un guardia parcial hasta operaciones 24/7 con cobertura multiplanta.' },
-  ]}
+  faq={FAQ_HOME.map((f) => ({ question: f.q, answer: f.a }))}
 >
   <!-- HERO -->
   <section class="hero" data-od-id="hero">
@@ -105,15 +100,15 @@ const markers = LOCATIONS.map((l) => {
         Certificación OS-10 · Ley 21.659
       </div>
       <h1>Seguridad Privada Profesional en Santiago de Chile</h1>
-      <p>Proteja su empresa, condominio o evento con <strong>guardias certificados OS-10</strong>, monitoreo propio 24/7 y el sistema autónomo <strong>Guardpod</strong>, una tecnología exclusiva en el mercado chileno. Más de 10 años de experiencia, 200+ guardias certificados y cobertura en 14 comunas de la Región Metropolitana y Valparaíso.</p>
+      <p class="hero-lead">Proteja su empresa, condominio o evento con <strong>guardias certificados OS-10</strong>, monitoreo propio 24/7 y el sistema autónomo <strong>Guardpod</strong>, una tecnología exclusiva en el mercado chileno. Más de 10 años de experiencia, 200+ guardias certificados y cobertura en 14 comunas: 12 en la Región Metropolitana y 2 en Valparaíso.</p>
       <div class="hero-ctas">
         <a href="/cotizacion" class="btn btn-primary btn-lg">
           <Icon name="shield" size={16} />
           Solicitar Cotización
         </a>
-        <a href={`tel:+56930000010`} class="btn btn-outline-light btn-lg">
+        <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg">
           <Icon name="phone" size={16} />
-          Llamar al +56 9 3000 0010
+          Llamar al +56 9 300 000 10
         </a>
       </div>
     </div>
@@ -353,12 +348,13 @@ const markers = LOCATIONS.map((l) => {
       <h2 class="section-title" style="text-align:center;max-width:700px;margin:0 auto 12px">Protección profesional para su tranquilidad</h2>
       <p class="section-subtitle" style="text-align:center;max-width:600px;margin:0 auto 28px">Más de 10 años protegiendo empresas y residencias con guardias certificados, tecnología propia y atención personalizada de un equipo que conoce su comuna.</p>
       <div style="text-align:center;margin-bottom:48px">
-        <a href="/contacto" class="btn btn-primary btn-lg">Hablar con un experto</a>
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+        <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg" style="margin-left:12px">Llamar al {SITE.PHONE}</a>
       </div>
       <hr style="border:0;border-top:1px solid rgba(255,255,255,.1);margin:0 0 48px" />
       <span class="section-label">Cobertura regional</span>
       <h2 class="section-title">Presencia en 14 comunas de Santiago y la Región de Valparaíso</h2>
-      <p class="section-subtitle">Atendemos en Providencia, Las Condes, Vitacura, Lo Barnechea, La Reina, Santiago Centro, Huechuraba, Quilicura, Conchalí, Pudahuel, Renca, Lampa, La Pintana, además de Los Andes y San Felipe. Cobertura operativa con respuesta coordinada entre zonas.</p>
+      <p class="section-subtitle">Atendemos en Las Condes, Vitacura, Lo Barnechea, La Reina, Santiago Centro, Huechuraba, Quilicura, Conchalí, Pudahuel, Renca, Lampa y La Pintana, además de Los Andes y San Felipe. Cobertura operativa con respuesta coordinada entre zonas.</p>
 
       <div class="coverage-split" style="margin-top:28px">
         <div class="coverage-zones">
@@ -398,7 +394,5 @@ const markers = LOCATIONS.map((l) => {
     title="Hablemos de su seguridad"
     subtitle="Nuestro equipo comercial está disponible 24/7 para responder consultas y diseñar una solución a su medida. Cotización personalizada en menos de 24 horas hábiles."
     primaryText="Solicitar Cotización"
-    secondaryText="Hablar con un experto"
-    secondaryHref="/contacto"
   />
 </BaseLayout>

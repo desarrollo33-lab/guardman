@@ -1,0 +1,27 @@
+/* ════════════════════════════════════════════════════════════════
+   GuardMan — Design tokens ( Tailwind @theme ).
+   ════════════════════════════════════════════════════════════════
+   Tokens compartidos por el bundle público y el del admin.
+   Se extrajeron de global.css para que el admin pueda importar Tailwind
+   sin arrastrarlo al sitio público (ver admin.css).
+   ════════════════════════════════════════════════════════════════ */
+
+@theme {
+  --color-navy: #1A2744;
+  --color-navy-light: #1E3054;
+  --color-navy-dark: #131D33;
+  --color-surface-0: #0D1525;
+  --color-surface-1: #131D33;
+  --color-surface-2: #1A2744;
+  --color-surface-3: #0f1729;
+  --color-fg: #e8ecf1;
+  --color-fg-muted: #8896ab;
+  --color-fg-dim: #5a6880;
+  --color-accent: #3B82F6;
+  --color-accent-hover: #2563eb;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+}

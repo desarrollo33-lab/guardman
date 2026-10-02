@@ -2,7 +2,11 @@
 // AdminLayout v3.1 — shell del panel admin. Astro puro + islas React.
 // v3.1: incluye MobileNav drawer + helpers JS mobile (toasts, long-press, move menu).
 import '../styles/design-tokens.css';
-import '../styles/global.css';
+// `admin.css` = tokens + Tailwind completo + los ~1.600 tokens de estilos del
+// panel. Antes el admin importaba `global.css`, que BaseLayout también importa:
+// por eso las clases del panel (.admin-shell, .kpi-card, .data-table, .sb-logo)
+// aparecían inlineadas en el <head> de cada página pública.
+import '../styles/admin.css';
 import '../styles/admin-mobile.css';
 import AdminSidebar from '../components/admin/AdminSidebar.astro';
 import AdminTopbar from '../components/admin/AdminTopbar.astro';

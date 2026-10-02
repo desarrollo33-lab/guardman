@@ -20,6 +20,10 @@ export const SITE = {
   EMAIL_INFO: 'info@guardman.cl',
   EMAIL_VENTAS: 'info@guardman.cl',
   ADDRESS: 'Av. Américo Vespucio 1940, Oficina 301-01, Núcleo Vespucio',
+  ADDRESS_LOCALITY: 'Conchalí',
+  ADDRESS_REGION: 'Región Metropolitana',
+  ADDRESS_POSTAL_CODE: '8560027',
+  ADDRESS_COUNTRY: 'CL',
   RUT: '77.123.456-7',
   FOUNDED_YEAR: 2014,
   INSTAGRAM_URL: 'https://www.instagram.com/grupo_guardman',
@@ -106,30 +110,94 @@ export const SECTOR_TO_SERVICE: Record<string, string> = {
 };
 
 // Ubicaciones con coordenadas exactas (para el mapa Leaflet)
+//
+// `qid` = Wikidata QID de la COMUNA (no de la ciudad ni de la estación de
+// metro). Verificado uno por uno contra la API de Wikidata el 2026-10-01:
+// los 14 devuelven P31=Q1840161 ("comuna de Chile") y son 14 IDs distintos.
+// La regla de oro: `qid` se escribe a mano DESPUÉS de verificar; nunca se
+// deriva de otra variable (un `slug.length * n` anterior produjo Q56 en cuatro
+// comunas distintas, que es indistinguible para un modelo).
 export interface Location {
   slug: string;
   name: string;
   lat: number;
   lng: number;
   zone: 'Oriente' | 'Centro' | 'Norte' | 'Sur' | 'Poniente' | 'Valparaíso';
+  /** Región administrativa: RM = Región Metropolitana, VS = Valparaíso. */
+  region: 'RM' | 'VS';
+  /** Wikidata QID verificado de la comuna. */
+  qid: string;
 }
 
 export const LOCATIONS: Location[] = [
-  { slug: 'santiago-centro', name: 'Santiago Centro', lat: -33.4378, lng: -70.6505, zone: 'Centro' },
-  { slug: 'huechuraba', name: 'Huechuraba', lat: -33.3586, lng: -70.6773, zone: 'Norte' },
-  { slug: 'lampa', name: 'Lampa', lat: -33.2786, lng: -70.8764, zone: 'Norte' },
-  { slug: 'quilicura', name: 'Quilicura', lat: -33.3586, lng: -70.7406, zone: 'Norte' },
-  { slug: 'la-reina', name: 'La Reina', lat: -33.4473, lng: -70.5459, zone: 'Oriente' },
-  { slug: 'las-condes', name: 'Las Condes', lat: -33.4189, lng: -70.5464, zone: 'Oriente' },
-  { slug: 'lo-barnechea', name: 'Lo Barnechea', lat: -33.3536, lng: -70.5219, zone: 'Oriente' },
-  { slug: 'vitacura', name: 'Vitacura', lat: -33.4028, lng: -70.5969, zone: 'Oriente' },
-  { slug: 'conchali', name: 'Conchalí', lat: -33.3917, lng: -70.6658, zone: 'Poniente' },
-  { slug: 'pudahuel', name: 'Pudahuel', lat: -33.4364, lng: -70.7406, zone: 'Poniente' },
-  { slug: 'renca', name: 'Renca', lat: -33.4056, lng: -70.6969, zone: 'Poniente' },
-  { slug: 'la-pintana', name: 'La Pintana', lat: -33.5836, lng: -70.6347, zone: 'Sur' },
-  { slug: 'los-andes', name: 'Los Andes', lat: -32.8339, lng: -70.5981, zone: 'Valparaíso' },
-  { slug: 'san-felipe', name: 'San Felipe', lat: -32.7483, lng: -70.7244, zone: 'Valparaíso' },
+  { slug: 'santiago-centro', name: 'Santiago Centro', lat: -33.4378, lng: -70.6505, zone: 'Centro', region: 'RM', qid: 'Q188002' },
+  { slug: 'huechuraba', name: 'Huechuraba', lat: -33.3586, lng: -70.6773, zone: 'Norte', region: 'RM', qid: 'Q14433' },
+  { slug: 'lampa', name: 'Lampa', lat: -33.2786, lng: -70.8764, zone: 'Norte', region: 'RM', qid: 'Q14477' },
+  { slug: 'quilicura', name: 'Quilicura', lat: -33.3586, lng: -70.7406, zone: 'Norte', region: 'RM', qid: 'Q51612' },
+  { slug: 'la-reina', name: 'La Reina', lat: -33.4473, lng: -70.5459, zone: 'Oriente', region: 'RM', qid: 'Q14466' },
+  { slug: 'las-condes', name: 'Las Condes', lat: -33.4189, lng: -70.5464, zone: 'Oriente', region: 'RM', qid: 'Q14484' },
+  { slug: 'lo-barnechea', name: 'Lo Barnechea', lat: -33.3536, lng: -70.5219, zone: 'Oriente', region: 'RM', qid: 'Q14502' },
+  { slug: 'vitacura', name: 'Vitacura', lat: -33.4028, lng: -70.5969, zone: 'Oriente', region: 'RM', qid: 'Q201036' },
+  { slug: 'conchali', name: 'Conchalí', lat: -33.3917, lng: -70.6658, zone: 'Poniente', region: 'RM', qid: 'Q3851' },
+  { slug: 'pudahuel', name: 'Pudahuel', lat: -33.4364, lng: -70.7406, zone: 'Poniente', region: 'RM', qid: 'Q51591' },
+  { slug: 'renca', name: 'Renca', lat: -33.4056, lng: -70.6969, zone: 'Poniente', region: 'RM', qid: 'Q56119' },
+  { slug: 'la-pintana', name: 'La Pintana', lat: -33.5836, lng: -70.6347, zone: 'Sur', region: 'RM', qid: 'Q14464' },
+  { slug: 'los-andes', name: 'Los Andes', lat: -32.8339, lng: -70.5981, zone: 'Valparaíso', region: 'VS', qid: 'Q23660195' },
+  { slug: 'san-felipe', name: 'San Felipe', lat: -32.7483, lng: -70.7244, zone: 'Valparaíso', region: 'VS', qid: 'Q23660221' },
 ];
+
+// ────────────────────────────────────────────────────────────────
+// Cobertura — fuente única de verdad
+//
+// Las tres capas que exponen cobertura (copy visible, `areaServed` del
+// JSON-LD y llms.txt) se derivan de acá. Si se edita una comuna, cambia
+// en las tres. Contar ≠ 14 en llms.txt es imposible por construcción.
+// ────────────────────────────────────────────────────────────────
+export const COVERAGE_RM = LOCATIONS.filter((l) => l.region === 'RM');
+export const COVERAGE_VS = LOCATIONS.filter((l) => l.region === 'VS');
+export const COVERAGE_TOTAL = LOCATIONS.length; // 14
+
+/** "Las Condes, Vitacura, ... y Lampa" — lista de la RM, para copy. */
+export const RM_COMMUNES_LIST = COVERAGE_RM.map((l) => l.name).join(', ');
+
+/** "Los Andes y San Felipe" — lista de Valparaíso, para copy. */
+export const VS_COMMUNES_LIST = COVERAGE_VS.map((l) => l.name).join(' y ');
+
+/**
+ * Frase de cobertura única. Toda mención de cobertura en el sitio debe
+ * salir de acá para que el número nunca contradiga a `areaServed`.
+ */
+export const COVERAGE_SENTENCE =
+  `Operamos en ${COVERAGE_RM.length} comunas de la Región Metropolitana ` +
+  `(${RM_COMMUNES_LIST}) y en ${COVERAGE_VS.length} de Valparaíso (${VS_COMMUNES_LIST}), ` +
+  `${COVERAGE_TOTAL} comunas en total.`;
+
+/**
+ * Descripción canónica del sitio, derivada de la cobertura real.
+ * `SITE.DESCRIPTION` queda como valor histórico declarado arriba; este es el
+ * que consumen los schemas, y nunca puede desincronizarse de `areaServed`.
+ */
+export const SITE_DESCRIPTION =
+  'GuardMan Chile - Seguridad privada con certificación OS-10. Guardias, CCTV, control de accesos, ' +
+  'PPI (Protección de Personas Importantes), monitoreo 24/7, Guardpod y Ajax Systems. ' +
+  `Cobertura en ${COVERAGE_RM.length} comunas de la Región Metropolitana más ` +
+  `${COVERAGE_VS.length} en Valparaíso (${COVERAGE_TOTAL} en total).`;
+
+// Guard de coherencia: el conteo escrito a mano en SITE.DESCRIPTION tiene que
+// seguir diciendo lo mismo que la cobertura derivada. Esto corrió durante años
+// con "14 comunas de la Región Metropolitana" cuando la RM tiene 12: el copy
+// y el `areaServed` contaban cosas distintas. En dev esto rompe el build en
+// vez de llegar a producción.
+if (import.meta.env.DEV) {
+  const declared = SITE.DESCRIPTION.match(/Cobertura en (\d+) comunas/);
+  if (!declared || Number(declared[1]) !== COVERAGE_RM.length) {
+    throw new Error(
+      `Cobertura inconsistente: SITE.DESCRIPTION declara ${declared?.[1] ?? 'n/d'} ` +
+        `comunas de la RM pero LOCATIONS tiene ${COVERAGE_RM.length}. ` +
+        `Usar SITE_DESCRIPTION (derivado) en los schemas.`,
+    );
+  }
+}
 
 export const LOCATION_SLUGS = LOCATIONS.map((l) => l.slug) as readonly string[];
 export const LOCATION_NAMES: Record<string, string> = Object.fromEntries(
@@ -296,17 +364,103 @@ export const GEO = {
   },
 } as const;
 
+// Hreflang. El sitio es 100% en español y no existe ninguna página /en/,
+// por lo que declarar `es` y `es-419` como alternates apuntaba a la misma
+// URL sin contenido distinto: 4 declarations para 1 página. Google las
+// trata como hreflang contradictorio. Se deja sólo el par canónico.
 export const HREFLANG = [
   { hreflang: 'es-cl', href: '/' },
-  { hreflang: 'es', href: '/' },
-  { hreflang: 'es-419', href: '/' },
   { hreflang: 'x-default', href: '/' },
 ] as const;
+
+// Horario de atención — fuente única.
+//
+// Antes vivía en tres versiones: el JSON-LD (L-V 08:00-20:00, S-D 24/7),
+// llms.txt (L-V 09:00-18:00, "GMT-4") y el copy visible. Un asistente que
+// citaba llms.txt daba un horario que el sitio no mostraba. Ahora lo
+// declara el JSON-LD y llms.txt lo lee de acá, así que no pueden divergir.
+//
+// Zona horaria: UTC-3 (hora oficial de Chile continental). El "GMT-4" que
+// declaraba llms.txt era el offset de horario de verano, no el de Chile.
+export const OPENING_HOURS = [
+  {
+    days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    dayLabel: 'lunes a viernes',
+    opens: '08:00',
+    closes: '20:00',
+    note: 'Atención comercial',
+  },
+  {
+    days: ['Saturday', 'Sunday'],
+    dayLabel: 'sábado y domingo',
+    opens: '00:00',
+    closes: '23:59',
+    note: 'Monitoreo 24/7 (centro de operaciones)',
+  },
+] as const;
+
+/**
+ * Imagen social. Las dimensiones van declaradas acá y no hardcodeadas en el
+ * `<head>`: `og-default-v2.jpg` es 1400x775 y el head anunciaba 1200x630, así
+ * que la tarjeta se recortaba con un marco que no era el de la pieza. Si se
+ * cambia el archivo, se cambian estos dos números con él.
+ */
+export const OG_IMAGE = {
+  PATH: '/images/og-default-v2.jpg',
+  WIDTH: 1400,
+  HEIGHT: 775,
+} as const;
+
+export const TIMEZONE = 'America/Santiago';
+export const TIMEZONE_LABEL = 'UTC-3 (hora oficial de Chile)';
+
+/** "lunes a viernes 08:00-20:00; sábado y domingo 00:00-23:59 (monitoreo 24/7)" */
+export const OPENING_HOURS_TEXT = OPENING_HOURS.map(
+  (h) => `${h.dayLabel} ${h.opens}-${h.closes}`,
+).join('; ');
 
 export const SOCIAL_PROFILES = [
   SITE.INSTAGRAM_URL,
   SITE.YOUTUBE_URL,
 ] as const;
+
+// ────────────────────────────────────────────────────────────────
+// FAQ de la home — fuente única
+//
+// Antes vivía duplicada: `TrustSignals.astro` (6 preguntas, texto A) y
+// `index.astro` (4 preguntas, texto B). El JSON-LD FAQPage salía de la
+// segunda, así que Google Rich Results marcaba contenido que el usuario
+// no veía en la página — violation de las directrices de datos
+// estructurados. Ahora ambas capas leen esta lista: el marcado es un
+// espejo exacto del `<details>` visible, por construcción.
+//
+// Si se agrega una pregunta, se agrega acá y aparece en ambos lados.
+export const FAQ_HOME: { q: string; a: string }[] = [
+  {
+    q: '¿Cuánto demora la cotización?',
+    a: 'Nuestro equipo comercial le contacta en menos de 24 horas hábiles. Para urgencias, llame al +56 9 300 000 10 y atendemos en el acto, todos los días del año.',
+  },
+  {
+    q: '¿Cuál es el mínimo de guardias que puedo contratar?',
+    a: 'No hay mínimo. Diseñamos planes desde un guardia con turno parcial hasta operaciones 24/7 con múltiples puestos. Cada cotización se ajusta a sus necesidades reales.',
+  },
+  {
+    q: '¿Los guardias están realmente certificados?',
+    a: 'Sí, todos nuestros guardias acreditan certificación OS-10 vigente emitida por la Prefectura de Seguridad Privada de Carabineros. Verificamos antecedentes penales, laborales y referencias.',
+  },
+  {
+    q: '¿Qué comunas de Santiago cubren?',
+    a: 'Cubrimos 12 comunas de la Región Metropolitana: Las Condes, Vitacura, Lo Barnechea, La Reina, Santiago Centro, Huechuraba, Quilicura, Conchalí, Renca, Pudahuel, La Pintana y Lampa. También Los Andes y San Felipe en la Región de Valparaíso.',
+  },
+  {
+    q: '¿Pueden combinar guardias con tecnología?',
+    a: 'Sí. Integramos guardias OS-10 con CCTV, control de accesos biométrico, Ajax Systems (somos instaladores oficiales) y el sistema autónomo Guardpod para vigilancia en zonas sin infraestructura. La cotización incluye la combinación óptima para su propiedad.',
+  },
+  {
+    q: '¿Qué pasa si necesito reemplazar un guardia?',
+    a: 'Contamos con un sistema de respaldo garantizado. Si un guardia se ausenta, enviamos reemplazo certificado en menos de 4 horas, sin costo adicional para el cliente.',
+  },
+];
 
 // Versión del bundle (para cache-busting).
 export const BUNDLE_VERSION = 'v5.5.4';
