@@ -37,7 +37,7 @@ function genSessionId(): string {
 }
 
 export const GET: APIRoute = async ({ request }) => {
-  if (!isAdminRequest(request)) {
+  if (!(await isAdminRequest(request))) {
     return json({ ok: false, error: 'unauthorized' }, 401);
   }
   const db = (env as { DB?: D1Database }).DB;
@@ -145,7 +145,7 @@ export const GET: APIRoute = async ({ request }) => {
 };
 
 export const POST: APIRoute = async ({ request }) => {
-  if (!isAdminRequest(request)) {
+  if (!(await isAdminRequest(request))) {
     return json({ ok: false, error: 'unauthorized' }, 401);
   }
   const db = (env as { DB?: D1Database }).DB;

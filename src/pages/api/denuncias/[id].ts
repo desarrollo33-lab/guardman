@@ -50,7 +50,7 @@ const json = (body: unknown, status: number, origin: string | null) =>
 const ID_RE = /^D-\d{8}-[A-HJ-NP-Z2-9]{4}$/;
 
 // Verifica admin via helper compartido (cookie o DENUNCIAS_ADMIN_TOKEN).
-const isAdmin = (request: Request): boolean => isAdminRequest(request);
+const isAdmin = (request: Request): Promise<boolean> => isAdminRequest(request);
 
 const STATUS_VALUES = ['pending', 'reviewing', 'investigating', 'resolved', 'archived'] as const;
 type Status = (typeof STATUS_VALUES)[number];
@@ -74,7 +74,7 @@ export const GET: APIRoute = async ({ params, request }) => {
     return json({ ok: false, error: 'DB no configurada' }, 500, origin);
   }
 
-  const admin = isAdmin(request);
+  const admin = await isAdmin(request);
   const sql = admin
     ? `SELECT id, created_at, updated_at, status, categoria, relacion, lugar,
               fecha_incidente, personas_involucradas, descripcion,
@@ -98,7 +98,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
   const origin = request.headers.get('Origin');
   const url = new URL(request.url);
 
-  if (!isAdmin(request)) {
+  if (!(await isAdmin(request))) {
     return json({ ok: false, error: 'No autorizado' }, 401, origin);
   }
 

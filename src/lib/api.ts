@@ -20,6 +20,25 @@ export class ApiError extends Error {
 
 let refreshInflight: Promise<string | null> | null = null;
 
+/**
+ * Re-sincroniza la cookie httpOnly `gm_session` con el access token vigente.
+ *
+ * El middleware SSR valida la firma del JWT que viaja en la cookie
+ * (`src/middleware.ts`). Si el panel refresca el token en silencio y no
+ * actualiza la cookie, la cookie queda con un JWT vencido y las páginas
+ * /admin/* redirigen a /admin/login aunque la sesión de localStorage siga
+ * viva. Se llama después de cada refresh; fire-and-forget, igual que hace
+ * `src/pages/admin/login.astro` tras el login.
+ */
+function syncSessionCookie(access: string): void {
+  void fetch('/api/admin/session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify({ token: access }),
+  }).catch(() => {});
+}
+
 async function tryRefresh(): Promise<string | null> {
   if (refreshInflight) return refreshInflight;
   const rt = getRefreshToken();
@@ -48,6 +67,7 @@ async function tryRefresh(): Promise<string | null> {
         return null;
       }
       setToken(access, refresh);
+      syncSessionCookie(access);
       return access;
     } catch {
       return null;

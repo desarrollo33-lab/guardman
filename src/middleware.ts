@@ -1,7 +1,8 @@
 // ════════════════════════════════════════════════════════════════
 // GuardMan — Middleware SSR
 //   1. Auth server-side para rutas /admin/* (excepto /admin/login).
-//      Verifica cookie httpOnly `gm_session`. Sin cookie → 302 a /admin/login.
+//      Verifica la firma del access token JWT en la cookie httpOnly
+//      `gm_session`. Sin sesión válida → 302 a /admin/login.
 //   2. NO comprimimos en el worker. Cloudflare Workers runtime YA hace
 //      auto-compression en el edge de forma nativa (gzip/brotli según
 //      `Accept-Encoding` del cliente) y agrega `Content-Encoding` correctamente.
@@ -9,9 +10,11 @@
 //      capa y queda single-gzip sin header → garbage en pantalla.
 //   3. Headers de seguridad en TODAS las respuestas.
 //   4. Vary: Accept-Encoding para que el edge cache respete la codificación.
+//   5. Link headers (RFC 8288) apuntando al manifiesto ARD y a /llms.txt.
 // ════════════════════════════════════════════════════════════════
 
 import { defineMiddleware } from 'astro:middleware';
+import { verifyJwt } from './lib/auth-server';
 
 const SESSION_COOKIE = 'gm_session';
 
@@ -19,7 +22,11 @@ const SESSION_COOKIE = 'gm_session';
 const ADMIN_PUBLIC = new Set(['/admin/login']);
 
 // Helper: agregar headers de seguridad + Vary a una Response.
-const addSecurityHeaders = (response: Response, contentType: string | null): Response => {
+const addSecurityHeaders = (
+  response: Response,
+  contentType: string | null,
+  origin: string,
+): Response => {
   const headers = new Headers(response.headers);
 
   // X-Content-Type-Options: previene MIME sniffing.
@@ -49,7 +56,7 @@ const addSecurityHeaders = (response: Response, contentType: string | null): Res
     headers.set('Vary', existingVary ? `${existingVary}, Accept-Encoding` : 'Accept-Encoding');
   }
 
-  // CSP: solo para respuestas HTML. Permite inline styles y scripts propios.
+  // CSP + Link: solo para respuestas HTML.
   if (contentType && contentType.includes('text/html')) {
     headers.set(
       'Content-Security-Policy',
@@ -66,6 +73,19 @@ const addSecurityHeaders = (response: Response, contentType: string | null): Res
         "form-action 'self'",
       ].join('; '),
     );
+
+    // Punteros de descubrimiento para agentes (RFC 8288). Un `Link` con
+    // relaciones registradas y verificables: el sitio ya publica
+    // /llms.txt y el manifiesto ARD, y antes nada apuntaba a ellos, así que
+    // un crawler no tenía forma de saber que existían.
+    //
+    // Este bloque va en el middleware y no en `public/_headers` a propósito:
+    // ese archivo sólo aplica a assets estáticos en Cloudflare y nunca
+    // aparecería en una página SSR.
+    headers.set('Link', [
+      `<${origin}/.well-known/ard.json>; rel="ard"; type="application/ai-catalog+json"`,
+      `<${origin}/llms.txt>; rel="describedby"; type="text/markdown"`,
+    ].join(', '));
   }
 
   return new Response(response.body, {
@@ -84,9 +104,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const isPublic = ADMIN_PUBLIC.has(pathname.replace(/\/$/, '') || '/');
     if (!isPublic) {
       const cookie = context.cookies.get(SESSION_COOKIE);
-      // Validación mínima: solo longitud. La cookie es httpOnly + Secure,
-      // y la verificación real del token la hace el Worker API externo.
-      if (!cookie || !cookie.value || cookie.value.length < 16) {
+      // La cookie transporta el access token JWT. Se verifica la firma con la
+      // misma clave HMAC que lo emitió, con la misma validación que aplican
+      // los endpoints de datos. Antes solo se miraba la longitud, así que
+      // `/admin/*` se desbloqueaba con cualquier string de 16+ caracteres.
+      const session = cookie?.value
+        ? await verifyJwt<{ type?: string }>(cookie.value)
+        : null;
+      if (session?.type !== 'access') {
         const redirect = encodeURIComponent(pathname + url.search);
         return context.redirect(`/admin/login?redirect=${redirect}`, 302);
       }
@@ -101,5 +126,5 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const response = await next();
 
   // ── Agregar headers de seguridad + Vary ────────────────────────
-  return addSecurityHeaders(response, response.headers.get('Content-Type'));
+  return addSecurityHeaders(response, response.headers.get('Content-Type'), url.origin);
 });

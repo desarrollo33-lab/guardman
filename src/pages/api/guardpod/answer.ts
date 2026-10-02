@@ -30,7 +30,7 @@ const json = (body: unknown, status: number) =>
 const VALID_TYPES = new Set(['text', 'textarea', 'number', 'select', 'multiselect', 'boolean', 'slider', 'upload', 'url', 'date']);
 
 export const POST: APIRoute = async ({ request }) => {
-  if (!isAdminRequest(request)) {
+  if (!(await isAdminRequest(request))) {
     return json({ ok: false, error: 'unauthorized' }, 401);
   }
   const db = (env as { DB?: D1Database }).DB;

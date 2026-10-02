@@ -58,7 +58,7 @@ async function hashIp(ip: string, salt: string): Promise<string> {
 }
 
 // Verifica que el request viene de un admin autenticado (helper compartido).
-const checkAdmin = (request: Request): boolean => isAdminRequest(request);
+const checkAdmin = (request: Request): Promise<boolean> => isAdminRequest(request);
 
 // ── POST: crear denuncia (público) ─────────────────────────────
 export const POST: APIRoute = async ({ request }) => {
@@ -167,7 +167,7 @@ export const POST: APIRoute = async ({ request }) => {
 // ── GET: listar denuncias (admin) ──────────────────────────────
 export const GET: APIRoute = async ({ request, url }) => {
   const origin = request.headers.get('Origin');
-  if (!checkAdmin(request)) {
+  if (!(await checkAdmin(request))) {
     return json({ ok: false, error: 'No autorizado' }, 401, origin);
   }
   const db = (env as { DB?: D1Database }).DB;

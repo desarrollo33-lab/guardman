@@ -42,7 +42,7 @@ const corsHeaders = (origin: string | null): HeadersInit => {
 const json = (body: unknown, status: number, origin: string | null) =>
   new Response(JSON.stringify(body), { status, headers: corsHeaders(origin) });
 
-function isAdmin(request: Request): boolean {
+function isAdmin(request: Request): Promise<boolean> {
   return isAdminRequest(request);
 }
 
@@ -53,7 +53,7 @@ const VALID_PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
 
 export const GET: APIRoute = async ({ params, request }) => {
   const origin = request.headers.get('Origin');
-  if (!isAdmin(request)) {
+  if (!(await isAdmin(request))) {
     return json({ ok: false, error: 'No autorizado' }, 401, origin);
   }
 
@@ -81,7 +81,7 @@ export const GET: APIRoute = async ({ params, request }) => {
 
 export const PATCH: APIRoute = async ({ params, request }) => {
   const origin = request.headers.get('Origin');
-  if (!isAdmin(request)) {
+  if (!(await isAdmin(request))) {
     return json({ ok: false, error: 'No autorizado' }, 401, origin);
   }
 

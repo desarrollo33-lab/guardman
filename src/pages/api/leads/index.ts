@@ -41,8 +41,8 @@ const corsHeaders = (origin: string | null): HeadersInit => {
 const json = (body: unknown, status: number, origin: string | null) =>
   new Response(JSON.stringify(body), { status, headers: corsHeaders(origin) });
 
-// Auth: cookie gm_session válida (helper compartido)
-function isAdmin(request: Request): boolean {
+// Auth: access token JWT válido en cookie gm_session (helper compartido)
+function isAdmin(request: Request): Promise<boolean> {
   return isAdminRequest(request);
 }
 
@@ -51,7 +51,7 @@ const VALID_PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
 
 export const GET: APIRoute = async ({ request, url }) => {
   const origin = request.headers.get('Origin');
-  if (!isAdmin(request)) {
+  if (!(await isAdmin(request))) {
     return json({ ok: false, error: 'No autorizado' }, 401, origin);
   }
 

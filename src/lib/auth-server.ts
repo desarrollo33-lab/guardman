@@ -8,8 +8,9 @@
 //     ya no existe → login roto.
 //
 // Ahora:
-//   • isAdminRequest sigue disponible (misma firma) para los 9
-//     handlers de /api/{denuncias,leads,guardpod,...} que ya la usan.
+//   • isAdminRequest valida la sesión de los 9 handlers de
+//     /api/{denuncias,leads,guardpod,...}. Desde 2026-10-02 es async y
+//     verifica la firma del access token (antes solo comparaba longitud).
 //   • verifyPassword / issueTokenPair / verifyJwt / signJwt / etc.
 //     exponen la lógica de auth consolidada para /api/login, /refresh,
 //     /logout, /api/admin/session.
@@ -28,29 +29,54 @@ import { argon2id } from '@noble/hashes/argon2';
 import { env } from 'cloudflare:workers';
 
 // ────────────────────────────────────────────────────────────────
-// isAdminRequest — preserva contrato original (9 endpoints dependen).
+// isAdminRequest — validación de sesión (9 endpoints dependen).
+// Desde 2026-10-02 es async: verifica la firma del access token JWT.
 // ────────────────────────────────────────────────────────────────
 
-const MIN_TOKEN_LEN = 16;
 const SESSION_COOKIE = 'gm_session';
+
+// Longitud mínima para siquiera intentar verificar un JWT. Evita gastar
+// una operación HMAC sobre basura (cookies truncadas, valores arbitrarios).
+const MIN_JWT_LEN = 32;
+
+/** Compara dos strings en tiempo constante (evita fuga por timing en el
+ *  token estático de integraciones). */
+function timingSafeEqualStr(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
 
 /**
  * Verifica que una request viene de un admin autenticado.
- * Acepta:
- *   1. Cookie gm_session con un token de 16+ chars (validación de longitud).
- *   2. Header X-Admin-Token o Authorization: Bearer con DENUNCIAS_ADMIN_TOKEN
- *      (para integraciones externas / scripts CLI).
+ *
+ * 1. Cookie `gm_session` → el access token JWT se **verifica con la misma
+ *    clave HMAC que lo emitió**: firma, `iss`, `aud`, `exp` y `type`.
+ * 2. Header `X-Admin-Token` o `Authorization: Bearer` con
+ *    `DENUNCIAS_ADMIN_TOKEN`, para integraciones externas / scripts CLI.
+ *
+ * NOTA (2026-10-02): antes la cookie se aceptaba con un chequeo de longitud
+ * (`length >= 16`), así que `gm_session=aaaaaaaaaaaaaaaa` pasaba el control de
+ * acceso a los 9 endpoints de datos. El comentario que lo justificaba —
+ * "el Worker API externo verifica el token real" — quedó obsoleto en la
+ * consolidación del 2026-09-22: ese worker ya no existe y nada más valida
+ * la sesión. Ahora se valida acá, que es donde corresponde.
  */
-export function isAdminRequest(request: Request): boolean {
+export async function isAdminRequest(request: Request): Promise<boolean> {
   const cookieHeader = request.headers.get('cookie') ?? '';
   const sessionMatch = /(?:^|;\s*)gm_session=([^;]+)/.exec(cookieHeader);
-  if (sessionMatch && sessionMatch[1].length >= MIN_TOKEN_LEN) {
-    return true;
+  if (sessionMatch && sessionMatch[1].length >= MIN_JWT_LEN) {
+    const payload = await verifyJwt<AccessTokenPayload>(sessionMatch[1]);
+    if (payload?.type === 'access') return true;
   }
+
   const adminToken = (env as { DENUNCIAS_ADMIN_TOKEN?: string }).DENUNCIAS_ADMIN_TOKEN;
-  const headerToken = request.headers.get('x-admin-token') ??
-    request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
-  if (adminToken && headerToken === adminToken) return true;
+  if (adminToken) {
+    const headerToken = request.headers.get('x-admin-token') ??
+      request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+    if (headerToken && timingSafeEqualStr(headerToken, adminToken)) return true;
+  }
   return false;
 }
 
