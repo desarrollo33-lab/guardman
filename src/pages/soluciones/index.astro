@@ -1,11 +1,12 @@
 ---
 // /soluciones — índice de soluciones integradas (seguridad + aseo).
-// Usa PageHero y card-grid; sin CSS propio.
+//
+// Patrón copiado de /servicios/ e /ubicaciones/:
+//   hub-hero > bg-neutral (grid) > bg-white-section > bg-dark (CTA)
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { SOLUTIONS } from '../../lib/soluciones';
-import PageHero from '../../components/PageHero.astro';
+import { SITE } from '../../lib/constants';
 import Icon from '../../components/Icon.astro';
-import LeadCTA from '../../components/LeadCTA.astro';
 
 export const prerender = true;
 ---
@@ -16,15 +17,17 @@ export const prerender = true;
   breadcrumb="Soluciones"
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Soluciones', url: '/soluciones' }]}
 >
-  <PageHero
-    variant="dark"
-    badge="Solución integrada"
-    badgeIcon="shield"
-    title="Seguridad y mantención, con un solo responsable"
-    subtitle="Cada solución combina vigilancia y aseo con un mismo proveedor. El argumento no es la cantidad de servicios, sino la coordinación: es el punto que ninguna empresa de seguridad ni de aseo puede resolver por separado."
-  />
+  <section class="hub-hero" data-od-id="hero">
+    <div class="container">
+      <h1>Seguridad y mantención, con un solo responsable</h1>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.8);max-width:640px;margin:16px 0 0">
+        Cada solución combina vigilancia y aseo con un mismo proveedor. El argumento no es la
+        cantidad de servicios, sino la coordinación entre ambos.
+      </p>
+    </div>
+  </section>
 
-  <section class="contenido" data-od-id="contenido">
+  <section class="bg-neutral" data-od-id="grid">
     <div class="container">
       <div class="card-grid">
         {SOLUTIONS.map((s) => (
@@ -44,29 +47,41 @@ export const prerender = true;
     </div>
   </section>
 
-  <section class="content-section" data-od-id="argumento">
+  <section class="bg-white-section" data-od-id="argumento">
     <div class="container">
-      <div class="detail-issues-grid">
-        <div class="detail-issue-card">
-          <Icon name="check" size={18} />
-          <span>
-            <strong>Por qué un solo proveedor funciona mejor.</strong> El problema de
-            coordinar dos empresas de servicios distintos no es teórico: son llaves
-            entregadas informalmente, personal que entra a zonas comunes sin registro, y
-            versiones distintas de un mismo hecho según a quién se le pregunte. Cuando
-            ambos servicios los presta una sola empresa, esa coordinación deja de ser un
-            problema entre partes y pasa a ser parte de la operación diaria, con un solo
-            responsable y un solo registro.
-          </span>
-        </div>
+      <span class="section-label">Por qué un solo proveedor</span>
+      <h2 class="section-title">La coordinación no la lidera nadie cuando son dos empresas</h2>
+      <p class="section-subtitle" style="max-width:820px">
+        El problema de coordinar una empresa de seguridad y otra de aseo no es teórico: son
+        llaves entregadas informalmente, personal que entra a zonas comunes sin registro, y
+        versiones distintas de un mismo hecho según a quién se le pregunte.
+      </p>
+      <p class="section-subtitle" style="max-width:820px">
+        Cuando ambos servicios los presta una sola empresa, esa coordinación deja de ser un
+        problema entre partes y pasa a ser parte de la operación diaria, con un solo
+        responsable y un solo registro.
+      </p>
+      <div style="margin-top:28px">
+        <a href="/soluciones/condominio-seguridad-y-aseo" class="btn btn-primary btn-lg">
+          Ver el detalle de la solución para condominios
+        </a>
       </div>
     </div>
   </section>
 
-  <LeadCTA
-    variant="inline"
-    title="Cotiza el servicio integrado"
-    subtitle="Un solo interlocutor para seguridad y mantención, con alcance declarado y responsable único ante cualquier incidente."
-    trustBadges={true}
-  />
+  <section class="bg-dark" data-od-id="cta">
+    <div class="container" style="text-align:center;padding:80px 0">
+      <h2 class="section-title" style="color:#fff">¿Necesita ambos servicios?</h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.7);max-width:600px;margin:0 auto 28px">
+        Cotice el servicio integrado y reciba una propuesta con el alcance declarado: un solo
+        interlocutor, un solo registro y un responsable único ante cualquier incidente.
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar servicio integrado</a>
+        <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg">
+          <Icon name="phone" size={16} /> {SITE.PHONE}
+        </a>
+      </div>
+    </div>
+  </section>
 </BaseLayout>

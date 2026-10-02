@@ -1,13 +1,20 @@
 ---
 // /guias — índice de guías de dotación y contratación.
 //
-// Usa PageHero y las clases canónicas de tarjeta (card-grid, card,
-// card-icon, card-body, card-link) en vez de un CSS propio.
+// Patrón copiado de /servicios/ e /ubicaciones/, que son los índices
+// canónicos de catálogo del sitio:
+//
+//   hub-hero  >  bg-neutral (grid)  >  bg-white-section (label/título)
+//             >  bg-dark (CTA)
+//
+// Antes usaba PageHero + card-grid + content-section + LeadCTA, que es un
+// patrón válido del sitio pero distinto del de los índices comparables: el
+// hero salía plano en vez de con gradiente, y el padding no cuadraba. La
+// consigna es que estas páginas se vean como sus pares.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { GUIDES } from '../../lib/guias';
-import PageHero from '../../components/PageHero.astro';
+import { SITE } from '../../lib/constants';
 import Icon from '../../components/Icon.astro';
-import LeadCTA from '../../components/LeadCTA.astro';
 
 export const prerender = true;
 ---
@@ -18,15 +25,17 @@ export const prerender = true;
   breadcrumb="Guías"
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Guías', url: '/guias' }]}
 >
-  <PageHero
-    variant="dark"
-    badge="Guías prácticas"
-    badgeIcon="doc"
-    title="Guías para contratar seguridad privada"
-    subtitle="Explicamos cómo razonamos la dotación de un puesto de seguridad, qué preguntar antes de firmar y cómo comparar propuestas que parecen equivalentes y no lo son."
-  />
+  <section class="hub-hero" data-od-id="hero">
+    <div class="container">
+      <h1>Guías para contratar seguridad privada</h1>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.8);max-width:640px;margin:16px 0 0">
+        Explicamos cómo razonamos la dotación de un puesto, qué preguntar antes de firmar y
+        cómo comparar propuestas que parecen equivalentes y no lo son.
+      </p>
+    </div>
+  </section>
 
-  <section class="contenido" data-od-id="contenido">
+  <section class="bg-neutral" data-od-id="grid">
     <div class="container">
       <div class="card-grid">
         {GUIDES.map((g) => (
@@ -45,27 +54,42 @@ export const prerender = true;
     </div>
   </section>
 
-  <section class="content-section" data-od-id="nota">
+  <section class="bg-white-section" data-od-id="nota">
     <div class="container">
-      <div class="detail-issues-grid">
-        <div class="detail-issue-card">
-          <Icon name="warn" size={18} />
-          <span>
-            <strong>Por qué no publicamos ratios de dotación.</strong> Los números que
-            circulan en internet sobre cuántos guardias necesita un condominio suelen
-            provenir de otros países, con otras normas y otros niveles de riesgo. Explicamos
-            el método completo —acceso, riesgo y horario— para que puedas evaluar cualquier
-            propuesta, y dejamos los números a la vista del técnico en terreno.
-          </span>
-        </div>
+      <span class="section-label">Nota metodológica</span>
+      <h2 class="section-title">Por qué no publicamos ratios de dotación</h2>
+      <p class="section-subtitle" style="max-width:820px">
+        Los números que circulan en internet sobre cuántos guardias necesita un condominio
+        suelen provenir de otros países, con otras normas y otros niveles de riesgo. Aplicados
+        sin evaluación a un edificio chileno producen resultados que van desde el exceso hasta
+        el hueco de seguridad.
+      </p>
+      <p class="section-subtitle" style="max-width:820px">
+        Explicamos el método completo —acceso, riesgo y horario— para que puedas evaluar
+        cualquier propuesta, incluida la nuestra, y dejamos los números concretos a la vista
+        del técnico en terreno.
+      </p>
+      <div style="margin-top:28px">
+        <a href="/guias/como-elegir-empresa-de-seguridad" class="btn btn-primary btn-lg">
+          Ver las verificaciones antes de contratar
+        </a>
       </div>
     </div>
   </section>
 
-  <LeadCTA
-    variant="inline"
-    title="Solicita una evaluación"
-    subtitle="La visita a terreno no tiene costo. Definimos la cobertura que corresponde a tu sitio en particular."
-    trustBadges={true}
-  />
+  <section class="bg-dark" data-od-id="cta">
+    <div class="container" style="text-align:center;padding:80px 0">
+      <h2 class="section-title" style="color:#fff">¿Dudas sobre la dotación de su sitio?</h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.7);max-width:600px;margin:0 auto 28px">
+        La visita a terreno no tiene costo. Recorremos el sitio, revisamos la infraestructura
+        existente y definimos la cobertura que corresponde a su propiedad en particular.
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar evaluación</a>
+        <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg">
+          <Icon name="phone" size={16} /> {SITE.PHONE}
+        </a>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
