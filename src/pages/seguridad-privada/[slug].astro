@@ -3,15 +3,18 @@
 //
 // Estas páginas NO venden: explican. Su objetivo es que las IAs y los
 // buscadores las citen cuando alguien pregunta sobre el marco legal del
-// rubro. Por eso el formato importa más que el largo: tablas,
-// definiciones en la primera frase y fuentes oficiales al pie.
+// rubro en Chile.
 //
-// Schema: Article + FAQPage + citation (ScholarlyArticle no aplica, pero
-// se declara `citation` y `about` para fortalecer la asociación con las
-// entidades legales citadas).
+// Estructura: la de /servicios/[slug], la página de detalle canónica.
+// Sin CSS propio: todo sale de classes que ya existen en components.css.
+// Para tablas se usa `legal-table`, que es el patrón público del sitio
+// (el de /privacidad). `data-table` existe pero solo en el panel admin.
+//
+// Schema: `ScholarlyArticle` con `citation` a las fuentes oficiales, que es
+// lo que permite atribuirle la fuente a un asistente. Se declara vía
+// `extraSchemas` para no duplicar el Article que emite BaseLayout.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { AUTHORITY_PAGES } from '../../lib/authority';
-import { SITE } from '../../lib/constants';
 import Icon from '../../components/Icon.astro';
 import LeadCTA from '../../components/LeadCTA.astro';
 
@@ -26,10 +29,6 @@ export function getStaticPaths() {
 
 const { page } = Astro.props;
 
-// Schema propio: asocia la página con la normativa que explica.
-// `citation` y `about` son los campos que hacen que un asistente pueda
-// atribuirle la fuente. Se declara aparte del Article que emite
-// BaseLayout para no duplicar el tipo.
 const citationLd = {
   '@context': 'https://schema.org',
   '@type': 'ScholarlyArticle',
@@ -66,43 +65,45 @@ const citationLd = {
   faq={page.faqs.map((f) => ({ question: f.q, answer: f.a }))}
   extraSchemas={[citationLd]}
 >
-  <section class="guide-hero">
+  <section class="detail-hero" data-od-id="hero">
     <div class="container">
-      <nav class="guide-crumb" aria-label="Ruta de navegación">
-        <a href="/">Inicio</a> <span>/</span> <a href="/seguridad-privada">Seguridad privada</a>
-      </nav>
-      <span class="guide-kicker">Guía de referencia</span>
+      <div class="detail-hero-badge">
+        <span class="detail-hero-badge-icon">
+          <Icon name="doc" size={14} />
+        </span>
+        Guía de referencia
+      </div>
       <h1>{page.h1}</h1>
-      <p class="guide-lead">{page.lead}</p>
-      <p class="guide-updated">
-        <Icon name="doc" size={14} />
-        Actualizado el {new Date(page.updatedISO).toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' })}
-      </p>
+      <p>{page.lead}</p>
+      <div class="detail-hero-ctas">
+        <a href="/cotizacion" class="btn btn-primary">Solicitar cotización</a>
+        <a href="/seguridad-privada" class="btn btn-outline-light">Ver todas las guías</a>
+      </div>
     </div>
   </section>
 
-  <section class="guide-body">
+  <section class="contenido" data-od-id="contenido">
     <div class="container">
-      <div class="guide-layout">
-        <article class="guide-article">
+      <div class="detail-content-grid">
+        <div class="article-body">
           {page.sections.map((s) => (
-            <section class="guide-section">
+            <div class="block">
               <h2>{s.heading}</h2>
               {s.body.map((p) => <p>{p}</p>)}
-            </section>
+            </div>
           ))}
 
           {page.tables.map((t) => (
-            <div class="guide-table-wrap">
-              <h3 class="guide-table-caption">{t.caption}</h3>
-              <div class="guide-table-scroll">
-                <table class="guide-table">
+            <div class="block">
+              <h2>{t.caption}</h2>
+              <div class="legal-table-wrap">
+                <table class="legal-table">
                   <thead>
-                    <tr>{t.columns.map((c) => <th scope="col">{c}</th>)}</tr>
+                    <tr>{t.columns.map((c) => <th>{c}</th>)}</tr>
                   </thead>
                   <tbody>
                     {t.rows.map((r) => (
-                      <tr>{r.map((cell, i) => (i === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>))}</tr>
+                      <tr>{r.map((cell) => <td>{cell}</td>)}</tr>
                     ))}
                   </tbody>
                 </table>
@@ -110,244 +111,72 @@ const citationLd = {
             </div>
           ))}
 
-          <section class="guide-section guide-faq">
+          <div class="block" data-od-id="block-faq">
             <h2>Preguntas frecuentes</h2>
-            {page.faqs.map((f) => (
-              <details open={f === page.faqs[0]}>
-                <summary>{f.q}</summary>
-                <div class="answer">{f.a}</div>
-              </details>
-            ))}
-          </section>
-
-          <section class="guide-sources">
-            <h2>Fuentes</h2>
-            <p class="guide-sources-note">
-              Los datos legales de esta página corresponden al texto vigente de la normativa citada.
-              Si necesitas confirmar un punto específico, la fuente primaria es la que manda.
-            </p>
-            <ul>
-              {page.sources.map((s) => (
-                <li>
-                  <a href={s.url} rel="nofollow noopener" target="_blank">{s.label}</a>
-                </li>
+            <div class="detail-faq">
+              {page.faqs.map((f, i) => (
+                <details open={i === 0}>
+                  <summary>{f.q}</summary>
+                  <div class="answer">{f.a}</div>
+                </details>
               ))}
-            </ul>
-          </section>
-        </article>
-
-        <aside class="guide-aside">
-          <div class="guide-aside-card">
-            <h3>Necesitas un proveedor que cumpla esto</h3>
-            <p>
-              Todos los puntos de esta página son exigibles en un contrato. Si tu proveedor actual
-              no puede acreditarlos, hay conversation pendiente.
-            </p>
-            <a href="/cotizacion" class="btn btn-primary btn-block">Solicitar cotización</a>
-            <a href="/guias/como-elegir-empresa-de-seguridad" class="guide-aside-link">
-              Cómo verificarlo antes de contratar
-            </a>
+            </div>
           </div>
 
-          <div class="guide-aside-card">
-            <h3>Otras guías</h3>
-            <ul class="guide-aside-list">
-              {AUTHORITY_PAGES.filter((p) => p.slug !== page.slug).map((p) => (
-                <li>
-                  <a href={`/seguridad-privada/${p.slug}`}>{p.title}</a>
-                </li>
+          <div class="block" data-od-id="block-sources">
+            <h2>Fuentes</h2>
+            <p>
+              Los datos legales de esta página corresponden al texto vigente de la
+              normativa citada. Si necesitas confirmar un punto específico, la fuente
+              primaria es la que manda.
+            </p>
+            <div class="detail-features-grid">
+              {page.sources.map((s) => (
+                <div class="detail-feature-item">
+                  <Icon name="doc" size={16} />
+                  <span>
+                    <a href={s.url} rel="nofollow noopener" target="_blank">{s.label}</a>
+                  </span>
+                </div>
               ))}
-            </ul>
+            </div>
+          </div>
+        </div>
+
+        <aside data-od-id="sidebar">
+          <div class="sidebar-sticky">
+            <div class="sidebar-cta-top">
+              <h3>Necesitas un proveedor que cumpla esto</h3>
+              <p>
+                Todos los puntos de esta página son exigibles en un contrato. Si tu
+                proveedor actual no puede acreditarlos, hay conversation pendiente.
+              </p>
+              <a href="/cotizacion" class="btn btn-primary">Cotizar ahora</a>
+              <a href="/contacto" class="btn btn-outline">Hablar con un experto</a>
+            </div>
+            <div class="sidebar-body">
+              <div class="sb-section">
+                <h4>Otras guías de referencia</h4>
+                {AUTHORITY_PAGES.filter((p) => p.slug !== page.slug).map((p) => (
+                  <a href={`/seguridad-privada/${p.slug}`} class="sb-link">{p.title}</a>
+                ))}
+              </div>
+              <div class="sb-section">
+                <h4>Guías de contratación</h4>
+                <a href="/guias/cuantos-guardias-necesita-mi-condominio" class="sb-link">Dotación de un condominio</a>
+                <a href="/guias/como-elegir-empresa-de-seguridad" class="sb-link">Cómo verificar un proveedor</a>
+              </div>
+            </div>
           </div>
         </aside>
       </div>
     </div>
   </section>
 
-  <section class="guide-cta-section">
-    <div class="container">
-      <LeadCTA
-        title="GuardMan Chile"
-        description="Más de 10 años, 200+ guardias certificados OS-10 y central de monitoreo propia 24/7, con cobertura en 16 comunas."
-      />
-    </div>
-  </section>
+  <LeadCTA
+    variant="inline"
+    title="GuardMan Chile"
+    subtitle="Más de 10 años, 200+ guardias certificados OS-10 y central de monitoreo propia 24/7, con cobertura en 16 comunas."
+    trustBadges={true}
+  />
 </BaseLayout>
-
-<style>
-  .guide-hero {
-    background: var(--navy, #1a2744);
-    padding: 56px 0 48px;
-    color: #fff;
-  }
-  .guide-crumb {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 20px;
-  }
-  .guide-crumb a { color: rgba(255, 255, 255, 0.85); text-decoration: none; }
-  .guide-crumb a:hover { color: #fff; text-decoration: underline; }
-  .guide-crumb span { margin: 0 6px; opacity: 0.4; }
-  .guide-kicker {
-    display: inline-block;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 14px;
-  }
-  .guide-hero h1 {
-    font-size: clamp(28px, 4.2vw, 42px);
-    font-weight: 800;
-    line-height: 1.15;
-    margin: 0 0 18px;
-    max-width: 780px;
-    letter-spacing: -0.02em;
-  }
-  .guide-lead {
-    font-size: clamp(16px, 1.7vw, 18px);
-    line-height: 1.65;
-    color: rgba(255, 255, 255, 0.85);
-    max-width: 720px;
-    margin: 0 0 18px;
-  }
-  .guide-updated {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.6);
-    margin: 0;
-  }
-
-  .guide-body { padding: 48px 0 64px; }
-  .guide-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: 48px;
-    align-items: start;
-  }
-  @media (max-width: 1024px) {
-    .guide-layout { grid-template-columns: 1fr; gap: 40px; }
-  }
-
-  .guide-section { margin-bottom: 40px; }
-  .guide-section h2 {
-    font-size: 24px;
-    font-weight: 700;
-    margin: 0 0 16px;
-    line-height: 1.3;
-    color: var(--navy, #1a2744);
-  }
-  .guide-section p {
-    font-size: 16px;
-    line-height: 1.75;
-    color: #333;
-    margin: 0 0 16px;
-  }
-
-  .guide-table-wrap { margin-bottom: 40px; }
-  .guide-table-caption {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--navy, #1a2744);
-    margin: 0 0 12px;
-  }
-  .guide-table-scroll { overflow-x: auto; }
-  .guide-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
-    line-height: 1.6;
-  }
-  .guide-table th,
-  .guide-table td {
-    text-align: left;
-    padding: 12px 14px;
-    border: 1px solid #e2e6ec;
-    vertical-align: top;
-  }
-  .guide-table thead th {
-    background: #f4f6f9;
-    font-weight: 700;
-    color: var(--navy, #1a2744);
-    font-size: 14px;
-  }
-  .guide-table tbody th {
-    background: #fafbfc;
-    font-weight: 600;
-    color: var(--navy, #1a2744);
-  }
-  .guide-table tbody tr:nth-child(even) { background: #fcfcfd; }
-
-  .guide-faq details {
-    border: 1px solid #e2e6ec;
-    border-radius: 8px;
-    padding: 16px 18px;
-    margin-bottom: 10px;
-    background: #fff;
-  }
-  .guide-faq summary {
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 16px;
-    color: var(--navy, #1a2744);
-    list-style: none;
-  }
-  .guide-faq summary::-webkit-details-marker { display: none; }
-  .guide-faq summary::before { content: '+'; margin-right: 10px; color: #3b82f6; font-weight: 700; }
-  .guide-faq details[open] summary::before { content: '−'; }
-  .guide-faq .answer {
-    margin-top: 12px;
-    font-size: 15px;
-    line-height: 1.7;
-    color: #444;
-  }
-
-  .guide-sources {
-    border-top: 2px solid #e2e6ec;
-    padding-top: 28px;
-    margin-top: 48px;
-  }
-  .guide-sources h2 { font-size: 18px; font-weight: 700; margin: 0 0 10px; color: var(--navy, #1a2744); }
-  .guide-sources-note { font-size: 14px; color: #666; margin: 0 0 16px; line-height: 1.6; }
-  .guide-sources ul { margin: 0; padding-left: 20px; }
-  .guide-sources li { font-size: 14px; margin-bottom: 8px; line-height: 1.6; }
-  .guide-sources a { color: #2563eb; }
-
-  .guide-aside { position: sticky; top: 24px; }
-  @media (max-width: 1024px) { .guide-aside { position: static; } }
-  .guide-aside-card {
-    border: 1px solid #e2e6ec;
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 20px;
-    background: #fff;
-  }
-  .guide-aside-card h3 {
-    font-size: 16px;
-    font-weight: 700;
-    margin: 0 0 10px;
-    color: var(--navy, #1a2744);
-  }
-  .guide-aside-card p { font-size: 14px; line-height: 1.65; color: #555; margin: 0 0 16px; }
-  .guide-aside-link {
-    display: block;
-    margin-top: 14px;
-    font-size: 14px;
-    color: #2563eb;
-    text-decoration: none;
-  }
-  .guide-aside-link:hover { text-decoration: underline; }
-  .guide-aside-list { list-style: none; margin: 0; padding: 0; }
-  .guide-aside-list li { margin-bottom: 12px; }
-  .guide-aside-list a {
-    font-size: 14px;
-    color: #333;
-    text-decoration: none;
-    line-height: 1.5;
-    display: block;
-  }
-  .guide-aside-list a:hover { color: #2563eb; }
-</style>

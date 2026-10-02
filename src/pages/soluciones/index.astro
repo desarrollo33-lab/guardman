@@ -1,7 +1,9 @@
 ---
 // /soluciones — índice de soluciones integradas (seguridad + aseo).
+// Usa PageHero y card-grid; sin CSS propio.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { SOLUTIONS } from '../../lib/soluciones';
+import PageHero from '../../components/PageHero.astro';
 import Icon from '../../components/Icon.astro';
 import LeadCTA from '../../components/LeadCTA.astro';
 
@@ -14,94 +16,57 @@ export const prerender = true;
   breadcrumb="Soluciones"
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Soluciones', url: '/soluciones' }]}
 >
-  <section class="idx-hero">
-    <div class="container">
-      <span class="idx-kicker">Soluciones integradas</span>
-      <h1>Seguridad y mantención, con un solo responsable</h1>
-      <p class="idx-lead">
-        Cada solución combina vigilancia y aseo con un mismo proveedor. El argumento no es la
-        cantidad de servicios, sino la coordinación: es el punto que ninguna empresa de
-        seguridad ni de aseo puede resolver por separado.
-      </p>
-    </div>
-  </section>
+  <PageHero
+    variant="dark"
+    badge="Solución integrada"
+    badgeIcon="shield"
+    title="Seguridad y mantención, con un solo responsable"
+    subtitle="Cada solución combina vigilancia y aseo con un mismo proveedor. El argumento no es la cantidad de servicios, sino la coordinación: es el punto que ninguna empresa de seguridad ni de aseo puede resolver por separado."
+  />
 
-  <section class="idx-body">
+  <section class="contenido" data-od-id="contenido">
     <div class="container">
-      <div class="idx-grid">
+      <div class="card-grid">
         {SOLUTIONS.map((s) => (
-          <a href={`/soluciones/${s.slug}`} class="idx-card">
-            <h2>{s.title}</h2>
-            <p>{s.metaDescription}</p>
-            <span class="idx-audience">{s.audience}</span>
-            <span class="idx-link">Ver solución →</span>
+          <a href={`/soluciones/${s.slug}`} class="card">
+            <div class="card-icon">
+              <Icon name="shield" size={20} />
+            </div>
+            <div class="card-body">
+              <h3>{s.title}</h3>
+              <p>{s.metaDescription}</p>
+              <span class="card-tag">{s.audience}</span>
+              <span class="card-link">Ver solución →</span>
+            </div>
           </a>
         ))}
       </div>
+    </div>
+  </section>
 
-      <div class="idx-note">
-        <Icon name="check" size={20} />
-        <div>
-          <h2>Por qué un solo proveedor funciona mejor</h2>
-          <p>
-            El problema de coordinar dos empresas de servicios distintos no es teórico: son llaves
+  <section class="content-section" data-od-id="argumento">
+    <div class="container">
+      <div class="detail-issues-grid">
+        <div class="detail-issue-card">
+          <Icon name="check" size={18} />
+          <span>
+            <strong>Por qué un solo proveedor funciona mejor.</strong> El problema de
+            coordinar dos empresas de servicios distintos no es teórico: son llaves
             entregadas informalmente, personal que entra a zonas comunes sin registro, y
-            versiones distintas de un mismo hecho según a quién se le pregunte. Cuando ambos
-            servicios los presta una sola empresa, esa coordinación deja de ser un problema entre
-            partes y pasa a ser parte de la operación diaria, con un solo responsable y un solo
-            registro.
-          </p>
+            versiones distintas de un mismo hecho según a quién se le pregunte. Cuando
+            ambos servicios los presta una sola empresa, esa coordinación deja de ser un
+            problema entre partes y pasa a ser parte de la operación diaria, con un solo
+            responsable y un solo registro.
+          </span>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="idx-cta">
-    <div class="container">
-      <LeadCTA
-        title="Cotiza el servicio integrado"
-        description="Un solo interlocutor para seguridad y mantención, con alcance declarado y responsable único ante cualquier incidente."
-      />
-    </div>
-  </section>
+  <LeadCTA
+    variant="inline"
+    title="Cotiza el servicio integrado"
+    subtitle="Un solo interlocutor para seguridad y mantención, con alcance declarado y responsable único ante cualquier incidente."
+    trustBadges={true}
+  />
 </BaseLayout>
-
-<style is:global>
-  .idx-hero { background: var(--navy, #1a2744); padding: 56px 0 48px; color: #fff; }
-  .idx-kicker {
-    display: inline-block; font-size: 12px; font-weight: 600;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.7); margin-bottom: 14px;
-  }
-  .idx-hero h1 {
-    font-size: clamp(28px, 4.2vw, 42px); font-weight: 800; line-height: 1.15;
-    margin: 0 0 18px; letter-spacing: -0.02em; max-width: 760px;
-  }
-  .idx-lead {
-    font-size: clamp(16px, 1.7vw, 18px); line-height: 1.65;
-    color: rgba(255, 255, 255, 0.85); max-width: 720px; margin: 0;
-  }
-  .idx-body { padding: 48px 0 32px; }
-  .idx-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
-  .idx-card {
-    border: 1px solid #e2e6ec; border-radius: 12px; padding: 26px;
-    background: #fff; text-decoration: none; display: block;
-    transition: border-color .15s, transform .15s;
-  }
-  .idx-card:hover { border-color: #3b82f6; transform: translateY(-2px); }
-  .idx-card h2 { font-size: 18px; font-weight: 700; margin: 0 0 10px; color: var(--navy, #1a2744); line-height: 1.4; }
-  .idx-card p { font-size: 15px; line-height: 1.65; color: #555; margin: 0 0 12px; }
-  .idx-audience {
-    display: block; font-size: 13px; color: #888;
-    padding-top: 10px; border-top: 1px solid #eee; margin-bottom: 12px;
-  }
-  .idx-link { font-size: 14px; font-weight: 600; color: #2563eb; }
-  .idx-note {
-    display: flex; gap: 16px; align-items: flex-start;
-    background: #f0f7ff; border-radius: 12px; padding: 26px; margin-top: 40px;
-  }
-  .idx-note svg { flex-shrink: 0; color: #2563eb; margin-top: 2px; }
-  .idx-note h2 { font-size: 17px; font-weight: 700; margin: 0 0 8px; color: var(--navy, #1a2744); }
-  .idx-note p { font-size: 15px; line-height: 1.7; color: #555; margin: 0; }
-  .idx-cta { padding: 0 0 64px; }
-</style>

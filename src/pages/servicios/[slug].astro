@@ -2,7 +2,7 @@
 // /servicios/[slug] — detalle de servicio (migración 1:1 del live).
 // Estructura idéntica al live: hero + contenido (con blocks anidados) + block-related.
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { SERVICE_NAMES, LOCATIONS } from '../../lib/constants';
+import { SERVICE_NAMES, LOCATIONS, COVERAGE_TOTAL } from '../../lib/constants';
 import { SERVICES } from '../../lib/content';
 import Icon from '../../components/Icon.astro';
 import StaffSection from '../../components/StaffSection.astro';
@@ -112,7 +112,7 @@ const seoDescription = certified
           <StaffSection />
 
           <div class="block" data-od-id="block-locations">
-            <h2>Disponible en 14 comunas</h2>
+            <h2>Disponible en {COVERAGE_TOTAL} comunas</h2>
             <p>Seleccione su comuna para ver detalles específicos y solicitar cotización.</p>
             <div class="locations-tags">
               {allLocations.map((l) => (
