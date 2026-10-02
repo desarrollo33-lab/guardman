@@ -13,6 +13,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE, DENUNCIA_CATEGORIES, DENUNCIA_RELACIONES } from '../lib/constants';
 import Icon from '../components/Icon.astro';
+import FaqList from '../components/FaqList.astro';
 import LeadForm from '../components/LeadForm.astro';
 
 const faq = [
@@ -228,14 +229,7 @@ const faq = [
     <div class="container">
       <span class="section-label">Preguntas frecuentes</span>
       <h2 class="section-title">Lo que más nos preguntan</h2>
-      <div class="faq-list">
-        {faq.map((f, i) => (
-          <details class="faq-item" open={i === 0}>
-            <summary>{f.question}</summary>
-            <p>{f.answer}</p>
-          </details>
-        ))}
-      </div>
+      <FaqList items={faq.map((f) => ({ q: f.question, a: f.answer }))} odId="denuncias-faq" />
     </div>
   </section>
 

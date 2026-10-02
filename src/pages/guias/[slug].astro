@@ -18,6 +18,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { GUIDES } from '../../lib/guias';
 import Icon from '../../components/Icon.astro';
 import LeadCTA from '../../components/LeadCTA.astro';
+import FaqList from '../../components/FaqList.astro';
 
 export const prerender = true;
 
@@ -141,7 +142,8 @@ const guideLd = {
           {page.sections.map((s) => (
             <div class="block">
               <h2>{s.heading}</h2>
-              {s.body.map((p) => <p>{p}</p>)}
+              {s.body?.map((p) => <p>{p}</p>)}
+              {s.list && <FaqList items={s.list} odId={`block-${s.heading.slice(0, 20).replace(/\s+/g, '-').toLowerCase()}`} />}
             </div>
           ))}
 

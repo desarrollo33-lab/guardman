@@ -1,0 +1,51 @@
+---
+// FaqList — lista de preguntas y respuestas en acordeón.
+//
+// POR QUÉ EXISTE: el patrón `.faq-list` + `.faq-item` con `<details>` estaba
+// duplicado literalmente en tres páginas (canal-de-denuncias, privacidad,
+// terminos) y además se necesitaba en las páginas de contenido largo, donde
+// antes se escribían las preguntas como párrafos sueltos. Eso producía un
+// muro de texto: cuatro preguntas seguidas sin jerarquía visual ni forma de
+// plegar la respuesta.
+//
+// Este componente no crea estilos nuevos. Usa las clases que ya existen en
+// `src/styles/components.css`:
+//
+//   .faq-list   contenedor
+//   .faq-item   tarjeta con borde, hover y estado abierto
+//   .faq-item summary  fila con el `+` / `−` animado
+//   .faq-item p        cuerpo de la respuesta
+//
+// Props:
+//   items     [{ q, a }] — par pregunta/respuesta
+//   openFirst — abre el primer elemento (default true, como el patrón previo)
+//   odId      — data-od-id para analítica
+import Icon from './Icon.astro';
+
+export interface FaqItem {
+  q: string;
+  a: string;
+}
+
+interface Props {
+  items: FaqItem[];
+  openFirst?: boolean;
+  odId?: string;
+}
+
+const { items, openFirst = true, odId = 'faq-list' } = Astro.props;
+---
+
+{items.length > 0 && (
+  <div class="faq-list" data-od-id={odId}>
+    {items.map((f, i) => (
+      <details class="faq-item" open={openFirst && i === 0}>
+        <summary>
+          {f.q}
+          <Icon name="chevronDown" size={16} />
+        </summary>
+        <p>{f.a}</p>
+      </details>
+    ))}
+  </div>
+)}
