@@ -99,6 +99,24 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const url = new URL(context.request.url);
   const pathname = url.pathname;
 
+  // ── Trailing slash: una sola forma canónica ─────────────────────
+  // El sitio declara barra final salvo la raíz. Las páginas de ruta dinámica ya
+  // redirigían solas (307), pero las planas (`/contacto`) servían 200 tanto con
+  // barra como sin ella, cada una declarando un canonical distinto. Esto
+  // duplicaba 13 URLs. Se normaliza antes de cualquier otra lógica.
+  // Verificado contra producción 2026-10-02.
+  const hasExtension = /\.[a-z0-9]+$/i.test(pathname);
+  if (
+    pathname !== '/' &&
+    !pathname.endsWith('/') &&
+    !hasExtension &&
+    // Los assets de /_astro y las rutas de API se sirven tal cual.
+    !pathname.startsWith('/_astro/') &&
+    !pathname.startsWith('/api/')
+  ) {
+    return context.redirect(`${pathname}/${url.search}`, 301);
+  }
+
   // ── Auth check para rutas /admin/* ─────────────────────────────
   if (pathname.startsWith('/admin/') || pathname === '/admin') {
     const isPublic = ADMIN_PUBLIC.has(pathname.replace(/\/$/, '') || '/');

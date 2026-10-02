@@ -404,9 +404,13 @@ export function geoMetaTags() {
  */
 export function hreflangTags(path: string = '/') {
   const base = SITE.URL;
+  // Forma canónica única: barra final salvo la raíz. Debe coincidir con el
+  // <loc> del sitemap y con el canonical del head; si difieren, Google
+  // descarta el par hreflang. Verificado contra producción 2026-10-02.
+  const canonicalPath = path === '/' ? path : path.endsWith('/') ? path : `${path}/`;
   return [
-    { hreflang: 'es-cl', href: `${base}${path}` },
-    { hreflang: 'x-default', href: `${base}${path}` },
+    { hreflang: 'es-cl', href: `${base}${canonicalPath}` },
+    { hreflang: 'x-default', href: `${base}${canonicalPath}` },
   ];
 }
 

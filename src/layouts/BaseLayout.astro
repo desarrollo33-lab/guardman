@@ -73,6 +73,13 @@ interface Props {
   };
   /** Items para BreadcrumbList schema. */
   breadcrumbs?: BreadcrumbItem[];
+  /**
+   * Schemas adicionales propios de la página. Se usan en las páginas de
+   * autoridad (/seguridad-privada/*) para declarar `citation` y `about`,
+   * que son los campos que associate la página con la normativa que
+   * explica y es lo que permite que un asistente la cite como fuente.
+   */
+  extraSchemas?: Record<string, unknown>[];
   /** Mostrar cluster de links relacionados al final. */
   showCluster?: boolean;
   /** Cluster tipo: servicios | ubicaciones | sectores | servicio | ubicacion | sector. */
@@ -100,9 +107,19 @@ const {
   showCluster = false,
   clusterType,
   clusterExclude,
+  extraSchemas,
 } = Astro.props;
 
-const url = canonical ?? new URL(Astro.url.pathname, SITE.URL).href;
+// Forma canónica única del sitio: barra final salvo la raíz. `/contacto` y
+// `/contacto/` servían 200 ambas con canonical distinto, y el hreflang/sitemap
+// apuntaban a una u otra. Ahora los tres coinciden siempre.
+// Verificado contra producción 2026-10-02.
+const canonicalPath = Astro.url.pathname === '/'
+  ? Astro.url.pathname
+  : Astro.url.pathname.endsWith('/')
+    ? Astro.url.pathname
+    : `${Astro.url.pathname}/`;
+const url = canonical ?? new URL(canonicalPath, SITE.URL).href;
 // v5.2: títulos sin separadores `|` o `-`. Se concatena con espacio natural.
 // Cada page ya entrega su title en español neutro sin guiones ni pipes.
 const fullTitle = title.includes(SITE.NAME) ? title : `${title} ${SITE.NAME}`;
@@ -190,6 +207,7 @@ const speakableLd = speakableSchema(Astro.url.pathname);
 const allSchemas = [
   orgLd, websiteLd, localBusinessLd, serviceLd, productLd,
   ...(locationLd ?? []), articleLd, faqLd, breadcrumbLd, speakableLd,
+  ...(extraSchemas ?? []),
 ].filter(Boolean);
 
 const geoTags = geoMetaTags();
