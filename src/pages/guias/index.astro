@@ -31,10 +31,10 @@ export const prerender = true;
       <div class="card-grid">
         {GUIDES.map((g) => (
           <a href={`/guias/${g.slug}`} class="card">
-            <div class="card-icon">
-              <Icon name="doc" size={20} />
-            </div>
             <div class="card-body">
+              <div class="card-icon">
+                <Icon name="doc" size={20} />
+              </div>
               <h3>{g.title}</h3>
               <p>{g.metaDescription}</p>
               <span class="card-link">Leer la guía →</span>

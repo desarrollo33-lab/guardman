@@ -26,8 +26,16 @@ export interface SolutionPage {
   h1: string;
   lead: string;
   updatedISO: string;
-  /** Tipo de propiedad al que se dirige. */
+  /**
+   * Etiqueta corta del tipo de cliente. Va en el badge del hero y en el
+   * schema, donde el espacio es limitado: "Condominios", no la frase
+   * completa. Antes `audience` hacía los dos trabajos —etiqueta y
+   * descripción— y el resultado era un texto de 68 caracteres dentro de
+   * un pill, que se desborda en móvil.
+   */
   audience: string;
+  /** Descripción larga del tipo de cliente, para la tarjeta del índice. */
+  audienceLong: string;
   /** El problema de coordinacion, que es el argumento central. */
   coordinationProblem: { title: string; body: string }[];
   /** Servicios incluidos, con el rol de cada uno. */
@@ -49,7 +57,8 @@ export const SOLUTIONS: SolutionPage[] = [
     lead:
       'Un condominio con vigilancia y con aseo tiene dos empresas coordinándose todos los días. El punto de fricción siempre es el mismo: el acceso de las equipes de limpieza y el control de quién entra y sale.',
     updatedISO: '2026-10-02',
-    audience: 'Administraciones de condominios residenciales en Santiago y Valparaíso',
+    audience: 'Condominios',
+    audienceLong: 'Administraciones de condominios residenciales en Santiago y Valparaíso',
     coordinationProblem: [
       {
         title: 'Las llaves y los accesos que nadie controla',
@@ -159,7 +168,8 @@ export const SOLUTIONS: SolutionPage[] = [
     lead:
       'En un edificio de oficinas, la videovigilancia y el aseo se complementan de una forma que rara vez se diseña en conjunto: las cámaras ven los accesos y los espacios comunes, y el aseo los mantiene en condiciones de uso y de seguridad.',
     updatedISO: '2026-10-02',
-    audience: 'Edificios de oficinas, torres y centros corporativos en Santiago',
+    audience: 'Edificios corporativos',
+    audienceLong: 'Edificios de oficinas, torres y centros corporativos en Santiago',
     coordinationProblem: [
       {
         title: 'Cámaras que capturan de más y vigilan de menos',
@@ -269,7 +279,8 @@ export const SOLUTIONS: SolutionPage[] = [
     lead:
       'En un centro comercial, la seguridad y el aseo confluyen en los mismos espacios y a las mismas horas. El pasillo donde hay más tránsito es el mismo donde hay más que limpiar, y la percepción de los locales se construye con las dos cosas.',
     updatedISO: '2026-10-02',
-    audience: 'Centros comerciales, galerías y paseos peatonales',
+    audience: 'Centros comerciales',
+    audienceLong: 'Centros comerciales, galerías y paseos peatonales',
     coordinationProblem: [
       {
         title: 'Aseo que interfiere con los accesos en hora alta',
@@ -379,7 +390,8 @@ export const SOLUTIONS: SolutionPage[] = [
     lead:
       'Una faena de construcción tiene una particularidad que la distingue de cualquier otro sitio: el perímetro cambia. Los accesos se mueven, los turnos rotan y el terreno.available es finito.',
     updatedISO: '2026-10-02',
-    audience: 'Constructoras, contratistas y operaciones de faena en Santiago',
+    audience: 'Faenas de construcción',
+    audienceLong: 'Constructoras, contratistas y operaciones de faena en Santiago',
     coordinationProblem: [
       {
         title: 'Accesos que cambian con el avance de la obra',
@@ -489,7 +501,8 @@ export const SOLUTIONS: SolutionPage[] = [
     lead:
       'Un evento tiene una estructura que no tiene un edificio: se monta, se usa y se desmonta. La seguridad y el aseo tienen que moverse con esa estructura, no por separado.',
     updatedISO: '2026-10-02',
-    audience: 'Organizadores de eventos corporativos,agles, conferences y donaciones',
+    audience: 'Eventos',
+    audienceLong: 'Organizadores de eventos corporativos, bodas, congresos y donaciones',
     coordinationProblem: [
       {
         title: 'El montaje y el desmontaje son parte de la operación',
