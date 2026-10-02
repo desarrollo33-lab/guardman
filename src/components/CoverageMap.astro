@@ -31,7 +31,7 @@
 //
 // Scope reducido: este componente renderiza SOLO el <figure> + <figcaption>.
 // El section, h2, subtitle y demas los pone la pagina padre.
-import { LOCATIONS, ZONE_COLORS, ZONE_DOT_COLORS, type Location } from '../lib/constants';
+import { LOCATIONS, ZONE_COLORS, ZONE_DOT_COLORS, COVERAGE_TOTAL, COVERAGE_RM, COVERAGE_VS, type Location } from '../lib/constants';
 // Import del CSS de Leaflet como string via `?raw` de Vite. Lo inlineamos en
 // el HTML con `<style is:inline set:html={leafletCSS}>`. Esto es robusto:
 // - Funciona independientemente de Vite/Astro code-splitting (que no emite
@@ -78,7 +78,7 @@ const borderColor = variant === 'dark' ? 'rgba(255,255,255,.12)' : 'var(--border
 const bg = variant === 'dark' ? '#1a1a2e' : '#f8f9fa';
 const captionColor = variant === 'dark' ? 'rgba(255,255,255,.75)' : 'var(--muted)';
 const captionText = showMarkers
-  ? 'GuardMan Chile — cobertura verificada en <strong>14 comunas</strong> de la Región Metropolitana.'
+  ? `GuardMan Chile — cobertura verificada en <strong>${COVERAGE_TOTAL} comunas</strong>: ${COVERAGE_RM.length} en la Región Metropolitana y ${COVERAGE_VS.length} en Valparaíso.`
   : `${singleName} — cobertura operativa verificada.`;
 
 // Empaquetamos la data en JSON para que el script modulo la lea. Esto evita

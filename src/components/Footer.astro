@@ -88,24 +88,11 @@ const topSectors = Object.entries(SECTOR_NAMES).slice(0, 6);
         además repetía el "Ver todos". Un solo árbol de servicios: la columna
         con su enlace a /servicios alcanza las 11 páginas de servicio. */}
 
-    <div class="footer-link-cluster">
-      <strong>Ubicaciones principales:</strong>
-      <a href="/ubicaciones/las-condes">Las Condes</a>
-      <span class="footer-sep">·</span>
-      <a href="/ubicaciones/vitacura">Vitacura</a>
-      <span class="footer-sep">·</span>
-      <a href="/ubicaciones/lo-barnechea">Lo Barnechea</a>
-      <span class="footer-sep">·</span>
-      <a href="/ubicaciones/santiago-centro">Santiago Centro</a>
-      <span class="footer-sep">·</span>
-      <a href="/ubicaciones/huechuraba">Huechuraba</a>
-      <span class="footer-sep">·</span>
-      <a href="/ubicaciones/pudahuel">Pudahuel</a>
-      <span class="footer-sep">·</span>
-      <a href="/ubicaciones/quilicura">Quilicura</a>
-      <span class="footer-sep">·</span>
-      <a href="/ubicaciones">Ver todas →</a>
-    </div>
+    {/* Same reasoning for the "Ubicaciones principales" cluster, which listed
+        7 communes (5 of them already in the "Cobertura" column above) plus a
+        second "Ver todas" link. The Cobertura column is derived from LOCATIONS,
+        so it is the single list. Two lists of the same 14 communes in one
+        footer is navigation noise. */}
 
     <div class="footer-bottom">
       <span>© {year} {SITE.LEGAL_NAME}</span>

@@ -3,7 +3,7 @@
 // v1.1 — usa <LeadForm> compartido con /cotizacion.
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LeadForm from '../components/LeadForm.astro';
-import { SITE } from '../lib/constants';
+import { SITE, OPENING_HOURS_TEXT, TIMEZONE_LABEL } from '../lib/constants';
 
 const services = [
   'Guardias de Seguridad',
@@ -90,7 +90,7 @@ const leadFormSections = [
           </div>
           <div class="contact-info-text">
             <h4>Horario</h4>
-            <p>Lunes a Domingo: 24 horas</p>
+            <p>{OPENING_HOURS_TEXT} ({TIMEZONE_LABEL})</p>
           </div>
         </div>
       </div>

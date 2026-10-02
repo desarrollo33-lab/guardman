@@ -79,7 +79,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { q: '¿Qué incluye el servicio de CCTV de GuardMan?', a: 'Incluye diseño del sistema, instalación de cámaras HD/4K, configuración de NVR, monitoreo 24/7 desde nuestro centro propio, mantención periódica y acceso remoto. Todo el personal operativo cuenta con certificación OS-10 vigente.' },
       { q: '¿Cuánto cuesta instalar videovigilancia en Chile?', a: 'El costo varía según la cantidad de cámaras, resolución, tipo de instalación y complejidad del cableado. Ofrecemos cotizaciones personalizadas tras una visita técnica sin compromiso.' },
       { q: '¿Qué certificaciones tienen los operadores de CCTV?', a: 'Todos nuestros operadores cuentan con certificación OS-10 vigente y capacitación continua en sistemas de videovigilancia, protocolos de seguridad y atención de emergencias.' },
-      { q: '¿En qué comunas ofrecen cobertura para videovigilancia?', a: 'Prestamos servicios en 14 comunas de la Región Metropolitana y en Los Andes y San Felipe. Contáctenos para verificar disponibilidad en su sector.' },
+      { q: '¿En qué comunas ofrecen cobertura para videovigilancia?', a: 'Prestamos servicios en 12 comunas de la Región Metropolitana más Los Andes y San Felipe. Contáctenos para verificar disponibilidad en su sector.' },
     ],
   },
 
@@ -91,7 +91,7 @@ export const SERVICES: Record<string, ServiceContent> = {
     heroBadge: 'Tecnología + Personal OS-10',
     heroTitle: 'Control de Accesos Profesional en Chile',
     heroSub:
-      'Proteja su propiedad con sistemas inteligentes y guardias certificados OS-10. Más de 10 años de experiencia en 14 comunas de la Región Metropolitana.',
+      'Proteja su propiedad con sistemas inteligentes y guardias certificados OS-10. Más de 10 años de experiencia en 12 comunas de la Región Metropolitana.',
     features: [
       { title: 'Lectores biométricos y QR', description: 'Torniquetes con reconocimiento de huella, lector de patentes, códigos QR y software de gestión de visitas para un control preciso.' },
       { title: 'Protocolos personalizados por propiedad', description: 'Diseñamos procedimientos de acceso específicos para edificios corporativos, condominios residenciales o parques industriales.' },
@@ -110,7 +110,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { q: '¿Qué incluye el servicio de control de accesos?', a: 'Incluye instalación de sistemas tecnológicos (lectores biométricos, QR, torniquetes), asignación de guardias OS-10, supervisión desde nuestro central de monitoreo 24/7 y gestión digital de visitas.' },
       { q: '¿Cuánto cuesta contratar control de accesos profesional?', a: 'El costo depende del tipo de propiedad, cantidad de accesos, tecnología requerida y número de guardias. Ofrecemos cotizaciones personalizadas sin compromiso.' },
       { q: '¿Qué certificaciones tienen sus guardias?', a: 'Todos nuestros guardias cuentan con certificación OS-10 vigente y capacitación continua en nuestra academia interna.' },
-      { q: '¿En qué comunas ofrecen el servicio?', a: 'Operamos en 14 comunas de la Región Metropolitana más Los Andes y San Felipe.' },
+      { q: '¿En qué comunas ofrecen el servicio?', a: 'Operamos en 12 comunas de la Región Metropolitana más Los Andes y San Felipe.' },
     ],
   },
 
@@ -140,7 +140,7 @@ export const SERVICES: Record<string, ServiceContent> = {
     faqs: [
       { q: '¿Qué es PPI (Protección de Personas Importantes)?', a: 'PPI es la categoría técnica de la escolta privada orientada a la protección de ejecutivos, autoridades y personas de alto perfil. En GuardMan Chile, nuestro servicio de PPI se opera con personal certificado OS-10, verificación de antecedentes, autorización de la Autoridad Administrativa Laboral y capacitación continua en protección ejecutiva y manejo de emergencias.' },
       { q: '¿Puedo contratar escoltas PPI solo para eventos específicos?', a: 'Sí, ofrecemos servicios PPI permanentes y eventuales. Contáctenos para una cotización personalizada según sus necesidades.' },
-      { q: '¿En qué comunas ofrecen servicio de PPI?', a: 'Cobertura en 14 comunas de la Región Metropolitana más Los Andes y San Felipe.' },
+      { q: '¿En qué comunas ofrecen servicio de PPI?', a: 'Cobertura en 12 comunas de la Región Metropolitana más Los Andes y San Felipe.' },
       { q: '¿Cómo se determina el precio del servicio PPI?', a: 'Depende de la duración, número de escoltas, nivel de riesgo y servicios adicionales como vehículos de apoyo. Solicite una cotización sin compromiso.' },
     ],
   },
@@ -172,7 +172,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { q: '¿En qué consiste el servicio de monitoreo 24/7?', a: 'Supervisión permanente desde nuestra central de vigilancia propia. Operadores capacitados vigilan cámaras y alarmas en tiempo real, detectan eventos, verifican alertas y coordinan respuestas según protocolos establecidos. Operamos directamente nuestro centro con redundancia de sistemas.' },
       { q: '¿Cuál es el costo del monitoreo 24/7?', a: 'Depende de la cantidad de cámaras, puntos de alarma, nivel de riesgo y servicios adicionales. Ofrecemos cotización personalizada sin costo donde evaluamos sus necesidades específicas.' },
       { q: '¿Qué significa la certificación OS-10?', a: 'Es la acreditación oficial de Carabineros de Chile que confirma que el guardia ha completado formación en vigilancia, primeros auxilios y legislación aplicable. Todos nuestros guardias mantienen esta certificación vigente.' },
-      { q: '¿En qué comunas tienen cobertura?', a: 'Cobertura en 14 comunas de la Región Metropolitana más Los Andes y San Felipe. Esta cobertura regional permite atender desde torres corporativas hasta parcelas residenciales.' },
+      { q: '¿En qué comunas tienen cobertura?', a: 'Cobertura en 12 comunas de la Región Metropolitana más Los Andes y San Felipe. Esta cobertura regional permite atender desde torres corporativas hasta parcelas residenciales.' },
       { q: '¿Cómo funciona la integración con alarmas y cámaras?', a: 'Como instaladores oficiales de Ajax Systems, implementamos soluciones conectadas a nuestra central. Cuando una alarma se activa, los operadores verifican por cámara, descartan falsas alarmas y activan el protocolo de respuesta, incluyendo contacto con Carabineros si corresponde.' },
     ],
   },
@@ -204,7 +204,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { q: '¿Cuántos guardias necesito para mi evento?', a: 'Depende del tipo de evento, número de asistentes, recinto y nivel de exposición. Para eventos pequeños (hasta 100 personas) recomendamos mínimo 2 guardias; eventos masivos pueden requerir equipos de 10 o más. Contáctenos para una evaluación precisa.' },
       { q: '¿Qué incluye el servicio de seguridad para eventos?', a: 'Selección de guardias OS-10, briefing de protocolo, supervisión durante la jornada, coordinación con central de monitoreo, comunicación interna y reporte post-evento. Opcionalmente: cámaras, Guardpod y coordinación con Carabineros.' },
       { q: '¿Cómo certifican la calidad del personal?', a: 'Proceso riguroso: verificación de antecedentes, validación de OS-10 ante Carabineros, evaluación de experiencia y competencias, capacitación interna de protocolos y supervisor de piso asignado.' },
-      { q: '¿Pueden cubrir eventos fuera de Santiago?', a: 'Sí. Además de las 14 comunas metropolitanas, tenemos presencia en San Felipe y Los Andes. Para otras zonas evaluamos viabilidad logística.' },
+      { q: '¿Pueden cubrir eventos fuera de Santiago?', a: 'Sí. Además de las 12 comunas metropolitanas, tenemos presencia en San Felipe y Los Andes. Para otras zonas evaluamos viabilidad logística.' },
     ],
   },
 
@@ -237,7 +237,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { q: '¿Cuántos guardias se necesitan para un estadio?', a: 'Depende del aforo y la categoría del evento. Como referencia operativa, un partido estándar parte de 1 guardia por cada 250 asistentes, más refuerzos en accesos y perímetro. Entregamos un plan operativo detallado tras la visita técnica.' },
       { q: '¿Tienen experiencia con eventos de alta convocatoria?', a: 'Sí, operamos eventos masivos, finales y clásicos con coordinación directa con Carabineros, gestión de hinchadas rivales y planes de contingencia documentados.' },
       { q: '¿Coordinan con las fuerzas de seguridad del Estado?', a: 'Sí. Mantenemos canales de comunicación directa con Carabineros y PDI durante el evento, con un supervisor de enlace asignado en el módulo de coordinación.' },
-      { q: '¿Pueden cubrir partidos fuera de Santiago?', a: 'Sí. Operamos en 14 comunas de la Región Metropolitana y en Los Andes y San Felipe. Para recintos en otras regiones evaluamos logística y desplazamos equipos.' },
+      { q: '¿Pueden cubrir partidos fuera de Santiago?', a: 'Sí. Operamos en 12 comunas de la Región Metropolitana más Los Andes y San Felipe. Para recintos en otras regiones evaluamos logística y desplazamos equipos.' },
     ],
   },
 
@@ -363,7 +363,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { q: '¿Qué incluye el servicio de aseo?', a: 'Personal uniformado, productos de limpieza, maquinaria industrial, supervisión de terreno y reporte mensual. Los planes se ajustan al tipo de propiedad y horario.' },
       { q: '¿Pueden trabajar en horario nocturno?', a: 'Sí. La mayoría de nuestros clientes operan con planes nocturnos para no interrumpir la operación diurna. Coordinamos accesos con su equipo de seguridad.' },
       { q: '¿Qué tipo de productos utilizan?', a: 'Productos certificados de uso industrial. Opciones biodegradables disponibles. Para áreas críticas contamos con protocolos de sanitización profunda.' },
-      { q: '¿En qué comunas ofrecen servicio?', a: 'En las 14 comunas de cobertura metropolitana más Los Andes y San Felipe.' },
+      { q: '¿En qué comunas ofrecen servicio?', a: 'En las 12 comunas de cobertura metropolitana más Los Andes y San Felipe, 14 en total.' },
     ],
   },
 };
@@ -760,7 +760,7 @@ export const SECTORS: Record<string, SectorContent> = {
   comercial: {
     name: 'Comercial',
     heroTitle: 'Seguridad para el Sector Comercial',
-    heroSub: 'Proteja su negocio con guardias certificados OS-10, prevención de hurto y control de aforo. Cobertura en 14 comunas de la Región Metropolitana.',
+    heroSub: 'Proteja su negocio con guardias certificados OS-10, prevención de hurto y control de aforo. Cobertura en 12 comunas de la Región Metropolitana.',
     intro: 'El comercio minorista enfrenta riesgos específicos: hurto interno y externo, accesos sin control durante horas pico y vandalismo en horarios de cierre. GuardMan Chile diseña protocolos de seguridad comerciales que protegen su inventario sin interferir con la experiencia de compra de sus clientes.',
     features: [
       { title: 'Prevención de hurto con presencia disuasoria', description: 'Guardias posicionados estratégicamente para disuadir el hurto en tiendas, locales y paseos comerciales.' },
@@ -913,8 +913,8 @@ export const SECTORS: Record<string, SectorContent> = {
     heroTitle: 'Seguridad Hospitalaria y Clínica OS-10 en Chile',
     heroSub: 'Protección profesional para hospitales, clínicas, laboratorios y centros médicos con guardias certificados OS-10 y protocolos adaptados al ambiente hospitalario.',
     seoTitle: 'Seguridad para Hospitales y Clínicas OS-10 en Santiago | GuardMan Chile',
-    seoDescription: 'Seguridad privada OS-10 para hospitales, clínicas, laboratorios y centros médicos en Santiago y 14 comunas de la Región Metropolitana. Control de acceso a pabellones, UCI, urgencias y farmacias. Personal con protocolo hospitalario, manejo de conflictos y confidencialidad médica. Cotice en 24 horas.',
-    intro: 'El sector salud en Chile opera con estándares de exigencia únicos: áreas restringidas con acceso crítico como pabellones, UCI y farmacias de alto costo, pacientes en situaciones vulnerables, medicamentos de alto valor y la necesidad permanente de mantener un ambiente de calma. GuardMan Chile forma a sus guardias en protocolos hospitalarios que combinan seguridad efectiva con sensibilidad hacia pacientes, personal médico y visitantes, con presencia operativa en 14 comunas de la Región Metropolitana.',
+    seoDescription: 'Seguridad privada OS-10 para hospitales, clínicas, laboratorios y centros médicos en Santiago y 12 comunas de la Región Metropolitana. Control de acceso a pabellones, UCI, urgencias y farmacias. Personal con protocolo hospitalario, manejo de conflictos y confidencialidad médica. Cotice en 24 horas.',
+    intro: 'El sector salud en Chile opera con estándares de exigencia únicos: áreas restringidas con acceso crítico como pabellones, UCI y farmacias de alto costo, pacientes en situaciones vulnerables, medicamentos de alto valor y la necesidad permanente de mantener un ambiente de calma. GuardMan Chile forma a sus guardias en protocolos hospitalarios que combinan seguridad efectiva con sensibilidad hacia pacientes, personal médico y visitantes, con presencia operativa en 12 comunas de la Región Metropolitana.',
     features: [
       { title: 'Control de acceso en áreas críticas', description: 'Verificación de identidad en urgencias, pabellones quirúrgicos, UCI/UTI, farmacias y unidades de alto riesgo con lectores biométricos y registro digital de cada ingreso.' },
       { title: 'Gestión de visitantes y acompañantes', description: 'Registro digital, acreditación con foto y acompañamiento de visitas con verificación de identidad y control riguroso de horarios de visita.' },
@@ -1015,7 +1015,7 @@ export const NOSOTROS_TIMELINE = [
   { year: '2014', title: 'Fundación de GuardMan Chile', text: 'GuardMan Chile inicia operaciones en Santiago con la misión de ofrecer servicios de seguridad privada de excelencia, comenzando con un equipo fundador de guardias certificados OS-10.' },
   { year: '2017', title: 'Consolidación en el mercado metropolitano', text: 'Tras sus primeros años, la empresa consolida su presencia en la Región Metropolitana, sumando sus primeros clientes corporativos y residenciales y fortaleciendo su academia interna de capacitación.' },
   { year: '2020', title: 'Inauguración del central de monitoreo', text: 'Se instala un central de monitoreo propio con tecnología de punta, permitiendo supervisión en tiempo real y respuesta inmediata, elevando los estándares de seguridad para los clientes.' },
-  { year: '2023', title: 'Expansión a 200+ guardias y 14 comunas', text: 'GuardMan Chile supera los 200 guardias certificados OS-10, cubriendo 14 comunas de la Región Metropolitana, posicionándose como un actor relevante en la seguridad privada local.' },
+  { year: '2023', title: 'Expansión a 200+ guardias y 14 comunas', text: 'GuardMan Chile supera los 200 guardias certificados OS-10, cubriendo 12 comunas de la Región Metropolitana, posicionándose como un actor relevante en la seguridad privada local.' },
   { year: '2024', title: 'Lanzamiento de Guardpod', text: 'Se introduce Guardpod, un sistema autónomo de vigilancia que integra cámaras 360°, detección por inteligencia artificial y alimentación autónoma, optimizando la gestión de seguridad para clientes.' },
 ];
 
