@@ -6,11 +6,11 @@
 body{font-family:var(--font)!important;color:#fff!important;line-height:1.5!important;-webkit-font-smoothing:antialiased;background:var(--bg-dark)!important}
 
 /* ── Header dark ── */
-[data-od-id="header"]{background:rgba(10,16,25,.92)!important;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.06);box-shadow:none}
+[data-od-id="header"]{background:var(--gm-glass-surface)!important;-webkit-backdrop-filter:blur(var(--gm-glass-blur));backdrop-filter:blur(var(--gm-glass-blur));border-bottom:1px solid var(--gm-border-light);box-shadow:none}
 .logo{font-weight:800!important;font-size:22px!important;color:#fff!important}
 nav a{color:rgba(255,255,255,.85)!important;font-size:15px!important;font-weight:500!important;transition:color .2s}nav a:hover,nav a.active{color:#fff!important}
 /* Dropdown menus del header — fondo blanco del site.css + texto blanco del body dark = invisible. Override: */
-[data-od-id="header"] .dropdown-menu{background:rgba(15,23,41,.96)!important;border:1px solid rgba(255,255,255,.06)!important;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+[data-od-id="header"] .dropdown-menu{background:var(--gm-glass-surface-raised)!important;border:1px solid var(--gm-border-light)!important;-webkit-backdrop-filter:blur(var(--gm-glass-blur));backdrop-filter:blur(var(--gm-glass-blur))}
 [data-od-id="header"] .dropdown-menu a{color:rgba(255,255,255,.85)!important}
 [data-od-id="header"] .dropdown-menu a:hover{background:rgba(59,130,246,.12)!important;color:#fff!important}
 .header-phone{color:rgba(255,255,255,.85)!important}.header-phone svg{width:16px!important;height:16px!important;color:var(--accent)!important}
@@ -20,7 +20,7 @@ nav a{color:rgba(255,255,255,.85)!important;font-size:15px!important;font-weight
 .btn-outline-light{background:transparent!important;color:#fff!important;border-color:rgba(255,255,255,.2)!important}.btn-outline-light:hover{background:rgba(255,255,255,.08)!important}
 
 /* ── Breadcrumb dark ── */
-[data-od-id="breadcrumb"]{background:#151d2b!important;border-bottom:1px solid rgba(255,255,255,.06)}
+[data-od-id="breadcrumb"]{background:#151d2b!important;border-bottom:1px solid var(--gm-border-light)}
 .breadcrumb-inner{color:rgba(255,255,255,.4)!important}.breadcrumb-inner a{color:rgba(255,255,255,.4)!important}.breadcrumb-inner a:hover{color:var(--accent)!important}.breadcrumb-inner span{color:rgba(255,255,255,.6)!important}.breadcrumb-sep{color:rgba(255,255,255,.2)!important}
 
 /* ── Section labels ── */
@@ -35,20 +35,20 @@ nav a{color:rgba(255,255,255,.85)!important;font-size:15px!important;font-weight
 
 /* ── Feature cards dark ── */
 .feature-grid{display:grid!important;grid-template-columns:1fr!important;gap:16px!important;margin-top:32px!important}@media(min-width:640px){.feature-grid{grid-template-columns:repeat(2,1fr)!important}}
-.feature-card{padding:24px!important;background:rgba(255,255,255,.03)!important;border:1px solid rgba(255,255,255,.06)!important;border-radius:var(--radius-lg)!important;transition:all .25s}.feature-card:hover{border-color:rgba(59,130,246,.25)!important;background:rgba(59,130,246,.04)!important}
+.feature-card{padding:24px!important;background:rgba(255,255,255,.03)!important;border:1px solid var(--gm-border-light)!important;border-radius:var(--radius-lg)!important;transition:all .25s}.feature-card:hover{border-color:rgba(59,130,246,.25)!important;background:rgba(59,130,246,.04)!important}
 .feature-card-icon{width:40px!important;height:40px!important;border-radius:var(--radius-md)!important;background:rgba(59,130,246,.15)!important;display:flex!important;align-items:center!important;justify-content:center!important;margin-bottom:14px!important;color:var(--accent)!important}.feature-card-icon svg{width:20px!important;height:20px!important}
 .feature-card h3{font-size:16px!important;font-weight:700!important;margin-bottom:6px!important;color:#fff!important}.feature-card p{font-size:14px!important;color:rgba(255,255,255,.5)!important;line-height:1.5!important}
 
 /* ── Problems dark ── */
 .problems-grid{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;margin-top:28px!important}@media(min-width:640px){.problems-grid{grid-template-columns:repeat(3,1fr)!important}}@media(max-width:767px){.problems-grid{grid-template-columns:1fr!important}}
-.problem-card{padding:20px!important;background:rgba(255,255,255,.03)!important;border:1px solid rgba(255,255,255,.06)!important;border-radius:var(--radius-lg)!important;display:flex!important;gap:12px!important}.problem-card svg{width:20px!important;height:20px!important;color:var(--warning)!important;flex-shrink:0!important;margin-top:2px!important}.problem-card p{font-size:14px!important;color:rgba(255,255,255,.5)!important;line-height:1.55!important}
+.problem-card{padding:20px!important;background:rgba(255,255,255,.03)!important;border:1px solid var(--gm-border-light)!important;border-radius:var(--radius-lg)!important;display:flex!important;gap:12px!important}.problem-card svg{width:20px!important;height:20px!important;color:var(--warning)!important;flex-shrink:0!important;margin-top:2px!important}.problem-card p{font-size:14px!important;color:rgba(255,255,255,.5)!important;line-height:1.55!important}
 
 /* ── FAQ dark ── */
-.faq details{border:1px solid rgba(255,255,255,.06)!important;background:rgba(255,255,255,.02)!important}.faq summary{color:#fff!important}.faq summary::after{color:rgba(255,255,255,.25)!important}.faq .answer{color:rgba(255,255,255,.45)!important}
+.faq details{border:1px solid var(--gm-border-light)!important;background:rgba(255,255,255,.02)!important}.faq summary{color:#fff!important}.faq summary::after{color:rgba(255,255,255,.25)!important}.faq .answer{color:rgba(255,255,255,.45)!important}
 
 /* ── Split dark ── */
 .split-text p{font-size:16px!important;color:rgba(255,255,255,.5)!important;line-height:1.7!important;margin-bottom:16px!important}
-.split-image{border-radius:var(--radius-xl)!important;overflow:hidden!important;background:radial-gradient(ellipse at center,rgba(59,130,246,.08),transparent 70%)!important;border:1px solid rgba(255,255,255,.06)!important}.split-image img{width:100%!important;display:block!important}
+.split-image{border-radius:var(--radius-xl)!important;overflow:hidden!important;background:radial-gradient(ellipse at center,rgba(59,130,246,.08),transparent 70%)!important;border:1px solid var(--gm-border-light)!important}.split-image img{width:100%!important;display:block!important}
 
 /* ── Why grid dark ── */
 .why-grid{display:grid!important;grid-template-columns:1fr!important;gap:20px!important;margin-top:32px!important}@media(min-width:640px){.why-grid{grid-template-columns:repeat(3,1fr)!important}}
@@ -95,12 +95,12 @@ section p{color:rgba(255,255,255,.7)!important}
 .faq .answer{padding:0 20px 18px!important;color:rgba(255,255,255,.6)!important;line-height:1.7!important;font-size:15px!important}
 
 /* ── CTA band dark ── */
-.cta-band{background:rgba(255,255,255,.03)!important;border-top:1px solid rgba(255,255,255,.06)!important;border-bottom:1px solid rgba(255,255,255,.06)!important}
+.cta-band{background:rgba(255,255,255,.03)!important;border-top:1px solid var(--gm-border-light)!important;border-bottom:1px solid var(--gm-border-light)!important}
 
 /* ── Footer dark ── */
-[data-od-id="footer"]{background:rgba(0,0,0,.3)!important;color:rgba(255,255,255,.5)!important;border-top:1px solid rgba(255,255,255,.06)}
+[data-od-id="footer"]{background:rgba(0,0,0,.3)!important;color:rgba(255,255,255,.5)!important;border-top:1px solid var(--gm-border-light)}
 .footer-col h4{color:rgba(255,255,255,.7)!important}.footer-col a{color:rgba(255,255,255,.4)!important}.footer-col a:hover{color:rgba(255,255,255,.7)!important}
-.footer-bottom{border-top-color:rgba(255,255,255,.06)!important}
+.footer-bottom{border-top-color:var(--gm-border-light)!important}
 
 /* ── Ajax / Guard Pod contrast fixes ── */
 body[data-theme="dark"] .hero-sub{color:rgba(255,255,255,.55)!important}
