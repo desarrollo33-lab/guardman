@@ -32,6 +32,7 @@ coverage/
 # playwright
 test-results/
 playwright-report/
+lighthouse-reports/
 
 # local artifacts (auto-generated, no versionar)
 .backups/

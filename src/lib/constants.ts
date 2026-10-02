@@ -368,6 +368,19 @@ export const FONT_VERSION = '20260925';
 /** URL completa del woff2 de Inter Variable con cache-bust. */
 export const INTER_FONT_URL = `/fonts/InterVariable.woff2?v=${FONT_VERSION}`;
 
+/**
+ * Versión de las imágenes re-codificadas (soporte responsive + compresión).
+ *
+ * `/images/*` y `/videos/*` se sirven con `max-age=31536000, immutable`
+ * (public/_headers). Re-codificar un archivo CONSERVANDO su nombre no cambia la
+ * cache key: el edge sigue sirviendo el binario viejo hasta que expire el año.
+ * Por eso toda referencia a una imagen re-codificada lleva `?v=${IMAGE_VERSION}`.
+ *
+ * Bumpear SOLO cuando cambian los bytes de alguna de esas imágenes, y siempre
+ * en el mismo commit que el re-encode (scripts/reencode-images.mjs).
+ */
+export const IMAGE_VERSION = '20261002-2';
+
 
 // ────────────────────────────────────────────────────────────────
 // SEO + GEO metadata (v3.0)

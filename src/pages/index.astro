@@ -2,7 +2,7 @@
 // Homepage v4.0 — Optimizada para captura de leads.
 // Hero persuasivo + trust signals + cómo funciona + CTA inline + cluster.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SERVICE_NAMES, LOCATIONS, ZONE_COLORS, FAQ_HOME, SITE, COVERAGE_PHRASE_LONG, COVERAGE_PHRASE_TOTAL } from '../lib/constants';
+import { SERVICE_NAMES, LOCATIONS, ZONE_COLORS, FAQ_HOME, SITE, COVERAGE_PHRASE_LONG, COVERAGE_PHRASE_TOTAL, IMAGE_VERSION } from '../lib/constants';
 import { ICONS, SERVICE_ICONS } from '../lib/icons';
 import { SERVICES, ZONAS } from '../lib/content';
 import Icon from '../components/Icon.astro';
@@ -83,11 +83,11 @@ const markers = LOCATIONS.map((l) => {
   <!-- HERO -->
   <section class="hero" data-od-id="hero">
     <div class="hero-bg">
-      <img src="/images/hero-824.webp"
-           srcset="/images/hero-480.webp 480w,
-                   /images/hero-824.webp 824w,
-                   /images/hero-1280.webp 1280w,
-                   /images/hero-1920.webp 1920w"
+      <img src={`/images/hero-824.webp?v=${IMAGE_VERSION}`}
+           srcset={`/images/hero-480.webp?v=${IMAGE_VERSION} 480w,
+                   /images/hero-824.webp?v=${IMAGE_VERSION} 824w,
+                   /images/hero-1280.webp?v=${IMAGE_VERSION} 1280w,
+                   /images/hero-1920.webp?v=${IMAGE_VERSION} 1920w`}
            sizes="100vw"
            alt="Seguridad Privada GuardMan Chile — Guardias OS-10"
            fetchpriority="high" decoding="async" width="1920" height="1080"
@@ -139,7 +139,11 @@ const markers = LOCATIONS.map((l) => {
         </a>
       </div>
       <div class="split-image">
-        <img src="/images/nosotros_seccion.webp" alt="Equipo GuardMan" loading="lazy" decoding="async" width="640" height="480" onerror="this.style.display='none'" />
+        <img src={`/images/nosotros_seccion.webp?v=${IMAGE_VERSION}`}
+             srcset={`/images/nosotros_seccion-560.webp?v=${IMAGE_VERSION} 560w,
+                     /images/nosotros_seccion.webp?v=${IMAGE_VERSION} 824w`}
+             sizes="(min-width: 1024px) 552px, 100vw"
+             alt="Equipo GuardMan" loading="lazy" decoding="async" width="824" height="558" onerror="this.style.display='none'" />
         <div class="split-image-badge">Conoce GuardMan</div>
       </div>
     </div>
@@ -167,13 +171,13 @@ const markers = LOCATIONS.map((l) => {
           <a href={`/servicios/${s.slug}`} class="card">
             <div class="card-image">
               <img
-                src={s.hasSrcset ? `/images/service-${s.slug}-732.webp` : `/images/service-${s.slug}.webp`}
-                srcset={s.hasSrcset ? `/images/service-${s.slug}-400.webp 400w, /images/service-${s.slug}-732.webp 732w` : undefined}
+                src={s.hasSrcset ? `/images/service-${s.slug}-732.webp?v=${IMAGE_VERSION}` : `/images/service-${s.slug}.webp?v=${IMAGE_VERSION}`}
+                srcset={s.hasSrcset ? `/images/service-${s.slug}-400.webp?v=${IMAGE_VERSION} 400w, /images/service-${s.slug}-732.webp?v=${IMAGE_VERSION} 732w` : undefined}
                 sizes={s.hasSrcset ? "(min-width: 768px) 366px, 100vw" : undefined}
                 alt={s.name}
                 loading="lazy" decoding="async"
                 width="400" height="240"
-                onerror="this.src='/images/hero-1280.webp';this.onerror=null" />
+                onerror={`this.src='/images/hero-1280.webp?v=${IMAGE_VERSION}';this.onerror=null`} />
             </div>
             <div class="card-body">
               <div class="card-icon">
@@ -234,7 +238,7 @@ const markers = LOCATIONS.map((l) => {
       <div class="split-image">
         <video
           src="/videos/guardpod-home.mp4"
-          poster="/videos/guardpod-home-poster.webp"
+          poster={`/videos/guardpod-home-poster.webp?v=${IMAGE_VERSION}`}
           width="1280"
           height="720"
           loop
@@ -287,7 +291,7 @@ const markers = LOCATIONS.map((l) => {
         {sectors.map((s) => (
           <a href={`/sectores/${s.slug}`} class="card">
             <div class="card-image" style="position:relative;background:var(--primary);overflow:hidden">
-              <img src={`/images/sector-${s.slug}.webp?v=20261002`} alt={s.name} loading="lazy" decoding="async" width="400" height="240" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+              <img src={`/images/sector-${s.slug}.webp?v=${IMAGE_VERSION}`} alt={s.name} loading="lazy" decoding="async" width="400" height="225" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
               <div style="display:none;align-items:center;justify-content:center;width:100%;height:100%;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:1.4rem;font-weight:700;position:absolute;top:0;left:0">{s.name}</div>
             </div>
             <div class="card-body">

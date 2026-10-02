@@ -65,7 +65,11 @@ const steps = [
     isolation: isolate;
     color: #ffffff;
     background-color: #0d1d3a;
-    background-image: url('/images/equipo/firma-contrato.webp');
+    /* ?v=20261002-2 = IMAGE_VERSION de src/lib/constants.ts (los <style> de
+       Astro no aceptan expresiones). /images/* es immutable por 1 año: sin el
+       cache-bust el edge sigue sirviendo el binario viejo. Bumpear acá y en
+       IMAGE_VERSION en el mismo commit que el re-encode. */
+    background-image: url('/images/equipo/firma-contrato.webp?v=20261002-2');
     background-size: cover;
     background-position: 18% center;
     border-radius: 16px;

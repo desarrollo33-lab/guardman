@@ -2,7 +2,7 @@
 // /servicios — hub de servicios.
 // v5.2 — Copy único por página, español neutro, estructura y componentes preservados.
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { SERVICE_NAMES, SITE, COVERAGE_PHRASE_LONG } from '../../lib/constants';
+import { SERVICE_NAMES, SITE, COVERAGE_PHRASE_LONG, IMAGE_VERSION } from '../../lib/constants';
 import { SERVICES } from '../../lib/content';
 import { SERVICE_ICONS } from '../../lib/icons';
 import Icon from '../../components/Icon.astro';
@@ -38,7 +38,7 @@ const services = Object.entries(SERVICE_NAMES).map(([slug, name]) => ({
         {services.map((s) => (
           <a href={`/servicios/${s.slug}`} class="service-card">
             <div class="service-image">
-              <img src={`/images/service-${s.slug}.webp`} alt={s.name} loading="lazy" onerror="this.style.display='none'" />
+              <img src={`/images/service-${s.slug}.webp?v=${IMAGE_VERSION}`} alt={s.name} loading="lazy" onerror="this.style.display='none'" />
             </div>
             <div class="service-body">
               <div class="service-icon">

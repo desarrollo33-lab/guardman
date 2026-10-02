@@ -2,7 +2,7 @@
 // TrustSignals — Bloque de señales de confianza para conversión.
 // Stats + certificaciones.
 import Icon from './Icon.astro';
-import { FAQ_HOME } from '../lib/constants';
+import { FAQ_HOME, IMAGE_VERSION } from '../lib/constants';
 
 const certifications = [
   { label: 'Certificación OS-10', desc: 'Vigente, autorizada por Carabineros de Chile', icon: 'shield' },
@@ -23,9 +23,9 @@ const faqs = FAQ_HOME;
     <div class="cert-split">
       <div class="cert-split-image">
         <img
-          src="/images/flota/portada-residencial-800.webp"
-          srcset="/images/flota/portada-residencial-560.webp 560w,
-                  /images/flota/portada-residencial-800.webp 800w"
+          src={`/images/flota/portada-residencial-800.webp?v=${IMAGE_VERSION}`}
+          srcset={`/images/flota/portada-residencial-560.webp?v=${IMAGE_VERSION} 560w,
+                  /images/flota/portada-residencial-800.webp?v=${IMAGE_VERSION} 800w`}
           sizes="(min-width: 768px) 560px, 100vw"
           alt="Flota operativa GuardMan — Saveiros identificadas en condominio"
           loading="lazy"

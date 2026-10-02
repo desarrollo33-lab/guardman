@@ -15,16 +15,21 @@ nav a{color:rgba(255,255,255,.85)!important;font-size:15px!important;font-weight
 [data-od-id="header"] .dropdown-menu a:hover{background:rgba(59,130,246,.12)!important;color:#fff!important}
 .header-phone{color:rgba(255,255,255,.85)!important}.header-phone svg{width:16px!important;height:16px!important;color:var(--accent)!important}
 .header-right{display:flex!important;align-items:center!important;gap:16px!important;flex-shrink:0}
-.btn-primary{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important;box-shadow:0 0 20px rgba(59,130,246,.3)}.btn-primary:hover{background:var(--accent-hover)!important;transform:translateY(-1px);box-shadow:0 0 30px rgba(59,130,246,.5)}
+/* Boton primario: var(--accent) (#3B82F6) con texto blanco daba 3.68:1 y
+   fallaba WCAG AA. var(--accent-strong) da 5.17:1. */
+.btn-primary{background:var(--accent-strong)!important;color:#fff!important;border-color:var(--accent-strong)!important;box-shadow:0 0 20px rgba(37,99,235,.3)}.btn-primary:hover{background:var(--accent-stronger)!important;transform:translateY(-1px);box-shadow:0 0 30px rgba(37,99,235,.5)}
 .btn-ghost{background:transparent!important;color:#fff!important;border-color:rgba(255,255,255,.2)!important}.btn-ghost:hover{background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.4)!important}
 .btn-outline-light{background:transparent!important;color:#fff!important;border-color:rgba(255,255,255,.2)!important}.btn-outline-light:hover{background:rgba(255,255,255,.08)!important}
 
 /* ── Breadcrumb dark ── */
 [data-od-id="breadcrumb"]{background:#151d2b!important;border-bottom:1px solid var(--gm-border-light)}
-.breadcrumb-inner{color:rgba(255,255,255,.4)!important}.breadcrumb-inner a{color:rgba(255,255,255,.4)!important}.breadcrumb-inner a:hover{color:var(--accent)!important}.breadcrumb-inner span{color:rgba(255,255,255,.6)!important}.breadcrumb-sep{color:rgba(255,255,255,.2)!important}
+/* Texto sobre fondo oscuro: blanco al 40% queda en #737780/#6a6d71 y da
+   3.76-3.78:1 (falla AA). Al 65% da ~6:1. El 50% ya pasa (5.1:1) y se deja. */
+.breadcrumb-inner{color:rgba(255,255,255,.65)!important}.breadcrumb-inner a{color:rgba(255,255,255,.65)!important}.breadcrumb-inner a:hover{color:var(--accent)!important}.breadcrumb-inner span{color:rgba(255,255,255,.75)!important}.breadcrumb-sep{color:rgba(255,255,255,.35)!important}
 
 /* ── Section labels ── */
-.section-label{color:var(--accent)!important}.section-title{color:#fff!important}.section-subtitle{color:rgba(255,255,255,.6)!important}
+/* #3B82F6 sobre fondo oscuro da 2.5:1. El azul claro #93C5FD da 8:1 o mas. */
+.section-label{color:#93C5FD!important}.section-title{color:#fff!important}.section-subtitle{color:rgba(255,255,255,.6)!important}
 
 /* ── Hero dark theme adjustments ── */
 .hero{padding:96px 0!important}@media(max-width:767px){.hero{padding:64px 0!important}}@media(min-width:1024px){.hero{padding:120px 0!important}}
@@ -52,11 +57,11 @@ nav a{color:rgba(255,255,255,.85)!important;font-size:15px!important;font-weight
 
 /* ── Why grid dark ── */
 .why-grid{display:grid!important;grid-template-columns:1fr!important;gap:20px!important;margin-top:32px!important}@media(min-width:640px){.why-grid{grid-template-columns:repeat(3,1fr)!important}}
-.why-card{padding:20px!important;background:rgba(255,255,255,.025)!important;border:1px solid rgba(255,255,255,.05)!important;border-radius:var(--radius-lg)!important;text-align:center!important}.why-card svg{width:36px!important;height:36px!important;color:var(--accent)!important;margin-bottom:12px!important}.why-card h4{font-size:16px!important;font-weight:700!important;color:#fff!important;margin-bottom:6px!important}.why-card p{font-size:14px!important;color:rgba(255,255,255,.45)!important;line-height:1.5!important}
+.why-card{padding:20px!important;background:rgba(255,255,255,.025)!important;border:1px solid rgba(255,255,255,.05)!important;border-radius:var(--radius-lg)!important;text-align:center!important}.why-card svg{width:36px!important;height:36px!important;color:var(--accent)!important;margin-bottom:12px!important}.why-card h4{font-size:16px!important;font-weight:700!important;color:#fff!important;margin-bottom:6px!important}.why-card p{font-size:14px!important;color:rgba(255,255,255,.65)!important;line-height:1.5!important}
 
 /* ── Stats dark ── */
 .stats-row{padding:40px 0!important;background:rgba(255,255,255,.015)!important;border-top:1px solid rgba(255,255,255,.04)!important;border-bottom:1px solid rgba(255,255,255,.04)!important}
-.stats-grid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:24px!important}@media(min-width:640px){.stats-grid{grid-template-columns:repeat(4,1fr)!important}}.stat-item{text-align:center!important}.stat-value{font-size:32px!important;font-weight:800!important;color:#fff!important}.stat-label{font-size:13px!important;color:rgba(255,255,255,.4)!important;margin-top:4px!important}
+.stats-grid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:24px!important}@media(min-width:640px){.stats-grid{grid-template-columns:repeat(4,1fr)!important}}.stat-item{text-align:center!important}.stat-value{font-size:32px!important;font-weight:800!important;color:#fff!important}.stat-label{font-size:13px!important;color:rgba(255,255,255,.65)!important;margin-top:4px!important}
 
 /* ── CTA dark ── */
 .cta-band{padding:80px 0!important;text-align:center!important;position:relative!important;overflow:hidden!important;background:transparent!important}.cta-band::before{content:''!important;position:absolute!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;width:600px!important;height:600px!important;background:radial-gradient(circle,rgba(59,130,246,.1),transparent 60%)!important;border-radius:50%!important}.cta-band .container{position:relative!important;z-index:1!important}.cta-band .section-title{max-width:600px!important;margin:0 auto 12px!important}.cta-band .section-subtitle{max-width:500px!important;margin:0 auto 28px!important;color:rgba(255,255,255,.5)!important}
@@ -67,7 +72,7 @@ nav a{color:rgba(255,255,255,.85)!important;font-size:15px!important;font-weight
 /* ── All sections visible on dark ── */
 section{background:transparent!important}
 section .container{color:#fff!important}
-section .section-label{color:var(--accent)!important}
+section .section-label{color:#93C5FD!important}
 section .section-title{color:#fff!important}
 section p{color:rgba(255,255,255,.7)!important}
 
@@ -99,7 +104,7 @@ section p{color:rgba(255,255,255,.7)!important}
 
 /* ── Footer dark ── */
 [data-od-id="footer"]{background:rgba(0,0,0,.3)!important;color:rgba(255,255,255,.5)!important;border-top:1px solid var(--gm-border-light)}
-.footer-col h4{color:rgba(255,255,255,.7)!important}.footer-col a{color:rgba(255,255,255,.4)!important}.footer-col a:hover{color:rgba(255,255,255,.7)!important}
+.footer-col h4{color:rgba(255,255,255,.8)!important}.footer-col a{color:rgba(255,255,255,.65)!important}.footer-col a:hover{color:rgba(255,255,255,.9)!important}
 .footer-bottom{border-top-color:var(--gm-border-light)!important}
 
 /* ── Ajax / Guard Pod contrast fixes ── */
