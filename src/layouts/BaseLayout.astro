@@ -182,7 +182,9 @@ const productLd = product
       name: product.name,
       description: product.description,
       image: product.image ? new URL(product.image, SITE.URL).href : `${SITE.URL}/favicon.svg`,
-      url: product.url ?? url,
+      // Absoluta: schema.org y Google exigen URL completa. `/guard-pod` en crudo
+      // se descarta en rich results.
+      url: product.url ? new URL(product.url, SITE.URL).href : url,
       brand: { '@type': 'Brand', name: SITE.NAME },
       provider: { '@type': 'Organization', name: SITE.NAME, url: SITE.URL },
       category: 'Seguridad Privada',

@@ -19,8 +19,24 @@ test.describe('public site', () => {
     const ldJsonScripts = await page.locator('script[type="application/ld+json"]').allTextContents();
     const joined = ldJsonScripts.join('\n');
     expect(joined).toContain('"@type":"FAQPage"');
-    expect(joined).toContain('"@type":"Product"');
+    // Una página de SERVICIO emite Service (con OfferCatalog), no Product.
+    // Product es para los productos físicos: /guard-pod y /ajax-systems.
+    expect(joined).toContain('"@type":"Service"');
+    expect(joined).not.toContain('"@type":"Product"');
     expect(joined).toContain('"@type":"BreadcrumbList"');
+  });
+
+  test('product landing pages emit Product schema', async ({ page }) => {
+    for (const [path, name] of [
+      ['/guard-pod', 'Guardpod V1'],
+      ['/ajax-systems', 'Ajax Systems (instalación oficial)'],
+    ]) {
+      await page.goto(path);
+      const joined = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+      expect(joined, `falta Product en ${path}`).toContain('"@type":"Product"');
+      expect(joined, `falta el nombre del producto en ${path}`).toContain(name);
+      expect(joined).toContain('"@type":"BreadcrumbList"');
+    }
   });
 
   test('contact form rejects invalid email and accepts valid', async ({ page }) => {

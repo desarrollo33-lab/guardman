@@ -35,6 +35,10 @@
 - **Verificar los bytes servidos después de deployear, no el exit code.** Traer la URL real
   del asset y grepear el valor nuevo. Ejemplo 2026-10-02: el HTML ya traía el critical CSS en
   1200px mientras `site.css` seguía sirviendo `.header-inner` en 1280px.
+- **Verificar el HTML con cache-bust.** Tras un deploy, un fetch normal a una ruta SSR puede
+  devolver todavía el HTML del deploy anterior (observado 2026-10-02 en `/guard-pod`, que
+  seguía emitiendo `"url":"/guard-pod"` en vez de la URL absoluta). Para comprobar un cambio
+  de HTML o de JSON-LD: `curl "https://guardman.cl/ruta?cb=$(timestamp)"`.
 - Lo mismo aplica a **`/images/*`** y **`/videos/*`**, que también son `immutable` por un año. Si se
   re-codifica un asset **conservando el nombre** (ej. `sector-salud.webp` de 1280×1280 a 400×225),
   hay que bumpear el `?v=` en **todas** las referencias que lo usan. Si en cambio el asset cambia de
