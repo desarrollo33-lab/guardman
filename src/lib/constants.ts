@@ -167,7 +167,29 @@ export const LOCATIONS: Location[] = [
 // ────────────────────────────────────────────────────────────────
 export const COVERAGE_RM = LOCATIONS.filter((l) => l.region === 'RM');
 export const COVERAGE_VS = LOCATIONS.filter((l) => l.region === 'VS');
-export const COVERAGE_TOTAL = LOCATIONS.length; // 14
+export const COVERAGE_TOTAL = LOCATIONS.length;
+
+/**
+ * Trozos de cobertura para copy. Existen porque el patrón de bug que los
+ * motivó (2026-10-02) fue escribir el número a mano en los templates: el
+ * sitio decía "14 comunas: 12 en la RM y 2 en Valparaíso" cuando ya había
+ * 16 (14 + 2). Doce páginas publicaban la cifra equivocada.
+ *
+ * Estos tres cubren los casos de uso reales y se actualizan solos. Si en
+ * el futuro aparece una frase nueva, se agrega AQUÍ, no en el template.
+ *
+ * - COVERAGE_PHRASE_LONG:  "16 comunas: 14 en la RM y 2 en Valparaíso"
+ * - COVERAGE_PHRASE_RM:    "14 comunas de la Región Metropolitana"
+ * - COVERAGE_PHRASE_TOTAL: "16 comunas"
+ */
+export const COVERAGE_PHRASE_LONG =
+  `${COVERAGE_TOTAL} comunas: ${COVERAGE_RM.length} en la Región Metropolitana ` +
+  `y ${COVERAGE_VS.length} en Valparaíso`;
+
+export const COVERAGE_PHRASE_RM =
+  `${COVERAGE_RM.length} comunas de la Región Metropolitana`;
+
+export const COVERAGE_PHRASE_TOTAL = `${COVERAGE_TOTAL} comunas`;
 
 /** "Las Condes, Vitacura, ... y Lampa" — lista de la RM, para copy. */
 export const RM_COMMUNES_LIST = COVERAGE_RM.map((l) => l.name).join(', ');
@@ -459,7 +481,7 @@ export const FAQ_HOME: { q: string; a: string }[] = [
   },
   {
     q: '¿Qué comunas de Santiago cubren?',
-    a: 'Cubrimos 12 comunas de la Región Metropolitana: Las Condes, Vitacura, Lo Barnechea, La Reina, Santiago Centro, Huechuraba, Quilicura, Conchalí, Renca, Pudahuel, La Pintana y Lampa. También Los Andes y San Felipe en la Región de Valparaíso.',
+    a: `Cubrimos ${COVERAGE_RM.length} comunas de la Región Metropolitana: ${RM_COMMUNES_LIST}. También ${VS_COMMUNES_LIST} en la Región de Valparaíso.`,
   },
   {
     q: '¿Pueden combinar guardias con tecnología?',
