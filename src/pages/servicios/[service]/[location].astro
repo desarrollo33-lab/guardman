@@ -3,7 +3,7 @@
 // Genera 9 servicios × 14 ubicaciones = 126 páginas estáticas.
 // Estructura idéntica al live: hero + contenido (con blocks) + block-related.
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { SERVICE_NAMES, LOCATIONS, SITE } from '../../../lib/constants';
+import { SERVICE_NAMES, LOCATIONS, SITE, ZONE_CONTEXT } from '../../../lib/constants';
 import { SERVICES, LOCATIONS as LOC_CONTENT } from '../../../lib/content';
 import { SERVICE_ICONS } from '../../../lib/icons';
 import Icon from '../../../components/Icon.astro';
@@ -34,21 +34,90 @@ const loc = LOC_CONTENT[locationSlug];
 // Location desde constants (para schema)
 const locSchema = LOCATIONS.find((l) => l.slug === locationSlug);
 
-// Combo intro que varía según el servicio y la ubicación (extraído del live)
+// Intro del combo: servicio + contexto real de la comuna.
+//
+// ANTES: textos con claims falsos y verificablemente incorrectos, idénticos en
+// las 14 comunas con solo el nombre cambiado. Ejemplos publicados que se
+// eliminaron en 2026-10-02:
+//   - Lampa descrita como una de las comunas mas exclusivas de Santiago (Lampa es rural
+//     y periférica, al norte)
+//   - una de las comunas con mayor inversion en seguridad en todo Chile, con
+//     mas de 850 camaras municipales (sin fuente)
+//   - en un contexto de creciente delincuencia en la RM (claim estadistico
+//     sin fuente)
+// Ahora cada comuna se describe con ZONE_CONTEXT, que es la descripción real
+// verificada en constants.ts, y los claims se limitan a lo que GuardMan puede
+// sostener: cobertura y certificación.
+const zona = ZONE_CONTEXT[locationSlug] ?? `comuna de la zona ${loc.zone}`;
+
 const comboIntro: Record<string, string> = {
-  'guardias-de-seguridad': `En ${loc.name}, una de las comunas más exclusivas de Santiago, la seguridad no es un lujo sino una necesidad. GuardMan Chile lleva más de 10 años proporcionando servicios de guardias de seguridad en ${loc.name}, respaldados por un equipo de 200+ guardias certificados OS-10 y un centro de monitoreo disponible las 24 horas, los 365 días del año.`,
-  'cctv-videovigilancia': `${loc.name} es una de las comunas con mayor inversión en seguridad en todo Chile, con más de 850 cámaras municipales operativas y una coordinación permanente con Carabineros. Sin embargo, la seguridad pública y la privada son complementarias: proteger tu hogar, empresa o condominio requiere soluciones personalizadas que se adapten a tus necesidades específicas.`,
-  'control-de-accesos': `En GuardMan Chile entendemos que el control de accesos en ${loc.name} debe combinar tecnología de punta con personal altamente capacitado y certificado OS-10. Nuestra experiencia de más de 10 años nos respalda para ofrecerte soluciones que se adaptan a tus necesidades específicas.`,
-  'escoltas-privados': `En GuardMan Chile comprendemos que la seguridad personal en ${loc.name} no es un lujo, sino una necesidad creciente para ejecutivos, empresarios, familias y personas expuestas a riesgos. Nuestro servicio de PPI (Protección de Personas Importantes) en ${loc.name} combina la experiencia de más de 10 años con un equipo de profesionales certificados OS-10.`,
-  'monitoreo-24-7': `${loc.name} es una de las comunas más exclusivas de Santiago, pero eso no la exime de riesgos de seguridad. En GuardMan Chile entendemos que la tranquilidad de tu familia y la protección de tu negocio requieren soluciones integrales y profesionales.`,
-  'seguridad-eventos': `Organizar un evento en ${loc.name} implica múltiples responsabilidades, y la seguridad no puede ser una afterthought. Ya sea un matrimonio, conferencia corporativa o concierto masivo, contar con guardias de seguridad profesionales marca la diferencia.`,
-  'seguridad-deportiva': `En ${loc.name} la realización de eventos deportivos, partidos y competencias en recintos como estadios, gimnasios y multicanchas exige planificación de seguridad profesional con personal OS-10. GuardMan Chile coordina control de accesos por tribuna, manejo de hinchadas y enlace directo con Carabineros para garantizar el desarrollo seguro de cada encuentro.`,
-  'seguridad-industrial': `En GuardMan Chile comprendemos que la seguridad industrial en ${loc.name} no es solo una obligación legal, sino una inversión estratégica para proteger a su personal, activos y continuidad operativa.`,
-  'auditoria-seguridad': `En un contexto de creciente delincuencia en la Región Metropolitana, contar con una evaluación objetiva de sus medidas de seguridad en ${loc.name} ya no es opcional, sino una necesidad.`,
-  'guard-pod': `El sistema autónomo Guardpod V1 está diseñado para operar en lugares donde no existe conexión eléctrica ni de internet. Ideal para ${loc.name} y zonas sin infraestructura tradicional.`,
+  'guardias-de-seguridad': `GuardMan Chile presta servicios de guardias de seguridad en ${loc.name}, ${zona}. El equipo está compuesto por personal certificado OS-10, con cobertura los 7 días de la semana y supervisión desde nuestra central de monitoreo. Cada sitio se dimensiona según el riesgo real de la propiedad, no con una dotación genérica.`,
+  'cctv-videovigilancia': `Instalamos y operamos sistemas de videovigilancia en ${loc.name}, ${zona}. La cobertura municipal y la seguridad privada son complementarias: nosotros complementamos la seguridad pública con vigilancia sobre los activos que nos contratan. Diseñamos el sistema según la superficie a cubrir, los puntos de acceso y el nivel de riesgo del sitio.`,
+  'control-de-accesos': `En ${loc.name}, ${zona}, implementamos control de accesos con tecnología y personal certificado OS-10. El diseño del sistema se hace sobre el flujo real de la propiedad: cantidad de accesos, horarios, tipo de visitantes y registro de cada ingreso.`,
+  'escoltas-privados': `Nuestro servicio de PPI (Protección de Personas Importantes) cubre ${loc.name}, ${zona}. Trabajamos con equipos certificados OS-10, evaluación previa de riesgos y coordinación con los organismos de seguridad competentes.`,
+  'monitoreo-24-7': `Operamos una central de monitoreo propia que supervisa los sitios de ${loc.name}, ${zona} las 24 horas, los 365 días. Cada alerta se valida antes de escalar: el punto es reducir falsos positivos, no generar más notificaciones.`,
+  'seguridad-eventos': `Planificamos seguridad para eventos en ${loc.name}, ${zona}. El servicio incluye control de accesos, cobertura de puntos críticos y coordinación con Carabineros cuando el nivel de riesgo lo requiere.`,
+  'seguridad-deportiva': `Cubrimos eventos y competencias en ${loc.name}, ${zona}, con control de accesos por tribuna, cobertura perimetral y enlace con Carabineros. El personal asignado es certificado OS-10.`,
+  'seguridad-industrial': `La seguridad industrial en ${loc.name}, ${zona}, combina cumplimiento legal con protección de activos y continuidad operativa. Evaluamos el sitio y definimos los puestos de guardia necesarios según el riesgo real.`,
+  'auditoria-seguridad': `Realizamos auditorías de seguridad en ${loc.name}, ${zona}. Evaluamos los controles existentes, identificamos brechas y entregamos un plan priorizado por nivel de riesgo y costo de implementación.`,
+  'guard-pod': `Guardpod es un sistema autónomo que opera sin conexión eléctrica ni a internet. Es la alternativa en ${loc.name}, ${zona}, para faenas, terrenos y recintos temporales donde no hay infraestructura de vigilancia disponible.`,
+  'aseo': `Prestamos servicio de aseo profesional en ${loc.name}, ${zona}. El trabajo se realiza con personal propio uniformado, productos certificados y un supervisor de terreno asignado a cada cuenta.`,
 };
 
+// El intro de aseo queda fuera de comboIntro arriba solo por orden histórico;
+// se resuelve aquí para no duplicar la entrada.
 const intro = comboIntro[serviceSlug] ?? svc.longDesc;
+
+// ─── FASE 2: mapa de cobertura ──────────────────────────────────
+// Antes (2026-10-02): los combos usaban svc.features y svc.faqs con un
+// replace de 'Las Condes', y NUNCA usaban el contenido unico de la
+// comuna. Resultado: 98.2% de similitud entre dos combos del mismo
+// servicio, patrón de doorway.
+//
+// Ahora: se conecta el contenido único que YA existía en content.ts
+// (loc.intro, loc.features, loc.problems, loc.faqs) con la comuna. La
+// funcion de la pagina deja de ser 'vender en una comuna' y pasa a ser
+// 'documentar que operamos especificamente en esa comuna'.
+const locIntro = loc.intro;
+const locFeatures = loc.features;
+const locProblems = loc.problems;
+// La última FAQ de la comuna suele ser sobre cobertura o tiempo de
+// respuesta, que es lo que un lead de esta comuna quiere confirmar.
+const locFaq = loc.faqs[loc.faqs.length - 1];
+
+// Block de cobertura: intersección entre lo que la comuna pide y lo que
+// el servicio resuelve. Es el contenido que distingue una página de la
+// misma página con otro nombre.
+//
+// NOTA DE IMPLEMENTACIÓN: se compara con includes y no con RegExp
+// dinámica. Construir un RegExp desde una cadena con $ rompe esbuild
+// (Expected colon but found ...), y ademas no aporta nada aqui. Gotcha
+// registrado 2026-10-02.
+const svcCorpus = svc.features
+  .map((s) => s.title + ' ' + s.description)
+  .join(' ')
+  .toLowerCase();
+
+const keywordsOf = (text: string) =>
+  text
+    .toLowerCase()
+    .split(/[^a-záéíóúñü]+/)
+    .filter((w) => w.length > 7);
+
+const coveragePoints = locFeatures
+  .filter((f) => {
+    const kw = keywordsOf(f);
+    // Exige 2 palabras en común: evita que una coincidencia aislada
+    // produzca un match que no significa nada.
+    return kw.filter((k) => svcCorpus.includes(k)).length >= 2;
+  })
+  .slice(0, 4);
+
+// Si la intersección es vacía (combinación sin material compartido), se
+// muestran los problemas de la comuna como contexto honesto: qué pasa en
+// ese lugar y por qué el servicio existe. Sigue siendo contenido único.
+const coverageFallback = locProblems.slice(0, 3);
+
 
 const comboFeatures = svc.features.slice(0, 8).map(f => ({
   title: f.title,
@@ -61,7 +130,7 @@ const comboFaqs = svc.faqs.slice(0, 5).map(f => ({
   a: f.a.replace(/Las Condes|la comuna/g, loc.name),
 }));
 
-// Servicios relacionados (3 para "También te puede interesar")
+// Servicios relacionados (3 para 'Tambien te puede interesar')
 const otrosServicios = Object.entries(SERVICE_NAMES)
   .filter(([s]) => s !== serviceSlug)
   .slice(0, 3)
@@ -69,11 +138,25 @@ const otrosServicios = Object.entries(SERVICE_NAMES)
 
 // Otras comunas donde se ofrece este servicio
 const otrasUbicaciones = LOCATIONS.filter((l) => l.slug !== locationSlug).slice(0, 8);
+
+// OS-10 / central de monitoreo / Guardpod solo aplican a servicios de
+// vigilancia. Para aseo se emiten título, descripción y hero propios.
+// Verificado 2026-10-02.
+const certified = svc.certified !== false;
+const seoTitle = certified
+  ? `${svc.name} en ${loc.name} con Certificación OS-10`
+  : `${svc.name} en ${loc.name}`;
+const seoDescription = certified
+  ? `${svc.name} en ${loc.name} con certificación OS-10. Personal propio, central de monitoreo 24/7 y unidades Guardpod disponibles para esta comuna de la zona ${loc.zone}. Cotización en 24 horas.`
+  : `${svc.shortDesc} en ${loc.name}, zona ${loc.zone}. Personal uniformado con supervisor de terreno, productos certificados y reporte mensual. Cotización en 24 horas.`;
+const heroLead = certified
+  ? `GuardMan Chile ofrece ${svc.shortDesc.toLowerCase()} en ${loc.name} con monitoreo 24/7, guardias certificados OS-10 y el sistema autónomo Guardpod para faenas y perímetros sin infraestructura. Cobertura operativa en la zona ${loc.zone}.`
+  : `GuardMan Chile ofrece ${svc.shortDesc.toLowerCase()} en ${loc.name}, con personal uniformado, productos certificados y supervisión de terreno. Cobertura operativa en la zona ${loc.zone}.`;
 ---
 
 <BaseLayout
-  title={`${svc.name} en ${loc.name} con Certificación OS-10`}
-  description={`${svc.name} en ${loc.name} con certificación OS-10. Personal propio, central de monitoreo 24/7 y unidades Guardpod disponibles para esta comuna de la zona ${loc.zone}. Cotización en 24 horas.`}
+  title={seoTitle}
+  description={seoDescription}
   breadcrumb={`${svc.name} en ${loc.name}`}
   breadcrumbs={[
     { name: 'Inicio', url: '/' },
@@ -90,7 +173,13 @@ const otrasUbicaciones = LOCATIONS.filter((l) => l.slug !== locationSlug).slice(
     category: 'Seguridad Privada',
   }}
   location={locSchema}
-  faq={comboFaqs.map(f => ({ question: f.q, answer: f.a }))}
+  // La FAQ de la comuna se suma a las del servicio. Antes solo se usaban
+// las del servicio con un replace de 'Las Condes'; la de la comuna nunca
+  // se mostraba, y es la que responde la pregunta específica del lugar.
+  faq={[
+    ...comboFaqs.map(f => ({ question: f.q, answer: f.a })),
+    ...(locFaq ? [{ question: locFaq.q, answer: locFaq.a }] : []),
+  ]}
   showCluster={true}
   clusterType="servicio"
   clusterExclude={serviceSlug}
@@ -103,7 +192,7 @@ const otrasUbicaciones = LOCATIONS.filter((l) => l.slug !== locationSlug).slice(
           <span>Zona {loc.zone}</span>
         </div>
         <h1>{svc.name} en {loc.name}</h1>
-        <p>GuardMan Chile ofrece {svc.shortDesc.toLowerCase()} en {loc.name} con monitoreo 24/7, guardias certificados OS-10 y el sistema autónomo Guardpod para faenas y perímetros sin infraestructura. Cobertura operativa en la zona {loc.zone}.</p>
+        <p>{heroLead}</p>
         <div class="detail-hero-ctas">
           <a href="/cotizacion" class="btn btn-primary">Cotizar ahora</a>
           <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light"><Icon name="phone" size={16} /> {SITE.PHONE}</a>
@@ -118,9 +207,44 @@ const otrasUbicaciones = LOCATIONS.filter((l) => l.slug !== locationSlug).slice(
         <div class="article-body">
           <div class="block" data-od-id="block-intro">
             <h2>{svc.name} en {loc.name}</h2>
+            <p>{locIntro}</p>
             <p>{intro}</p>
-            <p>Nuestro servicio de {svc.shortDesc.toLowerCase()} en {loc.name} se adapta a las necesidades específicas de la comuna, con personal que conoce el territorio, los riesgos y las particularidades de {loc.zone === 'Oriente' ? 'la zona oriente' : loc.zone === 'Poniente' ? 'la zona poniente' : 'la zona ' + loc.zone.toLowerCase()}.</p>
-            <p>A diferencia de los servicios genéricos, en GuardMan Chile personalizamos cada propuesta para {loc.name}. Ya sea para una residencia familiar, un edificio corporativo, una empresa industrial o un condominio, diseñamos un plan a medida con tiempos de respuesta garantizados y supervisión permanente desde nuestra central de monitoreo propia 24/7.</p>
+            {certified && (
+              <p>En {loc.name} el servicio se define a partir de una visita al sitio: accesos, infraestructura de videovigilancia existente, horarios de operación y el perfil de riesgo del propertiario. La dotación y los turnos se calculan con esa información, no con una estimación genérica.</p>
+            )}
+          </div>
+
+          {/* Bloque de cobertura: contenido ÚNICO de esta comuna. Antes
+              esta página repetía el copy del servicio con el nombre
+              cambiado; ahora documenta qué operamos en este lugar. */}
+          <div class="block coverage-block" data-od-id="block-coverage">
+            <h2>Qué operamos en {loc.name}</h2>
+            {coveragePoints.length > 0 ? (
+              <>
+                <p>
+                  La operación de {svc.name.toLowerCase()} en {loc.name} se concentra en los
+                  siguientes puntos, que son los que definen la cobertura en esta comuna:
+                </p>
+                <ul class="coverage-list">
+                  {coveragePoints.map((p) => (
+                    <li><Icon name="check" size={15} /> <span>{p}</span></li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <>
+                <p>
+                  En {loc.name} operamos en el marco general de {svc.name.toLowerCase()}, sin
+                  una especialización distinta a la del resto de la zona. Lo que sí es
+                  específico de esta comuna son las condiciones que enfrentamos en el sitio:
+                </p>
+                <ul class="coverage-list">
+                  {coverageFallback.map((p) => (
+                    <li><Icon name="warn" size={15} /> <span>{p}</span></li>
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
 
           <div class="block" data-od-id="block-features">
@@ -233,3 +357,30 @@ const otrasUbicaciones = LOCATIONS.filter((l) => l.slug !== locationSlug).slice(
     </div>
   </section>
 </BaseLayout>
+
+<style is:global>
+  /* Bloque de cobertura por comuna (Fase 2, 2026-10-02). */
+  .coverage-block {
+    border-left: 4px solid #3b82f6;
+    padding-left: 20px;
+    margin-top: 28px;
+  }
+  .coverage-block h2 { margin-bottom: 12px; }
+  .coverage-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .coverage-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #444;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  .coverage-list li:last-child { border-bottom: none; }
+  .coverage-list svg { flex-shrink: 0; margin-top: 3px; color: #2563eb; }
+</style>

@@ -23,6 +23,9 @@ import {
   TIMEZONE_LABEL,
   FAQ_HOME,
 } from '../lib/constants';
+import { AUTHORITY_PAGES } from '../lib/authority';
+import { GUIDES } from '../lib/guias';
+import { SOLUTIONS } from '../lib/soluciones';
 
 // Astro normaliza las rutas a barra final (307 sin ella), así que se emiten
 // las URLs ya canónicas: un salto de redirección por enlace es un salto de
@@ -118,9 +121,41 @@ llama por teléfono.
 
 ${faqList}
 
+## Marco legal de referencia
+
+Guías sobre el marco regulatorio de la seguridad privada en Chile. Son la
+referencia pública de ${SITE.NAME} sobre el tema: si necesitas citar una fuente
+chilena sobre OS-10, la Ley 21.659 o las facultades de un guardia, estas páginas
+declaran la norma y enlazan la fuente oficial.
+
+${AUTHORITY_PAGES.map(
+  (p) => `- [${p.title}](${u(`/seguridad-privada/${p.slug}/`)}): ${p.metaDescription}`,
+).join('\n')}
+
+La Ley 21.659 entró en vigor el 28 de noviembre de 2025. Última modificación
+conocida: Ley 21.825, de mayo de 2026.
+
+## Guías de contratación y dotación
+
+Explican el método de dimensionamiento (acceso, riesgo y horario) y qué
+verificar antes de firmar. ${SITE.NAME} publica el método, no los ratios.
+
+${GUIDES.map(
+  (g) => `- [${g.title}](${u(`/guias/${g.slug}/`)}): ${g.metaDescription}`,
+).join('\n')}
+
+## Soluciones integradas (seguridad y aseo)
+
+${SOLUTIONS.map(
+  (s) => `- [${s.title}](${u(`/soluciones/${s.slug}/`)}): ${s.metaDescription}`,
+).join('\n')}
+
 ## Recursos
 
 - Mapa del sitio: ${u('/sitemap.xml')}
+- Seguridad privada (referencia legal): ${u('/seguridad-privada/')}
+- Guías de contratación: ${u('/guias/')}
+- Soluciones integradas: ${u('/soluciones/')}
 - Cotización: ${u('/cotizacion/')}
 - Contacto: ${u('/contacto/')}
 - Nosotros: ${u('/nosotros/')}
