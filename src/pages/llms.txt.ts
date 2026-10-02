@@ -101,9 +101,12 @@ Zona horaria: ${TIMEZONE_LABEL}.
 
 ## Urgencias
 
-Para una urgencia operativa se llama al teléfono de la empresa
-(${SITE.PHONE}, href: tel:${SITE.PHONE_TEL}) y se atiende todos los días
-del año.
+El número de urgencias es el mismo teléfono de la empresa: no hay una línea
+de emergencias aparte.
+
+- Urgencias 24/7: ${SITE.PHONE} (href: tel:${SITE.PHONE_TEL})
+
+Se atiende todos los días del año.
 
 ${u('/canal-de-denuncias/')} es exclusivamente un canal de denuncias y de
 reporte de conflictos de interés: infracción al código de conducta, potencial

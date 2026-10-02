@@ -8,8 +8,11 @@ export const SITE = {
   NAME: 'GuardMan Chile',
   LEGAL_NAME: 'GuardMan Chile',
   TAGLINE: 'Seguridad Privada OS-10 - 10+ años protegiendo empresas y residencias',
-  DESCRIPTION:
-    'GuardMan Chile - Seguridad privada con certificación OS-10. Guardias, CCTV, control de accesos, PPI (Protección de Personas Importantes), monitoreo 24/7, Guardpod y Ajax Systems. Cobertura en 14 comunas de la Región Metropolitana y zona de Valparaíso.',
+  // Sin `DESCRIPTION` aquí a propósito: era una cadena escrita a mano con
+  // "14 comunas de la Región Metropolitana" (la RM tiene 12) y servía como
+  // `description` por defecto en BaseLayout, así que contaminaba el meta de
+  // toda página que no definía el suyo. Se usa `SITE_DESCRIPTION`, derivado de
+  // la cobertura real, declarado más abajo en este archivo.
   URL: import.meta.env.PUBLIC_SITE_URL ?? 'https://guardman.cl',
   // Login / refresh / logout viven en este mismo worker (same-origin).
   // Fallback cadena vacía = `${apiUrl}/api/login` se vuelve `/api/login`
@@ -24,7 +27,14 @@ export const SITE = {
   ADDRESS_REGION: 'Región Metropolitana',
   ADDRESS_POSTAL_CODE: '8560027',
   ADDRESS_COUNTRY: 'CL',
-  RUT: '77.123.456-7',
+  // RUT real. Antes era '77.123.456-7', un placeholder inventado que se
+  // publicaba en /terminos (2 veces) y /privacidad (1 vez): un identificador
+  // tributario falso en páginas legales. Confirmado por el cliente que era
+  // placeholder. OJO: 76.437.095-3 viene de los datos maestros del brief
+  // (inicio 03/11/14, coherente con la fundación de 2014). Verificar contra
+  // la documentación legal del cliente antes de cualquier uso que no sea
+  // este. Si cambia, cambia acá y sale en las tres páginas.
+  RUT: '76.437.095-3',
   FOUNDED_YEAR: 2014,
   INSTAGRAM_URL: 'https://www.instagram.com/grupo_guardman',
   YOUTUBE_URL: 'https://youtu.be/mqpLsKrwjAI',
@@ -174,30 +184,23 @@ export const COVERAGE_SENTENCE =
 
 /**
  * Descripción canónica del sitio, derivada de la cobertura real.
- * `SITE.DESCRIPTION` queda como valor histórico declarado arriba; este es el
- * que consumen los schemas, y nunca puede desincronizarse de `areaServed`.
+ *
+ * Sustituye al que fue `SITE.DESCRIPTION`, una cadena escrita a mano que decía
+ * "14 comunas de la Región Metropolitana" cuando la RM tiene 12. Se usaba como
+ * `description` por defecto en BaseLayout, así que toda página sin meta
+ * description propia publicaba el número equivocado.
+ *
+ * Se eliminó la constante en vez de corregirla porque una descripción escrita
+ * a mano es exactamente la forma de dato que vuelve a desincronizarse. El
+ * guard que la vigilaba no servía: iba detrás de `import.meta.env.DEV`, y
+ * `astro build` corre con DEV=false, o sea que nunca se ejecutó en el build
+ * que produce producción.
  */
 export const SITE_DESCRIPTION =
   'GuardMan Chile - Seguridad privada con certificación OS-10. Guardias, CCTV, control de accesos, ' +
   'PPI (Protección de Personas Importantes), monitoreo 24/7, Guardpod y Ajax Systems. ' +
   `Cobertura en ${COVERAGE_RM.length} comunas de la Región Metropolitana más ` +
   `${COVERAGE_VS.length} en Valparaíso (${COVERAGE_TOTAL} en total).`;
-
-// Guard de coherencia: el conteo escrito a mano en SITE.DESCRIPTION tiene que
-// seguir diciendo lo mismo que la cobertura derivada. Esto corrió durante años
-// con "14 comunas de la Región Metropolitana" cuando la RM tiene 12: el copy
-// y el `areaServed` contaban cosas distintas. En dev esto rompe el build en
-// vez de llegar a producción.
-if (import.meta.env.DEV) {
-  const declared = SITE.DESCRIPTION.match(/Cobertura en (\d+) comunas/);
-  if (!declared || Number(declared[1]) !== COVERAGE_RM.length) {
-    throw new Error(
-      `Cobertura inconsistente: SITE.DESCRIPTION declara ${declared?.[1] ?? 'n/d'} ` +
-        `comunas de la RM pero LOCATIONS tiene ${COVERAGE_RM.length}. ` +
-        `Usar SITE_DESCRIPTION (derivado) en los schemas.`,
-    );
-  }
-}
 
 export const LOCATION_SLUGS = LOCATIONS.map((l) => l.slug) as readonly string[];
 export const LOCATION_NAMES: Record<string, string> = Object.fromEntries(

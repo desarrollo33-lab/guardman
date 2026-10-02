@@ -11,7 +11,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import RelatedLinks from '../components/RelatedLinks.astro';
 import Analytics from '../components/Analytics.astro';
-import { SITE, OG_IMAGE } from '../lib/constants';
+import { SITE, OG_IMAGE, SITE_DESCRIPTION } from '../lib/constants';
 import {
   organizationSchema,
   localBusinessSchema,
@@ -83,7 +83,7 @@ interface Props {
 
 const {
   title,
-  description = SITE.DESCRIPTION,
+  description = SITE_DESCRIPTION,
   canonical,
   ogImage = OG_IMAGE.PATH,
   noindex = false,
