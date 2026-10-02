@@ -7,6 +7,22 @@
 - Build: `npm run build` (debe correrse antes de `wrangler deploy`, ver gotcha en MEMORY.md)
 - Deploy: `npx wrangler deploy`
 
+## Cache de assets estáticos — INVARIANTE
+- `public/_headers` sirve `/styles/site.css` con `Cache-Control: public, max-age=31536000,
+  immutable`. **Cualquier cambio de contenido en `site.css` obliga a bumpear el `?v=` de los
+  `<link>` en `src/layouts/BaseLayout.astro:327,333` dentro del MISMO commit.** Sin eso el
+  edge sigue respondiendo la versión anterior hasta un año. `wrangler deploy` reporta éxito
+  igual: el síntoma es silencioso.
+- `/styles/dark.css` **no** está en `_headers`, así que revalida sola. Esa asimetría es la que
+  hace el bug invisible: después de un deploy los dos stylesheets quedan en versiones
+  distintas. No agregar `dark.css` a `_headers` sin antes definir estrategia de versión.
+- El `?v=` del stylesheet y `FONT_VERSION` (`20260925`, `src/lib/constants.ts:367`) son
+  independientes. Bumpear el del CSS no provoca descarga doble de Inter, porque el `<link
+  rel=preload>` de la fuente usa `INTER_FONT_URL`, no el `?v=` del stylesheet.
+- **Verificar los bytes servidos después de deployear, no el exit code.** Traer la URL real
+  del asset y grepear el valor nuevo. Ejemplo 2026-10-02: el HTML ya traía el critical CSS en
+  1200px mientras `site.css` seguía sirviendo `.header-inner` en 1280px.
+
 ## Custom domain `guardman.cl` — ESTADO
 - **RESUELTO (verificado 2026-10-02).** El dominio SÍ sirve este worker.
 - `guardman.cl`, `www.guardman.cl` y `guardman-astro.oficinadesarrollo33.workers.dev` devuelven
