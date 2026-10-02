@@ -1,0 +1,235 @@
+---
+// /soluciones/[slug] — Soluciones integradas (Fase 4)
+//
+// El nicho aseo + seguridad. El argumento central NO es "hacemos más
+// servicios": es que un solo proveedor resuelve el problema de
+// coordinacion entre ambos, que es lo que ninguna empresa de seguridad
+// ni de aseo puede resolver por separado.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SOLUTIONS, SOLUTIONS_BY_SLUG } from '../../lib/soluciones';
+import Icon from '../../components/Icon.astro';
+import LeadCTA from '../../components/LeadCTA.astro';
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return SOLUTIONS.map((s) => ({ params: { slug: s.slug }, props: { page: s } }));
+}
+
+const { page } = Astro.props;
+
+const solutionLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: page.h1,
+  description: page.metaDescription,
+  serviceType: 'Seguridad privada y servicios de mantención',
+  provider: { '@type': 'Organization', name: 'GuardMan Chile' },
+  areaServed: { '@type': 'AdministrativeArea', name: 'Región Metropolitana y Valparaíso' },
+  audience: { '@type': 'Audience', audienceType: page.audience },
+  inLanguage: 'es-CL',
+};
+---
+
+<BaseLayout
+  title={page.metaTitle}
+  description={page.metaDescription}
+  article={{
+    headline: page.h1,
+    description: page.metaDescription,
+    datePublished: page.updatedISO,
+    dateModified: page.updatedISO,
+  }}
+  breadcrumb={page.title}
+  breadcrumbs={[
+    { name: 'Inicio', url: '/' },
+    { name: 'Soluciones', url: '/soluciones' },
+    { name: page.title, url: `/soluciones/${page.slug}` },
+  ]}
+  faq={page.faqs.map((f) => ({ question: f.q, answer: f.a }))}
+  extraSchemas={[solutionLd]}
+>
+  <section class="sol-hero">
+    <div class="container">
+      <nav class="sol-crumb" aria-label="Ruta de navegación">
+        <a href="/">Inicio</a> <span>/</span> <a href="/soluciones">Soluciones</a>
+      </nav>
+      <span class="sol-kicker">Solución integrada</span>
+      <h1>{page.h1}</h1>
+      <p class="sol-lead">{page.lead}</p>
+      <p class="sol-audience">
+        <Icon name="location" size={14} />
+        {page.audience}
+      </p>
+    </div>
+  </section>
+
+  <section class="sol-body">
+    <div class="container">
+      <section class="sol-block problem-block">
+        <h2>El problema que ninguna empresa resuelve por separado</h2>
+        <p class="sol-block-intro">
+          Contratar seguridad con una empresa y aseo con otra es lo habitual en el rubro. El
+          problema es que nadie lidera la coordinación entre ambos servicios, y siempre hay una
+          franja donde eso se nota.
+        </p>
+        <div class="problem-grid">
+          {page.coordinationProblem.map((p) => (
+            <div class="problem-card">
+              <h3>{p.title}</h3>
+              <p>{p.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="sol-block">
+        <h2>Qué incluye</h2>
+        <div class="services-list">
+          {page.services.map((s) => (
+            <div class="service-row">
+              <div class="service-role">{s.role}</div>
+              <div class="service-body">
+                <h3>{s.name}</h3>
+                <p>{s.detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="sol-block">
+        <h2>Cómo se opera</h2>
+        <p class="sol-block-intro">
+          La diferencia entre dos proveedores y uno integrado no está en la lista de servicios,
+          sino en cómo se coordina la operación diaria.
+        </p>
+        <ol class="op-steps">
+          {page.operation.map((o, i) => (
+            <li>
+              <span class="op-num">{i + 1}</span>
+              <div>
+                <h3>{o.step}</h3>
+                <p>{o.detail}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {page.sections.map((s) => (
+        <section class="sol-block">
+          <h2>{s.heading}</h2>
+          {s.body.map((p) => <p>{p}</p>)}
+        </section>
+      ))}
+
+      <section class="sol-block sol-faq">
+        <h2>Preguntas frecuentes</h2>
+        {page.faqs.map((f) => (
+          <details open={f === page.faqs[0]}>
+            <summary>{f.q}</summary>
+            <div class="answer">{f.a}</div>
+          </details>
+        ))}
+      </section>
+    </div>
+  </section>
+
+  <section class="sol-cta">
+    <div class="container">
+      <LeadCTA
+        title="Cotiza el servicio integrado"
+        description="Un solo interlocutor para seguridad y mantención, con alcance declarado y responsable único ante cualquier incidente."
+      />
+    </div>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .sol-hero {
+    background: var(--navy, #1a2744);
+    padding: 56px 0 48px;
+    color: #fff;
+  }
+  .sol-crumb { font-size: 13px; color: rgba(255, 255, 255, 0.6); margin-bottom: 20px; }
+  .sol-crumb a { color: rgba(255, 255, 255, 0.85); text-decoration: none; }
+  .sol-crumb a:hover { color: #fff; text-decoration: underline; }
+  .sol-crumb span { margin: 0 6px; opacity: 0.4; }
+  .sol-kicker {
+    display: inline-block; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7); margin-bottom: 14px;
+  }
+  .sol-hero h1 {
+    font-size: clamp(28px, 4.2vw, 42px); font-weight: 800; line-height: 1.15;
+    margin: 0 0 18px; max-width: 780px; letter-spacing: -0.02em;
+  }
+  .sol-lead {
+    font-size: clamp(16px, 1.7vw, 18px); line-height: 1.65;
+    color: rgba(255, 255, 255, 0.85); max-width: 720px; margin: 0 0 16px;
+  }
+  .sol-audience {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 14px; color: rgba(255, 255, 255, 0.6); margin: 0;
+  }
+  .sol-body { padding: 48px 0 32px; }
+  .sol-block { margin-bottom: 48px; }
+  .sol-block h2 {
+    font-size: 26px; font-weight: 700; margin: 0 0 16px;
+    line-height: 1.3; color: var(--navy, #1a2744);
+  }
+  .sol-block-intro { font-size: 16px; line-height: 1.75; color: #444; margin: 0 0 24px; }
+  .sol-block p { font-size: 16px; line-height: 1.75; color: #333; margin: 0 0 16px; }
+
+  .problem-block {
+    background: #f8f9fb; border-radius: 14px; padding: 32px; margin-bottom: 48px;
+  }
+  .problem-grid { display: grid; gap: 18px; margin-top: 24px; }
+  @media (min-width: 768px) { .problem-grid { grid-template-columns: repeat(3, 1fr); } }
+  .problem-card {
+    background: #fff; border: 1px solid #e2e6ec; border-radius: 10px; padding: 20px;
+  }
+  .problem-card h3 { font-size: 16px; font-weight: 700; margin: 0 0 10px; color: #b91c1c; line-height: 1.4; }
+  .problem-card p { font-size: 14px; line-height: 1.7; color: #555; margin: 0; }
+
+  .services-list { margin-top: 24px; }
+  .service-row {
+    display: flex; gap: 20px; align-items: flex-start;
+    border: 1px solid #e2e6ec; border-radius: 10px;
+    padding: 20px 22px; margin-bottom: 14px; background: #fff;
+  }
+  @media (max-width: 640px) { .service-row { flex-direction: column; gap: 10px; } }
+  .service-role {
+    flex-shrink: 0; min-width: 150px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: #2563eb; padding-top: 3px;
+  }
+  .service-body h3 { font-size: 17px; font-weight: 700; margin: 0 0 6px; color: var(--navy, #1a2744); }
+  .service-body p { font-size: 15px; line-height: 1.7; color: #555; margin: 0; }
+
+  .op-steps { list-style: none; padding: 0; margin: 24px 0 0; }
+  .op-steps li { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .op-num {
+    flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%;
+    background: #3b82f6; color: #fff; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .op-steps h3 { font-size: 16px; font-weight: 700; margin: 4px 0 6px; color: var(--navy, #1a2744); }
+  .op-steps p { font-size: 15px; line-height: 1.7; color: #555; margin: 0; }
+
+  .sol-faq details {
+    border: 1px solid #e2e6ec; border-radius: 8px; padding: 16px 18px;
+    margin-bottom: 10px; background: #fff;
+  }
+  .sol-faq summary {
+    font-weight: 600; cursor: pointer; font-size: 16px;
+    color: var(--navy, #1a2744); list-style: none;
+  }
+  .sol-faq summary::-webkit-details-marker { display: none; }
+  .sol-faq summary::before { content: '+'; margin-right: 10px; color: #3b82f6; font-weight: 700; }
+  .sol-faq details[open] summary::before { content: '−'; }
+  .sol-faq .answer { margin-top: 12px; font-size: 15px; line-height: 1.7; color: #444; }
+
+  .sol-cta { padding: 0 0 64px; }
+</style>
