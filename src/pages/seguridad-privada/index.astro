@@ -1,11 +1,12 @@
 ---
-// /seguridad-privada — índice de la capa de autoridad.
-// Usa PageHero y card-grid; sin CSS propio.
+// /seguridad-privada — índice de la capa de autoridad legal.
+//
+// Patrón copiado de /servicios/ e /ubicaciones/:
+//   hub-hero > bg-neutral (grid) > bg-white-section > bg-dark (CTA)
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { AUTHORITY_PAGES } from '../../lib/authority';
-import PageHero from '../../components/PageHero.astro';
+import { SITE } from '../../lib/constants';
 import Icon from '../../components/Icon.astro';
-import LeadCTA from '../../components/LeadCTA.astro';
 
 export const prerender = true;
 ---
@@ -16,15 +17,18 @@ export const prerender = true;
   breadcrumb="Seguridad privada"
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Seguridad privada', url: '/seguridad-privada' }]}
 >
-  <PageHero
-    variant="dark"
-    badge="Guías de referencia"
-    badgeIcon="doc"
-    title="Seguridad privada en Chile"
-    subtitle="Material de referencia sobre el marco legal y operativo del rubro. Cada guía explica un punto concreto con la normativa vigente a la vista, para que puedas verificar lo que te afirma cualquier proveedor, incluido nosotros."
-  />
+  <section class="hub-hero" data-od-id="hero">
+    <div class="container">
+      <h1>Seguridad privada en Chile</h1>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.8);max-width:640px;margin:16px 0 0">
+        Material de referencia sobre el marco legal y operativo del rubro, con la normativa
+        vigente a la vista. Sirve para verificar lo que te afirma cualquier proveedor,
+        incluido nosotros.
+      </p>
+    </div>
+  </section>
 
-  <section class="contenido" data-od-id="contenido">
+  <section class="bg-neutral" data-od-id="grid">
     <div class="container">
       <div class="card-grid">
         {AUTHORITY_PAGES.map((p) => (
@@ -43,27 +47,36 @@ export const prerender = true;
     </div>
   </section>
 
-  <section class="content-section" data-od-id="vigencia">
+  <section class="bg-white-section" data-od-id="vigencia">
     <div class="container">
-      <div class="detail-issues-grid">
-        <div class="detail-issue-card">
-          <Icon name="doc" size={18} />
-          <span>
-            <strong>Sobre la vigencia de esta información.</strong> La Ley 21.659 entró
-            en vigor el 28 de noviembre de 2025 y su última modificación corresponde a la
-            Ley 21.825, de mayo de 2026. Las guías se actualizan cuando cambia el texto
-            normativo, no de forma periódica. Cada una incluye las fuentes oficiales para
-            que puedas verificar los datos directamente.
-          </span>
-        </div>
-      </div>
+      <span class="section-label">Vigencia</span>
+      <h2 class="section-title">Sobre la actualización de estas guías</h2>
+      <p class="section-subtitle" style="max-width:820px">
+        La Ley 21.659 entró en vigor el 28 de noviembre de 2025 y su última modificación
+        corresponde a la Ley 21.825, de mayo de 2026. Estas guías se actualizan cuando cambia
+        el texto normativo, no de forma periódica.
+      </p>
+      <p class="section-subtitle" style="max-width:820px">
+        Cada una incluye las fuentes oficiales —Ley Chile de la BCN y la Subsecretaría de
+        Prevención del Delito— para que puedas verificar los datos directamente en la fuente
+        primaria, que es la que manda.
+      </p>
     </div>
   </section>
 
-  <LeadCTA
-    variant="inline"
-    title="GuardMan Chile"
-    subtitle="Empresa de seguridad privada autorizada, con 200+ guardias certificados OS-10 y central de monitoreo propia 24/7."
-    trustBadges={true}
-  />
+  <section class="bg-dark" data-od-id="cta">
+    <div class="container" style="text-align:center;padding:80px 0">
+      <h2 class="section-title" style="color:#fff">¿Necesitas un proveedor que cumpla esto?</h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.7);max-width:600px;margin:0 auto 28px">
+        Todos los puntos de estas guías son exigibles en un contrato. Solicite una propuesta y
+        verálos aplicados en la práctica, no solo declarados.
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+        <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg">
+          <Icon name="phone" size={16} /> {SITE.PHONE}
+        </a>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
