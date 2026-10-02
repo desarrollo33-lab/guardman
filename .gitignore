@@ -42,3 +42,6 @@ public/images/.tmp-*.webp
 imagenes guardman/
 # stray file from typo'd command
 -w
+
+# originales de re-encode (scripts/reencode-images.mjs; recuperables desde git)
+.reenc-src/

@@ -22,11 +22,21 @@
 - **Verificar los bytes servidos después de deployear, no el exit code.** Traer la URL real
   del asset y grepear el valor nuevo. Ejemplo 2026-10-02: el HTML ya traía el critical CSS en
   1200px mientras `site.css` seguía sirviendo `.header-inner` en 1280px.
-- Lo mismo aplica a **`/images/*`**, que también es `immutable` por un año. Si se re-codifica
-  una imagen **conservando el nombre** (ej. `sector-salud.webp` de 1280×1280 a 400×225), hay
-  que bumpear el `?v=` en la referencia que la usa, hoy `` `/images/sector-${s.slug}.webp?v=20261002` ``
-  en `src/pages/index.astro` y `src/pages/sectores/index.astro`. Si en cambio la imagen cambia
-  de nombre (variantes `-640`/`-960`/…), la cache key cambia sola y no hay que hacer nada.
+- Lo mismo aplica a **`/images/*`** y **`/videos/*`**, que también son `immutable` por un año. Si se
+  re-codifica un asset **conservando el nombre** (ej. `sector-salud.webp` de 1280×1280 a 400×225),
+  hay que bumpear el `?v=` en **todas** las referencias que lo usan. Si en cambio el asset cambia de
+  nombre (variantes `-640`/`-560`/…), la cache key cambia sola y no hay que hacer nada.
+- **El `?v=` de imágenes y videos es `IMAGE_VERSION`** (`src/lib/constants.ts`), hoy `20261002-2`.
+  Nunca escribir la versión a mano en un template: importarla. La excepción conocida es el
+  `background-image` de `HowItWorks.astro`, porque los `<style>` de Astro no aceptan expresiones; ahí
+  el valor está hardcodeado con un comentario que apunta a `IMAGE_VERSION`.
+- **Re-codificar imágenes = usar `scripts/reencode-images.mjs`.** Guarda el original en `.reenc-src/`
+  (gitignored, recuperable desde git) y siempre encodea desde ahí, así que re-correr el script no
+  recomprime dos veces. Los `quality` del script no son gusto: son el punto donde la heurística de
+  compresión de Lighthouse deja de pedir más compresión. Si se sube un quality, se re-codifica TODO
+  el set en el mismo commit que el bumpe de `IMAGE_VERSION`.
+- Un `?v=` también se necesita para el **`poster` de un `<video>`**: al cambiar sus bytes, la
+  referencia en el HTML cambia aunque el `.mp4` no se toque.
 
 ## Custom domain `guardman.cl` — ESTADO
 - **RESUELTO (verificado 2026-10-02).** El dominio SÍ sirve este worker.
