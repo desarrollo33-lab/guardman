@@ -1,5 +1,18 @@
 # guardman — Contexto operativo
 
+## Orden de cascada de los CSS — leer antes de "arreglar" un color o un estilo
+- `public/styles/site.css` se sirve con `<link>` y se carga **primero**.
+- `src/styles/*.css` (design-tokens, components) se compilan a `/_astro/*.css` y se cargan **después**.
+- Con la misma especificidad **gana `components.css` sobre `site.css`**. Corolario real: editar
+  `public/styles/site.css` para cambiar el color de un botón o de un link puede no hacer nada y
+  `wrangler deploy` reporta éxito igual. Los tokens viven en `design-tokens.css`
+  (`--gm-*`, mapeados a `--*`); los componentes que reusan estilos del sitio están en
+  `components.css`.
+- **Regla de método:** para saber qué gana de verdad, medir el estilo computado en el navegador
+  (Playwright `getComputedStyle`) y leer los tokens resueltos, no deducirlo leyendo la cascada.
+  `design-tokens.css` redefine `--muted`, `--accent` y `--fg`, así que los valores de
+  `site.css:30` no son los finales.
+
 ## Deploy
 - Worker: `guardman-astro` (https://guardman-astro.oficinadesarrollo33.workers.dev)
 - Cuenta Cloudflare: oficinadesarrollo33@gmail.com (account ID b3a89fc9524552b7ab3202269f1ab6f3)
