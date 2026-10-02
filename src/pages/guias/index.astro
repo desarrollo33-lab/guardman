@@ -1,0 +1,100 @@
+---
+// /guias — índice de guías de dotación y contratación.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { GUIDES } from '../../lib/guias';
+import Icon from '../../components/Icon.astro';
+import LeadCTA from '../../components/LeadCTA.astro';
+
+export const prerender = true;
+---
+
+<BaseLayout
+  title="Guías de seguridad privada"
+  description="Guías prácticas sobre dotación de guardias, turnos, cobertura 24/7 y cómo elegir una empresa de seguridad privada en Chile."
+  breadcrumb="Guías"
+  breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Guías', url: '/guias' }]}
+>
+  <section class="idx-hero">
+    <div class="container">
+      <span class="idx-kicker">Guías prácticas</span>
+      <h1>Guías para contratar seguridad privada</h1>
+      <p class="idx-lead">
+        Explicamos cómo razonamos la dotación de un puesto de seguridad, qué preguntar antes de
+        firmar y cómo comparar propuestas que parecen equivalentes y no lo son.
+      </p>
+    </div>
+  </section>
+
+  <section class="idx-body">
+    <div class="container">
+      <div class="idx-grid">
+        {GUIDES.map((g) => (
+          <a href={`/guias/${g.slug}`} class="idx-card">
+            <h2>{g.title}</h2>
+            <p>{g.metaDescription}</p>
+            <span class="idx-link">Leer la guía →</span>
+          </a>
+        ))}
+      </div>
+
+      <div class="idx-note">
+        <Icon name="warn" size={20} />
+        <div>
+          <h2>Por qué no publicamos ratios de dotación</h2>
+          <p>
+            Los números que circulan en internet sobre cuántos guardias necesita un condominio
+            suelen provenir de otros países, con otras normas y otros niveles de riesgo, y
+            aplicados sin evaluación producen resultados que van desde el exceso hasta el hueco
+            de seguridad. Explicamos el método completo —acceso, riesgo y horario— para que puedas
+            evaluar cualquier propuesta, y dejamos los números a la vista del técnico en terreno.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="idx-cta">
+    <div class="container">
+      <LeadCTA
+        title="Solicita una evaluación"
+        description="La visita a terreno no tiene costo. Definimos la cobertura que corresponde a tu sitio en particular."
+      />
+    </div>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .idx-hero { background: var(--navy, #1a2744); padding: 56px 0 48px; color: #fff; }
+  .idx-kicker {
+    display: inline-block; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7); margin-bottom: 14px;
+  }
+  .idx-hero h1 {
+    font-size: clamp(28px, 4.2vw, 42px); font-weight: 800; line-height: 1.15;
+    margin: 0 0 18px; letter-spacing: -0.02em; max-width: 760px;
+  }
+  .idx-lead {
+    font-size: clamp(16px, 1.7vw, 18px); line-height: 1.65;
+    color: rgba(255, 255, 255, 0.85); max-width: 720px; margin: 0;
+  }
+  .idx-body { padding: 48px 0 32px; }
+  .idx-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .idx-card {
+    border: 1px solid #e2e6ec; border-radius: 12px; padding: 26px;
+    background: #fff; text-decoration: none; display: block;
+    transition: border-color .15s, transform .15s;
+  }
+  .idx-card:hover { border-color: #3b82f6; transform: translateY(-2px); }
+  .idx-card h2 { font-size: 18px; font-weight: 700; margin: 0 0 10px; color: var(--navy, #1a2744); line-height: 1.4; }
+  .idx-card p { font-size: 15px; line-height: 1.65; color: #555; margin: 0 0 14px; }
+  .idx-link { font-size: 14px; font-weight: 600; color: #2563eb; }
+  .idx-note {
+    display: flex; gap: 16px; align-items: flex-start;
+    background: #f8f9fb; border-radius: 12px; padding: 26px; margin-top: 40px;
+  }
+  .idx-note svg { flex-shrink: 0; color: #d97706; margin-top: 2px; }
+  .idx-note h2 { font-size: 17px; font-weight: 700; margin: 0 0 8px; color: var(--navy, #1a2744); }
+  .idx-note p { font-size: 15px; line-height: 1.7; color: #555; margin: 0; }
+  .idx-cta { padding: 0 0 64px; }
+</style>

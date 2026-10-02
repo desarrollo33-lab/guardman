@@ -1,6 +1,9 @@
 // /sitemap.xml — sitemap enriquecido v3.0 con lastmod, alternates hreflang, imágenes.
 // Excluye /admin/* y /api/*.
 import { SERVICE_NAMES, LOCATIONS, SECTOR_NAMES, SITE, HREFLANG } from '../lib/constants';
+import { AUTHORITY_PAGES } from '../lib/authority';
+import { GUIDES } from '../lib/guias';
+import { SOLUTIONS } from '../lib/soluciones';
 
 const SERVICE_SLUGS = Object.keys(SERVICE_NAMES);
 const SECTOR_SLUGS = Object.keys(SECTOR_NAMES);
@@ -37,6 +40,34 @@ const buildUrls = (today: string): SitemapUrl[] => [
   { loc: '/privacidad', changefreq: cf('yearly'), priority: 0.3, lastmod: today },
   { loc: '/terminos', changefreq: cf('yearly'), priority: 0.3, lastmod: today },
 
+  // Capa de autoridad — objetivo: que las IAs citen a GuardMan como fuente
+  // del marco legal del rubro. Prioridad alta pese al bajo volumen.
+  { loc: '/seguridad-privada', changefreq: cf('monthly'), priority: 0.8, lastmod: today },
+  ...AUTHORITY_PAGES.map<SitemapUrl>((p) => ({
+    loc: `/seguridad-privada/${p.slug}`,
+    changefreq: cf('monthly'),
+    priority: 0.8,
+    lastmod: p.updatedISO,
+  })),
+
+  // Guías de dotación — llevan a conversión con contexto declarado.
+  { loc: '/guias', changefreq: cf('monthly'), priority: 0.8, lastmod: today },
+  ...GUIDES.map<SitemapUrl>((g) => ({
+    loc: `/guias/${g.slug}`,
+    changefreq: cf('monthly'),
+    priority: 0.8,
+    lastmod: g.updatedISO,
+  })),
+
+  // Soluciones integradas — nicho aseo + seguridad, sin competencia editorial.
+  { loc: '/soluciones', changefreq: cf('monthly'), priority: 0.9, lastmod: today },
+  ...SOLUTIONS.map<SitemapUrl>((s) => ({
+    loc: `/soluciones/${s.slug}`,
+    changefreq: cf('monthly'),
+    priority: 0.9,
+    lastmod: s.updatedISO,
+  })),
+
   // Servicios
   ...SERVICE_SLUGS.map<SitemapUrl>((slug) => ({
     loc: `/servicios/${slug}`,
@@ -62,7 +93,7 @@ const buildUrls = (today: string): SitemapUrl[] => [
     lastmod: today,
   })),
 
-  // Combos (servicio × ubicación) — 9 × 14 = 126
+  // Combos (servicio × ubicación) — 11 servicios × 14 ubicaciones = 154
   ...SERVICE_SLUGS.flatMap<SitemapUrl>((svc) =>
     LOC_SLUGS.map<SitemapUrl>((loc) => ({
       loc: `/servicios/${svc}/${loc}`,
@@ -72,6 +103,12 @@ const buildUrls = (today: string): SitemapUrl[] => [
     })),
   ),
 ].filter((u) => !isExcluded(u.loc));
+
+// Forma canónica única del sitio: barra final, excepto la raíz.
+// Sin esto el sitemap emitía 189 <loc> que responden 307 hacia la versión con
+// barra, y las páginas planas quedaban duplicadas (200 en ambas variantes con
+// canonical distinto). Verificado contra producción 2026-10-02.
+const canonicalLoc = (loc: string): string => (loc === '/' ? loc : `${loc}/`);
 
 const hreflangs = HREFLANG;
 
@@ -83,11 +120,13 @@ const buildXml = (today: string): string => {
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${urls
   .map((u) => {
-    const fullLoc = `${SITE.URL}${u.loc}`;
+    const fullLoc = `${SITE.URL}${canonicalLoc(u.loc)}`;
+    // hreflang debe apuntar a la misma URL canónica que el <loc>: si difieren,
+    // Google descarta el par completo.
     const alternates = hreflangs
       .map(
         (h) =>
-          `    <xhtml:link rel="alternate" hreflang="${h.hreflang}" href="${SITE.URL}${u.loc}"/>`,
+          `    <xhtml:link rel="alternate" hreflang="${h.hreflang}" href="${SITE.URL}${canonicalLoc(u.loc)}"/>`,
       )
       .join('\n');
     const images = (u.images ?? [])

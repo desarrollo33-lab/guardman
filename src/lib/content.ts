@@ -16,6 +16,13 @@ export interface ServiceContent {
   features: { title: string; description: string }[]
   problems: string[]
   faqs: ServiceFAQ[]
+  // OS-10 es la certificación OSIPEC de seguridad privada: solo aplica a los
+  // servicios de vigilancia. Sin esta bandera, los templates NO deben emitir
+  // OS-10, central de monitoreo ni Guardpod. Verificado 2026-10-02.
+  certified?: boolean
+  // Sustitutos del bloque de confianza en servicios no certificables.
+  trustBadge?: string
+  trustPoints?: string[]
 }
 
 export const SERVICES: Record<string, ServiceContent> = {
@@ -365,6 +372,16 @@ export const SERVICES: Record<string, ServiceContent> = {
       { q: '¿Qué tipo de productos utilizan?', a: 'Productos certificados de uso industrial. Opciones biodegradables disponibles. Para áreas críticas contamos con protocolos de sanitización profunda.' },
       { q: '¿En qué comunas ofrecen servicio?', a: 'En las 12 comunas de cobertura metropolitana más Los Andes y San Felipe, 14 en total.' },
     ],
+    // Servicio NO certificable: el aseo es una línea de negocio distinta dentro
+    // de GuardMan y no se presta bajo el marco OS-10 ni con central de monitoreo.
+    certified: false,
+    trustBadge: 'Personal propio y supervisado',
+    trustPoints: [
+      'Personal uniformado con supervisor de terreno por cuenta',
+      'Productos de limpieza industriales certificados, opciones biodegradables',
+      'Reporte mensual de actividades, incidencias y horas ejecutadas',
+      'Cotización personalizada en 24 horas hábiles, sin compromiso',
+    ],
   },
 };
 
@@ -402,6 +419,54 @@ export const LOCATIONS: Record<string, LocationContent> = {
       { q: '¿Qué servicios ofrecen específicamente para Las Condes?', a: 'Ofrecemos guardias para edificios corporativos, control de acceso para embajadas, vigilancia de centros comerciales y protección de clínicas. Todos con certificación OS-10 y adaptados al perfil de alta exigencia de la comuna.' },
       { q: '¿Tienen experiencia con embajadas y consulados?', a: 'Sí, trabajamos con representaciones diplomáticas aplicando protocolos de seguridad específicos que incluyen verificación de identidad, control de perímetro y coordinación con organismos de seguridad del Estado.' },
       { q: '¿Cuál es el tiempo de respuesta en Las Condes?', a: 'Menos de 15 minutos para incidentes prioritarios. Contamos con vehículos de reacción rápida desplegados en la zona Oriente.' },
+    ],
+  },
+
+  'providencia': {
+    name: 'Providencia', zone: 'oriente', zoneLabel: 'Zona Oriente', zoneFull: 'oriente',
+    intro: 'Providencia concentra una mezcla poco común de oficinas corporativas, comercio gastronómico de alta rotación y barrios residenciales consolidados desde el siglo XIX. El Parque Bicentenario, el Costanera Center y el eje de Avenida Providencia generan flujos de personas muy distintos entre el día y la noche. GuardMan Chile cubre esa variación ajustando turnos y puestos de guardia.',
+    features: [
+      'Guardias para edificios de oficinas en el eje Providencia y Costanera',
+      'Control de acceso en edificios con flujo de visitantes de alto volumen',
+      'Vigilancia para locales comerciales y restaurantes con cierre nocturno',
+      'Protección de estacionamientos subterráneos frente a robo de vehículos',
+      'Cobertura de eventos corporativos y funerarios en espacios alquilados',
+      'Rondas preventivas en el Parque Bicentenario y áreas verdes comunes',
+    ],
+    problems: [
+      'Robos en estacionamientos subterráneos por la concentración de vehículos en horario nocturno',
+      'Accesos no controlados en edificios de oficinas durante la hora de almuerzo, con alta rotación de visitantes',
+      'Vandalismo y conflictos nocturnos en el comercio gastronómico de Avenida Providencia',
+      'Ocupación no autorizada de plazas y áreas verdes por personas en situación de calle',
+    ],
+    faqs: [
+      { q: '¿Qué servicios ofrecen específicamente para Providencia?', a: 'Guardias para edificios corporativos, control de acceso, vigilancia de locales comerciales y rondas preventivas. Todos con personal certificado OS-10 y dimensión según el riesgo del sitio.' },
+      { q: '¿Cubren el Parque Bicentenario y el Costanera?', a: 'Sí, tenemos procesos de vigilancia y rondas en áreas verdes comunes. En recintos con requisitos de acceso específicos se designa un plan de cobertura a medida.' },
+      { q: '¿Cuál es el tiempo de respuesta en Providencia?', a: 'La comuna pertenece a la zona Oriente, donde operamos con nuestros supervisores y central de monitoreo. El tiempo de respuesta se define según el contrato y el nivel de riesgo del sitio.' },
+    ],
+  },
+
+  'nunoa': {
+    name: 'Ñuñoa', zone: 'oriente', zoneLabel: 'Zona Oriente', zoneFull: 'oriente',
+    intro: 'Ñuñoa es la comuna más antigua del sector oriente y mezcla un parque deportivo de escala nacional, campus universitarios, comercio barrial y barrios residenciales de distinta antigüedad. El Estadio Nacional, el Campus Islae de la Pontificia Universidad Católica y el corredor comercial de Irarrázaval generan niveles de flujo que cambian radicalmente según el día y la hora.',
+    features: [
+      'Seguridad para el Estadio Nacional y eventos deportivos en el sector',
+      'Guardias para edificios residenciales en Irarrázaval y el eje sur de la comuna',
+      'Vigilancia para comercio local y licencias de alcohol con horarios de cierre',
+      'Control de acceso en instituciones educativas y campus universitarios',
+      'Protección de predios en zonas de mayor incidencia y reconstrucción urbana',
+      'Coordinación con Carabineros ante incidentes en el sector',
+    ],
+    problems: [
+      'Robos en estacionamientos y patios de edificios de tamaño mediano',
+      'Accesos no controlados en edificios residenciales durante horarios nocturnos',
+      'Disturbios y conflictos en el entorno del Estadio Nacional en fechas de alta concurrencia',
+      'Vandalismo en comercio de barrio y zonas con menor presencia policial',
+    ],
+    faqs: [
+      { q: '¿Qué servicios ofrecen para Ñuñoa?', a: 'Guardias residenciales, seguridad para eventos deportivos, vigilancia de comercio local y control de acceso. Personal certificado OS-10 con dimensión acorde al riesgo de cada sitio.' },
+      { q: '¿Tienen experiencia en recintos deportivos?', a: 'Sí. Cubrimos eventos y competencias con control de accesos por tribuna, cobertura perimetral y coordinación con Carabineros, elementos clave en el entorno del Estadio Nacional.' },
+      { q: '¿Cubren el comercio local de Irarrázaval?', a: 'Sí, con rondas y vigilancia en horario nocturno y de cierre. El plan se ajusta al local y al horario de operación de cada cliente.' },
     ],
   },
 

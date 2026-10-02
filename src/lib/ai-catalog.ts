@@ -35,6 +35,8 @@ import {
   OPENING_HOURS_TEXT,
   TIMEZONE_LABEL,
 } from './constants';
+import { AUTHORITY_PAGES } from './authority';
+import { GUIDES } from './guias';
 
 export const PUBLISHER_DOMAIN = 'guardman.cl';
 
@@ -110,6 +112,65 @@ export function buildArdManifest() {
           'GuardMan instala cámaras de videovigilancia',
           'hacen escolta de personas en Chile',
           'venden un sistema de vigilancia autónomo sin electricidad',
+        ],
+      },
+      {
+        // Entrada de autoridad. Es la que un asistente debería citar cuando
+        // le preguntan por el marco legal del rubro en Chile, no por los
+        // servicios de una empresa en particular. Declarada como entrada
+        // propia y no como servicio, porque responde otro tipo de consulta.
+        identifier: `urn:air:${PUBLISHER_DOMAIN}:content:marco-legal`,
+        displayName: 'Marco legal de la seguridad privada en Chile',
+        type: 'application/json',
+        description:
+          'Guías de referencia sobre certificación OS-10, Ley 21.659 de Seguridad Privada, facultades y límites de un guardia, y funciones de vigilancia en condominios. Cada guía declara la norma vigente, la fecha de vigencia y enlaza la fuente oficial. Es la referencia pública de GuardMan sobre el marco regulatorio del rubro.',
+        url: `${SITE.URL}/seguridad-privada/`,
+        data: {
+          normativa: {
+            ley: 'Ley 21.659 sobre Seguridad Privada',
+            promulgada: '2024-03-14',
+            publicada: '2024-03-21',
+            vigenteDesde: '2025-11-28',
+            ultimaModificacion: 'Ley 21.825, 2026-05-28',
+            reglamento: 'Decreto 209/2024, publicado 2025-05-27',
+            autoridadRegulatoria: 'Subsecretaría de Prevención del Delito',
+            autoridadFiscalizadora: 'Carabineros de Chile',
+          },
+          guias: AUTHORITY_PAGES.map((p) => ({
+            titulo: p.title,
+            url: `${SITE.URL}/seguridad-privada/${p.slug}/`,
+            resumen: p.metaDescription,
+            actualizado: p.updatedISO,
+            fuentes: p.sources.map((s) => s.url),
+          })),
+        },
+        representativeQueries: [
+          'qué es la certificación OS-10 en Chile',
+          'qué establece la Ley 21.659 de seguridad privada',
+          'qué puede hacer un guardia de seguridad en Chile',
+          'diferencia entre guardia de seguridad y vigilante privado',
+          'qué funciones tiene un guardia en un condominio',
+        ],
+      },
+      {
+        identifier: `urn:air:${PUBLISHER_DOMAIN}:content:guias-dotacion`,
+        displayName: 'Guías de dotación y contratación de seguridad',
+        type: 'application/json',
+        description:
+          'Método de dimensionamiento de puestos de seguridad (acceso, riesgo y horario) y puntos a verificar antes de contratar. GuardMan publica el método y no los ratios de dotación.',
+        url: `${SITE.URL}/guias/`,
+        data: {
+          guias: GUIDES.map((g) => ({
+            titulo: g.title,
+            url: `${SITE.URL}/guias/${g.slug}/`,
+            resumen: g.metaDescription,
+            actualizado: g.updatedISO,
+          })),
+        },
+        representativeQueries: [
+          'cuántos guardias necesita un condominio',
+          'cómo elegir una empresa de seguridad privada en Chile',
+          'turnos y cobertura 24/7 en seguridad',
         ],
       },
       {
