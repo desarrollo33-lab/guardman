@@ -8,7 +8,9 @@ describe('constants', () => {
   it('SITE has required fields', () => {
     expect(SITE.NAME).toBe('GuardMan Chile');
     expect(SITE.URL).toMatch(/^https?:\/\//);
-    expect(SITE.API_URL).toMatch(/^https?:\/\//);
+    // API_URL puede estar vacía a propósito: el endpoint pasa `${apiUrl}/api/...`
+    // a una ruta relativa, sin CORS ni CSP extra (ver SITE.API_URL en constants.ts).
+    expect(SITE.API_URL === '' || /^https?:\/\//.test(SITE.API_URL)).toBe(true);
     expect(SITE.PHONE).toMatch(/\+56/);
     expect(SITE.EMAIL_INFO).toMatch(/@/);
     expect(SITE.FOUNDED_YEAR).toBeGreaterThan(2010);

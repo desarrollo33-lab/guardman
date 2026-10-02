@@ -44,14 +44,30 @@ describe('api', () => {
   it('attempts refresh on 401 once and retries', async () => {
     const { setToken } = await import('../src/lib/auth');
     setToken('OLD', 'REFRESH_TOKEN');
+    // Un 401 son CUATRO requests, no tres:
+    //   1. el request original -> 401
+    //   2. POST /api/refresh
+    //   3. POST /api/admin/session (syncSessionCookie, fire-and-forget: sin esto
+    //      la cookie gm_session queda con el JWT vencido y el SSR expulsa al
+    //      admin aunque su sesion en localStorage siga viva)
+    //   4. el retry
     (fetch as unknown as ReturnType<typeof vi.fn>)
       .mockResolvedValueOnce(new Response(JSON.stringify({ ok: false }), { status: 401 }))
       .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true, data: { access_token: 'NEW', refresh_token: 'NEW_R' } }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true, data: { ok: true } }), { status: 200 }));
     const { crm } = await import('../src/lib/api');
     const out = await crm.leads.list();
     expect(out).toEqual({ ok: true });
-    expect((fetch as unknown as ReturnType<typeof vi.fn>).mock.calls.length).toBe(3);
+    const calls = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls;
+    expect(calls.length).toBe(4);
+    // El re-sync de la cookie es parte del contrato: si alguien lo saca, esto falla.
+    expect(calls.map((c) => c[0])).toEqual([
+      '/api/crm/leads',
+      '/api/refresh',
+      '/api/admin/session',
+      '/api/crm/leads',
+    ]);
   });
 
   it('exports a helper to build image URLs from the API origin', async () => {
