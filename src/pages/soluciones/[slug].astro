@@ -28,7 +28,7 @@ const solutionLd = {
   serviceType: 'Seguridad privada y servicios de mantención',
   provider: { '@type': 'Organization', name: 'GuardMan Chile' },
   areaServed: { '@type': 'AdministrativeArea', name: 'Región Metropolitana y Valparaíso' },
-  audience: { '@type': 'Audience', audienceType: page.audience },
+  audience: { '@type': 'Audience', audienceType: page.audienceLong },
   inLanguage: 'es-CL',
 };
 ---
@@ -57,7 +57,7 @@ const solutionLd = {
         <span class="detail-hero-badge-icon">
           <Icon name="shield" size={14} />
         </span>
-        Solución integrada
+        {page.audience}
       </div>
       <h1>{page.h1}</h1>
       <p>{page.lead}</p>

@@ -29,13 +29,13 @@ export const prerender = true;
       <div class="card-grid">
         {SOLUTIONS.map((s) => (
           <a href={`/soluciones/${s.slug}`} class="card">
-            <div class="card-icon">
-              <Icon name="shield" size={20} />
-            </div>
             <div class="card-body">
+              <div class="card-icon">
+                <Icon name="shield" size={20} />
+              </div>
               <h3>{s.title}</h3>
+              <p>{s.audienceLong}</p>
               <p>{s.metaDescription}</p>
-              <span class="card-tag">{s.audience}</span>
               <span class="card-link">Ver solución →</span>
             </div>
           </a>
