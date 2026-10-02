@@ -6,6 +6,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../lib/constants';
 import Icon from '../components/Icon.astro';
+import FaqList from '../components/FaqList.astro';
 import LeadCTA from '../components/LeadCTA.astro';
 
 const lastUpdatedHuman = '15 de julio de 2026';
@@ -199,14 +200,7 @@ const contacto = [
         <!-- ═══════ FAQ ═══════ -->
         <section class="legal-faq" data-od-id="legal-faq">
           <h2 class="legal-faq-title">Preguntas frecuentes</h2>
-          <div class="faq-list">
-            {faq.map((f, i) => (
-              <details class="faq-item" open={i === 0}>
-                <summary>{f.question}</summary>
-                <p>{f.answer}</p>
-              </details>
-            ))}
-          </div>
+          <FaqList items={faq.map((f) => ({ q: f.question, a: f.answer }))} odId="legal-faq-list" />
         </section>
       </article>
     </div>

@@ -23,6 +23,25 @@
 // Toda afirmación sobre el método debe ser verificable en terreno. No se
 // publica ninguna que no se pueda sostener en una visita técnica.
 
+/**
+ * Sección de contenido largo.
+ *
+ * `list` existe porque `body` solo puede producir párrafos. Cuando la
+ * intención editorial es una enumeración —"estas cuatro preguntas", "estas
+ * seis verificaciones"— escribirla como `body` la convertía en un muro de
+ * párrafos sin jerarquía visual y sin forma de plegar la respuesta.
+ * Con `list`, la intención se declara como dato y el template la renderiza
+ * con el acordeón canónico (FaqList → .faq-list / .faq-item).
+ *
+ * Regla de redacción: si el contenido empieza con "estas", "estos",
+ * "cuatro", "seis" o similar, es una lista. Va en `list`, no en `body`.
+ */
+export interface GuideSection {
+  heading: string;
+  body?: string[];
+  list?: { q: string; a: string }[];
+}
+
 export interface GuidePage {
   slug: string;
   title: string;
@@ -37,7 +56,7 @@ export interface GuidePage {
   assessment: { step: string; detail: string }[];
   /** Errores frecuentes de quien contrata sin evaluación. */
   mistakes: { mistake: string; consequence: string }[];
-  sections: { heading: string; body: string[] }[];
+  sections: GuideSection[];
   faqs: { q: string; a: string }[];
   ctaTitle: string;
   ctaBody: string;
@@ -144,18 +163,20 @@ export const GUIDES: GuidePage[] = [
       {
         heading: 'Qué sí puedes comparar entre proveedores',
         body: [
-          'Si el método no es público, hay señales que sí permiten comparar y que dicen más que el número final:',
-          '¿La propuesta incluye visita a terreno antes de cotizar, o el número salió de un formulario? Una cotización sin visita es una estimación.',
-          '¿El alcance está declarado con precisión? Puestos, horarios, protocolo de reemplazo, supervisión,Uniforme,equipamiento. Una propuesta vaga obliga a adivinar después.',
-          '¿El personal tiene acreditación vigente y hay un proceso de renovación? Bajo la Ley 21.659 es obligación, y una empresa ordenada lo demuestra sin que se le pida.',
-          '¿Existe un procedimiento para los puestos descubiertos? Es la pregunta que separa a un proveedor de un intermediario.',
+          'Si el método no es público, hay señales que sí permiten comparar y que dicen más que el número final de una cotización.',
+        ],
+        list: [
+          { q: '¿La propuesta incluye visita a terreno antes de cotizar?', a: 'Si el número salió de un formulario, es una estimación. Una cotización sin visita no puede ser correcta, y esa es la primera señal de que el proveedor no conoce el sitio.' },
+          { q: '¿El alcance está declarado con precisión?', a: 'Puestos, horarios, protocolo de reemplazo, supervisión, uniforme y equipamiento. Una propuesta vaga obliga a adivinar después, y lo que no está declarado no se puede comparar.' },
+          { q: '¿El personal tiene acreditación vigente y hay proceso de renovación?', a: 'Bajo la Ley 21.659 es obligación. Una empresa ordenada lo demuestra sin que se le pida, y una que lo entrega tiene el control montado.' },
+          { q: '¿Existe un procedimiento para los puestos descubiertos?', a: 'Es la pregunta que separa a un proveedor de un intermediario, y la que más directamente afecta su seguridad.' },
         ],
       },
       {
         heading: 'El costo de equivocarse en cada dirección',
         body: [
           'Sobre-dimensionar tiene un costo visible: se paga más de lo necesario por un servicio que no rinde proporcionalmente más.',
-          'Sub-dimensionar tiene un costo invisible y más caro: un incidente que se prevention porque no había nadie, o un control que se degrada justo en el horario de mayor riesgo. Ese costo no aparece en la boleta y aparece en el historial del edificio.',
+          'Sub-dimensionar tiene un costo invisible y más caro: un incidente que se previene porque no había nadie, o un control que se degrada justo en el horario de mayor riesgo. Ese costo no aparece en la boleta y aparece en el historial del edificio.',
         ],
       },
     ],
@@ -381,12 +402,14 @@ export const GUIDES: GuidePage[] = [
       {
         heading: 'Lo que un buen proveedor debe poder responder',
         body: [
-          'Estas son preguntas concretas. Cualquiera se puede responder sin dejar nada para después:',
-          '¿Cuántas horas al día y en qué bloques se cubre?',
-          '¿Con qué esquema de turnos y cómo se sostiene la rotación?',
-          '¿Con qué frecuencia visita un supervisor y qué verifica?',
-          '¿Qué pasa cuando falta un guardia, en cuánto tiempo se cubre y quién lo comunica?',
-          '¿Cómo se registra la cobertura efectiva de cada turno?',
+          'Estas son preguntas concretas. Cualquiera se puede responder sin dejar nada para después, y la respuesta es tan reveladora como la pregunta: un proveedor con método responde con datos concretos y uno que improvisa responde con evasivas.',
+        ],
+        list: [
+          { q: '¿Cuántas horas al día y en qué bloques se cubre?', a: 'Debe decirlo por bloques, no como promedio. "Cobertura 24/7" no es una respuesta: cubrir las 24 horas de lunes a domingo es distinto de cubrir las 24 horas de lunes a viernes, y la dotación cambia por completo.' },
+          { q: '¿Con qué esquema de turnos y cómo se sostiene la rotación?', a: 'El esquema (12 horas, 8 horas, 4x4, 5x2) determina la rotación y el pool de personal necesario. La pregunta importante es cómo se cubre una ausencia, la licencia y las vacaciones sin bajar el servicio.' },
+          { q: '¿Con qué frecuencia visita un supervisor y qué verifica?', a: 'Sin frecuencia declarada, la supervisión es una afirmación. Un supervisor que pasa una vez al mes sin registro dejó de cumplir la función hace tiempo.' },
+          { q: '¿Qué pasa cuando falta un guardia, en cuánto tiempo se cubre y quién lo comunica?', a: 'Se espera un tiempo de respuesta concreto y un responsable identificado, no la frase "tenemos personal de reemplazo". Esta es la pregunta que más revela la calidad de un proveedor.' },
+          { q: '¿Cómo se registra la cobertura efectiva de cada turno?', a: 'El registro de cobertura efectiva es el indicador que permite verificar el servicio con el tiempo. Si no lo llevan, es probable que no lo estén midiendo.' },
         ],
       },
       {
@@ -497,11 +520,13 @@ export const GUIDES: GuidePage[] = [
       {
         heading: 'Las cuatro preguntas que más revelan la calidad de un proveedor',
         body: [
-          'Si solo puedes hacer cuatro preguntas antes de decidir, que sean estas:',
-          '¿El plan de rondas está por escrito? Un proveedor que tiene un método responde con frecuencia y recorrido. Uno que improvisa responde con evasivas.',
-          '¿Qué pasa cuando falta un guardia? La respuesta esperada incluye tiempo de respuesta y responsable, no solo "tenemos personal de reemplazo".',
-          '¿Cómo se documenta la cobertura efectiva de los turnos? Es un indicador que un proveedor organizado lleva por control propio.',
-          '¿Puedo ver el registro de acreditación del personal? Con fechas. No es una peticiónrary, es una consecuencia de la ley.',
+          'Si solo puedes hacer cuatro preguntas antes de decidir, que sean estas.',
+        ],
+        list: [
+          { q: '¿El plan de rondas está por escrito?', a: 'Un proveedor que tiene un método responde con frecuencia y recorrido definidos. Uno que improvisa responde con evasivas, y esa diferencia ya dice casi todo.' },
+          { q: '¿Qué pasa cuando falta un guardia?', a: 'La respuesta esperada incluye tiempo de respuesta y responsable identificado, no solo la frase "tenemos personal de reemplazo".' },
+          { q: '¿Cómo se documenta la cobertura efectiva de los turnos?', a: 'Es un indicador que un proveedor organizado lleva por control propio. Si no lo tiene, conviene asumir que no lo está midiendo.' },
+          { q: '¿Puedo ver el registro de acreditación del personal?', a: 'Con fechas de acreditación y de próxima renovación. No es una petición arbitraria: es una consecuencia directa de la Ley 21.659, y cualquier empresa que opera en el sistema puede entregarlo.' },
         ],
       },
       {
