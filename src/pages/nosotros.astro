@@ -7,11 +7,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import StaffSection from '../components/StaffSection.astro';
+import { COVERAGE_PHRASE_LONG, COVERAGE_PHRASE_RM, COVERAGE_PHRASE_TOTAL, COVERAGE_TOTAL, COVERAGE_RM, COVERAGE_VS } from '../lib/constants';
 
 const stats = [
   { value: '10+', label: 'Años de experiencia' },
   { value: '200+', label: 'Guardias certificados' },
-  { value: '14', label: 'Comunas con cobertura' },
+  { value: String(COVERAGE_TOTAL), label: 'Comunas con cobertura' },
   { value: '24/7', label: 'Central de monitoreo' },
 ];
 
@@ -27,7 +28,7 @@ const differentiators = [
   { icon: 'radar', title: 'Central de monitoreo propia 24/7', text: 'Operamos nuestra propia central de vigilancia, sin tercerizar. Supervisión en tiempo real, redundancia de sistemas y respuesta inmediata ante cada evento validado.' },
   { icon: 'shield', title: 'Certificación OS-10 vigente', text: 'Acreditación oficial de la Prefectura de Seguridad Privada de Carabineros de Chile, que respalda nuestro cumplimiento de la Ley 21.659 de seguridad privada.' },
   { icon: 'clock', title: 'Más de 10 años de trayectoria', text: 'Desde 2014 protegemos hogares, empresas e instituciones en la Región Metropolitana y Valparaíso, con un equipo estable y clientes recurrentes.' },
-  { icon: 'location', title: 'Cobertura en 14 comunas', text: 'Presencia operativa directa en 12 comunas de Santiago más Los Andes y San Felipe, con capacidad de respuesta coordinada entre zonas.' },
+  { icon: 'location', title: 'Cobertura en ' + COVERAGE_PHRASE_TOTAL, text: 'Presencia operativa directa en ' + COVERAGE_PHRASE_RM + ' más ' + COVERAGE_VS.map((c) => c.name).join(' y ') + ', con capacidad operativa propia.' },
 ];
 
 const certifications = [
@@ -42,14 +43,14 @@ const faqs = [
   { question: '¿Qué certificaciones y cumplimiento legal tienen sus guardias?', answer: 'Cada guardia cuenta con certificación OS-10 vigente, exigida por la Prefectura de Seguridad Privada de Carabineros de Chile, y nuestra operación cumple con la Ley 21.659 de seguridad privada vigente desde 2024.' },
   { question: '¿GuardMan tiene central de monitoreo propia?', answer: 'Sí. Operamos nuestra propia central de monitoreo 24/7, sin tercerizar el servicio. Esto nos permite supervisar en tiempo real cada alerta, validar eventos y coordinar respuesta con Carabineros o equipos en terreno cuando corresponde.' },
   { question: '¿Qué es Guardpod y por qué es un diferenciador de GuardMan?', answer: 'Guardpod es un sistema autónomo de vigilancia desarrollado por GuardMan Chile durante 15 meses de I+D. Integra cámaras 360°, detección por inteligencia artificial y conexión a nuestra central propia, sin requerir infraestructura eléctrica ni personal permanente. Ninguna otra empresa de seguridad en Chile ofrece un sistema equivalente.' },
-  { question: '¿En qué comunas y regiones opera GuardMan?', answer: 'Tenemos cobertura operativa directa en 12 comunas de la Región Metropolitana, además de Los Andes y San Felipe en la Región de Valparaíso, con capacidad de respuesta coordinada entre zonas.' },
+  { question: '¿En qué comunas y regiones opera GuardMan?', answer: 'Tenemos cobertura operativa directa en ' + COVERAGE_PHRASE_RM + ', además de ' + COVERAGE_VS.map((c) => c.name).join(' y ') + ' en Valparaíso. En total, ' + COVERAGE_PHRASE_TOTAL + ' con operación propia.' },
   { question: '¿Puedo contratar solo guardias OS-10 sin monitoreo?', answer: 'Sí. Ofrecemos esquemas flexibles: guardias OS-10 con supervisión propia, monitoreo 24/7 desde nuestra central, unidades Guardpod para perímetros sin infraestructura, o combinaciones de estos servicios según las necesidades de cada cliente.' },
 ];
 ---
 
 <BaseLayout
   title="Nosotros GuardMan Chile Seguridad Privada desde 2014"
-  description={`Conozca a GuardMan Chile: empresa de seguridad privada con certificación OS-10, central de monitoreo propia y el sistema autónomo Guardpod. Más de 10 años protegiendo empresas y residencias en 14 comunas: 12 en la Región Metropolitana y 2 en Valparaíso.`}
+  description={`Conozca a GuardMan Chile: empresa de seguridad privada con certificación OS-10, central de monitoreo propia y el sistema autónomo Guardpod. Más de 10 años de trayectoria y cobertura en ${COVERAGE_PHRASE_LONG}.`}
   theme="dark"
   loadDarkCss={true}
   breadcrumb="Nosotros"
@@ -68,7 +69,7 @@ const faqs = [
             Seguridad privada certificada
           </div>
           <h1>Protegemos lo que más le importa <span>desde 2014</span></h1>
-          <p class="hero-sub">GuardMan Chile nació con una convicción: la seguridad privada en el país merecía un estándar más alto. Más de 10 años después, somos la opción de cientos de empresas e instituciones y protegemos 12 comunas de la Región Metropolitana, sumando 2 comunas en la Región de Valparaíso con cobertura propia en Los Andes y San Felipe.</p>
+          <p class="hero-sub">GuardMan Chile nació con una convicción: la seguridad privada en el país merecía un estándar más alto. Más de 10 años después, somos la opción de cientos de empresas e instituciones y protegemos {COVERAGE_PHRASE_LONG}, con cobertura propia en cada una.</p>
           <div class="hero-ctas">
             <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
             <a href="#historia" class="btn btn-ghost btn-lg">Conocer nuestra historia</a>
@@ -76,7 +77,7 @@ const faqs = [
           <div class="hero-stats">
             <div><div class="hero-stat-value">10+</div><div class="hero-stat-label">Años</div></div>
             <div><div class="hero-stat-value">200+</div><div class="hero-stat-label">Guardias OS-10</div></div>
-            <div><div class="hero-stat-value">14</div><div class="hero-stat-label">Comunas</div></div>
+  <div><div class="hero-stat-value">{COVERAGE_TOTAL}</div><div class="hero-stat-label">Comunas</div></div>
             <div><div class="hero-stat-value">24/7</div><div class="hero-stat-label">Central propia</div></div>
           </div>
         </div>

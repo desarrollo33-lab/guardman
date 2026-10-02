@@ -2,7 +2,7 @@
 // Homepage v4.0 — Optimizada para captura de leads.
 // Hero persuasivo + trust signals + cómo funciona + CTA inline + cluster.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SERVICE_NAMES, LOCATIONS, ZONE_COLORS, FAQ_HOME, SITE } from '../lib/constants';
+import { SERVICE_NAMES, LOCATIONS, ZONE_COLORS, FAQ_HOME, SITE, COVERAGE_PHRASE_LONG, COVERAGE_PHRASE_TOTAL } from '../lib/constants';
 import { ICONS, SERVICE_ICONS } from '../lib/icons';
 import { SERVICES, ZONAS } from '../lib/content';
 import Icon from '../components/Icon.astro';
@@ -74,7 +74,7 @@ const markers = LOCATIONS.map((l) => {
 
 <BaseLayout
   title="Seguridad Privada OS-10 Santiago"
-  description="Seguridad privada OS-10 en 14 comunas: 12 en la Región Metropolitana y 2 en Valparaíso. Guardias, CCTV, monitoreo 24/7, Guardpod y Ajax Systems. Cotización en 24h."
+  description={`Seguridad privada OS-10 en ${COVERAGE_PHRASE_LONG}. Guardias, CCTV, monitoreo 24/7, Guardpod y Ajax Systems. Cotización en 24h.`}
   localBusiness={true}
   showCluster={true}
   clusterType="servicios"
@@ -100,7 +100,7 @@ const markers = LOCATIONS.map((l) => {
         Certificación OS-10 · Ley 21.659
       </div>
       <h1>Seguridad Privada Profesional en Santiago de Chile</h1>
-      <p class="hero-lead">Proteja su empresa, condominio o evento con <strong>guardias certificados OS-10</strong>, monitoreo propio 24/7 y el sistema autónomo <strong>Guardpod</strong>, una tecnología exclusiva en el mercado chileno. Más de 10 años de experiencia, 200+ guardias certificados y cobertura en 14 comunas: 12 en la Región Metropolitana y 2 en Valparaíso.</p>
+      <p class="hero-lead">Proteja su empresa, condominio o evento con <strong>guardias certificados OS-10</strong>, monitoreo propio 24/7 y el sistema autónomo <strong>Guardpod</strong>, una tecnología exclusiva en el mercado chileno. Más de 10 años de experiencia, 200+ guardias certificados y cobertura en {COVERAGE_PHRASE_LONG}.</p>
       <div class="hero-ctas">
         <a href="/cotizacion" class="btn btn-primary btn-lg">
           <Icon name="shield" size={16} />
@@ -353,7 +353,7 @@ const markers = LOCATIONS.map((l) => {
       </div>
       <hr style="border:0;border-top:1px solid rgba(255,255,255,.1);margin:0 0 48px" />
       <span class="section-label">Cobertura regional</span>
-      <h2 class="section-title">Presencia en 14 comunas: 12 en Santiago y 2 en la Región de Valparaíso</h2>
+      <h2 class="section-title">Presencia en {COVERAGE_PHRASE_LONG}</h2>
       <p class="section-subtitle">Atendemos en Las Condes, Vitacura, Lo Barnechea, La Reina, Santiago Centro, Huechuraba, Quilicura, Conchalí, Pudahuel, Renca, Lampa y La Pintana, además de Los Andes y San Felipe. Cobertura operativa con respuesta coordinada entre zonas.</p>
 
       <div class="coverage-split" style="margin-top:28px">
@@ -378,7 +378,7 @@ const markers = LOCATIONS.map((l) => {
         <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius-xl);padding:32px;text-align:center;min-height:400px">
           <div style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:rgba(59,130,246,.12);color:#60a5fa;margin-bottom:16px" set:html={ICONS.shield} />
           <p style="font-size:1.1rem;color:rgba(255,255,255,.9);margin:0 0 8px;font-weight:600">Mapa interactivo de cobertura</p>
-          <p style="font-size:14px;color:rgba(255,255,255,.65);margin:0 0 24px;max-width:280px">Visualice las 14 comunas con cobertura operativa verificada y el detalle por zona.</p>
+      <p style="font-size:14px;color:rgba(255,255,255,.65);margin:0 0 24px;max-width:280px">Visualice las {COVERAGE_PHRASE_TOTAL} con cobertura operativa verificada y el detalle por zona.</p>
           <a href="/ubicaciones" class="btn btn-primary">Abrir mapa de cobertura</a>
         </div>
       </div>

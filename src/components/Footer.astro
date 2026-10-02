@@ -1,7 +1,7 @@
 ---
 // Footer v3.0 — enriquecido con más cross-linking para SEO interno.
 // v4.1: link amarillo de Canal de Denuncias en columna "Empresa".
-import { SITE, SERVICE_NAMES, LOCATIONS, SECTOR_NAMES, DENUNCIA_PATH } from '../lib/constants';
+import { SITE, SERVICE_NAMES, LOCATIONS, SECTOR_NAMES, DENUNCIA_PATH, COVERAGE_TOTAL } from '../lib/constants';
 import { ICONS } from '../lib/icons';
 const year = new Date().getFullYear();
 const topServices = Object.entries(SERVICE_NAMES).slice(0, 6);
@@ -40,7 +40,9 @@ const topSectors = Object.entries(SECTOR_NAMES).slice(0, 6);
         {topLocations.map((l) => (
           <a href={`/ubicaciones/${l.slug}`}>{l.name}</a>
         ))}
-        <a href="/ubicaciones" class="footer-see-all">Ver mapa completo →</a>
+        <a href="/ubicaciones" class="footer-see-all">
+          Ver las {COVERAGE_TOTAL} communes →
+        </a>
       </div>
 
       <div class="footer-col">
@@ -52,10 +54,19 @@ const topSectors = Object.entries(SECTOR_NAMES).slice(0, 6);
       </div>
 
       <div class="footer-col">
+        <h4>Recursos</h4>
+        <a href="/seguridad-privada">Marco legal</a>
+        <a href="/guias">Guías de contratación</a>
+        <a href="/soluciones">Soluciones integradas</a>
+        <a href="/llms.txt">llms.txt</a>
+      </div>
+
+      <div class="footer-col">
         <h4>Empresa</h4>
         <a href="/nosotros">Nosotros</a>
         <a href="/guard-pod">Guardpod</a>
         <a href="/ajax-systems">Ajax Systems</a>
+        <a href="/canal-de-denuncias">Canal de denuncias</a>
         <a href="/contacto">Contacto</a>
         <a href="/cotizacion">Solicitar cotización</a>
         <a href="/privacidad">Privacidad</a>

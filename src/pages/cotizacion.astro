@@ -2,7 +2,7 @@
 // /cotizacion — formulario detallado (migración 1:1 del live).
 // v4.2 — usa componentes del sistema de diseño: Icon, HowItWorks, LeadCTA, TrustSignals, LeadForm.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SERVICE_NAMES, LOCATIONS } from '../lib/constants';
+import { SERVICE_NAMES, LOCATIONS, COVERAGE_PHRASE_LONG } from '../lib/constants';
 import { SERVICES } from '../lib/content';
 import Icon from '../components/Icon.astro';
 import HowItWorks from '../components/HowItWorks.astro';
@@ -59,7 +59,7 @@ const leadFormSections = [
 
 <BaseLayout
   title="Cotización de Seguridad Privada en 24 Horas"
-  description="Cotice seguridad privada con guardias OS-10, CCTV, monitoreo 24/7, el sistema autónomo Guardpod y Ajax Systems. Respuesta personalizada en menos de 24 horas hábiles. Cobertura en 14 comunas: 12 en la Región Metropolitana y 2 en Valparaíso."
+  description={`Cotice seguridad privada con guardias OS-10, CCTV, monitoreo 24/7, el sistema autónomo Guardpod y Ajax Systems. Respuesta personalizada en menos de 24 horas hábiles. Cobertura en ${COVERAGE_PHRASE_LONG}.`}
   breadcrumb="Cotización"
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Cotización', url: '/cotizacion' }]}
   showCluster={true}

@@ -1,7 +1,7 @@
 ---
 // LeadCTA — Componente reutilizable de CTA orientado a conversión.
 // Variantes: hero | inline | sticky | footer
-import { SITE } from '../lib/constants';
+import { SITE, COVERAGE_PHRASE_TOTAL } from '../lib/constants';
 import Icon from './Icon.astro';
 
 interface Props {
@@ -150,7 +150,7 @@ const finalPrimaryText = primaryText || primaryTextDefault;
         <div class="lead-cta-trust">
           <span><Icon name="check" size={14} /> 200+ guardias certificados</span>
           <span><Icon name="check" size={14} /> 10+ años de experiencia</span>
-          <span><Icon name="check" size={14} /> 14 comunas con cobertura</span>
+          <span><Icon name="check" size={14} /> {COVERAGE_PHRASE_TOTAL} con cobertura</span>
         </div>
       )}
     </div>
