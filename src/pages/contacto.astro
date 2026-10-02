@@ -21,12 +21,12 @@ const services = [
 const leadFormSections = [
   {
     fields: [
-      { name: 'name', label: 'Nombre completo', type: 'text' as const, required: true },
-      { name: 'email', label: 'Correo electrónico', type: 'email' as const, required: true },
-      { name: 'phone', label: 'Teléfono', type: 'tel' as const, required: true },
-      { name: 'location', label: 'Comuna', type: 'text' as const },
-      { name: 'service', label: 'Servicio de interés', type: 'select' as const, required: true, options: services, fullWidth: true },
-      { name: 'message', label: 'Mensaje', type: 'textarea' as const, fullWidth: true, rows: 4 },
+      { name: 'name', label: 'Nombre completo', type: 'text' as const, required: true, paramDescription: 'Nombre y apellido de quien escribe.' },
+      { name: 'email', label: 'Correo electrónico', type: 'email' as const, required: true, paramDescription: 'Correo donde se enviará la respuesta.' },
+      { name: 'phone', label: 'Teléfono', type: 'tel' as const, required: true, paramDescription: 'Teléfono de contacto, formato +56 9 XXXX XXXX.' },
+      { name: 'location', label: 'Comuna', type: 'text' as const, paramDescription: 'Comuna de la persona, si la necesita.' },
+      { name: 'service', label: 'Servicio de interés', type: 'select' as const, required: true, options: services, fullWidth: true, paramDescription: 'Servicio sobre el que se pregunta.' },
+      { name: 'message', label: 'Mensaje', type: 'textarea' as const, fullWidth: true, rows: 4, paramDescription: 'Consulta o requerimiento en texto libre.' },
     ],
   },
 ];
@@ -104,6 +104,11 @@ const leadFormSections = [
           submitText="Enviar mensaje"
           trackName="contacto"
           successRedirect="/gracias"
+          webmcp={{
+            name: 'guardman_enviar_mensaje',
+            description:
+              'Envía un mensaje o consulta a GuardMan Chile por seguridad privada. La respuesta es humana y llega en menos de 24 horas hábiles. Para una cotización con datos de propiedad use guardman_solicitar_cotizacion en /cotizacion.',
+          }}
         />
 
         <div style="margin-top:24px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);text-align:center">

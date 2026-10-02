@@ -53,6 +53,8 @@ interface Field {
   // Conditional: si se setea, este field está oculto por default y el script lo muestra
   wrapId?: string;
   hidden?: boolean;
+  /** Descripción del parámetro para agentes (WebMCP). Ver prop `webmcp`. */
+  paramDescription?: string;
 }
 
 interface Props {
@@ -85,6 +87,17 @@ interface Props {
     footNote?: string;
     footIcon?: string;
   };
+  /**
+   * Exposición a agentes vía la API declarativa de WebMCP: emite
+   * `toolname` / `tooldescription` en el `<form>` y `toolparamdescription`
+   * en los inputs que declaren `paramDescription`.
+   *
+   * Opt-in explícito y por formulario, no automático. `/canal-de-denuncias`
+   * NO debe recibirlo: es el canal de denuncias y reporte de conflictos de
+   * interés, y una denuncia tiene que tener una persona identificable
+   * detrás. Dejarlo en `null` es lo correcto para ese form.
+   */
+  webmcp?: { name: string; description: string } | null;
 }
 
 const {
@@ -94,7 +107,13 @@ const {
   footNote, errorText = 'Hubo un error. Por favor intenta nuevamente o llámanos.',
   novalidate, autocomplete,
   successPanel,
+  webmcp = null,
 } = Astro.props;
+
+/** Atributos WebMCP de un campo. Vacío si el form no está expuesto o el
+ *  campo no describe su parámetro — nunca se emite un atributo vacío. */
+const toolAttrs = (f: Field) =>
+  webmcp && f.paramDescription ? { 'toolparamdescription': f.paramDescription } : {};
 
 // Agrupa los fields de una section en rows. `fullWidth: true` sale del grid
 // 2-col y ocupa toda la línea (ej: textarea, radio-row, conditional).
@@ -144,6 +163,8 @@ const sectionRows = (section: SectionType): RowItem[] => {
     data-mode={mode}
     novalidate={novalidate}
     autocomplete={autocomplete}
+    toolname={webmcp?.name}
+    tooldescription={webmcp?.description}
   >
     {sections.map((section) => (
       <Fragment>
@@ -171,12 +192,12 @@ const sectionRows = (section: SectionType): RowItem[] => {
                     {f.required && <span class="required">*</span>}
                   </label>
                   {f.type === 'select' ? (
-                    <select name={f.name} id={f.id} required={f.required}>
+                    <select name={f.name} id={f.id} required={f.required} {...toolAttrs(f)}>
                       <option value="">Selecciona</option>
                       {f.options?.map((opt) => <option value={opt}>{opt}</option>)}
                     </select>
                   ) : f.type === 'date' ? (
-                    <input type="date" name={f.name} id={f.id} required={f.required} min={f.min} max={f.max} />
+                    <input type="date" name={f.name} id={f.id} required={f.required} min={f.min} max={f.max} {...toolAttrs(f)} />
                   ) : f.type === 'radio' ? (
                     <div class="radio-row">
                       {f.radioOptions?.map((opt) => (
@@ -189,7 +210,7 @@ const sectionRows = (section: SectionType): RowItem[] => {
                   ) : f.type === 'acceptance' ? (
                     <div class="form-acceptance">
                       <label class="check-pill">
-                        <input type="checkbox" name={f.name} id={f.id} required={f.required} />
+                        <input type="checkbox" name={f.name} id={f.id} required={f.required} {...toolAttrs(f)} />
                         <span set:html={f.acceptLabel} />
                       </label>
                     </div>
@@ -202,6 +223,7 @@ const sectionRows = (section: SectionType): RowItem[] => {
                       placeholder={f.placeholder}
                       minlength={f.minlength}
                       maxlength={f.maxlength}
+                      {...toolAttrs(f)}
                     />
                   )}
                   {f.hint && <small class="form-hint">{f.hint}</small>}
@@ -224,6 +246,7 @@ const sectionRows = (section: SectionType): RowItem[] => {
                     placeholder={row.field.placeholder}
                     minlength={row.field.minlength}
                     maxlength={row.field.maxlength}
+                    {...toolAttrs(row.field)}
                   />
                   {row.field.hint && (
                     <small class="form-hint">
@@ -240,12 +263,12 @@ const sectionRows = (section: SectionType): RowItem[] => {
                   )}
                 </>
               ) : row.field.type === 'select' ? (
-                <select name={row.field.name} id={row.field.id} required={row.field.required}>
+                <select name={row.field.name} id={row.field.id} required={row.field.required} {...toolAttrs(row.field)}>
                   <option value="">Selecciona</option>
                   {row.field.options?.map((opt) => <option value={opt}>{opt}</option>)}
                 </select>
               ) : row.field.type === 'date' ? (
-                <input type="date" name={row.field.name} id={row.field.id} required={row.field.required} min={row.field.min} max={row.field.max} />
+                <input type="date" name={row.field.name} id={row.field.id} required={row.field.required} min={row.field.min} max={row.field.max} {...toolAttrs(row.field)} />
               ) : row.field.type === 'radio' ? (
                 <>
                   <div class="radio-row">
@@ -261,7 +284,7 @@ const sectionRows = (section: SectionType): RowItem[] => {
               ) : row.field.type === 'acceptance' ? (
                 <div class="form-acceptance">
                   <label class="check-pill">
-                    <input type="checkbox" name={row.field.name} id={row.field.id} required={row.field.required} />
+                    <input type="checkbox" name={row.field.name} id={row.field.id} required={row.field.required} {...toolAttrs(row.field)} />
                     <span set:html={row.field.acceptLabel} />
                   </label>
                 </div>
@@ -274,6 +297,7 @@ const sectionRows = (section: SectionType): RowItem[] => {
                   placeholder={row.field.placeholder}
                   minlength={row.field.minlength}
                   maxlength={row.field.maxlength}
+                  {...toolAttrs(row.field)}
                 />
               )}
               {row.field.type !== 'textarea' && row.field.type !== 'radio' && row.field.hint && (

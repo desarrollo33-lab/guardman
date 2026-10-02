@@ -1,0 +1,168 @@
+// ════════════════════════════════════════════════════════════════
+// GuardMan — Manifiesto de descubrimiento ARD / AI Catalog
+//
+// Un solo documento, servido en dos rutas:
+//
+//   /.well-known/ard.json           → ruta canónica (ARD v0.91)
+//   /.well-known/ai-catalog.json    → ruta predecesora (cortesía)
+//
+// Por qué las dos: ARD v0.91 (agenticresourcediscovery.org, ago 2026)
+// renombró la ruta canónica a `ard.json` y dejó `ai-catalog.json` como
+// cortesía opcional — "consultar esa ruta es cortesía, no conformidad", y
+// un publicador que se quede solo en la ruta vieja "puede no ser
+// encontrado". Servir ambas con el mismo documento es lo que hace
+// descubrible el sitio a un consumidor conforme con el spec actual y a uno
+// que sólo implemente la versión previa.
+//
+// Deriva de `constants.ts`, igual que `llms.txt` y el JSON-LD. Si el sitio
+// cambia cobertura, servicios u horario, el manifiesto cambia con él. No
+// editar a mano: ya pasó antes que una capa de descubrimiento quedara
+// diciendo cosas que el sitio no mostraba (ver el comentario de
+// `src/pages/llms.txt.ts`).
+//
+// `specVersion: "1.0"` es la versión del **data model de AI Catalog**, no la
+// del spec ARD. ARD lee el campo como definido por transporte y lo ignora.
+// ════════════════════════════════════════════════════════════════
+
+import {
+  SITE,
+  SERVICE_NAMES,
+  SERVICE_DESCRIPTIONS,
+  SECTOR_NAMES,
+  COVERAGE_RM,
+  COVERAGE_VS,
+  COVERAGE_TOTAL,
+  OPENING_HOURS_TEXT,
+  TIMEZONE_LABEL,
+} from './constants';
+
+export const PUBLISHER_DOMAIN = 'guardman.cl';
+
+export interface ArdEntry {
+  identifier: string;
+  displayName: string;
+  type: string;
+  description: string;
+  /** Exactamente uno de `url` o `data` — nunca ambos, nunca ninguno. */
+  url?: string;
+  data?: unknown;
+  representativeQueries: string[];
+}
+
+const serviceEntries = Object.keys(SERVICE_NAMES).map((slug) => ({
+  slug,
+  nombre: SERVICE_NAMES[slug],
+  descripcion: SERVICE_DESCRIPTIONS[slug] ?? '',
+  url: `${SITE.URL}/servicios/${slug}/`,
+}));
+
+const coverageData = {
+  total: COVERAGE_TOTAL,
+  regionMetropolitana: COVERAGE_RM.map((l) => ({ nombre: l.name, url: `${SITE.URL}/ubicaciones/${l.slug}/` })),
+  valparaiso: COVERAGE_VS.map((l) => ({ nombre: l.name, url: `${SITE.URL}/ubicaciones/${l.slug}/` })),
+  sectores: Object.keys(SECTOR_NAMES),
+};
+
+export function buildArdManifest() {
+  return {
+    specVersion: '1.0',
+    host: {
+      displayName: SITE.NAME,
+      // Requisito duro de conformidad: sin `host.identifier` el manifiesto
+      // no valida. `did:web` anclado al dominio, sin esquema ni path.
+      identifier: `did:web:${PUBLISHER_DOMAIN}`,
+      url: SITE.URL,
+      founded: SITE.FOUNDED_YEAR,
+      description: `${SITE.TAGLINE}. Cobertura en ${COVERAGE_TOTAL} comunas de la Región Metropolitana y Valparaíso.`,
+      // El teléfono y el horario son los dos datos que un asistente más
+      // necesita y menos suele acertar. Se declaran acá para que no dependan
+      // de que el agente raspe el HTML.
+      contactPoint: {
+        telephone: SITE.PHONE,
+        email: SITE.EMAIL_INFO,
+        availableHours: `${OPENING_HOURS_TEXT} (${TIMEZONE_LABEL})`,
+        address: `${SITE.ADDRESS}, ${SITE.ADDRESS_LOCALITY}, ${SITE.ADDRESS_REGION}`,
+      },
+      sameAs: [SITE.INSTAGRAM_URL, SITE.YOUTUBE_URL],
+    },
+    entries: [
+      {
+        identifier: `urn:air:${PUBLISHER_DOMAIN}:content:llms-txt`,
+        displayName: 'GuardMan Chile — resumen estructurado del sitio',
+        type: 'text/markdown',
+        description:
+          'Documento markdown generado desde las constantes del sitio: servicios, cobertura real por comuna, horario, contacto y preguntas frecuentes. Es la fuente que ya deben leer los asistentes.',
+        url: `${SITE.URL}/llms.txt`,
+        representativeQueries: [
+          'qué servicios de seguridad privada ofrece GuardMan en Chile',
+          'en qué comunas de Santiago trabaja GuardMan',
+          'cuál es el teléfono y el horario de GuardMan',
+        ],
+      },
+      {
+        identifier: `urn:air:${PUBLISHER_DOMAIN}:content:services`,
+        displayName: 'Catálogo de servicios de GuardMan',
+        type: 'application/json',
+        description:
+          'Los servicios que ofrece GuardMan con su descripción y su URL pública. Para verificar si un servicio específico existe antes de proponerlo.',
+        data: { servicios: serviceEntries },
+        representativeQueries: [
+          'GuardMan instala cámaras de videovigilancia',
+          'hacen escolta de personas en Chile',
+          'venden un sistema de vigilancia autónomo sin electricidad',
+        ],
+      },
+      {
+        identifier: `urn:air:${PUBLISHER_DOMAIN}:content:coverage`,
+        displayName: 'Cobertura geográfica de GuardMan',
+        type: 'application/json',
+        description: `Las ${COVERAGE_TOTAL} comunas donde GuardMan opera, con su URL de detalle, más los sectores atendidos.`,
+        data: coverageData,
+        representativeQueries: [
+          'GuardMan cubre Vitacura',
+          'tienen cobertura en la Región de Valparaíso',
+          'en qué sectores trabajan: residencial, industrial, salud',
+        ],
+      },
+      {
+        identifier: `urn:air:${PUBLISHER_DOMAIN}:contact:quote`,
+        displayName: 'Solicitud de cotización de GuardMan',
+        type: 'text/html',
+        description:
+          'Formulario público de cotización. Un agente puede completar nombre, correo, teléfono y servicio; la respuesta comercial es humana y en menos de 24 horas hábiles.',
+        url: `${SITE.URL}/cotizacion/`,
+        representativeQueries: [
+          'quiero cotizar vigilancia para un condominio',
+          'necesito precio de guardias de seguridad',
+          'presupuesto para instalar CCTV',
+        ],
+      },
+      {
+        identifier: `urn:air:${PUBLISHER_DOMAIN}:compliance:denuncias`,
+        displayName: 'Canal de denuncias de GuardMan',
+        type: 'text/html',
+        description:
+          'Canal anónimo de denuncias y reporte de conflictos de interés: infracción al código de conducta, potencial delito, acoso laboral o sexual, y falla de seguridad o protocolo. No es un canal de urgencias, y no debe completarse de forma automatizada: exige una persona detrás.',
+        url: `${SITE.URL}/canal-de-denuncias/`,
+        representativeQueries: [
+          'cómo hago una denuncia en GuardMan',
+          'dónde reportar acoso laboral',
+          'canal de denuncias anónimo GuardMan',
+        ],
+      },
+      {
+        identifier: `urn:air:${PUBLISHER_DOMAIN}:site:home`,
+        displayName: 'GuardMan Chile — sitio web',
+        type: 'text/html',
+        description: `${SITE.TAGLINE}. Seguridad privada con certificación OS-10.`,
+        url: `${SITE.URL}/`,
+        representativeQueries: [
+          'GuardMan Chile seguridad privada OS-10',
+          'empresa de guardias de seguridad con certificación OS-10',
+        ],
+      },
+    ] satisfies ArdEntry[],
+  };
+}
+
+export const ARD_JSON_TYPE = 'application/ai-catalog+json';

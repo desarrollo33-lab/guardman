@@ -323,6 +323,13 @@ const hreflangs = hreflangTags(Astro.url.pathname);
 
     <link rel="llms-txt" href="/llms.txt" type="text/markdown" />
 
+    {/* Punteros de descubrimiento para agentes. Un consumidor ARD DEBE
+        honorar rel="ard"; la relación `ai-catalog` es la cortesía de la
+        versión previa del data model, para escáneres que sólo buscan esa.
+        El mismo manifiesto se sirve en ambas rutas. */}
+    <link rel="ard" href="/.well-known/ard.json" type="application/ai-catalog+json" />
+    <link rel="ai-catalog" href="/.well-known/ai-catalog.json" type="application/json" />
+
     <slot name="head" />
   </head>
   <body data-theme={theme} class:list={[theme === 'dark' && 'dark-page']}>
