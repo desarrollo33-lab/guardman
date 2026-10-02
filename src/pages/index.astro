@@ -90,7 +90,7 @@ const markers = LOCATIONS.map((l) => {
                    /images/hero-1920.webp 1920w"
            sizes="100vw"
            alt="Seguridad Privada GuardMan Chile — Guardias OS-10"
-           fetchpriority="high" decoding="sync" width="1920" height="1080"
+           fetchpriority="high" decoding="async" width="1920" height="1080"
            onerror="this.style.display='none'" />
       <div class="hero-bg-overlay"></div>
     </div>
@@ -326,7 +326,14 @@ const markers = LOCATIONS.map((l) => {
         </a>
       </div>
       <div class="split-image">
-        <img src="/images/Ajax-systems-header.jpg" alt="Ajax Systems" loading="lazy" decoding="async" width="640" height="360" onerror="this.style.display='none'" />
+        <img src="/images/Ajax-systems-header-960.webp"
+             srcset="/images/Ajax-systems-header-640.webp 640w,
+                     /images/Ajax-systems-header-960.webp 960w,
+                     /images/Ajax-systems-header-1280.webp 1280w,
+                     /images/Ajax-systems-header.webp 1920w"
+             sizes="(min-width: 1024px) 552px, 100vw"
+             alt="Ajax Systems" loading="lazy" decoding="async" width="960" height="319"
+             onerror="this.style.display='none'" />
         <div class="split-image-badge">Instalador Oficial</div>
       </div>
     </div>
