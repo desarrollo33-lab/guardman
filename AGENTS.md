@@ -22,6 +22,11 @@
 - **Verificar los bytes servidos después de deployear, no el exit code.** Traer la URL real
   del asset y grepear el valor nuevo. Ejemplo 2026-10-02: el HTML ya traía el critical CSS en
   1200px mientras `site.css` seguía sirviendo `.header-inner` en 1280px.
+- Lo mismo aplica a **`/images/*`**, que también es `immutable` por un año. Si se re-codifica
+  una imagen **conservando el nombre** (ej. `sector-salud.webp` de 1280×1280 a 400×225), hay
+  que bumpear el `?v=` en la referencia que la usa, hoy `` `/images/sector-${s.slug}.webp?v=20261002` ``
+  en `src/pages/index.astro` y `src/pages/sectores/index.astro`. Si en cambio la imagen cambia
+  de nombre (variantes `-640`/`-960`/…), la cache key cambia sola y no hay que hacer nada.
 
 ## Custom domain `guardman.cl` — ESTADO
 - **RESUELTO (verificado 2026-10-02).** El dominio SÍ sirve este worker.

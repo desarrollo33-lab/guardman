@@ -34,7 +34,7 @@ const sectors = Object.entries(SECTOR_NAMES).map(([slug, name]) => ({
         {sectors.map((s) => (
           <a href={`/sectores/${s.slug}`} class="sector-card">
             <div class="sector-image">
-              <img src={`/images/sector-${s.slug}.webp`} alt={s.name} loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+              <img src={`/images/sector-${s.slug}.webp?v=20261002`} alt={s.name} loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
               <div class="sector-image-fallback" style="display:none">
                 <Icon name={s.slug} size={56} />
               </div>
