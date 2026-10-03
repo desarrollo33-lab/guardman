@@ -8,7 +8,7 @@
 --
 -- El texto viejo ya no está en el repo (los dos archivos del seed quedaron
 -- corregidos). Este archivo se generó diffeando el seed contra git HEAD, así
--- que los 35 question_key salen de las claves que existen de verdad.
+-- que los 36 question_key salen de las claves que existen de verdad.
 --
 -- NO se pudo aplicar desde el entorno de desarrollo: el token OAuth de
 -- wrangler no tiene alcance de D1 remoto (APIError 7403, "The given account
@@ -145,6 +145,10 @@ UPDATE guardpod_questions SET label = '¿Qué hace cuando un cliente deja de res
 -- ventas.cuando_cliente_calla / real_world_prompt
 UPDATE guardpod_questions SET real_world_prompt = 'El proceso de seguimiento que usa'
   WHERE question_key = 'ventas.cuando_cliente_calla';
+
+-- ventas.fuentes_lead / options_json
+UPDATE guardpod_questions SET options_json = '["Web / formulario", "WhatsApp directo", "Vendedor en terreno", "Referido de otro cliente", "Aliado / socio", "LinkedIn", "Google Ads", "Instagram", "Otro"]'
+  WHERE question_key = 'ventas.fuentes_lead';
 
 -- ventas.tasa_conversion / label
 UPDATE guardpod_questions SET label = 'Aproximadamente, ¿qué porcentaje de contactos cierra como cliente?'

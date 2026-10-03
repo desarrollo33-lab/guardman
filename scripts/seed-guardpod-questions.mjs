@@ -438,7 +438,7 @@ const QUESTIONS = [
     key: 'ventas.fuentes_lead', type: 'multiselect',
     label: '¿De dónde llegan los clientes que contratan?',
     help: 'Queremos conocer los canales que más convierten.',
-    options: ['Web / formulario', 'WhatsApp directo', 'Vendedor en terreno', 'Referido de otro cliente', 'Aliado / partner', 'LinkedIn', 'Google Ads', 'Instagram', 'Otro'],
+    options: ['Web / formulario', 'WhatsApp directo', 'Vendedor en terreno', 'Referido de otro cliente', 'Aliado / socio', 'LinkedIn', 'Google Ads', 'Instagram', 'Otro'],
     required: 1,
   },
   {

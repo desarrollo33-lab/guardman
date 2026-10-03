@@ -363,7 +363,7 @@ INSERT INTO guardpod_questions
   VALUES
     ('v1', 'ventas.fuentes_lead', 'ventas', 7, 4,
      'multiselect', '¿De dónde llegan los clientes que contratan?', 'Queremos conocer los canales que más convierten.', NULL,
-     0, 1, '["Web / formulario","WhatsApp directo","Vendedor en terreno","Referido de otro cliente","Aliado / partner","LinkedIn","Google Ads","Instagram","Otro"]', 0);
+     0, 1, '["Web / formulario","WhatsApp directo","Vendedor en terreno","Referido de otro cliente","Aliado / socio","LinkedIn","Google Ads","Instagram","Otro"]', 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
