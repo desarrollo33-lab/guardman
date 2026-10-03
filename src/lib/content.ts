@@ -55,14 +55,14 @@ export const SERVICES: Record<string, ServiceContent> = {
     heroSub:
       'Proteja su empresa, condominio o evento con personal certificado OS-10 y más de 10 años de experiencia en seguridad privada.',
     features: [
-      { title: 'Verificación exhaustiva de antecedentes', description: 'Cada guardia pasa por un proceso de selección riguroso con verificación de antecedentes penales, laborales y referencias antes de ser asignado.' },
-      { title: 'Supervisión nocturna preventiva', description: 'Rondas programadas y supervisión en tiempo real durante turnos nocturnos para detectar conductas sospechosas antes de que ocurran incidentes.' },
-      { title: 'Protocolos adaptados por sector', description: 'Diseñamos procedimientos específicos según el tipo de propiedad: corporativo, residencial, industrial o comercial.' },
-      { title: 'Academia de capacitación continua', description: 'Formación permanente en primeros auxilios, manejo de conflictos, uso de tecnología y normativa vigente en nuestra academia interna.' },
-      { title: 'Vehículos de reacción rápida', description: 'Flota de vehículos equipados desplegados estratégicamente para respuesta inmediata ante emergencias en cada zona de cobertura.' },
-      { title: 'Comunicación radial permanente', description: 'Cada guardia mantiene comunicación constante con supervisores y central de monitoreo mediante radios digitales encriptados.' },
-      { title: 'Reportes digitales diarios', description: 'Bitácoras digitales con registro fotográfico de rondas, incidentes y novedades, accesibles en tiempo real por el cliente.' },
-      { title: 'Guardias de reemplazo garantizados', description: 'Sistema de backup con personal de reserva para asegurar continuidad del servicio ante ausencias imprevistas.' },
+      { title: 'Revisamos los antecedentes antes de asignar', description: 'Antecedentes penales, laborales y referencias verificados antes de que entre a un puesto. Es el orden en que hacemos las cosas, no una promesa de calidad.' },
+      { title: 'Supervisamos la noche desde la central', description: 'Rondas programadas y seguimiento en vivo durante la noche, que es la franja en que el edificio está vacío y nadie ve lo que pasa.' },
+      { title: 'Escribimos el protocolo para su propiedad', description: 'Corporativo, residencial, industrial o comercial. El procedimiento se escribe para su propiedad antes de empezar, no después de un incidente.' },
+      { title: 'Capacitamos al personal en forma continua', description: 'Primeros auxilios, manejo de conflictos, uso de tecnología y normativa vigente, en nuestra academia interna.' },
+      { title: 'Respondemos con vehículo propio', description: 'Flota equipada, desplegada por zona. En un edificio con acceso restringido, llegar rápido es parte del servicio.' },
+      { title: 'El guardia conversa con la central, siempre', description: 'Radio digital encriptado con supervisores y central. La comunicación no depende de que el guardia tenga teléfono.' },
+      { title: 'Usted ve el registro de cada ronda', description: 'Registro fotográfico de rondas, incidentes y novedades, disponible mientras los hechos están frescos.' },
+      { title: 'Si falta un guardia, entra uno de reserva', description: 'Personal de relevo para que el puesto nunca quede descubierto, y el registro de quién lo cubrió.' },
     ],
     problems: [
       'Incremento de robos en condominios durante horarios nocturnos y fines de semana, cuando la vigilancia disminuye.',
