@@ -13,6 +13,7 @@
 // `areaServed`, el `openingHoursSpecification` y el copy visible. Si el sitio
 // cambia, este archivo cambia con él — no hay nada que mantener a mano.
 import {
+  ARD_MARKDOWN_TYPE,
   SITE,
   SERVICE_NAMES,
   SERVICE_DESCRIPTIONS,
@@ -167,10 +168,12 @@ ${SOLUTIONS.map(
 export const GET = () =>
   new Response(text, {
     headers: {
-      // El manifiesto ARD declara esta entrada como `text/markdown`, así que el
-      // header tiene que decir lo mismo. Servirla como text/plain sería
-      // contradecir el propio manifiesto: el media type es parte del contrato.
-      'Content-Type': 'text/markdown; charset=utf-8',
+      // El manifiesto ARD declara esta entrada como `text/markdown` con el
+      // perfil `urn:air:agent-skills`, así que el header tiene que decir
+      // exactamente lo mismo. Servirla como text/plain sería contradecir el
+      // propio manifiesto, y omitir el perfil deja el tipo incompleto para
+      // ARD: el media type es parte del contrato con el consumidor.
+      'Content-Type': `${ARD_MARKDOWN_TYPE}; charset=utf-8`,
       'Cache-Control': 'public, max-age=3600',
     },
   });

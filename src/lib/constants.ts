@@ -381,6 +381,24 @@ export const INTER_FONT_URL = `/fonts/InterVariable.woff2?v=${FONT_VERSION}`;
  */
 export const IMAGE_VERSION = '20261002-2';
 
+/**
+ * Media type de los documentos markdown para agentes.
+ *
+ * `text/markdown` a secas está incompleto para ARD: el conformance tester de la
+ * spec lo acepta como "standard discovery type" pero exige el parámetro
+ * `profile`, y el validador de "Agent Discoverability" marca la entrada como
+ * Low. Con el perfil, ambos dan limpio.
+ *
+ * El perfil declara para qué está escrito el documento, no qué género tiene:
+ * estos son material de referencia que existe para que lo lean asistentes
+ * (`llms.txt` nació justo para eso), que es lo que el perfil dice.
+ *
+ * Se usa en el manifiesto Y en el header Content-Type de los endpoints: el
+ * header tiene que decir lo mismo que el manifiesto, o el consumidor recibe una
+ * cosa y lee otra.
+ */
+export const ARD_MARKDOWN_TYPE = 'text/markdown; profile="urn:air:agent-skills"';
+
 
 // ────────────────────────────────────────────────────────────────
 // SEO + GEO metadata (v3.0)

@@ -19,6 +19,7 @@ import { describe, it, expect } from 'vitest';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { readFileSync } from 'node:fs';
 import { buildArdManifest, PUBLISHER_DOMAIN } from '../src/lib/ai-catalog';
+import { ARD_MARKDOWN_TYPE } from '../src/lib/constants';
 import { MCP_TOOLS, buildMcpCard } from '../src/lib/mcp-card';
 import { LLMS_DOCS } from '../src/lib/llms-docs';
 
@@ -122,7 +123,9 @@ describe('lo que el manifiesto declara existe de verdad', () => {
   it('cada entrada markdown apunta a un documento que el sitio genera', () => {
     let generated = 0;
     for (const entry of manifest.entries) {
-      if (entry.type !== 'text/markdown') continue;
+      // El tipo lleva parámetros (`profile="urn:air:agent-skills"`), así que la
+      // comparación es por prefijo, no igualdad exacta.
+      if (!entry.type.startsWith('text/markdown')) continue;
       const file = entry.url!.split('/').pop()!;
       // /llms.txt lo genera su propio endpoint, no el registro de llms-docs.
       if (file === 'llms.txt') {
@@ -141,6 +144,21 @@ describe('lo que el manifiesto declara existe de verdad', () => {
     expect(types).not.toContain('text/html');
     expect(types).not.toContain('application/json');
     expect(types).toContain('application/mcp-server-card+json');
+  });
+
+  it('los documentos markdown llevan el perfil que ARD exige', () => {
+    // `text/markdown` a secas está INCOMPLETO para ARD: el conformance tester lo
+    // acepta como standard discovery type pero exige el parámetro profile, y el
+    // validador de "Agent Discoverability" marca la entrada como Low. El 2026-10-02
+    // lo dimos por quirk del validador y eran las dos cosas: los dos avisos dicen
+    // que falta el parámetro. Sin este test, la próxima entrada markdown nace
+    // rota otra vez.
+    const markdown = manifest.entries.filter((e) => e.type.startsWith('text/markdown'));
+    expect(markdown.length).toBe(5);
+    for (const e of markdown) {
+      expect(e.type, `${e.identifier} sin perfil`).toBe(ARD_MARKDOWN_TYPE);
+      expect(e.type).toContain('profile="urn:air:agent-skills"');
+    }
   });
 
   it('los datos de contacto siguen accesibles sin rascar el HTML', () => {

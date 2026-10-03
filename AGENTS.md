@@ -101,6 +101,14 @@
   `application/json` quedan fuera de esa lista a propósito: son los tipos honestos de páginas
   públicas y de catálogos propios, y etiquetarlos como `application/ai-catalog+json` haría que un
   consumidor conforme intente parsearlos como manifiesto y falle.
+- **`text/markdown` a secas está INCOMPLETO para ARD**: el conformance tester lo acepta como
+  "standard discovery type" pero exige el parámetro `profile="urn:air:agent-skills"`, y el
+  validador de Agent Discoverability marca la entrada como Low. Con las dos fuentes diciendo lo
+  mismo, no es quirk del validador. El tipo correcto es `ARD_MARKDOWN_TYPE` en `constants.ts`, y
+  es el mismo que va en el `Content-Type` de `/llms.txt` y los `/llms*.md`: el header tiene que
+  decir lo mismo que el manifiesto. El perfil declara para qué está escrito el documento, no qué
+  género tiene — estos existen para que los lean asistentes. Ese detalle se agregado el
+  2026-10-02, después de descartar dos veces el aviso como falso positivo.
 - **Los 403 en `/.well-known/*` y `/llms*` vienen del edge, no del Worker.** Medido el 2026-10-02:
   la **Browser Integrity Check** bloquea los User-Agent que no son navegadores (típicamente
   `Python-urllib/x.y`, que es el que usa el conformance tester oficial de la spec), y una regla

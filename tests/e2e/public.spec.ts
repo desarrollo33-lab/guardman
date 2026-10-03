@@ -70,12 +70,15 @@ test.describe('public site', () => {
   });
 
   test('documentos para agentes se sirven con el media type que declara el manifiesto', async ({ request }) => {
-    // El manifiesto dice text/markdown. Servirlos como text/plain sería decir
-    // una cosa y entregar otra: el media type es parte del contrato.
+    // El manifiesto dice `text/markdown; profile="urn:air:agent-skills"`. Servir
+    // text/plain o markdown sin el perfil sería decir una cosa y entregar otra:
+    // el media type es parte del contrato con el consumidor.
     for (const path of ['/llms.txt', '/llms-servicios.md', '/llms-cobertura.md', '/llms-marco-legal.md', '/llms-guias.md']) {
       const res = await request.get(path);
       expect(res.status(), `${path} no responde 200`).toBe(200);
-      expect(res.headers()['content-type'], `${path} con content-type incorrecto`).toContain('text/markdown');
+      const ct = res.headers()['content-type'];
+      expect(ct, `${path} con content-type incorrecto`).toContain('text/markdown');
+      expect(ct, `${path} sin el perfil que ARD exige`).toContain('profile="urn:air:agent-skills"');
       expect((await res.text()).length, `${path} vino vacío`).toBeGreaterThan(500);
     }
   });

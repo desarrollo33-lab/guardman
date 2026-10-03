@@ -66,6 +66,7 @@
 // ════════════════════════════════════════════════════════════════
 
 import {
+  ARD_MARKDOWN_TYPE,
   SITE,
   COVERAGE_TOTAL,
   OPENING_HOURS_TEXT,
@@ -140,7 +141,7 @@ export function buildArdManifest() {
       {
         identifier: `urn:air:${PUBLISHER_DOMAIN}:content:llms-txt`,
         displayName: 'GuardMan Chile — resumen estructurado del sitio',
-        type: 'text/markdown',
+        type: ARD_MARKDOWN_TYPE,
         description:
           'Documento markdown generado desde las constantes del sitio: servicios, cobertura real por comuna, horario, contacto y preguntas frecuentes. Es la fuente que ya deben leer los asistentes.',
         url: `${SITE.URL}/llms.txt`,
@@ -167,7 +168,7 @@ export function buildArdManifest() {
       {
         identifier: `urn:air:${PUBLISHER_DOMAIN}:content:servicios`,
         displayName: 'Catálogo de servicios de GuardMan',
-        type: 'text/markdown',
+        type: ARD_MARKDOWN_TYPE,
         description:
           'Los servicios que ofrece GuardMan con su descripción y su URL pública, más el producto físico Guardpod. Para verificar si un servicio específico existe antes de proponerlo.',
         url: md('llms-servicios.md'),
@@ -182,7 +183,7 @@ export function buildArdManifest() {
       {
         identifier: `urn:air:${PUBLISHER_DOMAIN}:content:marco-legal`,
         displayName: 'Marco legal de la seguridad privada en Chile',
-        type: 'text/markdown',
+        type: ARD_MARKDOWN_TYPE,
         description:
           'Ley 21.659, su reglamento y las guías sobre certificación OS-10, facultades y límites de un guardia, y funciones de vigilancia en condominios. Cada guía declara la norma vigente, su fecha de actualización y enlaza la fuente oficial. Es la referencia pública de GuardMan sobre el marco regulatorio del rubro.',
         url: md('llms-marco-legal.md'),
@@ -199,7 +200,7 @@ export function buildArdManifest() {
       {
         identifier: `urn:air:${PUBLISHER_DOMAIN}:content:guias-dotacion`,
         displayName: 'Guías de dotación y contratación de seguridad',
-        type: 'text/markdown',
+        type: ARD_MARKDOWN_TYPE,
         description:
           'Método de dimensionamiento de puestos de seguridad (acceso, riesgo y horario) y puntos a verificar antes de contratar. GuardMan publica el método y no los ratios de dotación.',
         url: md('llms-guias.md'),
@@ -215,7 +216,7 @@ export function buildArdManifest() {
       {
         identifier: `urn:air:${PUBLISHER_DOMAIN}:content:coverage`,
         displayName: 'Cobertura geográfica de GuardMan',
-        type: 'text/markdown',
+        type: ARD_MARKDOWN_TYPE,
         description: `Las ${COVERAGE_TOTAL} comunas donde GuardMan opera, con su URL de detalle, más los sectores atendidos y dónde NO hay cobertura.`,
         url: md('llms-cobertura.md'),
         capabilities: ['Cobertura', 'RegionMetropolitana', 'Valparaiso'],
