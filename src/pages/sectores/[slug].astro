@@ -2,7 +2,7 @@
 // /sectores/[slug] — detalle de sector (migración 1:1 del live).
 // Estructura idéntica al live: hero + contenido (con blocks anidados) + block-related.
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { SECTOR_NAMES, SECTOR_TO_SERVICE, SERVICE_NAMES, SITE } from '../../lib/constants';
+import { SECTOR_NAMES, SECTOR_TO_SERVICE, SERVICE_NAMES, SITE, COVERAGE_PHRASE_TOTAL } from '../../lib/constants';
 import { SECTORS } from '../../lib/content';
 import Icon from '../../components/Icon.astro';
 import StaffSection from '../../components/StaffSection.astro';
@@ -36,8 +36,7 @@ const sectoresRelacionados = Object.entries(SECTOR_NAMES)
 
 <BaseLayout
   title={sector.seoTitle ?? `Seguridad Privada para Sector ${name}`}
-  description={sector.seoDescription ?? `Servicios de seguridad especializados para el sector ${name.toLowerCase()} en Chile. Protocolos específicos, personal certificado OS-10 y tecnología Guardpod. GuardMan Chile, 14 comunas con cobertura operativa.`}
-  breadcrumb={name}
+  description={sector.seoDescription ?? `Servicios de seguridad especializados para el sector ${name.toLowerCase()} en Chile. Protocolos específicos, personal certificado OS-10 y tecnología Guardpod. GuardMan Chile, ${COVERAGE_PHRASE_TOTAL} con cobertura operativa.`}
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Sectores', url: '/sectores' }, { name, url: `/sectores/${slug}` }]}
   service={{
     slug: relatedServiceSlug,
@@ -105,7 +104,7 @@ const sectoresRelacionados = Object.entries(SECTOR_NAMES)
           </div>
 
           <div class="block" data-od-id="block-locations">
-            <h2>Cobertura en 14 comunas</h2>
+            <h2>Cobertura en {COVERAGE_PHRASE_TOTAL}</h2>
             <p>Seleccione su comuna para ver detalles y solicitar cotización.</p>
             <div class="locations-tags">
               <a href="/ubicaciones/las-condes" class="loc-tag">Las Condes</a>

@@ -29,7 +29,6 @@ const locationsByZone = ZONES.map((zone) => ({
 <BaseLayout
   title="Cobertura de Seguridad Privada en Santiago y Valparaíso"
   description={`GuardMan Chile cubre ${COVERAGE_PHRASE_LONG}. Personal OS-10 disponible en Las Condes, Vitacura, Lo Barnechea, Santiago Centro, Huechuraba, Quilicura y más. Mapa operativo verificado.`}
-  breadcrumb="Ubicaciones"
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Ubicaciones', url: '/ubicaciones' }]}
   showCluster={true}
   clusterType="servicios"
@@ -61,7 +60,7 @@ const locationsByZone = ZONES.map((zone) => ({
   <section class="bg-white-section" data-od-id="map-section">
     <div class="container">
       <span class="section-label">Mapa interactivo</span>
-      <h2 class="section-title">14 comunas en el mapa</h2>
+      <h2 class="section-title">{LOCATIONS.length} comunas en el mapa</h2>
       <p class="section-subtitle">Haga clic en cada marcador para ver detalles de la comuna y solicitar cotización.</p>
       <CoverageMap id="map-ubicaciones" height={480} variant="light" />
     </div>

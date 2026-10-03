@@ -65,10 +65,9 @@ nav{display:none;align-items:center;gap:32px}@media(min-width:1024px){nav{displa
 .header-dark .header-phone{color:#fff}.header-dark .btn-primary{background:var(--accent)}.header-dark .btn-primary:hover{background:var(--accent-hover)}
 
 /* ── Breadcrumb ── */
+/* `.breadcrumb-inner` se fue con el rastro <ol>; sus reglas eran código muerto.
+   El trail y sus colores viven en src/styles/components.css, que carga después. */
 .breadcrumb{text-align:left;display:block;background:var(--bg);padding:12px 16px;border-bottom:1px solid var(--border)}
-.breadcrumb-inner{justify-content:flex-start;font-size:14px}
-.breadcrumb-inner a{color:var(--muted);transition:color .2s}.breadcrumb-inner a:hover{color:var(--primary)}
-.breadcrumb-inner span{color:var(--fg);font-weight:500}
 .breadcrumb-sep{color:var(--muted-light);margin:0 2px}
 
 /* ── Section labels / titles ── */

@@ -115,22 +115,34 @@
 }
 .skip-link:focus { top: 0; }
 
-/* Breadcrumb (BaseLayout) */
+/* Breadcrumb (BaseLayout)
+ *
+ * El rastro se renderiza como <ol> porque la jerarquía es real y son N
+ * niveles, no un `Inicio / X` fijo: el separador va dentro del <li> para que
+ * el último nunca quede con barra colgando cuando el trail se parte en dos
+ * líneas en mobile. Antes era un <div> de dos hijos fijos. */
 .breadcrumb {
   background: var(--gm-surface);
   border-bottom: 1px solid var(--gm-border);
   padding: 12px 0;
   font-size: 13px;
 }
-.breadcrumb-inner {
+.breadcrumb-list {
   max-width: var(--gm-container);
   margin: 0 auto;
   padding: 0 24px;
+  list-style: none;
   display: flex;
   align-items: center;
   gap: 8px;
   color: var(--gm-text-muted);
   flex-wrap: wrap;
+}
+.breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 .breadcrumb a {
   color: var(--gm-primary);
@@ -147,7 +159,7 @@ body.dark-page .breadcrumb {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 body.dark-page .breadcrumb,
-body.dark-page .breadcrumb-inner { color: rgba(255, 255, 255, 0.6); }
+body.dark-page .breadcrumb-list { color: rgba(255, 255, 255, 0.6); }
 body.dark-page .breadcrumb a { color: #fff; }
 body.dark-page .breadcrumb span[aria-current="page"] { color: #fff; }
 

@@ -20,7 +20,6 @@ const services = Object.entries(SERVICE_NAMES).map(([slug, name]) => ({
 <BaseLayout
   title="Servicios de Seguridad Privada OS-10 en Chile"
   description={`Catálogo de servicios de seguridad privada de GuardMan Chile: guardias OS-10, CCTV, control de accesos, PPI (Protección de Personas Importantes), monitoreo 24/7, el sistema autónomo Guardpod, Ajax Systems Grade 3, auditoría y aseo. Cobertura en ${COVERAGE_PHRASE_LONG}.`}
-  breadcrumb="Servicios"
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Servicios', url: '/servicios' }]}
   showCluster={true}
   clusterType="ubicaciones"
@@ -28,7 +27,7 @@ const services = Object.entries(SERVICE_NAMES).map(([slug, name]) => ({
   <section class="hub-hero" data-od-id="hero">
     <div class="container">
       <h1>Nuestros servicios</h1>
-      <p>Soluciones integrales de seguridad privada con certificación OS-10. Personal entrenado en academia propia, tecnología de origen europeo y la unidad autónoma Guardpod, exclusiva de GuardMan en Chile. Cobertura operativa en 14 comunas: 12 en la Región Metropolitana y 2 en Valparaíso.</p>
+      <p>Soluciones integrales de seguridad privada con certificación OS-10. Personal entrenado en academia propia, tecnología de origen europeo y la unidad autónoma Guardpod, exclusiva de GuardMan en Chile. Cobertura operativa en {COVERAGE_PHRASE_LONG}.</p>
     </div>
   </section>
 

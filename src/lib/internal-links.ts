@@ -296,9 +296,19 @@ export const SERVICE_BRIDGE: Record<string, BridgeLink[]> = {
       note: 'Cómo se define la dotación antes de cotizar.',
     },
     {
+      href: '/guias/cuantos-guardias-para-mi-edificio',
+      label: 'Cuántos guardias para un edificio de oficinas',
+      note: 'La misma dotación, calculada para un destino de oficinas.',
+    },
+    {
       href: '/seguridad-privada/que-puede-hacer-un-guardia',
       label: 'Qué puede y qué no puede hacer un guardia',
       note: 'El alcance legal de la figura que vas a contratar.',
+    },
+    {
+      href: '/seguridad-privada/funciones-guardia-en-condominio',
+      label: 'Funciones de un guardia en condominios',
+      note: 'Qué se le pide a un guardia cuando el sitio es un condominio.',
     },
   ],
   'cctv-videovigilancia': [
@@ -401,6 +411,11 @@ export const SECTOR_BRIDGE: Record<string, BridgeLink[]> = {
       label: 'Cuántos guardias necesita un condominio',
       note: 'El criterio de dotación específico de residencial.',
     },
+    {
+      href: '/seguridad-privada/funciones-guardia-en-condominio',
+      label: 'Funciones de un guardia en condominios',
+      note: 'El alcance del trabajo en un condominio con acceso restringido.',
+    },
   ],
   comercial: [
     {
@@ -412,6 +427,11 @@ export const SECTOR_BRIDGE: Record<string, BridgeLink[]> = {
       href: '/soluciones/edificio-corporativo-cctv-y-aseo',
       label: 'Videovigilancia y aseo para edificios corporativos',
       note: 'La solución para edificios de oficinas.',
+    },
+    {
+      href: '/guias/cuantos-guardias-para-mi-edificio',
+      label: 'Cuántos guardias para un edificio de oficinas',
+      note: 'La dotación de un destino de oficinas por superficie.',
     },
   ],
   industrial: [

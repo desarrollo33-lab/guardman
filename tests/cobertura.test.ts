@@ -48,6 +48,46 @@ describe('cobertura: ningún número escrito a mano', () => {
     expect(offenders.join('\n')).toBe('');
   });
 
+  it('todo "N comunas" sin calificar dice el total real', () => {
+    // El test de arriba solo miraba la forma "N comunas de la Región
+    // Metropolitana". Por ese hueco pasaron seis textos vivos que publicaban
+    // el número equivocado, entre ellos la meta description de las diez
+    // páginas de servicio, el párrafo del hero de /servicios y el encabezado
+    // que anuncia el mapa de /ubicaciones (con 16 marcadores debajo).
+    //
+    // "14" es correcto cuando se refiere a la RM y falso cuando habla del
+    // total, así que la regla tiene que mirar el contexto de la misma línea.
+    const offenders: string[] = [];
+    const re = /(\d{1,2})\s+comunas/gi;
+    for (const file of files) {
+      const lines = readFileSync(file, 'utf8').split('\n');
+      lines.forEach((line, i) => {
+        if (isComment(line)) return;
+        for (const m of line.matchAll(re)) {
+          const n = Number(m[1]);
+          const after = line.slice(m.index + m[0].length);
+          // "14 comunas de la RM" y "2 en Valparaíso" son correctos: se
+          // comparan contra su propia constante, no contra el total.
+          if (/^\s*(de la (Región Metropolitana|RM)|en Valparaíso)/i.test(after)) continue;
+          if (n === COVERAGE_TOTAL) continue;
+          offenders.push(
+            `${file}:${i + 1} dice "${m[0]}" sin calificar (total real: ${COVERAGE_TOTAL})`,
+          );
+        }
+      });
+    }
+    expect(offenders.join('\n')).toBe('');
+  });
+
+  it('ninguna constante de cobertura queda con el número escrito a mano', () => {
+    // Una constante muerta con un número viejo no la ve ningún test de copy:
+    // `STATS.COMUNAS = '14'` convivió meses con 16 comunas reales sin que
+    // nada fallara, porque no se renderizaba. Ya no existe, y este test
+    // falla si alguien la reintroduce para "usarla más adelante".
+    const src = readFileSync('src/lib/constants.ts', 'utf8');
+    expect(src).not.toMatch(/export const STATS\b/);
+  });
+
   it('las constantes de cobertura cuadran entre sí', () => {
     // Si alguien agrega una comuna a la lista y olvida el total, el mismo bug
     // reaparece por otra vía.

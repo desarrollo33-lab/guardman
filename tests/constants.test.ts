@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  SITE, STATS, SERVICE_NAMES, SERVICE_SLUGS, LOCATIONS, LOCATION_SLUGS,
+  SITE, SERVICE_NAMES, SERVICE_SLUGS, LOCATIONS, LOCATION_SLUGS,
   ZONE_CONTEXT, SECTOR_NAMES, SECTOR_TO_SERVICE, API_TIMEOUT_MS, BUNDLE_VERSION,
 } from '../src/lib/constants';
 
@@ -14,10 +14,6 @@ describe('constants', () => {
     expect(SITE.PHONE).toMatch(/\+56/);
     expect(SITE.EMAIL_INFO).toMatch(/@/);
     expect(SITE.FOUNDED_YEAR).toBeGreaterThan(2010);
-  });
-
-  it('STATS has 4 numeric stats', () => {
-    expect(Object.keys(STATS)).toEqual(['GUARDIAS', 'EMPRESAS', 'COMUNAS', 'ANOS']);
   });
 
   it('SERVICE_SLUGS matches SERVICE_NAMES keys', () => {

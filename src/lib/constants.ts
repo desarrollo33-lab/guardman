@@ -46,12 +46,8 @@ export const SITE = {
   ],
 } as const;
 
-export const STATS = {
-  GUARDIAS: '200+',
-  EMPRESAS: '200+',
-  COMUNAS: '14',
-  ANOS: '10+',
-} as const;
+// `STATS` se eliminó (2026-10-03): no lo renderizaba nada y su `COMUNAS: '14'`
+// ya era falso. Las cifras que sí se publican salen de COVERAGE_TOTAL.
 
 export const SERVICE_NAMES: Record<string, string> = {
   'guardias-de-seguridad': 'Guardias de Seguridad',
@@ -68,20 +64,6 @@ export const SERVICE_NAMES: Record<string, string> = {
 };
 
 export const SERVICE_SLUGS = Object.keys(SERVICE_NAMES);
-
-export const SERVICE_DESCRIPTIONS: Record<string, string> = {
-  'guardias-de-seguridad': 'Guardias certificados OS-10 con verificación de antecedentes, rondas preventivas y supervisión nocturna para empresas y condominios en 14 comunas.',
-  'cctv-videovigilancia': 'Cámaras IP HD/4K con visión nocturna, grabación NVR y monitoreo remoto desde nuestro centro de control propio.',
-  'control-de-accesos': 'Lectores biométricos, códigos QR y torniquetes con registro digital de visitantes para edificios corporativos.',
-  'escoltas-privados': 'PPI (Protección de Personas Importantes) con escoltas certificados OS-10, evaluación previa de riesgos y vehículos equipados para protección ejecutiva y traslado de valores.',
-  'monitoreo-24-7': 'Central de vigilancia propia con redundancia de sistemas, análisis en tiempo real y coordinación directa con Carabineros.',
-  'seguridad-eventos': 'Planificación de seguridad personalizada para eventos corporativos, sociales y masivos con control de accesos y aforo.',
-  'seguridad-deportiva': 'Cobertura de seguridad OS-10 para recintos y eventos deportivos: control de acceso por tribuna, vigilancia perimetral, manejo de hinchadas y coordinación con Carabineros.',
-  'seguridad-industrial': 'Vigilancia perimetral con rondas programadas y control de carga para plantas, bodegas y centros de distribución.',
-  'auditoria-seguridad': 'Inspección en terreno de perímetros, CCTV, alarmas e iluminación con informe ejecutivo y plan de acción priorizado.',
-  'guard-pod': 'Sistema autónomo de vigilancia con cámaras 360°, detección de intrusos por IA y monitoreo 24/7 sin infraestructura eléctrica.',
-  aseo: 'Servicio de aseo con personal uniformado, productos certificados y planes diurnos, nocturnos o de fin de semana.',
-};
 
 export const SECTOR_NAMES: Record<string, string> = {
   residencial: 'Residencial',
@@ -196,6 +178,27 @@ export const RM_COMMUNES_LIST = COVERAGE_RM.map((l) => l.name).join(', ');
 
 /** "Los Andes y San Felipe" — lista de Valparaíso, para copy. */
 export const VS_COMMUNES_LIST = COVERAGE_VS.map((l) => l.name).join(' y ');
+
+/**
+ * Descripción corta de cada servicio. Va AQUÍ, y no junto a `SERVICE_NAMES`,
+ * porque la primera entrada deriva el número de cobertura: antes de este
+ * cambio la línea era un string fijo y por eso publicaba "14 comunas" cuando
+ * eran 16. Declararla antes de `COVERAGE_TOTAL` la dejaría en TDZ y el módulo
+ * no cargaría.
+ */
+export const SERVICE_DESCRIPTIONS: Record<string, string> = {
+  'guardias-de-seguridad': `Guardias certificados OS-10 con verificación de antecedentes, rondas preventivas y supervisión nocturna para empresas y residencias en ${COVERAGE_TOTAL} comunas.`,
+  'cctv-videovigilancia': 'Cámaras IP HD/4K con visión nocturna, grabación NVR y monitoreo remoto desde nuestro centro de control propio.',
+  'control-de-accesos': 'Lectores biométricos, códigos QR y torniquetes con registro digital de visitantes para edificios corporativos.',
+  'escoltas-privados': 'PPI (Protección de Personas Importantes) con escoltas certificados OS-10, evaluación previa de riesgos y vehículos equipados para protección ejecutiva y traslado de valores.',
+  'monitoreo-24-7': 'Central de vigilancia propia con redundancia de sistemas, análisis en tiempo real y coordinación directa con Carabineros.',
+  'seguridad-eventos': 'Planificación de seguridad personalizada para eventos corporativos, sociales y masivos con control de accesos y aforo.',
+  'seguridad-deportiva': 'Cobertura de seguridad OS-10 para recintos y eventos deportivos: control de acceso por tribuna, vigilancia perimetral, manejo de hinchadas y coordinación con Carabineros.',
+  'seguridad-industrial': 'Vigilancia perimetral con rondas programadas y control de carga para plantas, bodegas y centros de distribución.',
+  'auditoria-seguridad': 'Inspección en terreno de perímetros, CCTV, alarmas e iluminación con informe ejecutivo y plan de acción priorizado.',
+  'guard-pod': 'Sistema autónomo de vigilancia con cámaras 360°, detección de intrusos por IA y monitoreo 24/7 sin infraestructura eléctrica.',
+  aseo: 'Servicio de aseo con personal uniformado, productos certificados y planes diurnos, nocturnos o de fin de semana.',
+};
 
 /**
  * Frase de cobertura única. Toda mención de cobertura en el sitio debe

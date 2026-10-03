@@ -164,12 +164,23 @@ const heroLead = certified
 <BaseLayout
   title={seoTitle}
   description={seoDescription}
-  breadcrumb={`${svc.name} en ${loc.name}`}
+  // El trail es una cadena de ancestros reales de la URL: home, /servicios,
+  // el servicio, y la página. Antes metía un salto de rama cruzada, la ruta
+  // /ubicaciones de la comuna, entre el servicio y la página: un nivel sin
+  // padre en la ruta que además le daba a esa comuna dos padres distintos.
+  // Google pide un camino típico de usuario, no un espejo del árbol, y este
+  // era el único trail del sitio que no se podía recorrer subiendo un nivel.
+  //
+  // OJO con este comentario: vive DENTRO de la etiqueta de BaseLayout, así que
+  // el compilador lo lee. Cualquier corchete aquí no es texto, es sintaxis: con
+  // una llave el build moría pidiendo un paréntesis, y con un ángulo se comía
+  // la prop breadcrumbs de abajo sin avisar, dejando 160 páginas sin breadcrumb
+  // ni en visible ni en JSON-LD. Por eso las rutas van en prosa. Hay un guard
+  // que lo hace cumplir (tests/breadcrumb.test.ts).
   breadcrumbs={[
     { name: 'Inicio', url: '/' },
     { name: 'Servicios', url: '/servicios' },
     { name: svc.name, url: `/servicios/${serviceSlug}` },
-    { name: loc.name, url: `/ubicaciones/${locationSlug}` },
     { name: `${svc.name} en ${loc.name}`, url: `/servicios/${serviceSlug}/${locationSlug}` },
   ]}
   service={{
@@ -289,7 +300,8 @@ const heroLead = certified
                 <a href={`/servicios/${serviceSlug}/${l.slug}`} class="loc-tag">{l.name}</a>
               ))}
             </div>
-            <div style="margin-top:16px">
+            <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
+              <a href={`/ubicaciones/${locationSlug}`} class="btn btn-outline btn-sm">Cobertura general en {loc.name}</a>
               <a href="/ubicaciones" class="btn btn-outline btn-sm">Explorar mapa de cobertura →</a>
             </div>
           </div>

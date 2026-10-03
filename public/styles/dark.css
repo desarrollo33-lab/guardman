@@ -24,8 +24,11 @@ nav a{color:rgba(255,255,255,.85)!important;font-size:15px!important;font-weight
 /* ── Breadcrumb dark ── */
 [data-od-id="breadcrumb"]{background:#151d2b!important;border-bottom:1px solid var(--gm-border-light)}
 /* Texto sobre fondo oscuro: blanco al 40% queda en #737780/#6a6d71 y da
-   3.76-3.78:1 (falla AA). Al 65% da ~6:1. El 50% ya pasa (5.1:1) y se deja. */
-.breadcrumb-inner{color:rgba(255,255,255,.65)!important}.breadcrumb-inner a{color:rgba(255,255,255,.65)!important}.breadcrumb-inner a:hover{color:var(--accent)!important}.breadcrumb-inner span{color:rgba(255,255,255,.75)!important}.breadcrumb-sep{color:rgba(255,255,255,.35)!important}
+   3.76-3.78:1 (falla AA). Al 65% da ~6:1. El 50% ya pasa (5.1:1) y se deja.
+   `.breadcrumb-list`/`.breadcrumb-item` reemplazan a `.breadcrumb-inner`: el
+   rastro pasó a <ol> con un nivel por <li>. Se maintainen los mismos valores
+   para no cambiar el contraste que se midió. */
+.breadcrumb-list{color:rgba(255,255,255,.65)!important}.breadcrumb-list a{color:rgba(255,255,255,.65)!important}.breadcrumb-list a:hover{color:var(--accent)!important}.breadcrumb-list span[aria-current="page"]{color:rgba(255,255,255,.75)!important}.breadcrumb-sep{color:rgba(255,255,255,.35)!important}
 
 /* ── Section labels ── */
 /* #3B82F6 sobre fondo oscuro da 2.5:1. El azul claro #93C5FD da 8:1 o mas. */

@@ -189,6 +189,119 @@ describe('puentes entre la capa editorial y la comercial', () => {
   });
 });
 
+describe('ningún artículo editorial queda huérfano', () => {
+  // Los tests de arriba verifican dirección SALIENTE: que cada artículo
+  // declare a dónde lleva. Nada verificaba que algo lo llevara a él, y por
+  // eso dos artículosconvivieron con la capa editorial sin ninguna entrada
+  // más que el índice de su sección:
+  //
+  //   /guias/cuantos-guardias-para-mi-edificio
+  //   /seguridad-privada/funciones-guardia-en-condominio
+  //
+  // Declaraban sus propios puentes, pasaban la suite entera, y no eran
+  // alcanzables desde ningún servicio ni sector: las dos cosas que un lector
+  // de un servicio está buscando justo antes de cotizar.
+  //
+  // La entrada mínima es 1 (el índice de sección cuenta): el objetivo no es
+  // repartir PageRank, es que ninguna página exista sólo para Google.
+  const allBridges = [
+    ...Object.values(EDITORIAL_BRIDGE),
+    ...Object.values(SERVICE_BRIDGE),
+    ...Object.values(SECTOR_BRIDGE),
+  ].flat();
+
+  const editorial = [
+    ...GUIDES.map((g) => `/guias/${g.slug}`),
+    ...AUTHORITY_PAGES.map((p) => `/seguridad-privada/${p.slug}`),
+    ...SOLUTIONS.map((s) => `/soluciones/${s.slug}`),
+  ];
+
+  it('cada artículo editorial es destino de al menos un enlace del sitio', () => {
+    // El índice de cada sección ya los enlaza a todos con un `.map` sobre el
+    // catálogo, así que "reachable desde el índice" no distingue nada: sería
+    // una prueba que siempre pasa. Lo que faltaba y faltaba es el enlace
+    // desde la capa comercial. Por eso el criterio es "destino de al menos un
+    // puente": un artículo que solo aparece en su índice no tiene camino
+    // desde el servicio que lojustify.
+    const orphans = editorial.filter(
+      (url) => !allBridges.some((l) => norm(l.href) === url),
+    );
+    expect(orphans).toEqual([]);
+  });
+
+  it('los dos artículos que estaban huérfanos ya tienen entrada desde un puente', () => {
+    // Fijados por nombre: son el caso concreto que motivó este bloque, y un
+    // test genérico que ya no falla no deja ver que volvió a pasar.
+    const mustBeLinked = [
+      '/guias/cuantos-guardias-para-mi-edificio',
+      '/seguridad-privada/funciones-guardia-en-condominio',
+    ];
+    const missing = mustBeLinked.filter(
+      (url) => !allBridges.some((l) => norm(l.href) === url),
+    );
+    expect(missing).toEqual([]);
+  });
+
+  it('ningún artículo editorial se enlaza a sí mismo', () => {
+    const selfLinks: string[] = [];
+    for (const [slug, links] of Object.entries(EDITORIAL_BRIDGE)) {
+      for (const l of links) {
+        if (
+          norm(l.href) === `/guias/${slug}` ||
+          norm(l.href) === `/seguridad-privada/${slug}` ||
+          norm(l.href) === `/soluciones/${slug}`
+        ) {
+          selfLinks.push(`${slug} → ${l.href}`);
+        }
+      }
+    }
+    expect(selfLinks).toEqual([]);
+  });
+});
+
+describe('el grafo entre servicios y comunas es simétrico', () => {
+  // Hay 160 páginas de servicio × comuna. Durante un tiempo el único camino
+  // hacia ellas era /ubicaciones/{comuna}, así que cada comuna llegaba a sus
+  // diez servicios pero ningún servicio bajaba a sus dieciséis comunas:
+  // /servicios/{svc} quedaba como un callejón sin salida hacia abajo, y el
+  // lector que estaba en "Guardias de Seguridad" y elegía su comuna caía en la
+  // cobertura general, perdiendo el servicio que estaba mirando.
+  //
+  // Se comprueba sobre las plantillas, que es donde el enlace se declara. Un
+  // grafo que se rompe por un cambio de href es invisible en revisión visual.
+  const serviceTemplate = readFileSync('src/pages/servicios/[slug].astro', 'utf8');
+  const comboTemplate = readFileSync(
+    'src/pages/servicios/[service]/[location].astro',
+    'utf8',
+  );
+  const locationTemplate = readFileSync('src/pages/ubicaciones/[slug].astro', 'utf8');
+
+  it('la página de servicio baja a sus variantes por comuna', () => {
+    // El href tiene que llevar el slug del SERVICIO, no solo el de la comuna.
+    expect(serviceTemplate).toMatch(/href=\{`\/servicios\/\$\{slug\}\/\$\{l\.slug\}`\}/);
+  });
+
+  it('la página de comuna sube a sus variantes por servicio', () => {
+    expect(locationTemplate).toMatch(/href=\{`\/servicios\/\$\{s\}\/\$\{slug\}`\}/);
+  });
+
+  it('el combo devuelve el camino a la comuna y a sus hermanas', () => {
+    // El breadcrumb ya no mete /ubicaciones/{comuna} (era un salto de rama
+    // cruzada), pero el cuerpo sí tiene que ofrecerlo: es lo que mantiene viva
+    // la entrada desde la capa de servicios hacia la capa de cobertura.
+    expect(comboTemplate).toMatch(/href=\{`\/ubicaciones\/\$\{locationSlug\}`\}/);
+    expect(comboTemplate).toMatch(/href=\{`\/servicios\/\$\{serviceSlug\}\/\$\{l\.slug\}`\}/);
+  });
+
+  it('ninguna plantilla de servicio vuelve a apuntar solo a la comuna genérica', () => {
+    // Si alguien revierte el href a /ubicaciones/{l.slug}, la asimetría
+    // regresa sin que ninguna otra prueba se entere. El patrón mira el href,
+    // no la clase: `class="loc-tag">{l.name}` es idéntico en las dos
+    // versiones y no distingue nada.
+    expect(serviceTemplate).not.toMatch(/href=\{`\/ubicaciones\/\$\{l\.slug\}`\}[^>]*class="loc-tag"/);
+  });
+});
+
 describe('los puentes se renderizan con el widget canónico', () => {
   // El sitio tiene un widget para esto: RelatedLinks. Una versión paralela del
   // mismo markup ya se construyó una vez (`EditorialBridge`) y terminó siendo
