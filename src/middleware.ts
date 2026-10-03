@@ -1,20 +1,25 @@
 // ════════════════════════════════════════════════════════════════
 // GuardMan — Middleware SSR
-//   1. Auth server-side para rutas /admin/* (excepto /admin/login).
+//   1. Host canónico: todo hostname que no sea `guardman.cl` (el alias
+//      `www.` y `*.workers.dev`) responde 301 al canónico, sin servir
+//      contenido. Ver `src/lib/canonical-host.ts` para el porqué.
+//   2. Auth server-side para rutas /admin/* (excepto /admin/login).
 //      Verifica la firma del access token JWT en la cookie httpOnly
 //      `gm_session`. Sin sesión válida → 302 a /admin/login.
-//   2. NO comprimimos en el worker. Cloudflare Workers runtime YA hace
+//   3. NO comprimimos en el worker. Cloudflare Workers runtime YA hace
 //      auto-compression en el edge de forma nativa (gzip/brotli según
 //      `Accept-Encoding` del cliente) y agrega `Content-Encoding` correctamente.
 //      Comprimir acá causa DOBLE compression: el browser descomprime UNA
 //      capa y queda single-gzip sin header → garbage en pantalla.
-//   3. Headers de seguridad en TODAS las respuestas.
-//   4. Vary: Accept-Encoding para que el edge cache respete la codificación.
-//   5. Link headers (RFC 8288) apuntando al manifiesto ARD y a /llms.txt.
+//   4. Headers de seguridad en TODAS las respuestas.
+//   5. Vary: Accept-Encoding para que el edge cache respete la codificación.
+//   6. Link headers (RFC 8288) apuntando al manifiesto ARD y a /llms.txt.
 // ════════════════════════════════════════════════════════════════
 
 import { defineMiddleware } from 'astro:middleware';
 import { verifyJwt } from './lib/auth-server';
+import { canonicalRedirect, needsTrailingSlash } from './lib/canonical-host';
+import { CONTENT_SIGNALS } from './lib/constants';
 
 const SESSION_COOKIE = 'gm_session';
 
@@ -28,6 +33,18 @@ const addSecurityHeaders = (
   origin: string,
 ): Response => {
   const headers = new Headers(response.headers);
+
+  // Charset a nivel HTTP para todo el texto. El sitio es UTF-8 y las páginas
+  // ya lo declaran con <meta charset>, pero según el estándar la cabecera
+  // gana sobre el meta: si el meta se moviera, o una respuesta se sirviera
+  // sin él, los acentos y la ñ se verían rotos. Con `nosniff` ya activo, el
+  // navegador no puede deducirlo, así que conviene declararlo una vez y
+  // listo. El sitio entero es español, no hay variantes con otro charset.
+  if (contentType && !/charset=/i.test(contentType)) {
+    if (/^text\//i.test(contentType) || /^application\/(json|javascript|xml|ld\+json)/i.test(contentType)) {
+      headers.set('Content-Type', `${contentType}; charset=utf-8`);
+    }
+  }
 
   // X-Content-Type-Options: previene MIME sniffing.
   headers.set('X-Content-Type-Options', 'nosniff');
@@ -56,6 +73,16 @@ const addSecurityHeaders = (
     headers.set('Vary', existingVary ? `${existingVary}, Accept-Encoding` : 'Accept-Encoding');
   }
 
+  // Content Signals (spec de Cloudflare/Akamai). La directiva ya estaba en el
+  // cuerpo de robots.txt, pero el header es lo que un crawler lee en la página
+  // concreta: sin él la política `ai-train=no` solo regía el archivo, no el
+  // documento. `search=yes, ai-input=yes` mantiene abierta la citación por
+  // asistentes, que es lo que el cliente pidió; `ai-train=no` cierra el uso para
+  // entrenamiento. Medido 2026-10-03.
+  if (contentType && contentType.includes('text/html')) {
+    headers.set('Content-Signal', CONTENT_SIGNALS);
+  }
+
   // CSP + Link: solo para respuestas HTML.
   if (contentType && contentType.includes('text/html')) {
     headers.set(
@@ -66,7 +93,7 @@ const addSecurityHeaders = (
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: https:",
         "font-src 'self' data:",
-        "connect-src 'self' https://guardman.oficinadesarrollo33.workers.dev https://static.cloudflareinsights.com",
+        "connect-src 'self' https://static.cloudflareinsights.com",
         "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
         "frame-ancestors 'self'",
         "base-uri 'self'",
@@ -99,21 +126,23 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const url = new URL(context.request.url);
   const pathname = url.pathname;
 
+  // ── Host canónico: 301 sin servir contenido ───────────────────
+  // Va PRIMERO, antes de la barra final, para que un enlace a un host no
+  // canónico llegue al canónico en un solo salto en vez de encadenar dos
+  // 301. La normalización de path la hace `canonicalRedirect` con la misma
+  // regla que el bloque siguiente.
+  const redirect = canonicalRedirect(url);
+  if (redirect) {
+    return context.redirect(redirect, 301);
+  }
+
   // ── Trailing slash: una sola forma canónica ─────────────────────
   // El sitio declara barra final salvo la raíz. Las páginas de ruta dinámica ya
   // redirigían solas (307), pero las planas (`/contacto`) servían 200 tanto con
   // barra como sin ella, cada una declarando un canonical distinto. Esto
   // duplicaba 13 URLs. Se normaliza antes de cualquier otra lógica.
   // Verificado contra producción 2026-10-02.
-  const hasExtension = /\.[a-z0-9]+$/i.test(pathname);
-  if (
-    pathname !== '/' &&
-    !pathname.endsWith('/') &&
-    !hasExtension &&
-    // Los assets de /_astro y las rutas de API se sirven tal cual.
-    !pathname.startsWith('/_astro/') &&
-    !pathname.startsWith('/api/')
-  ) {
+  if (needsTrailingSlash(pathname)) {
     return context.redirect(`${pathname}/${url.search}`, 301);
   }
 

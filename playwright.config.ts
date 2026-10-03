@@ -11,7 +11,9 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
-    baseURL: process.env.BASE_URL ?? `http://localhost:${PORT}`,
+    // 127.0.0.1 y no `localhost`: el webServer de abajo binds IPv4, y en Windows
+    // `localhost` resuelve a ::1 primero → ERR_CONNECTION_REFUSED.
+    baseURL: process.env.BASE_URL ?? `http://127.0.0.1:${PORT}`,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },

@@ -43,7 +43,7 @@ const iconMap: Record<string, string> = {
           >
             <span class="nav-item-icon" set:html={iconMap[item.icon]} />
             <span class="nav-item-label">{item.label}</span>
-            {item.id === 'inbox' && <span class="nav-item-badge" data-badge="inbox">3</span>}
+            {item.id === 'inbox' && <span class="nav-item-badge" data-badge="inbox" hidden />}
           </a>
         ))}
       </nav>

@@ -3,12 +3,16 @@
 Snapshot del estado actual del proyecto. v0.1.0 = master baseline. Esta es la única fuente de verdad operativa; el CHANGELOG registra los cambios.
 
 ## Deploy
-- **Worker**: `guardman-astro` → https://guardman-astro.oficinadesarrollo33.workers.dev
+- **Worker**: `guardman-astro` → https://guardman.cl
 - **Cuenta Cloudflare**: oficinadesarrollo33@gmail.com (account ID `b3a89fc9524552b7ab3202269f1ab6f3`)
 - **Stack**: Astro 6 SSR + @astrojs/cloudflare
 - **Build**: `npm run build` (debe correrse antes de `wrangler deploy`)
-- **Deploy**: `npx wrangler deploy`
-- **Custom domain** `guardman.cl`: NO apunta a este worker (responde con `Server: ESF` de Google Sites). `wrangler.jsonc` no tiene `routes` ni `custom_domains` configurado. Pendiente.
+- **Deploy**: `npx wrangler deploy --config dist/server/wrangler.json`
+- **Custom domain** `guardman.cl`: SÍ sirve este worker (conectado a nivel de zona desde el
+  dashboard, por eso `wrangler.jsonc` no tiene `routes` ni `custom_domains`).
+- **Host de servicio apagado**: `workers_dev: false`. El worker no se publica en
+  `*.workers.dev` y `www.guardman.cl` responde 301 al apex. Invariante en
+  `src/lib/canonical-host.ts` + `tests/canonical-host.test.ts`.
 
 ## Tech stack
 - **Frontend SSR**: Astro 6
@@ -84,7 +88,7 @@ astro.config.mjs
 - `/api/health` — health check
 - `/api/leads/*` — captura + gestión
 - `/api/denuncias/*` — creación + estado
-- `/api/guardpod/session`, `/api/guardpod/answer`, `/api/guardpod/answer/batch`, `/api/guardpod/export`, `/api/guardpod/progress`
+- `/api/guardpod/session`, `/api/guardpod/answer`, `/api/guardpod/answer/batch`, `/api/guardpod/export`
 - `/api/analytics/pageview`
 - `/api/admin/session`
 

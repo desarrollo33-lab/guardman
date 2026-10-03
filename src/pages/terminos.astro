@@ -30,7 +30,7 @@ const sections = [
     num: '02',
     icon: 'doc' as const,
     title: 'Sobre este sitio y sus contenidos',
-    intro: 'Las fotos, textos, logos y diseño de guardman.cl son nuestros. Si quieres usar algo con fines comerciales, escríbenos y lo conversamos.',
+    intro: 'Las fotos, textos, logos y diseño de guardman.cl son nuestros. Si desea usar algo con fines comerciales, escríbanos y lo conversamos.',
     note: 'Para uso personal o periodístico no hay problema. Para uso comercial o republicación, necesitamos un visto bueno por escrito.',
   },
   {
@@ -38,21 +38,21 @@ const sections = [
     num: '03',
     icon: 'edit' as const,
     title: 'Si cambiamos este documento',
-    intro: 'Ocasionalmente actualizaremos estos Términos. Cuando el cambio sea importante, te avisaremos por correo electrónico si eres cliente activo, o con un aviso visible en el sitio.',
+    intro: 'Ocasionalmente actualizaremos estos Términos. Cuando el cambio sea importante, le avisaremos por correo electrónico si usted es cliente activo, o con un aviso visible en el sitio.',
   },
   {
     id: 'marco-legal',
     num: '04',
     icon: 'scale' as const,
     title: 'Marco legal',
-    intro: 'Operamos bajo las leyes chilenas, en particular la Ley 21.659 de Seguridad Privada. Si tienes dudas legales sobre el contrato, contáctanos y derivamos con nuestro equipo jurídico.',
+    intro: 'Operamos bajo las leyes chilenas, en particular la Ley 21.659 de Seguridad Privada. Si tiene dudas legales sobre el contrato, comuníquese con nuestro equipo jurídico y derivamos la consulta.',
   },
 ];
 
 const faq = [
   { question: '¿Estos términos aplican al sitio web o también a los servicios contratados?', answer: 'A ambos. Estos Términos regulan el uso de guardman.cl y la contratación de cualquier servicio ofrecido por GuardMan Chile. Cada contrato de servicio puede incluir condiciones comerciales específicas acordadas por escrito.' },
-  { question: '¿Puedo usar fotos o textos de guardman.cl en mi sitio?', answer: 'Para uso personal o periodístico no hay problema. Para uso comercial o republicación, necesitamos un visto bueno por escrito. Escríbenos a ' + SITE.EMAIL_INFO + '.' },
-  { question: '¿Cómo me entero si cambian estos términos?', answer: 'Cuando un cambio sea importante, te avisaremos por correo electrónico si eres cliente activo, o con un aviso visible en el sitio. La fecha de última actualización está al inicio de este documento.' },
+  { question: '¿Puedo usar fotos o textos de guardman.cl en mi sitio?', answer: 'Para uso personal o periodístico no hay problema. Para uso comercial o republicación, necesitamos un visto bueno por escrito. Escríbanos a ' + SITE.EMAIL_INFO + '.' },
+  { question: '¿Cómo me entero si cambian estos términos?', answer: 'Cuando un cambio sea importante, le avisaremos por correo electrónico si usted es cliente activo, o con un aviso visible en el sitio. La fecha de última actualización está al inicio de este documento.' },
   { question: '¿Qué ley aplica a estos términos?', answer: 'Se rige por las leyes de la República de Chile. Cualquier controversia será resuelta por los tribunales competentes de la Región Metropolitana.' },
 ];
 
@@ -66,7 +66,6 @@ const contacto = [
 <BaseLayout
   title="Términos y Condiciones GuardMan Chile"
   description="Términos simples y claros para el uso del sitio web guardman.cl de GuardMan Chile. Sin letra chica."
-  breadcrumb="Términos"
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Términos', url: '/terminos' }]}
   faq={faq}
 >
@@ -128,7 +127,7 @@ const contacto = [
 
       <article class="legal-content" data-od-id="legal-article">
         <p class="legal-intro">
-          Bienvenido a <strong>{SITE.NAME}</strong>. Estos Términos y Condiciones regulan el uso del sitio web <strong>guardman.cl</strong>. Al navegar en este sitio, aceptas estos términos en su totalidad, conforme a la legislación chilena vigente.
+          Bienvenido a <strong>{SITE.NAME}</strong>. Estos Términos y Condiciones regulan el uso del sitio web <strong>guardman.cl</strong>. Al navegar en este sitio, acepta estos términos en su totalidad, conforme a la legislación chilena vigente.
         </p>
 
         {sections.map((s) => (
@@ -177,7 +176,7 @@ const contacto = [
             <div class="legal-section-icon"><Icon name="mail" size={20} /></div>
             <h2>Contacto</h2>
           </header>
-          <p class="legal-section-intro">Para consultas sobre estos términos o cualquier asunto legal, escríbenos a cualquiera de estos canales.</p>
+          <p class="legal-section-intro">Para consultas sobre estos términos o cualquier asunto legal, escríbanos a cualquiera de estos canales.</p>
           <div class="contacto-grid">
             {contacto.map((c) => (
               <article class="contacto-card">
@@ -209,7 +208,7 @@ const contacto = [
   <LeadCTA
     variant="footer"
     title="¿Dudas sobre estos términos?"
-    subtitle="Si tienes preguntas sobre el uso del sitio o el alcance de este documento, escríbenos."
+    subtitle="Si tiene preguntas sobre el uso del sitio o el alcance de este documento, escríbanos."
     primaryText="Escribir al equipo"
     primaryHref={`mailto:${SITE.EMAIL_INFO}?subject=Consulta sobre Términos y Condiciones`}
     secondaryText="Ver Política de Privacidad"

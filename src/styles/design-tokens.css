@@ -18,6 +18,13 @@
   /* Accent on light text — ≥4.5:1 over white (WCAG AA normal text).
      Use for section-label, card-link, step-cta, etc. — not for borders/hovers. */
   --gm-accent-text: #1D4ED8;
+  /* Accent as a BACKGROUND under white text (botones .btn-primary).
+     --gm-accent (#3B82F6) da 3.68:1 con blanco y NO pasa WCAG AA: es el boton
+     de cotizacion, el elemento de conversion mas importante del sitio.
+     #2563EB = 5.17:1 y #1D4ED8 = 6.70:1 (hover). Un tono mas oscuro del mismo
+     azul, sin cambiar el tono de marca. */
+  --gm-accent-strong: #2563EB;
+  --gm-accent-stronger: #1D4ED8;
 
   /* Semantic */
   --gm-success: #10B981;
@@ -31,7 +38,9 @@
 
   /* Text */
   --gm-text: #0D0D0D;
-  --gm-text-muted: #6C757D;
+  /* #6C757D daba 4.45:1 sobre --gm-surface-alt (#F8F9FA): falla AA por 0.05.
+     #5F6A76 da 5.23:1 sobre #F8F9FA y 5.61:1 sobre blanco. */
+  --gm-text-muted: #5F6A76;
   --gm-text-dim: #ADB5BD;
 
   /* Border */
@@ -47,6 +56,12 @@
   --gm-dark-fg: #e8ecf1;
   --gm-dark-fg-muted: #8896ab;
   --gm-dark-fg-dim: #5a6880;
+
+  /* Glass — header / dropdown. --gm-glass-surface is --gm-dark-bg at 92%,
+     --gm-glass-surface-raised is --gm-dark-surface-3 at 96%. */
+  --gm-glass-blur: 16px;
+  --gm-glass-surface: rgba(10, 16, 25, 0.92);
+  --gm-glass-surface-raised: rgba(15, 23, 41, 0.96);
 }
 
 /* ── Border Radius ── */
@@ -141,6 +156,8 @@
   --accent: var(--gm-accent);
   --accent-hover: var(--gm-accent-hover);
   --accent-text: var(--gm-accent-text);
+  --accent-strong: var(--gm-accent-strong);
+  --accent-stronger: var(--gm-accent-stronger);
   --success: var(--gm-success);
   --warning: var(--gm-warning);
   --error: var(--gm-error);

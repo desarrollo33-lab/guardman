@@ -1,7 +1,7 @@
 // Test raw con http2 para controlar EXACTAMENTE los headers
 import http2 from 'node:http2';
 
-const url = process.argv[2] || 'https://guardman-astro.oficinadesarrollo33.workers.dev/?v=rawtest';
+const url = process.argv[2] || 'https://guardman.cl/?v=rawtest';
 
 const cases = [
   { label: 'NO Accept-Encoding', headers: { ':method': 'GET', ':path': new URL(url).pathname + new URL(url).search, ':authority': new URL(url).host, ':scheme': 'https' } },

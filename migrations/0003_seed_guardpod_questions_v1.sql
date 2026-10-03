@@ -5,14 +5,14 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'identidad.nombre_oficial', 'identidad', 1, 1,
-     'text', '¿Cómo se llama el producto en documentos y contratos?', 'Queremos conocer la forma canónica del nombre. Si hay diferencias entre "Guardpod", "GuardPod" o "guard-pod" en distintos documentos, anotalas todas.', 'Ej: Guardpod, GuardPod, guard-pod, o variantes según documento',
+     'text', '¿Cómo se llama el producto en documentos y contratos?', 'Queremos conocer la forma canónica del nombre. Si hay diferencias entre "Guardpod", "GuardPod" o "guard-pod" en distintos documentos, anótelas todas.', 'Ej: Guardpod, GuardPod, guard-pod, o variantes según documento',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'identidad.claim_diferenciador', 'identidad', 1, 2,
-     'textarea', '¿Qué tiene Guardpod que no tiene ningún otro producto similar en Chile?', 'Queremos conocer la razón por la que un cliente elegiría Guardpod por sobre cualquier alternativa. No marketing: la diferencia concreta y verificable. Si la respuesta requiere datos técnicos, dejala a nivel de concepto.', 'Pensá en la última vez que un cliente te dijo "¿y por qué no la otra?". La respuesta que diste es la que va acá.',
+     'textarea', '¿Qué tiene Guardpod que no tiene ningún otro producto similar en Chile?', 'Queremos conocer la razón por la que un cliente elegiría Guardpod por sobre cualquier alternativa. No marketing: la diferencia concreta y verificable. Si la respuesta requiere datos técnicos, déjela a nivel de concepto.', 'Piense en la última vez que un cliente le dijo "¿y por qué no la otra?". La respuesta que dio es la que va aquí.',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -26,7 +26,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'cliente.tres_verticales_top', 'cliente_mercado', 2, 1,
-     'text', '¿Cuáles son los 3 tipos de proyectos donde Guardpod más se vende?', 'Queremos conocer los 3 rubros principales, ordenados por los que más te piden. Los demás se mencionan en la página web solo si hay espacio.', 'Los 3 más pedidos, de mayor a menor',
+     'text', '¿Cuáles son los 3 tipos de proyectos donde Guardpod más se vende?', 'Queremos conocer los 3 rubros principales, ordenados por los que más le piden. Los demás se mencionan en la página web solo si hay espacio.', 'Los 3 más pedidos, de mayor a menor',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -75,7 +75,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'cliente.dolor_principal', 'cliente_mercado', 2, 8,
-     'textarea', '¿Qué es lo que más le preocupa al cliente antes de contratar Guardpod?', 'Queremos conocer el dolor que lo trae. La frase exacta que te dijo cuando preguntó por primera vez.', 'La frase exacta que te dijo el último cliente nuevo',
+     'textarea', '¿Qué es lo que más le preocupa al cliente antes de contratar Guardpod?', 'Queremos conocer el dolor que lo trae. La frase exacta que le dijo cuando preguntó por primera vez.', 'La frase exacta que le dijo el último cliente nuevo',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -96,7 +96,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'cliente.pregunta_frecuente', 'cliente_mercado', 2, 11,
-     'textarea', '¿Cuál es la pregunta que más te hace un cliente antes de firmar?', 'Queremos conocer la pregunta repetida. La que si la respondiéramos bien en la página web, venderíamos más.', 'La pregunta exacta que más te han hecho antes de firmar',
+     'textarea', '¿Cuál es la pregunta que más le hace un cliente antes de firmar?', 'Queremos conocer la pregunta repetida. La que si la respondiéramos bien en la página web, venderíamos más.', 'La pregunta exacta que más le han hecho antes de firmar',
      0, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -110,7 +110,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'prod.que_resuelve', 'producto_cliente', 3, 1,
-     'textarea', '¿Qué problema concreto de un cliente resuelve Guardpod, en sus palabras?', 'Queremos conocer el problema en lenguaje de cliente, no en lenguaje técnico. La frase que el cliente usaría.', 'Lo que el cliente te dijo: "lo que pasa es que en mi obra..."',
+     'textarea', '¿Qué problema concreto de un cliente resuelve Guardpod, en sus palabras?', 'Queremos conocer el problema en lenguaje de cliente, no en lenguaje técnico. La frase que el cliente usaría.', 'Lo que el cliente le dijo: "lo que pasa es que en mi obra..."',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -145,7 +145,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'prod.donde_no_sirve', 'producto_cliente', 3, 6,
-     'textarea', '¿Dónde NO sirve Guardpod? ¿En qué caso el cliente debería mirar otra cosa?', 'Queremos conocer los casos donde Guardpod no aplica. Para no prometer algo que no se puede cumplir y para derivar bien al cliente.', 'Casos reales donde dijiste "mira, para eso te conviene otra cosa"',
+     'textarea', '¿Dónde NO sirve Guardpod? ¿En qué caso el cliente debería mirar otra cosa?', 'Queremos conocer los casos donde Guardpod no aplica. Para no prometer algo que no se puede cumplir y para derivar bien al cliente.', 'Casos reales donde dijo "mira, para eso le conviene otra cosa"',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -159,7 +159,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'prod.frase_testimonio', 'producto_cliente', 3, 8,
-     'textarea', '¿Cuál es la mejor frase real que te dijo un cliente después de usar Guardpod?', 'Queremos conocer la frase textual del cliente. Aunque sea ordinaria, aunque sea mal redactada. Lo que se usa como testimonio.', 'Copia y pega del WhatsApp, mail o conversación. La frase exacta',
+     'textarea', '¿Cuál es la mejor frase real que le dijo un cliente después de usar Guardpod?', 'Queremos conocer la frase textual del cliente. Aunque sea ordinaria, aunque sea mal redactada. Lo que se usa como testimonio.', 'Copia y pega del WhatsApp, mail o conversación. La frase exacta',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -173,7 +173,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'casos.peor_queja', 'casos_vividos', 4, 2,
-     'textarea', '¿Cuál fue la queja más dura que recibiste de un cliente?', 'Queremos conocer la queja real. Aunque duela. La honestidad acá vale más que diez casos de éxito.', 'La queja más dura, la que te hizo pensar "esto no puede repetirse"',
+     'textarea', '¿Cuál fue la queja más dura que recibiste de un cliente?', 'Queremos conocer la queja real. Aunque duela. La honestidad acá vale más que diez casos de éxito.', 'La queja más dura, la que le hizo pensar "esto no puede repetirse"',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -194,7 +194,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'casos.cliente_perdido', 'casos_vividos', 4, 5,
-     'textarea', '¿Por qué el último cliente que NO firmó decidió no avanzar?', 'Queremos conocer la razón real. Lo que el cliente dijo cuando le preguntaste por qué. Aunque incomode.', 'La razón real que te dieron cuando les preguntaste por qué no avanzó',
+     'textarea', '¿Por qué el último cliente que NO firmó decidió no avanzar?', 'Queremos conocer la razón real. Lo que el cliente dijo cuando le preguntó por qué. Aunque incomode.', 'La razón real que le dieron cuando les preguntó por qué no avanzó',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -208,28 +208,28 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'casos.situacion_inusual', 'casos_vividos', 4, 7,
-     'textarea', '¿Tuviste alguna situación inusual o inesperada con un cliente? (positiva o negativa)', 'Queremos conocer los casos atípicos. Los que no encajan en el flujo normal y enseñan algo.', 'Algo que te pasó con un cliente que no te había pasado antes',
+     'textarea', '¿Tuviste alguna situación inusual o inesperada con un cliente? (positiva o negativa)', 'Queremos conocer los casos atípicos. Los que no encajan en el flujo normal y enseñan algo.', 'Algo que le pasó con un cliente que no le había pasado antes',
      0, 0, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'casos.preg_mas_rara', 'casos_vividos', 4, 8,
-     'textarea', '¿Cuál es la pregunta más rara que te hizo un cliente sobre Guardpod?', 'Queremos conocer la pregunta inesperada. Para FAQ y para entender qué mitos circulan.', 'La pregunta que te hizo pensar "¿de dónde sacaron eso?"',
+     'textarea', '¿Cuál es la pregunta más rara que le hizo un cliente sobre Guardpod?', 'Queremos conocer la pregunta inesperada. Para FAQ y para entender qué mitos circulan.', 'La pregunta que le hizo pensar "¿de dónde sacaron eso?"',
      0, 0, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'casos.mito_borrar', 'casos_vividos', 4, 9,
-     'textarea', 'Si pudieras borrar un mito sobre cámaras solares con IA en Chile, ¿cuál sería?', 'Queremos conocer la creencia falsa más repetida. La que te tocó desmentir más veces en reuniones.', 'La frase que más escuchaste tipo "es que dicen que..."',
+     'textarea', 'Si pudieras borrar un mito sobre cámaras solares con IA en Chile, ¿cuál sería?', 'Queremos conocer la creencia falsa más repetida. La que le tocó desmentir más veces en reuniones.', 'La frase que más escuchaste tipo "es que dicen que..."',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'casos.miedo_cliente', 'casos_vividos', 4, 10,
-     'textarea', '¿Cuál es el miedo #1 que tiene un cliente antes de arrendar Guardpod?', 'Queremos conocer la frase que el cliente dijo cuando dudó. La más repetida.', 'Lo que el cliente te dijo cuando estaba por firmar pero se echó para atrás',
+     'textarea', '¿Cuál es el miedo #1 que tiene un cliente antes de arrendar Guardpod?', 'Queremos conocer la frase que el cliente dijo cuando dudó. La más repetida.', 'Lo que el cliente le dijo cuando estaba por firmar pero se echó para atrás',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -243,7 +243,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'comp.heimdal_diferencia', 'competencia', 5, 2,
-     'textarea', '¿Cómo se diferencia Guardpod de su principal competidor?', 'Queremos conocer la diferencia concreta. Hechos verificables. Lo que le dirías a un cliente que te dice "ya cotizamos con ellos".', 'Diferencia concreta, no genérica',
+     'textarea', '¿Cómo se diferencia Guardpod de su principal competidor?', 'Queremos conocer la diferencia concreta. Hechos verificables. Lo que le diría a un cliente que le dice "ya cotizamos con ellos".', 'Diferencia concreta, no genérica',
      1, 0, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -278,28 +278,28 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'comp.objeciones_comunes', 'competencia', 5, 7,
-     'textarea', '¿Las 3 objeciones más comunes de clientes que comparan con la competencia?', 'Queremos conocer las frases que más escuchás cuando el cliente viene comparando.', 'Las frases exactas que te dijeron en reuniones',
+     'textarea', '¿Las 3 objeciones más comunes de clientes que comparan con la competencia?', 'Queremos conocer las frases que más escuchás cuando el cliente viene comparando.', 'Las frases exactas que le dijeron en reuniones',
      0, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'comp.razones_ganar', 'competencia', 5, 8,
-     'textarea', '¿Por qué un cliente elige Guardpod sobre la competencia? Las 3 razones más fuertes.', 'Queremos conocer las razones por las que firmaste los últimos contratos.', 'Las frases textuales que te dijeron al decidir',
+     'textarea', '¿Por qué un cliente elige Guardpod sobre la competencia? Las 3 razones más fuertes.', 'Queremos conocer las razones por las que firmaste los últimos contratos.', 'Las frases textuales que le dijeron al decidir',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'comp.que_practican_ellos', 'competencia', 5, 9,
-     'multiselect', '¿Qué prácticas de la competencia te han tocado enfrentar al vender?', 'Queremos conocer los movimientos reales de la competencia que más se repiten. Para preparar el equipo comercial.', NULL,
+     'multiselect', '¿Qué prácticas de la competencia le han tocado enfrentar al vender?', 'Queremos conocer los movimientos reales de la competencia que más se repiten. Para preparar el equipo comercial.', NULL,
      0, 0, '["Precio más bajo","Descuentos agresivos","Ofrecen guardia gratis los primeros N días","Dicen que Guardpod no es legal","Dicen que la IA no funciona","Ofrecen marca internacional","Otra"]', 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'comp.no_podemos_competir', 'competencia', 5, 10,
-     'textarea', '¿En qué no podemos competir hoy? (Sea por precio, cobertura, capacidad u otro motivo)', 'Queremos conocer los casos donde Guardpod hoy no tiene cómo ganar. Sirve para no prometer lo que no se puede cumplir.', 'Lo que el cliente te pidió y tuviste que decir "no"',
+     'textarea', '¿En qué no podemos competir hoy? (Sea por precio, cobertura, capacidad u otro motivo)', 'Queremos conocer los casos donde Guardpod hoy no tiene cómo ganar. Sirve para no prometer lo que no se puede cumplir.', 'Lo que el cliente le pidió y tuvo que decir "no"',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -313,7 +313,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'pricing.que_paga_competencia', 'pricing', 6, 2,
-     'textarea', '¿Cuánto cobra la competencia por el servicio equivalente?', 'Queremos conocer lo que el mercado está cobrando por cosas similares. Aunque sea estimado.', 'Lo que el cliente te dice que le cobraron los otros',
+     'textarea', '¿Cuánto cobra la competencia por el servicio equivalente?', 'Queremos conocer lo que el mercado está cobrando por cosas similares. Aunque sea estimado.', 'Lo que el cliente le dice que le cobraron los otros',
      0, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -341,21 +341,21 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'ventas.objetor_principal', 'ventas', 7, 1,
-     'textarea', '¿Cuál es la objeción #1 que hay que vencer para cerrar una venta?', 'Queremos conocer la frase exacta que te dijeron y la frase que tú usaste para responderla.', 'La objeción más repetida y la respuesta que diste',
+     'textarea', '¿Cuál es la objeción #1 que hay que vencer para cerrar una venta?', 'Queremos conocer la frase exacta que le dijeron y la frase que usted usó para responderla.', 'La objeción más repetida y la respuesta que diste',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'ventas.truco_cierre', 'ventas', 7, 2,
-     'textarea', '¿Cuál es el truco o argumento que más te ha servido para cerrar ventas complicadas?', 'Queremos conocer lo que dices cuando el cliente duda y está a punto de decir que no. Lo que funciona.', 'La frase o movimiento que usaste cuando el cliente se iba sin firmar',
+     'textarea', '¿Cuál es el truco o argumento que más le ha servido para cerrar ventas complicadas?', 'Queremos conocer lo que dices cuando el cliente duda y está a punto de decir que no. Lo que funciona.', 'La frase o movimiento que usaste cuando el cliente se iba sin firmar',
      1, 0, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'ventas.cuando_cliente_calla', 'ventas', 7, 3,
-     'textarea', '¿Qué hacés cuando un cliente deja de responder?', 'Queremos conocer el seguimiento. Cuántos intentos, qué dices, cuándo das por perdido.', 'El proceso de follow-up que usás',
+     'textarea', '¿Qué hace cuando un cliente deja de responder?', 'Queremos conocer el seguimiento. Cuántos intentos, qué dices, cuándo das por perdido.', 'El proceso de follow-up que usa',
      0, 0, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -383,7 +383,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'legal.permisos_cliente', 'legal', 9, 2,
-     'textarea', '¿El cliente necesita algún permiso para instalar Guardpod en su terreno?', 'Queremos conocer si la instalación es libre o requiere algo.', 'Lo que le explicás al cliente cuando pregunta',
+     'textarea', '¿El cliente necesita algún permiso para instalar Guardpod en su terreno?', 'Queremos conocer si la instalación es libre o requiere algo.', 'Lo que le explica al cliente cuando pregunta',
      0, 0, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -404,7 +404,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'vis.vision_3_anios', 'vision', 9, 1,
-     'textarea', '¿Cómo te imaginás Guardpod en 3 años?', 'Queremos conocer la visión cruda. Cifras, geografías, productos concretos.', 'Lo que le dirías a un socio escéptico en 60 segundos',
+     'textarea', '¿Cómo imaginaría Guardpod dentro de 3 años?', 'Queremos conocer la visión cruda. Cifras, geografías, productos concretos.', 'Lo que le diría a un socio escéptico en 60 segundos',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,

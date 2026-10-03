@@ -76,7 +76,13 @@ export const POST: APIRoute = async ({ request }) => {
     const valueText = a.value === null || a.value === undefined
       ? null
       : (typeof a.value === 'string' ? a.value : JSON.stringify(a.value));
-    const isEmpty = valueText === null || valueText === '' || valueText === 'null';
+    // "[]" = multiselect marcado y desmarcado. Contaba como respondida.
+    const isEmpty =
+      valueText === null ||
+      valueText === '' ||
+      valueText === 'null' ||
+      valueText === '[]' ||
+      valueText === '{}';
 
     if (isEmpty) {
       await db
@@ -123,16 +129,36 @@ export const POST: APIRoute = async ({ request }) => {
     .bind(session.active_version)
     .first<{ total: number }>();
   const answeredRes = await db
-    .prepare('SELECT COUNT(*) AS answered FROM guardpod_answers WHERE session_id = ? AND answer_text IS NOT NULL AND answer_text <> ""')
-    .bind(body.session_id)
+    .prepare(
+      `SELECT COUNT(*) AS answered
+         FROM guardpod_answers a
+         JOIN guardpod_questions q
+           ON q.question_key = a.question_key
+          AND q.version = ?
+        WHERE a.session_id = ?
+          AND a.answer_text IS NOT NULL
+          AND TRIM(a.answer_text) <> ''
+          AND a.answer_text <> '[]'
+          AND a.answer_text <> '{}'`,
+    )
+    .bind(session.active_version, body.session_id)
     .first<{ answered: number }>();
   const total = totalRes?.total ?? 0;
   const answered = answeredRes?.answered ?? 0;
   const pct = total > 0 ? Math.round((answered / total) * 1000) / 10 : 0;
 
   await db
-    .prepare('UPDATE guardpod_sessions SET progress_pct = ?, answered_count = ?, total_questions = ?, last_activity = ? WHERE id = ?')
-    .bind(pct, answered, total, now, body.session_id)
+    .prepare(
+      `UPDATE guardpod_sessions
+          SET progress_pct = ?, answered_count = ?, total_questions = ?, last_activity = ?,
+              completed_at = CASE
+                WHEN ? >= 100 AND completed_at IS NULL
+                  THEN strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+                ELSE completed_at
+              END
+        WHERE id = ?`,
+    )
+    .bind(pct, answered, total, now, pct, body.session_id)
     .run();
 
   return json({ ok: true, saved, skipped, saved_at: now, progress_pct: pct, answered_count: answered, total_questions: total });

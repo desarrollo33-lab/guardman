@@ -28,7 +28,6 @@ export const prerender = false;
 const ALLOWED_ORIGINS = new Set([
   'https://guardman.cl',
   'https://www.guardman.cl',
-  'https://guardman-astro.oficinadesarrollo33.workers.dev',
   'http://localhost:4321',
   'http://127.0.0.1:4321',
 ]);
@@ -156,7 +155,7 @@ export const POST: APIRoute = async ({ request }) => {
       ok: true,
       id,
       message:
-        'Denuncia registrada. Guarda tu ID de seguimiento para consultar el estado.',
+        'Denuncia registrada. Guarde su ID de seguimiento para consultar el estado.',
       contacto: { sitio: SITE.NAME, email: SITE.EMAIL_INFO },
     },
     201,

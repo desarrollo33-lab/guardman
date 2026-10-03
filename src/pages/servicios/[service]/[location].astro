@@ -3,11 +3,13 @@
 // Genera 9 servicios × 14 ubicaciones = 126 páginas estáticas.
 // Estructura idéntica al live: hero + contenido (con blocks) + block-related.
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { SERVICE_NAMES, LOCATIONS, SITE, ZONE_CONTEXT } from '../../../lib/constants';
+import { SERVICE_NAMES, LOCATIONS, SITE, ZONE_CONTEXT, serviceTitleName, serviceNameInSentence } from '../../../lib/constants';
 import { SERVICES, LOCATIONS as LOC_CONTENT } from '../../../lib/content';
 import { SERVICE_ICONS } from '../../../lib/icons';
 import Icon from '../../../components/Icon.astro';
 import StaffSection from '../../../components/StaffSection.astro';
+import RelatedLinks from '../../../components/RelatedLinks.astro';
+import { SERVICE_BRIDGE, bridgeItems } from '../../../lib/internal-links';
 
 export const prerender = true;
 
@@ -136,19 +138,30 @@ const otrosServicios = Object.entries(SERVICE_NAMES)
   .slice(0, 3)
   .map(([s, n]) => ({ slug: s, name: n }));
 
-// Otras comunas donde se ofrece este servicio
-const otrasUbicaciones = LOCATIONS.filter((l) => l.slug !== locationSlug).slice(0, 8);
+// Otras comunas donde se ofrece este servicio.
+// Sin truncar: con `.slice(0, 8)` las 7 comunas finales (Vitacura, Conchalí,
+// Pudahuel, Renca, La Pintana, Los Andes, San Felipe) nunca aparecían en el
+// listado de ninguna página hermana, así que sus 42 páginas servicio×comuna
+// quedaban con un solo enlace entrante —el de su página de comuna—. La lista
+// completa además hace simétrico el vínculo entre hermanas.
+const otrasUbicaciones = LOCATIONS.filter((l) => l.slug !== locationSlug);
 
 // OS-10 / central de monitoreo / Guardpod solo aplican a servicios de
 // vigilancia. Para aseo se emiten título, descripción y hero propios.
 // Verificado 2026-10-02.
+//
+// El title usa `serviceTitleName` (nombre corto) y no `svc.name`: con la comuna
+// más larga y la marca, "PPI (Protección de Personas Importantes) en Santiago
+// Centro con Certificación OS-10 GuardMan Chile" daba 78 caracteres y Google
+// cortaba antes de la comuna, que es justo la keyword que trae la búsqueda.
+// El H1 de más abajo sigue con el nombre completo. Ver `TITLE_MAX` en lib/seo.
 const certified = svc.certified !== false;
 const seoTitle = certified
-  ? `${svc.name} en ${loc.name} con Certificación OS-10`
-  : `${svc.name} en ${loc.name}`;
+  ? `${serviceTitleName(serviceSlug)} en ${loc.name} OS-10`
+  : `${serviceTitleName(serviceSlug)} en ${loc.name}`;
 const seoDescription = certified
-  ? `${svc.name} en ${loc.name} con certificación OS-10. Personal propio, central de monitoreo 24/7 y unidades Guardpod disponibles para esta comuna de la zona ${loc.zone}. Cotización en 24 horas.`
-  : `${svc.shortDesc} en ${loc.name}, zona ${loc.zone}. Personal uniformado con supervisor de terreno, productos certificados y reporte mensual. Cotización en 24 horas.`;
+  ? `${svc.name} en ${loc.name} con certificación OS-10. Central de monitoreo 24/7 y unidades Guardpod. Cotización en 24 horas.`
+  : `${svc.shortDesc} en ${loc.name}, zona ${loc.zone}. Personal uniformado y reporte mensual. Cotización en 24 horas.`;
 const heroLead = certified
   ? `GuardMan Chile ofrece ${svc.shortDesc.toLowerCase()} en ${loc.name} con monitoreo 24/7, guardias certificados OS-10 y el sistema autónomo Guardpod para faenas y perímetros sin infraestructura. Cobertura operativa en la zona ${loc.zone}.`
   : `GuardMan Chile ofrece ${svc.shortDesc.toLowerCase()} en ${loc.name}, con personal uniformado, productos certificados y supervisión de terreno. Cobertura operativa en la zona ${loc.zone}.`;
@@ -157,12 +170,23 @@ const heroLead = certified
 <BaseLayout
   title={seoTitle}
   description={seoDescription}
-  breadcrumb={`${svc.name} en ${loc.name}`}
+  // El trail es una cadena de ancestros reales de la URL: home, /servicios,
+  // el servicio, y la página. Antes metía un salto de rama cruzada, la ruta
+  // /ubicaciones de la comuna, entre el servicio y la página: un nivel sin
+  // padre en la ruta que además le daba a esa comuna dos padres distintos.
+  // Google pide un camino típico de usuario, no un espejo del árbol, y este
+  // era el único trail del sitio que no se podía recorrer subiendo un nivel.
+  //
+  // OJO con este comentario: vive DENTRO de la etiqueta de BaseLayout, así que
+  // el compilador lo lee. Cualquier corchete aquí no es texto, es sintaxis: con
+  // una llave el build moría pidiendo un paréntesis, y con un ángulo se comía
+  // la prop breadcrumbs de abajo sin avisar, dejando 160 páginas sin breadcrumb
+  // ni en visible ni en JSON-LD. Por eso las rutas van en prosa. Hay un guard
+  // que lo hace cumplir (tests/breadcrumb.test.ts).
   breadcrumbs={[
     { name: 'Inicio', url: '/' },
     { name: 'Servicios', url: '/servicios' },
     { name: svc.name, url: `/servicios/${serviceSlug}` },
-    { name: loc.name, url: `/ubicaciones/${locationSlug}` },
     { name: `${svc.name} en ${loc.name}`, url: `/servicios/${serviceSlug}/${locationSlug}` },
   ]}
   service={{
@@ -194,7 +218,7 @@ const heroLead = certified
         <h1>{svc.name} en {loc.name}</h1>
         <p>{heroLead}</p>
         <div class="detail-hero-ctas">
-          <a href="/cotizacion" class="btn btn-primary">Cotizar ahora</a>
+          <a href="/cotizacion" class="btn btn-primary">Cotizar para mi propiedad</a>
           <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light"><Icon name="phone" size={16} /> {SITE.PHONE}</a>
         </div>
       </div>
@@ -222,7 +246,7 @@ const heroLead = certified
             {coveragePoints.length > 0 ? (
               <>
                 <p>
-                  La operación de {svc.name.toLowerCase()} en {loc.name} se concentra en los
+                  La operación de {serviceNameInSentence(svc.name)} en {loc.name} se concentra en los
                   siguientes puntos, que son los que definen la cobertura en esta comuna:
                 </p>
                 <ul class="coverage-list">
@@ -234,7 +258,7 @@ const heroLead = certified
             ) : (
               <>
                 <p>
-                  En {loc.name} operamos en el marco general de {svc.name.toLowerCase()}, sin
+                  En {loc.name} operamos en el marco general de {serviceNameInSentence(svc.name)}, sin
                   una especialización distinta a la del resto de la zona. Lo que sí es
                   específico de esta comuna son las condiciones que enfrentamos en el sitio:
                 </p>
@@ -248,7 +272,7 @@ const heroLead = certified
           </div>
 
           <div class="block" data-od-id="block-features">
-            <h2>Por qué elegir {svc.name.toLowerCase()} en {loc.name}</h2>
+            <h2>Por qué elegir {svc.name} en {loc.name}</h2>
             <div class="detail-features-grid">
               {comboFeatures.map((f) => (
                 <div class="detail-feature-item">
@@ -282,7 +306,8 @@ const heroLead = certified
                 <a href={`/servicios/${serviceSlug}/${l.slug}`} class="loc-tag">{l.name}</a>
               ))}
             </div>
-            <div style="margin-top:16px">
+            <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
+              <a href={`/ubicaciones/${locationSlug}`} class="btn btn-outline btn-sm">Cobertura general en {loc.name}</a>
               <a href="/ubicaciones" class="btn btn-outline btn-sm">Explorar mapa de cobertura →</a>
             </div>
           </div>
@@ -298,14 +323,21 @@ const heroLead = certified
               ))}
             </div>
           </div>
+
+          <RelatedLinks
+            items={bridgeItems(SERVICE_BRIDGE[serviceSlug])}
+            title="Antes de contratar este servicio"
+            subtitle="Lo que conviene revisar antes de decidir, independiente de quién lo ejecute."
+            odId="block-bridge"
+          />
         </div>
 
         <aside data-od-id="sidebar">
           <div class="sidebar-sticky">
             <div class="sidebar-cta-top">
               <h3>Cotice este servicio</h3>
-              <a href="/cotizacion" class="btn btn-primary">Cotizar ahora</a>
-              <a href="/contacto" class="btn btn-outline">Hablar con un experto</a>
+              <a href="/cotizacion" class="btn btn-primary">Cotizar para mi propiedad</a>
+              <a href="/contacto" class="btn btn-outline">Enviar mi consulta</a>
             </div>
             <div class="sidebar-body">
               <div class="sb-section">
@@ -351,9 +383,9 @@ const heroLead = certified
 
   <section class="bg-dark cta-section-detail" data-od-id="block-cta">
     <div class="container" style="text-align:center">
-      <h2 class="section-title" style="color:#fff">Cotice {svc.name.toLowerCase()} en {loc.name}</h2>
+      <h2 class="section-title" style="color:#fff">Cotice {serviceNameInSentence(svc.name)} en {loc.name}</h2>
       <p class="section-subtitle" style="color:rgba(255,255,255,.7)">Evaluación gratuita sin compromiso. Cubrimos toda la comuna con respuesta coordinada.</p>
-      <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+      <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar para mi propiedad</a>
     </div>
   </section>
 </BaseLayout>

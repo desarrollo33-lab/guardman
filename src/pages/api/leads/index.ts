@@ -21,7 +21,6 @@ interface D1Database { prepare(query: string): D1PreparedStatement; }
 const ALLOWED_ORIGINS = new Set([
   'https://guardman.cl',
   'https://www.guardman.cl',
-  'https://guardman-astro.oficinadesarrollo33.workers.dev',
   'http://localhost:4321',
   'http://127.0.0.1:4321',
 ]);
@@ -102,7 +101,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       `SELECT id, created_at, updated_at, name, email, phone, company,
               service, location, sector, property_type, guards_count,
               message, status, priority, source, value,
-              assigned_to, owner_email
+              assigned_to
          FROM leads
          ${whereClause}
          ORDER BY created_at DESC

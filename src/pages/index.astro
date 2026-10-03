@@ -2,13 +2,15 @@
 // Homepage v4.0 — Optimizada para captura de leads.
 // Hero persuasivo + trust signals + cómo funciona + CTA inline + cluster.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SERVICE_NAMES, LOCATIONS, ZONE_COLORS, FAQ_HOME, SITE, COVERAGE_PHRASE_LONG, COVERAGE_PHRASE_TOTAL } from '../lib/constants';
+import { SERVICE_NAMES, LOCATIONS, ZONE_COLORS, FAQ_HOME, SITE, COVERAGE_TOTAL, COVERAGE_PHRASE_LONG, COVERAGE_PHRASE_TOTAL, RM_COMMUNES_LIST, VS_COMMUNES_LIST, IMAGE_VERSION } from '../lib/constants';
 import { ICONS, SERVICE_ICONS } from '../lib/icons';
 import { SERVICES, ZONAS } from '../lib/content';
 import Icon from '../components/Icon.astro';
 import LeadCTA from '../components/LeadCTA.astro';
 import TrustSignals from '../components/TrustSignals.astro';
 import HowItWorks from '../components/HowItWorks.astro';
+import { GUIDES } from '../lib/guias';
+import RelatedLinks from '../components/RelatedLinks.astro';
 
 // srcset only when source >= 732w; small assets (<500w) ship as-is
 // (re-encoding makes them larger — verified via sharp).
@@ -39,6 +41,37 @@ const nosotrosFeatures = [
   { title: 'Personal certificado OS-10' },
   { title: 'Centro de monitoreo propio' },
   { title: 'Cobertura regional amplia' },
+];
+
+// Bloque editorial de la home. La home enlazaba a 19 páginas de servicio y a
+// cero de guías, marco legal o soluciones: la capa que explica el marco de
+// contratación era invisible desde el punto de entrada del sitio, y se conocía
+// sobre todo desde búsqueda. Las cuatro guías son las de mayor intención
+// ("cuántos guardias", "cómo elegir"): son las que un comprador lee antes de
+// pedir una cotización, y las que lo devuelven a la página cuando decide.
+//
+// Los items se arman aquí y no en `internal-links.ts` porque son enlaces de
+// navegación desde la home, no puentes entre capas: el puente editorial ya vive
+// en el mapa y se inyecta desde cada artículo.
+const homeEditorial = [
+  ...GUIDES.map((g) => ({
+    url: `/guias/${g.slug}`,
+    name: g.title,
+    desc: g.metaDescription,
+    icon: 'book',
+  })),
+  {
+    url: '/seguridad-privada',
+    name: 'Marco legal de la seguridad privada',
+    desc: 'Qué exige la Ley 21.659, qué es la certificación OS-10 y qué puede o no puede hacer un guardia.',
+    icon: 'scale',
+  },
+  {
+    url: '/soluciones',
+    name: 'Soluciones integradas',
+    desc: 'Seguridad y mantención bajo un mismo responsable: condominios, oficinas, centros comerciales, obras y eventos.',
+    icon: 'users',
+  },
 ];
 
 const guardPodFeatures = [
@@ -83,14 +116,14 @@ const markers = LOCATIONS.map((l) => {
   <!-- HERO -->
   <section class="hero" data-od-id="hero">
     <div class="hero-bg">
-      <img src="/images/hero-824.webp"
-           srcset="/images/hero-480.webp 480w,
-                   /images/hero-824.webp 824w,
-                   /images/hero-1280.webp 1280w,
-                   /images/hero-1920.webp 1920w"
+      <img src={`/images/hero-824.webp?v=${IMAGE_VERSION}`}
+           srcset={`/images/hero-480.webp?v=${IMAGE_VERSION} 480w,
+                   /images/hero-824.webp?v=${IMAGE_VERSION} 824w,
+                   /images/hero-1280.webp?v=${IMAGE_VERSION} 1280w,
+                   /images/hero-1920.webp?v=${IMAGE_VERSION} 1920w`}
            sizes="100vw"
            alt="Seguridad Privada GuardMan Chile — Guardias OS-10"
-           fetchpriority="high" decoding="sync" width="1920" height="1080"
+           fetchpriority="high" decoding="async" width="1920" height="1080"
            onerror="this.style.display='none'" />
       <div class="hero-bg-overlay"></div>
     </div>
@@ -99,12 +132,12 @@ const markers = LOCATIONS.map((l) => {
         <Icon name="shield" size={14} />
         Certificación OS-10 · Ley 21.659
       </div>
-      <h1>Seguridad Privada Profesional en Santiago de Chile</h1>
-      <p class="hero-lead">Proteja su empresa, condominio o evento con <strong>guardias certificados OS-10</strong>, monitoreo propio 24/7 y el sistema autónomo <strong>Guardpod</strong>, una tecnología exclusiva en el mercado chileno. Más de 10 años de experiencia, 200+ guardias certificados y cobertura en {COVERAGE_PHRASE_LONG}.</p>
+      <h1>Guardia OS-10 y vigilancia autónoma en {COVERAGE_TOTAL} comunas</h1>
+      <p class="hero-lead">Guardias con certificación OS-10, una central de monitoreo propia y el <strong>Guardpod</strong>, que vigila sin guardia en terreno. La misma empresa responde por las tres cosas.</p>
       <div class="hero-ctas">
         <a href="/cotizacion" class="btn btn-primary btn-lg">
           <Icon name="shield" size={16} />
-          Solicitar Cotización
+          Cotizar para mi propiedad
         </a>
         <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg">
           <Icon name="phone" size={16} />
@@ -139,7 +172,11 @@ const markers = LOCATIONS.map((l) => {
         </a>
       </div>
       <div class="split-image">
-        <img src="/images/nosotros_seccion.webp" alt="Equipo GuardMan" loading="lazy" decoding="async" width="640" height="480" onerror="this.style.display='none'" />
+        <img src={`/images/nosotros_seccion.webp?v=${IMAGE_VERSION}`}
+             srcset={`/images/nosotros_seccion-560.webp?v=${IMAGE_VERSION} 560w,
+                     /images/nosotros_seccion.webp?v=${IMAGE_VERSION} 824w`}
+             sizes="(min-width: 1024px) 552px, 100vw"
+             alt="Equipo GuardMan" loading="lazy" decoding="async" width="824" height="558" onerror="this.style.display='none'" />
         <div class="split-image-badge">Conoce GuardMan</div>
       </div>
     </div>
@@ -153,7 +190,7 @@ const markers = LOCATIONS.map((l) => {
     variant="inline"
     title="¿Listo para proteger su propiedad?"
     subtitle="Reciba una propuesta personalizada sin compromiso. Nuestro equipo comercial le contacta en menos de 24 horas hábiles con un plan diseñado a su medida."
-    primaryText="Solicitar Cotización"
+    primaryText="Cotizar para mi propiedad"
   />
 
   <!-- SERVICIOS -->
@@ -167,13 +204,13 @@ const markers = LOCATIONS.map((l) => {
           <a href={`/servicios/${s.slug}`} class="card">
             <div class="card-image">
               <img
-                src={s.hasSrcset ? `/images/service-${s.slug}-732.webp` : `/images/service-${s.slug}.webp`}
-                srcset={s.hasSrcset ? `/images/service-${s.slug}-400.webp 400w, /images/service-${s.slug}-732.webp 732w` : undefined}
+                src={s.hasSrcset ? `/images/service-${s.slug}-732.webp?v=${IMAGE_VERSION}` : `/images/service-${s.slug}.webp?v=${IMAGE_VERSION}`}
+                srcset={s.hasSrcset ? `/images/service-${s.slug}-400.webp?v=${IMAGE_VERSION} 400w, /images/service-${s.slug}-732.webp?v=${IMAGE_VERSION} 732w` : undefined}
                 sizes={s.hasSrcset ? "(min-width: 768px) 366px, 100vw" : undefined}
                 alt={s.name}
                 loading="lazy" decoding="async"
                 width="400" height="240"
-                onerror="this.src='/images/hero-1280.webp';this.onerror=null" />
+                onerror={`this.src='/images/hero-1280.webp?v=${IMAGE_VERSION}';this.onerror=null`} />
             </div>
             <div class="card-body">
               <div class="card-icon">
@@ -196,10 +233,10 @@ const markers = LOCATIONS.map((l) => {
   <section class="bg-dark" data-od-id="guardpod">
     <div class="container split">
       <div>
-        <span class="section-label">Tecnología exclusiva GuardMan</span>
-        <h2 class="section-title">Guardpod, la guardia virtual autónoma que ninguna otra seguridad ofrece en Chile</h2>
+        <span class="section-label">Guardpod</span>
+        <h2 class="section-title">Vigilancia autónoma donde no hay quién camine</h2>
         <p class="dark-intro">
-          Vigilancia autónoma con cámaras 360° e IA, sin conexión eléctrica ni internet fijo. Protege faenas, estacionamientos, condominios y eventos 24/7, a una fracción del costo de un guardia presencial. Único en Chile operado por una empresa de seguridad.
+          Cámaras 360° con IA, sin conexión eléctrica ni internet fijo. Protege faenas, estacionamientos, condominios y eventos durante las 24 horas, y cubre los horarios en que un guardia presencial no alcanza. En Chile lo operamos nosotros como empresa de seguridad, que es lo que permite que la respuesta en terreno siga siendo nuestra.
         </p>
         <div class="stat-strip" role="list">
           <div class="stat-cell" role="listitem">
@@ -234,7 +271,7 @@ const markers = LOCATIONS.map((l) => {
       <div class="split-image">
         <video
           src="/videos/guardpod-home.mp4"
-          poster="/videos/guardpod-home-poster.webp"
+          poster={`/videos/guardpod-home-poster.webp?v=${IMAGE_VERSION}`}
           width="1280"
           height="720"
           loop
@@ -287,7 +324,7 @@ const markers = LOCATIONS.map((l) => {
         {sectors.map((s) => (
           <a href={`/sectores/${s.slug}`} class="card">
             <div class="card-image" style="position:relative;background:var(--primary);overflow:hidden">
-              <img src={`/images/sector-${s.slug}.webp`} alt={s.name} loading="lazy" decoding="async" width="400" height="240" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+              <img src={`/images/sector-${s.slug}.webp?v=${IMAGE_VERSION}`} alt={s.name} loading="lazy" decoding="async" width="400" height="225" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
               <div style="display:none;align-items:center;justify-content:center;width:100%;height:100%;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:1.4rem;font-weight:700;position:absolute;top:0;left:0">{s.name}</div>
             </div>
             <div class="card-body">
@@ -299,6 +336,21 @@ const markers = LOCATIONS.map((l) => {
         ))}
       </div>
     </div>
+  </section>
+
+  <!-- EDITORIAL: guías de contratación, marco legal y soluciones.
+       Va entre "sectores" y "ajax" porque es el punto donde el visitante ya
+       sabe qué protegemos y todavía no ha decidido con quién: ahí la pregunta
+       natural es "¿cómo elijo a la empresa?", no "¿qué producto tienen?".
+       Usa el widget RelatedLinks como el resto de los clusters del sitio,
+       en vez de un grid de cards propio. -->
+  <RelatedLinks
+    items={homeEditorial}
+    title="Cómo elegir una empresa de seguridad"
+    subtitle="Publicamos lo que le exigimos a cualquier proveedor. Sirve igual para evaluarnos a nosotros."
+    odId="guias"
+  />
+
   </section>
 
   <!-- AJAX SYSTEMS (dark split) -->
@@ -326,7 +378,14 @@ const markers = LOCATIONS.map((l) => {
         </a>
       </div>
       <div class="split-image">
-        <img src="/images/Ajax-systems-header.jpg" alt="Ajax Systems" loading="lazy" decoding="async" width="640" height="360" onerror="this.style.display='none'" />
+        <img src="/images/Ajax-systems-header-960.webp"
+             srcset="/images/Ajax-systems-header-640.webp 640w,
+                     /images/Ajax-systems-header-960.webp 960w,
+                     /images/Ajax-systems-header-1280.webp 1280w,
+                     /images/Ajax-systems-header.webp 1920w"
+             sizes="(min-width: 1024px) 552px, 100vw"
+             alt="Ajax Systems" loading="lazy" decoding="async" width="960" height="319"
+             onerror="this.style.display='none'" />
         <div class="split-image-badge">Instalador Oficial</div>
       </div>
     </div>
@@ -345,16 +404,16 @@ const markers = LOCATIONS.map((l) => {
           Ley 21.659
         </div>
       </div>
-      <h2 class="section-title" style="text-align:center;max-width:700px;margin:0 auto 12px">Protección profesional para su tranquilidad</h2>
-      <p class="section-subtitle" style="text-align:center;max-width:600px;margin:0 auto 28px">Más de 10 años protegiendo empresas y residencias con guardias certificados, tecnología propia y atención personalizada de un equipo que conoce su comuna.</p>
+      <h2 class="section-title" style="text-align:center;max-width:700px;margin:0 auto 12px">Su propiedad, con nombre y dirección</h2>
+      <p class="section-subtitle" style="text-align:center;max-width:600px;margin:0 auto 28px">Atendemos {COVERAGE_TOTAL} communes con equipos propios de la zona, no con personal rotado desde otra comuna.</p>
       <div style="text-align:center;margin-bottom:48px">
-        <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar para mi propiedad</a>
         <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg" style="margin-left:12px">Llamar al {SITE.PHONE}</a>
       </div>
       <hr style="border:0;border-top:1px solid rgba(255,255,255,.1);margin:0 0 48px" />
       <span class="section-label">Cobertura regional</span>
       <h2 class="section-title">Presencia en {COVERAGE_PHRASE_LONG}</h2>
-      <p class="section-subtitle">Atendemos en Las Condes, Vitacura, Lo Barnechea, La Reina, Santiago Centro, Huechuraba, Quilicura, Conchalí, Pudahuel, Renca, Lampa y La Pintana, además de Los Andes y San Felipe. Cobertura operativa con respuesta coordinada entre zonas.</p>
+      <p class="section-subtitle">Atendemos en {RM_COMMUNES_LIST}, además de {VS_COMMUNES_LIST}. Cobertura operativa con respuesta coordinada entre zonas.</p>
 
       <div class="coverage-split" style="margin-top:28px">
         <div class="coverage-zones">
@@ -393,6 +452,6 @@ const markers = LOCATIONS.map((l) => {
     variant="footer"
     title="Hablemos de su seguridad"
     subtitle="Nuestro equipo comercial está disponible 24/7 para responder consultas y diseñar una solución a su medida. Cotización personalizada en menos de 24 horas hábiles."
-    primaryText="Solicitar Cotización"
+    primaryText="Cotizar para mi propiedad"
   />
 </BaseLayout>

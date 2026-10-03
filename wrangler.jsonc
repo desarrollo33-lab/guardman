@@ -10,6 +10,13 @@
   "main": "@astrojs/cloudflare/entrypoints/server",
   "compatibility_date": "2026-06-01",
   "compatibility_flags": ["nodejs_compat"],
+  // El sitio se publica SOLO en guardman.cl (y su alias www, que 301 al apex).
+  // Sin esto, cada `wrangler deploy` vuelve a publicar el worker en
+  // `*.oficinadesarrollo33.workers.dev`: una copia indexable del sitio, con el
+  // nombre de la cuenta que lo hostea en la URL, que el 2026-10-03 apareció en
+  // búsquedas. El 301 de `src/lib/canonical-host.ts` es la red de seguridad
+  // para cuando este host se republique; el flag es lo que lo evita.
+  "workers_dev": false,
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",

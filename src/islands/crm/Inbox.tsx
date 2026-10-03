@@ -13,6 +13,7 @@ import {
   type LeadStatus,
   type LeadPriority,
 } from '../../lib/crm-data';
+import { apiFetch } from '../../lib/api-client';
 
 const INBOX_STATUSES: LeadStatus[] = ['new', 'contacted'];
 
@@ -35,7 +36,6 @@ interface ApiLead {
   source: string;
   value: number;
   assigned_to?: string | null;
-  owner_email?: string | null;
 }
 
 function apiToLead(a: ApiLead): Lead {
@@ -56,12 +56,14 @@ function apiToLead(a: ApiLead): Lead {
     source: (a.source as Lead['source']) ?? 'web_contacto',
     value: a.value,
     created_at: a.created_at,
-    owner_email: a.owner_email ?? undefined,
+    updated_at: a.updated_at ?? '',
+    assigned_to: a.assigned_to ?? undefined,
   };
 }
 
 export default function Inbox() {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'new' | 'contacted'>('all');
@@ -72,26 +74,25 @@ export default function Inbox() {
   // Kammler al agendar visita: la pantalla quedaba en blanco con el empty state.
   const [recentlyMoved, setRecentlyMoved] = useState<{ lead: Lead; toStatus: LeadStatus } | null>(null);
   const [query, setQuery] = useState('');
-  const filterRef = useRef(filter);
   const queryRef = useRef(query);
 
   const load = useCallback(async () => {
     try {
-      const cur = filterRef.current;
+      // Se pide SIEMPRE la cola completa del inbox (new + contacted) y se
+      // filtra localmente. Antes se filtraba en el servidor: al cambiar de
+      // pestaña, los contadores se recalculaban sobre el array YA filtrado, así
+      // que con 40 nuevos y 12 contactados, "Contactados" pasaba a 0 al mirar
+      // "Nuevos" y el admin concluía que esa cola estaba vacía.
       const q = queryRef.current;
       const params = new URLSearchParams();
       params.set('limit', '200');
-      if (cur !== 'all') params.set('status', cur);
       if (q) params.set('q', q);
-      const res = await fetch(`/api/leads?${params.toString()}`, { credentials: 'same-origin' });
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error ?? `Error ${res.status}`);
-      }
-      let list: Lead[] = (data.leads ?? []).map(apiToLead);
-      // Si "all", filtrar localmente a los status del inbox
-      if (cur === 'all') list = list.filter((l) => INBOX_STATUSES.includes(l.status));
+      const data = await apiFetch<{ leads?: ApiLead[]; total?: number }>(`/api/leads?${params.toString()}`);
+      const list: Lead[] = (data.leads ?? [])
+        .map(apiToLead)
+        .filter((l) => INBOX_STATUSES.includes(l.status));
       setLeads(list);
+      setTotal(data.total ?? 0);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -100,7 +101,7 @@ export default function Inbox() {
     }
   }, []);
 
-  useEffect(() => { filterRef.current = filter; queryRef.current = query; load(); }, [filter, query, load]);
+  useEffect(() => { queryRef.current = query; load(); }, [query, load]);
 
   // Refresh auto 30s, pausa en tab oculta
   useEffect(() => {
@@ -113,11 +114,12 @@ export default function Inbox() {
     return () => { stop(); document.removeEventListener('visibilitychange', onVis); };
   }, [load]);
 
-  // Los datos ya vienen filtrados por la API. Solo ordenamos por fecha.
-  const filtered = useMemo(
-    () => [...leads].sort((a, b) => b.created_at.localeCompare(a.created_at)),
-    [leads],
-  );
+  // `leads` es la cola completa del inbox (new + contacted). El filtro de
+  // pestaña se aplica acá; los contadores usan el conjunto entero.
+  const filtered = useMemo(() => {
+    const base = filter === 'all' ? leads : leads.filter((l) => l.status === filter);
+    return [...base].sort((a, b) => b.created_at.localeCompare(a.created_at));
+  }, [leads, filter]);
 
   const counts = useMemo(
     () => ({
@@ -134,16 +136,10 @@ export default function Inbox() {
       setLeads((cur) => cur.map((l) => (l.id === id ? { ...l, status: newStatus } : l)));
       setSelected((cur) => (cur && cur.id === id ? { ...cur, status: newStatus } : cur));
       try {
-        const res = await fetch(`/api/leads/${id}`, {
+        await apiFetch(`/api/leads/${id}`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'same-origin',
           body: JSON.stringify({ status: newStatus }),
         });
-        const data = await res.json();
-        if (!res.ok || !data.ok) {
-          throw new Error(data.error ?? `Error ${res.status}`);
-        }
         if (!INBOX_STATUSES.includes(newStatus)) {
           setLeads((cur) => cur.filter((l) => l.id !== id));
           // Mostrar estado contextual con CTAs en vez de un dead-end vacío
@@ -230,6 +226,12 @@ export default function Inbox() {
 
   return (
     <div>
+      {total > leads.length && (
+        <div className="panel" style={{ marginBottom: 16, padding: '12px 16px' }}>
+          <strong>Mostrando los {leads.length} leads más recientes.</strong> Hay {total} en total:{' '}
+          los que quedaron fuera de la ventana no aparecen en la bandeja.
+        </div>
+      )}
       <div className="inbox-toolbar">
         <div className="filter-tabs">
           <button className={`tab ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>
@@ -262,7 +264,7 @@ export default function Inbox() {
               <p className="empty-state-title">Bandeja vacía</p>
               <p className="empty-state-msg">
                 {query
-                  ? 'No hay leads que coincidan con tu búsqueda.'
+                  ? 'No hay leads que coincidan con su búsqueda.'
                   : 'Todos los leads han sido procesados. ¡Buen trabajo!'}
               </p>
               {query && (
@@ -332,7 +334,7 @@ export default function Inbox() {
           ) : (
             <div className="panel empty-panel">
               <div className="empty-state-graphic">👈</div>
-              <p className="empty-state-title">Selecciona un lead</p>
+              <p className="empty-state-title">Seleccione un lead</p>
               <p className="empty-state-msg">Toca una tarjeta para ver el detalle completo, llamar o cambiar estado.</p>
             </div>
           )}
@@ -413,10 +415,10 @@ function LeadInboxDetail({
             <span className="info-value">{formatCLP(lead.value)}</span>
           </div>
         )}
-        {lead.owner_email && (
+        {lead.assigned_to && (
           <div className="info-row">
             <span className="info-label">Asignado a</span>
-            <span className="info-value">{lead.owner_email}</span>
+            <span className="info-value">{lead.assigned_to}</span>
           </div>
         )}
       </div>

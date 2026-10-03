@@ -2,15 +2,11 @@
 // MobileNav v1.0 — Drawer de navegación para mobile (<768px).
 // Mismo contenido que AdminSidebar, pero en drawer deslizable controlado
 // por el botón hamburger del AdminTopbar. Sin JavaScript de framework:
-// usa <details>/<summary> para colapsar grupos + un script inline para
-// cerrar al navegar o tocar backdrop, más atajo Escape.
+// un script inline para cerrar al navegar o tocar backdrop, más atajo Escape.
 import { ADMIN_NAV_GROUPS } from '../../lib/constants';
 import { ICONS } from '../../lib/icons';
 
-interface Props {
-  active: string;
-}
-const { active } = Astro.props;
+const { active } = Astro.props as { active: string };
 
 const iconMap: Record<string, string> = {
   gauge: ICONS.gauge,
@@ -59,7 +55,7 @@ const iconMap: Record<string, string> = {
             >
               <span class="mobile-nav-item-icon" set:html={iconMap[item.icon]} />
               <span class="mobile-nav-item-label">{item.label}</span>
-              {item.id === 'inbox' && <span class="mobile-nav-item-badge" data-badge="inbox">3</span>}
+              {item.id === 'inbox' && <span class="mobile-nav-item-badge" data-badge="inbox" hidden />}
             </a>
           ))}
         </div>
@@ -344,19 +340,10 @@ const iconMap: Record<string, string> = {
     }, { passive: true });
     nav.addEventListener('touchend', () => { tracking = false; }, { passive: true });
 
-    // Logout (mismo flujo que settings)
+    // Logout: delega en el helper único del layout, que además revoca el
+    // refresh token en el servidor (antes solo se limpiaba el navegador).
     logoutBtn?.addEventListener('click', () => {
-      try {
-        localStorage.removeItem('gm_token');
-        localStorage.removeItem('gm_token_expires_at');
-        localStorage.removeItem('gm_refresh_token');
-        localStorage.removeItem('gm_refresh_expires_at');
-      } catch {}
-      fetch('/api/admin/session', { method: 'DELETE', credentials: 'same-origin' })
-        .catch(() => {})
-        .finally(() => {
-          window.location.href = '/admin/login';
-        });
+      window.gmLogout?.();
     });
   })();
 </script>

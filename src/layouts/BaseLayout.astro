@@ -17,6 +17,7 @@ import {
   localBusinessSchema,
   serviceSchema,
   locationSchema,
+  localBusinessAtLocation,
   breadcrumbSchema,
   faqSchema,
   articleSchema,
@@ -24,6 +25,8 @@ import {
   websiteSchema,
   geoMetaTags,
   hreflangTags,
+  composeTitle,
+  fitDescription,
   type BreadcrumbItem,
 } from '../lib/seo';
 import { INTER_FONT_URL, type Location } from '../lib/constants';
@@ -38,10 +41,11 @@ interface Props {
   theme?: 'light' | 'dark';
   /** Cargar dark.css (override para páginas dark). */
   loadDarkCss?: boolean;
-  /** Etiqueta de breadcrumb (ej. "Servicios", "Las Condes"). */
-  breadcrumb?: string;
   /** Schema LocalBusiness (homepage). */
   localBusiness?: boolean;
+  /** Schema LocalBusiness con `@id` propio para una comuna. Solo en
+   *  `/ubicaciones/[slug]`, que es la página canónica de cada comuna. */
+  localBusinessAt?: Location;
   /** Schema Product/Servicio (páginas de servicio). */
   product?: {
     name: string;
@@ -71,7 +75,11 @@ interface Props {
     dateModified?: string;
     author?: string;
   };
-  /** Items para BreadcrumbList schema. */
+  /** Items para BreadcrumbList schema. Fuente única: de aquí sale también el
+   *  rastro visible. Antes había un segundo prop (`breadcrumb`, una sola
+   *  etiqueta) que pintaba `Inicio / X` mientras el JSON-LD declaraba tres o
+   *  cinco niveles. Google descarta el markup que no corresponde a algo
+   *  visible, así que el sitio declaraba una jerarquía que nadie podía ver. */
   breadcrumbs?: BreadcrumbItem[];
   /**
    * Schemas adicionales propios de la página. Se usan en las páginas de
@@ -96,8 +104,8 @@ const {
   noindex = false,
   theme = 'light',
   loadDarkCss = false,
-  breadcrumb,
   localBusiness = false,
+  localBusinessAt,
   product,
   service,
   location,
@@ -122,7 +130,15 @@ const canonicalPath = Astro.url.pathname === '/'
 const url = canonical ?? new URL(canonicalPath, SITE.URL).href;
 // v5.2: títulos sin separadores `|` o `-`. Se concatena con espacio natural.
 // Cada page ya entrega su title en español neutro sin guiones ni pipes.
-const fullTitle = title.includes(SITE.NAME) ? title : `${title} ${SITE.NAME}`;
+//
+// El title pasa por `composeTitle`: si la marca más el título de página se pasa
+// del presupuesto de SERP, se cae el calificador de la cola, nunca la marca.
+// Antes la concatenación era a ciegas y por eso 164 de 242 titles quedaban
+// truncados en el resultado de búsqueda. Ver `TITLE_MAX` en `lib/seo.ts`.
+const fullTitle = composeTitle(title, SITE.NAME);
+// Idem para la description: 225 de 242 pasaban de 160 caracteres y Google
+// cortaba a mitad de frase.
+const metaDescription = fitDescription(description);
 const ogType = article ? 'article' : 'website';
 const publishedISO = article?.datePublished ?? '2024-01-01';
 const modifiedISO = article?.dateModified ?? new Date().toISOString().slice(0, 10);
@@ -147,9 +163,9 @@ const modifiedISO = article?.dateModified ?? new Date().toISOString().slice(0, 1
 const CRITICAL_CSS = `@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;src:url('${INTER_FONT_URL}') format('woff2-variations');font-display:swap}
 @font-face{font-family:'Inter Fallback';src:local('Arial'),local('Liberation Sans'),local('Helvetica Neue'),local('Helvetica');size-adjust:107.40%;ascent-override:90.20%;descent-override:22.48%;line-gap-override:0%;font-weight:100 900;font-style:normal;font-display:swap}
 body{font-family:'Inter','Inter Fallback',system-ui,-apple-system,sans-serif;color:#0D0D0D;background:#F8F9FA;line-height:1.5;-webkit-font-smoothing:antialiased}
-.container{max-width:1280px;margin:0 auto;padding:0 16px}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
 header.site-header{position:sticky;top:0;z-index:1100;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-.header-inner{display:flex;align-items:center;justify-content:space-between;height:64px;max-width:1280px;margin:0 auto;padding:0 16px}
+.header-inner{display:flex;align-items:center;justify-content:space-between;height:64px;max-width:1200px;margin:0 auto;padding:0 24px}
 @media(min-width:1024px){.header-inner{height:80px}}
 .logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .logo-img{height:38px;width:auto;display:block}
@@ -174,6 +190,7 @@ header.site-header{position:sticky;top:0;z-index:1100;background:#fff;box-shadow
 const orgLd = organizationSchema();
 const websiteLd = websiteSchema();
 const localBusinessLd = localBusiness ? localBusinessSchema() : null;
+const localBusinessAtLd = localBusinessAt ? localBusinessAtLocation(localBusinessAt) : null;
 const serviceLd = service ? serviceSchema(service) : null;
 const productLd = product
   ? {
@@ -182,7 +199,9 @@ const productLd = product
       name: product.name,
       description: product.description,
       image: product.image ? new URL(product.image, SITE.URL).href : `${SITE.URL}/favicon.svg`,
-      url: product.url ?? url,
+      // Absoluta: schema.org y Google exigen URL completa. `/guard-pod` en crudo
+      // se descarta en rich results.
+      url: product.url ? new URL(product.url, SITE.URL).href : url,
       brand: { '@type': 'Brand', name: SITE.NAME },
       provider: { '@type': 'Organization', name: SITE.NAME, url: SITE.URL },
       category: 'Seguridad Privada',
@@ -193,19 +212,15 @@ const articleLd = article
   ? articleSchema({ ...article, url: Astro.url.pathname })
   : null;
 const faqLd = faq && faq.length > 0 ? faqSchema(faq) : null;
-const breadcrumbLd =
-  (breadcrumbs && breadcrumbs.length > 0) || breadcrumb
-    ? breadcrumbSchema(
-        breadcrumbs && breadcrumbs.length > 0
-          ? breadcrumbs
-          : [{ name: breadcrumb!, url: Astro.url.pathname }],
-      )
-    : null;
+// Breadcrumb: una sola lista alimenta el JSON-LD y el rastro visible. Los dos
+// se derivan de `breadcrumbs`, así que no pueden descreparse por construcción.
+const breadcrumbItems = breadcrumbs && breadcrumbs.length > 0 ? breadcrumbs : null;
+const breadcrumbLd = breadcrumbItems ? breadcrumbSchema(breadcrumbItems) : null;
 const speakableLd = speakableSchema(Astro.url.pathname);
 
 // Todos los JSON-LD en un array para imprimir
 const allSchemas = [
-  orgLd, websiteLd, localBusinessLd, serviceLd, productLd,
+  orgLd, websiteLd, localBusinessLd, localBusinessAtLd, serviceLd, productLd,
   ...(locationLd ?? []), articleLd, faqLd, breadcrumbLd, speakableLd,
   ...(extraSchemas ?? []),
 ].filter(Boolean);
@@ -227,7 +242,7 @@ const hreflangs = hreflangTags(Astro.url.pathname);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{fullTitle}</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescription} />
     <meta name="author" content={SITE.LEGAL_NAME} />
     <meta name="language" content="Spanish" />
     <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'} />
@@ -248,7 +263,7 @@ const hreflangs = hreflangTags(Astro.url.pathname);
     {/* OpenGraph */}
     <meta property="og:type" content={ogType} />
     <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={metaDescription} />
     <meta property="og:url" content={url} />
     <meta property="og:image" content={new URL(ogImage, SITE.URL).href} />
     <meta property="og:image:width" content={String(OG_IMAGE.WIDTH)} />
@@ -271,7 +286,7 @@ const hreflangs = hreflangTags(Astro.url.pathname);
     {/* Twitter Card */}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:description" content={metaDescription} />
     <meta name="twitter:image" content={new URL(ogImage, SITE.URL).href} />
     <meta name="twitter:image:alt" content={fullTitle} />
     <meta name="twitter:label1" content="Escrito por" />
@@ -324,13 +339,13 @@ const hreflangs = hreflangTags(Astro.url.pathname);
     <link
       rel="stylesheet"
       id="site-css-main"
-      href="/styles/site.css?v=20260927"
+      href="/styles/site.css?v=20261003-1"
     />
     {loadDarkCss && (
       <link
         rel="stylesheet"
         id="dark-css-main"
-        href="/styles/dark.css?v=20260927"
+        href="/styles/dark.css?v=20261003"
       />
     )}
 
@@ -354,13 +369,21 @@ const hreflangs = hreflangTags(Astro.url.pathname);
     <a href="#main-content" class="skip-link">Saltar al contenido</a>
     <Header theme={theme} />
 
-    {breadcrumb && (
+    {breadcrumbItems && (
       <nav class="breadcrumb" data-od-id="breadcrumb" aria-label="Breadcrumb">
-        <div class="breadcrumb-inner">
-          <a href="/">Inicio</a>
-          <span class="breadcrumb-sep">/</span>
-          <span aria-current="page">{breadcrumb}</span>
-        </div>
+        <ol class="breadcrumb-list">
+          {breadcrumbItems.map((b, i) => {
+            const isLast = i === breadcrumbItems.length - 1;
+            return (
+              <li class="breadcrumb-item">
+                {isLast
+                  ? <span aria-current="page">{b.name}</span>
+                  : <a href={b.url}>{b.name}</a>}
+                {!isLast && <span class="breadcrumb-sep" aria-hidden="true">/</span>}
+              </li>
+            );
+          })}
+        </ol>
       </nav>
     )}
 

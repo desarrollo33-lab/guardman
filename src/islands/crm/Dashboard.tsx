@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   STATUS_LABELS,
+  STATUS_COLORS,
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   SOURCE_LABELS,
@@ -10,6 +11,7 @@ import {
   type Lead,
   type LeadStatus,
 } from '../../lib/crm-data';
+import { apiFetch } from '../../lib/api-client';
 
 interface ApiLead {
   id: string;
@@ -43,27 +45,21 @@ function apiToLead(a: ApiLead): Lead {
 }
 
 const STATUS_FUNNEL: LeadStatus[] = ['new', 'contacted', 'visit', 'proposal', 'negotiation', 'won'];
-const STATUS_COLORS: Record<LeadStatus, string> = {
-  new: '#3B82F6',
-  contacted: '#10B981',
-  visit: '#F59E0B',
-  proposal: '#8B5CF6',
-  negotiation: '#8B5CF6',
-  won: '#10B981',
-  lost: '#EF4444',
-};
+// La paleta vive en crm-data. Este archivo tenía una copia local con otros
+// hexes: el mismo estado salía verde en el embudo y morado en la lista de
+// leads, y el admin lo leía como dos etapas distintas.
 
 export default function Dashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch('/api/leads?limit=200', { credentials: 'same-origin' });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
+      const data = await apiFetch<{ leads?: ApiLead[]; total?: number }>('/api/leads?limit=200');
       setLeads((data.leads ?? []).map(apiToLead));
+      setTotal(data.total ?? 0);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -201,6 +197,12 @@ export default function Dashboard() {
 
   return (
     <div className="crm-dashboard">
+      {total > leads.length && (
+        <div className="panel" style={{ marginBottom: 16, padding: '12px 16px' }}>
+          <strong>Mostrando los {leads.length} leads más recientes.</strong> Hay {total} en total:{' '}
+          los KPIs y el embudo de abajo se calculan sobre esta muestra, no sobre el histórico.
+        </div>
+      )}
       <div className="kpi-row">
         <div className="kpi-card">
           <div className="kpi-top"><span className="kpi-icon">📥</span></div>

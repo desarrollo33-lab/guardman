@@ -32,6 +32,7 @@ coverage/
 # playwright
 test-results/
 playwright-report/
+lighthouse-reports/
 
 # local artifacts (auto-generated, no versionar)
 .backups/
@@ -41,3 +42,13 @@ public/images/.tmp-*.webp
 imagenes guardman/
 # stray file from typo'd command
 -w
+
+# originales de re-encode (scripts/reencode-images.mjs; recuperables desde git)
+.reenc-src/
+
+# research/ — auditorías de copy y espejos de sitios competidores.
+# El .md con la propuesta sí se versiona, el HTML descargado no: son cientos de
+# archivos de terceros y pesan más que todo el código del repo.
+research/**/html/
+research/**/text/
+research/**/manifest.json

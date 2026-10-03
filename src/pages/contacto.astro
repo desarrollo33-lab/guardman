@@ -4,6 +4,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LeadForm from '../components/LeadForm.astro';
 import { SITE, OPENING_HOURS_TEXT, TIMEZONE_LABEL } from '../lib/constants';
+import { MCP_TOOLS } from '../lib/mcp-card';
 
 const services = [
   'Guardias de Seguridad',
@@ -33,9 +34,8 @@ const leadFormSections = [
 ---
 
 <BaseLayout
-  title="Contacto 24/7 GuardMan Chile Seguridad Privada"
+  title="Contacto | GuardMan Chile, seguridad privada 24/7"
   description="Contáctenos 24/7. Teléfono, correo electrónico y formulario. Hable con un experto en seguridad privada certificado OS-10. Respuesta garantizada en menos de 24 horas hábiles."
-  breadcrumb="Contacto"
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Contacto', url: '/contacto' }]}
   showCluster={true}
   clusterType="servicios"
@@ -104,11 +104,7 @@ const leadFormSections = [
           submitText="Enviar mensaje"
           trackName="contacto"
           successRedirect="/gracias"
-          webmcp={{
-            name: 'guardman_enviar_mensaje',
-            description:
-              'Envía un mensaje o consulta a GuardMan Chile por seguridad privada. La respuesta es humana y llega en menos de 24 horas hábiles. Para una cotización con datos de propiedad use guardman_solicitar_cotizacion en /cotizacion.',
-          }}
+          webmcp={MCP_TOOLS[1].webmcp}
         />
 
         <div style="margin-top:24px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);text-align:center">
@@ -123,7 +119,7 @@ const leadFormSections = [
     <div class="container">
       <h2 class="section-title" style="color:#fff">¿Prefiere que le llamemos?</h2>
       <p class="section-subtitle" style="color:rgba(255,255,255,.7);max-width:500px;margin:0 auto 28px">Solicite una cotización sin compromiso y descubra por qué cientos de empresas e instituciones confían en GuardMan Chile para proteger lo que más les importa.</p>
-      <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+      <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar para mi propiedad</a>
     </div>
   </section>
 </BaseLayout>

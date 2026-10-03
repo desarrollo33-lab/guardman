@@ -46,12 +46,8 @@ export const SITE = {
   ],
 } as const;
 
-export const STATS = {
-  GUARDIAS: '200+',
-  EMPRESAS: '200+',
-  COMUNAS: '14',
-  ANOS: '10+',
-} as const;
+// `STATS` se eliminó (2026-10-03): no lo renderizaba nada y su `COMUNAS: '14'`
+// ya era falso. Las cifras que sí se publican salen de COVERAGE_TOTAL.
 
 export const SERVICE_NAMES: Record<string, string> = {
   'guardias-de-seguridad': 'Guardias de Seguridad',
@@ -69,18 +65,51 @@ export const SERVICE_NAMES: Record<string, string> = {
 
 export const SERVICE_SLUGS = Object.keys(SERVICE_NAMES);
 
-export const SERVICE_DESCRIPTIONS: Record<string, string> = {
-  'guardias-de-seguridad': 'Guardias certificados OS-10 con verificación de antecedentes, rondas preventivas y supervisión nocturna para empresas y condominios en 14 comunas.',
-  'cctv-videovigilancia': 'Cámaras IP HD/4K con visión nocturna, grabación NVR y monitoreo remoto desde nuestro centro de control propio.',
-  'control-de-accesos': 'Lectores biométricos, códigos QR y torniquetes con registro digital de visitantes para edificios corporativos.',
-  'escoltas-privados': 'PPI (Protección de Personas Importantes) con escoltas certificados OS-10, evaluación previa de riesgos y vehículos equipados para protección ejecutiva y traslado de valores.',
-  'monitoreo-24-7': 'Central de vigilancia propia con redundancia de sistemas, análisis en tiempo real y coordinación directa con Carabineros.',
-  'seguridad-eventos': 'Planificación de seguridad personalizada para eventos corporativos, sociales y masivos con control de accesos y aforo.',
-  'seguridad-deportiva': 'Cobertura de seguridad OS-10 para recintos y eventos deportivos: control de acceso por tribuna, vigilancia perimetral, manejo de hinchadas y coordinación con Carabineros.',
-  'seguridad-industrial': 'Vigilancia perimetral con rondas programadas y control de carga para plantas, bodegas y centros de distribución.',
-  'auditoria-seguridad': 'Inspección en terreno de perímetros, CCTV, alarmas e iluminación con informe ejecutivo y plan de acción priorizado.',
-  'guard-pod': 'Sistema autónomo de vigilancia con cámaras 360°, detección de intrusos por IA y monitoreo 24/7 sin infraestructura eléctrica.',
-  aseo: 'Servicio de aseo con personal uniformado, productos certificados y planes diurnos, nocturnos o de fin de semana.',
+/**
+ * Nombre corto para titles y breadcrumbs.
+ *
+ * El nombre completo va bien en el H1 y en el cuerpo, pero
+ * "PPI (Protección de Personas Importantes)" son 39 caracteres: con la comuna y
+ * la marca el title se pasa de 60 y se corta. Medido 2026-10-03 sobre las 242
+ * URLs en producción, 164 titles quedaban truncados en el resultado de búsqueda.
+ *
+ * Acá se acorta SOLO el title. El H1 conserva el nombre completo, porque ahí no
+ * hay presupuesto y la keyword larga sigue siendo la que se indexa en el H1.
+ * Los servicios que no aparecen acá usan `SERVICE_NAMES`.
+ */
+export const SERVICE_TITLE_NAMES: Record<string, string> = {
+  'cctv-videovigilancia': 'CCTV',
+  'escoltas-privados': 'Escoltas PPI',
+};
+
+export const serviceTitleName = (slug: string): string =>
+  SERVICE_TITLE_NAMES[slug] ?? SERVICE_NAMES[slug] ?? slug;
+
+/**
+ * Nombre del servicio en minúscula, para usar DENTRO de una frase.
+ *
+ * Antes las plantillashacían `svc.name.toLowerCase()`, y eso rompía dos cosas
+ * a la vez en las 176 páginas servicio×comuna: la abreviatura interna aparecía
+ * en el encabezado ("Por qué elegir **ppi** (Protección de Personas
+ * Importantes) en Santiago Centro") y la marca perdía su capitalización
+ * ("Por qué elegir **guardpod** en Las Condes"). Verificado en producción.
+ *
+ * Reglas, en orden:
+ *   - Si la primera palabra es una sigla o una marca propia, NO se toca:
+ *     "CCTV Videovigilancia" y "Guardpod" se quedan como vienen.
+ *   - Si la primera palabra es un artículo o preposición, se lowercasea igual
+ *     ("El Aseo de Seguridad" → "el aseo de seguridad"), porque ahí lo que
+ *     empieza la frase no es la marca.
+ *   - En cualquier otro caso solo baja la primera letra, que es lo que se
+ *     busca al escribir "la operación de guardias de seguridad en Las Condes".
+ */
+const SIGLAS_Y_MARCAS = new Set(['cctv', 'ppi', 'guardpod', 'guardman', 'ajax', 'os-10']);
+
+export const serviceNameInSentence = (name: string): string => {
+  const first = name.split(' ')[0] ?? '';
+  if (SIGLAS_Y_MARCAS.has(first.toLowerCase())) return name;
+  if (first === 'El' || first === 'La' || first === 'Los' || first === 'Las') return name;
+  return name.charAt(0).toLowerCase() + name.slice(1);
 };
 
 export const SECTOR_NAMES: Record<string, string> = {
@@ -198,6 +227,27 @@ export const RM_COMMUNES_LIST = COVERAGE_RM.map((l) => l.name).join(', ');
 export const VS_COMMUNES_LIST = COVERAGE_VS.map((l) => l.name).join(' y ');
 
 /**
+ * Descripción corta de cada servicio. Va AQUÍ, y no junto a `SERVICE_NAMES`,
+ * porque la primera entrada deriva el número de cobertura: antes de este
+ * cambio la línea era un string fijo y por eso publicaba "14 comunas" cuando
+ * eran 16. Declararla antes de `COVERAGE_TOTAL` la dejaría en TDZ y el módulo
+ * no cargaría.
+ */
+export const SERVICE_DESCRIPTIONS: Record<string, string> = {
+  'guardias-de-seguridad': `Guardias certificados OS-10 con verificación de antecedentes, rondas preventivas y supervisión nocturna para empresas y residencias en ${COVERAGE_TOTAL} comunas.`,
+  'cctv-videovigilancia': 'Cámaras IP HD/4K con visión nocturna, grabación NVR y monitoreo remoto desde nuestro centro de control propio.',
+  'control-de-accesos': 'Lectores biométricos, códigos QR y torniquetes con registro digital de visitantes para edificios corporativos.',
+  'escoltas-privados': 'PPI (Protección de Personas Importantes) con escoltas certificados OS-10, evaluación previa de riesgos y vehículos equipados para protección ejecutiva y traslado de valores.',
+  'monitoreo-24-7': 'Central de vigilancia propia con redundancia de sistemas, análisis en tiempo real y coordinación directa con Carabineros.',
+  'seguridad-eventos': 'Planificación de seguridad personalizada para eventos corporativos, sociales y masivos con control de accesos y aforo.',
+  'seguridad-deportiva': 'Cobertura de seguridad OS-10 para recintos y eventos deportivos: control de acceso por tribuna, vigilancia perimetral, manejo de hinchadas y coordinación con Carabineros.',
+  'seguridad-industrial': 'Vigilancia perimetral con rondas programadas y control de carga para plantas, bodegas y centros de distribución.',
+  'auditoria-seguridad': 'Inspección en terreno de perímetros, CCTV, alarmas e iluminación con informe ejecutivo y plan de acción priorizado.',
+  'guard-pod': 'Sistema autónomo de vigilancia con cámaras 360°, detección de intrusos por IA y monitoreo 24/7 sin infraestructura eléctrica.',
+  aseo: 'Servicio de aseo con personal uniformado, productos certificados y planes diurnos, nocturnos o de fin de semana.',
+};
+
+/**
  * Frase de cobertura única. Toda mención de cobertura en el sitio debe
  * salir de acá para que el número nunca contradiga a `areaServed`.
  */
@@ -226,8 +276,22 @@ export const SITE_DESCRIPTION =
   `Cobertura en ${COVERAGE_RM.length} comunas de la Región Metropolitana más ` +
   `${COVERAGE_VS.length} en Valparaíso (${COVERAGE_TOTAL} en total).`;
 
-export const LOCATION_SLUGS = LOCATIONS.map((l) => l.slug) as readonly string[];
-export const LOCATION_NAMES: Record<string, string> = Object.fromEntries(
+// ───────────────────────────────────────────────────────────────
+// Content Signals (draft IETF draft-romm-aipref-contentsignals)
+//
+// Una sola definición para los dos lugares donde se emite: la directiva dentro
+// de robots.txt (solo para crawlers de IA, ver `pages/robots.txt.ts`) y el
+// header HTTP en cada página HTML (ver `middleware.ts`). Antes el texto estaba
+// duplicado y la política solo regía el archivo, no el documento.
+//
+// `ai-train=no` cierra el uso para entrenar. `search=yes, ai-input=yes` deja
+// abierta la lectura y la cita por asistentes, que es la intención declarada del
+// cliente. No confundir con los bots: el bloqueo por User-Agent (GPTBot,
+// ClaudeBot) lo aplica Cloudflare, esto es la capa declarativa.
+// ───────────────────────────────────────────────────────────────
+export const CONTENT_SIGNALS = 'ai-train=no, search=yes, ai-input=yes';
+
+export const LOCATION_SLUGS = LOCATIONS.map((l) => l.slug) as readonly string[];export const LOCATION_NAMES: Record<string, string> = Object.fromEntries(
   LOCATIONS.map((l) => [l.slug, l.name]),
 );
 
@@ -343,14 +407,6 @@ export const ADMIN_NAV_GROUPS = [
   },
 ] as const;
 
-// Compat con AdminSidebar legacy (ya no se usa, mantenido para refs externas)
-export const ADMIN_NAV = [
-  { id: 'dashboard', label: 'Dashboard', href: '/admin', icon: 'gauge' },
-  { id: 'inbox', label: 'Bandeja', href: '/admin/inbox', icon: 'inbox' },
-  { id: 'pipeline', label: 'Pipeline', href: '/admin/pipeline', icon: 'pipeline' },
-  { id: 'leads', label: 'Leads', href: '/admin/leads', icon: 'users' },
-] as const;
-
 export const API_TIMEOUT_MS = 15_000;
 
 // ────────────────────────────────────────────────────────────────
@@ -367,6 +423,37 @@ export const API_TIMEOUT_MS = 15_000;
 export const FONT_VERSION = '20260925';
 /** URL completa del woff2 de Inter Variable con cache-bust. */
 export const INTER_FONT_URL = `/fonts/InterVariable.woff2?v=${FONT_VERSION}`;
+
+/**
+ * Versión de las imágenes re-codificadas (soporte responsive + compresión).
+ *
+ * `/images/*` y `/videos/*` se sirven con `max-age=31536000, immutable`
+ * (public/_headers). Re-codificar un archivo CONSERVANDO su nombre no cambia la
+ * cache key: el edge sigue sirviendo el binario viejo hasta que expire el año.
+ * Por eso toda referencia a una imagen re-codificada lleva `?v=${IMAGE_VERSION}`.
+ *
+ * Bumpear SOLO cuando cambian los bytes de alguna de esas imágenes, y siempre
+ * en el mismo commit que el re-encode (scripts/reencode-images.mjs).
+ */
+export const IMAGE_VERSION = '20261002-2';
+
+/**
+ * Media type de los documentos markdown para agentes.
+ *
+ * `text/markdown` a secas está incompleto para ARD: el conformance tester de la
+ * spec lo acepta como "standard discovery type" pero exige el parámetro
+ * `profile`, y el validador de "Agent Discoverability" marca la entrada como
+ * Low. Con el perfil, ambos dan limpio.
+ *
+ * El perfil declara para qué está escrito el documento, no qué género tiene:
+ * estos son material de referencia que existe para que lo lean asistentes
+ * (`llms.txt` nació justo para eso), que es lo que el perfil dice.
+ *
+ * Se usa en el manifiesto Y en el header Content-Type de los endpoints: el
+ * header tiene que decir lo mismo que el manifiesto, o el consumidor recibe una
+ * cosa y lee otra.
+ */
+export const ARD_MARKDOWN_TYPE = 'text/markdown; profile="urn:air:agent-skills"';
 
 
 // ────────────────────────────────────────────────────────────────

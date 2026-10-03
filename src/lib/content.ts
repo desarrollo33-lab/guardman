@@ -4,7 +4,7 @@
 // Español neutro latinoamericano, tono profesional.
 // ════════════════════════════════════════════════════════════════
 
-import { COVERAGE_RM, COVERAGE_VS, COVERAGE_TOTAL } from './constants';
+import { COVERAGE_RM, COVERAGE_VS, COVERAGE_TOTAL, RM_COMMUNES_LIST, VS_COMMUNES_LIST, LOCATIONS as CANONICAL_LOCATIONS } from './constants';
 
 /**
  * Cobertura en FAQ y hero. Derivada, nunca escrita a mano.
@@ -55,14 +55,14 @@ export const SERVICES: Record<string, ServiceContent> = {
     heroSub:
       'Proteja su empresa, condominio o evento con personal certificado OS-10 y más de 10 años de experiencia en seguridad privada.',
     features: [
-      { title: 'Verificación exhaustiva de antecedentes', description: 'Cada guardia pasa por un proceso de selección riguroso con verificación de antecedentes penales, laborales y referencias antes de ser asignado.' },
-      { title: 'Supervisión nocturna preventiva', description: 'Rondas programadas y supervisión en tiempo real durante turnos nocturnos para detectar conductas sospechosas antes de que ocurran incidentes.' },
-      { title: 'Protocolos adaptados por sector', description: 'Diseñamos procedimientos específicos según el tipo de propiedad: corporativo, residencial, industrial o comercial.' },
-      { title: 'Academia de capacitación continua', description: 'Formación permanente en primeros auxilios, manejo de conflictos, uso de tecnología y normativa vigente en nuestra academia interna.' },
-      { title: 'Vehículos de reacción rápida', description: 'Flota de vehículos equipados desplegados estratégicamente para respuesta inmediata ante emergencias en cada zona de cobertura.' },
-      { title: 'Comunicación radial permanente', description: 'Cada guardia mantiene comunicación constante con supervisores y central de monitoreo mediante radios digitales encriptados.' },
-      { title: 'Reportes digitales diarios', description: 'Bitácoras digitales con registro fotográfico de rondas, incidentes y novedades, accesibles en tiempo real por el cliente.' },
-      { title: 'Guardias de reemplazo garantizados', description: 'Sistema de backup con personal de reserva para asegurar continuidad del servicio ante ausencias imprevistas.' },
+      { title: 'Revisamos los antecedentes antes de asignar', description: 'Antecedentes penales, laborales y referencias verificados antes de que entre a un puesto. Es el orden en que hacemos las cosas, no una promesa de calidad.' },
+      { title: 'Supervisamos la noche desde la central', description: 'Rondas programadas y seguimiento en vivo durante la noche, que es la franja en que el edificio está vacío y nadie ve lo que pasa.' },
+      { title: 'Escribimos el protocolo para su propiedad', description: 'Corporativo, residencial, industrial o comercial. El procedimiento se escribe para su propiedad antes de empezar, no después de un incidente.' },
+      { title: 'Capacitamos al personal en forma continua', description: 'Primeros auxilios, manejo de conflictos, uso de tecnología y normativa vigente, en nuestra academia interna.' },
+      { title: 'Respondemos con vehículo propio', description: 'Flota equipada, desplegada por zona. En un edificio con acceso restringido, llegar rápido es parte del servicio.' },
+      { title: 'El guardia conversa con la central, siempre', description: 'Radio digital encriptado con supervisores y central. La comunicación no depende de que el guardia tenga teléfono.' },
+      { title: 'Usted ve el registro de cada ronda', description: 'Registro fotográfico de rondas, incidentes y novedades, disponible mientras los hechos están frescos.' },
+      { title: 'Si falta un guardia, entra uno de reserva', description: 'Personal de relevo para que el puesto nunca quede descubierto, y el registro de quién lo cubrió.' },
     ],
     problems: [
       'Incremento de robos en condominios durante horarios nocturnos y fines de semana, cuando la vigilancia disminuye.',
@@ -71,7 +71,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       'Ausencia de protocolos claros ante emergencias, lo que provoca respuestas lentas y descoordinadas.',
     ],
     faqs: [
-      { q: '¿Qué es la certificación OS-10 y por qué es importante?', a: 'La certificación OS-10 es la autorización que otorga Carabineros de Chile a las personas que desean trabajar como guardias de seguridad privada. Es un requisito legal indispensable. En GuardMan Chile, todos nuestros guardias mantienen esta certificación vigente, lo que garantiza formación en uso de la fuerza, primeros auxilios, control de accesos y normativa legal.' },
+      { q: '¿Qué es la certificación OS-10 y por qué es importante?', a: 'La certificación OS-10 es la acreditación legal que deben tener las personas que trabajan como guardias de seguridad privada en Chile. Desde la Ley 21.659, vigente el 28 de noviembre de 2025, la autoriza la Subsecretaría de Prevención del Delito y la fiscaliza Carabineros de Chile a través de la Prefectura de Seguridad Privada. En GuardMan Chile todos nuestros guardias la mantienen vigente y se la podemos entregar con sus fechas para que usted la verifique.' },
       { q: '¿Cuánto cuesta contratar un guardia de seguridad en Chile?', a: 'El precio varía según la cantidad de guardias, el tipo de turno (diurno, nocturno, 4x4, 6x1), la ubicación y las necesidades específicas del servicio. Ofrecemos cotizaciones personalizadas sin compromiso. Contáctenos para recibir un presupuesto ajustado a sus requerimientos.' },
     { q: '¿En qué comunas de Santiago ofrecen servicios de guardias?', a: `Tenemos presencia en ${covRM()}. Para el detalle completo por comuna, revise el mapa de cobertura o contáctenos.` },
       { q: '¿Qué diferencia a GuardMan Chile de otras empresas de seguridad?', a: 'Nos diferenciamos por nuestro central de monitoreo propio 24/7, verificación rigurosa de antecedentes, academia interna de capacitación, vehículos de reacción rápida y el Guardpod, nuestro sistema autónomo de vigilancia. Más de 10 años y 200+ guardias certificados nos respaldan.' },
@@ -164,7 +164,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       'Acompañamiento en eventos públicos con gran concentración de personas donde el riesgo aumenta.',
     ],
     faqs: [
-      { q: '¿Qué es PPI (Protección de Personas Importantes)?', a: 'PPI es la categoría técnica de la escolta privada orientada a la protección de ejecutivos, autoridades y personas de alto perfil. En GuardMan Chile, nuestro servicio de PPI se opera con personal certificado OS-10, verificación de antecedentes, autorización de la Autoridad Administrativa Laboral y capacitación continua en protección ejecutiva y manejo de emergencias.' },
+      { q: '¿Qué es PPI (Protección de Personas Importantes)?', a: 'PPI es la categoría técnica de la escolta privada orientada a la protección de ejecutivos, autoridades y personas de alto perfil. La Ley 21.659 exige que las empresas que ofrecen escolta personal o guardaespaldas estén autorizadas por la Subsecretaría de Prevención del Delito. En GuardMan Chile operamos con personal acreditado OS-10, verificación de antecedentes, autorización vigente y capacitación continua en protección ejecutiva y manejo de emergencias.' },
       { q: '¿Puedo contratar escoltas PPI solo para eventos específicos?', a: 'Sí, ofrecemos servicios PPI permanentes y eventuales. Contáctenos para una cotización personalizada según sus necesidades.' },
     { q: '¿En qué comunas ofrecen servicio de PPI?', a: `Cobertura en ${covFull()}.` },
       { q: '¿Cómo se determina el precio del servicio PPI?', a: 'Depende de la duración, número de escoltas, nivel de riesgo y servicios adicionales como vehículos de apoyo. Solicite una cotización sin compromiso.' },
@@ -324,7 +324,7 @@ export const SERVICES: Record<string, ServiceContent> = {
     faqs: [
       { q: '¿Qué es una auditoría de seguridad y para qué sirve?', a: 'Es un examen sistemático de las medidas de protección física, tecnológica y procedimental de una propiedad. Identifica vulnerabilidades, evalúa riesgos y propone mejoras concretas bajo estándares OS-10.' },
       { q: '¿Cuánto dura y qué incluye?', a: 'Entre 4 y 8 horas para una empresa o condominio estándar. Incluye inspección en terreno, revisión de documentación, análisis de sistemas y entrevistas. Entregamos informe escrito con hallazgos y recomendaciones.' },
-      { q: '¿Cuál es el precio?', a: 'Varía según alcance y complejidad. Una auditoría básica puede partir desde $150.000. Ofrecemos presupuestos personalizados sin compromiso.' },
+      { q: '¿Cuál es el precio?', a: 'Varía según el alcance, el número de recintos y la profundidad del análisis. Lo que determina el valor es cuántas horas de terreno se dedican y qué se revisa. Le entregamos el presupuesto después de la visita, con el detalle de qué incluye cada etapa.' },
       { q: '¿Necesito auditoría si ya tengo guardias y cámaras?', a: 'Sí. Muchas veces los sistemas están mal configurados, las cámaras tienen ángulos ciegos o los guardias carecen de protocolos claros. Una auditoría detecta estas brechas y optimiza los recursos existentes.' },
     ],
   },
@@ -1104,11 +1104,21 @@ export const NOSOTROS_TIMELINE = [
 ];
 
 // ─── Zonas (cobertura) ────────────────────────────────────────────
-export const ZONAS = [
-  { name: 'Centro', locations: ['Santiago Centro'] },
-  { name: 'Norte', locations: ['Huechuraba', 'Lampa', 'Quilicura'] },
-  { name: 'Oriente', locations: ['La Reina', 'Las Condes', 'Lo Barnechea', 'Vitacura'] },
-  { name: 'Poniente', locations: ['Conchalí', 'Pudahuel', 'Renca'] },
-  { name: 'Sur', locations: ['La Pintana'] },
-  { name: 'Valparaíso', locations: ['Los Andes', 'San Felipe'] },
-];
+//
+// DERIVADA de `LOCATIONS`, no escrita a mano. Antes era una lista literal y
+// quedó desactualizada: le faltaban Providencia y Ñuñoa, que sí están en
+// `LOCATIONS` (ambas `zone: 'Oriente'`). Como `index.astro` la usa para pintar
+// el mapa (`ZONAS.find(...) ?? 'Centro'`), esas dos communes se pintaban como
+// Zona Centro, y el bloque de cobertura del home las omitía del texto.
+//
+// El agrupamiento sale de `l.zone` del array canónico de `constants.ts` (el
+// `LOCATIONS` local de este archivo es un Record con el copy de cada comuna, otra
+// forma: por eso se importa con alias arriba). Agregar una comuna a
+// `LOCATIONS` la agrega automáticamente a la zona correcta y al listado; no hay
+// nada que sincronizar.
+const ORDEN_ZONAS = ['Centro', 'Norte', 'Oriente', 'Poniente', 'Sur', 'Valparaíso'] as const;
+
+export const ZONAS = ORDEN_ZONAS.map((name) => ({
+  name,
+  locations: CANONICAL_LOCATIONS.filter((l) => l.zone === name).map((l) => l.name),
+})).filter((z) => z.locations.length > 0);

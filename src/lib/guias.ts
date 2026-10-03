@@ -98,7 +98,7 @@ export const GUIDES: GuidePage[] = [
         body: [
           'La cobertura 24/7 y la cobertura diurna no son el mismo servicio ni tienen la misma dotación. Este es el eje que más se negocia, porque es el que define la estructura del turno.',
           'Un edificio con recepción nocturna activa tiene una necesidad distinta de uno donde el conserje cierra a las 20:00 y el resto del horario queda sin cobertura presencial.',
-          'También incide la calidad de esa cobertura: un turno de 12 horas es físicamente distinto de un turno de 8, tanto para laBSDBs sostenida del guardia como para la capacidad real de respuesta. No es el mismo servicio aunque ambos se llamen "guardia de seguridad".',
+          'También incide la calidad de esa cobertura: un turno de 12 horas es físicamente distinto de un turno de 8, tanto para la carga sostenida del guardia como para la capacidad real de respuesta. No es el mismo servicio aunque ambos se llamen "guardia de seguridad".',
         ],
       },
     ],
@@ -133,7 +133,7 @@ export const GUIDES: GuidePage[] = [
       {
         mistake: 'Pedir un número por teléfono sin visita previa',
         consequence:
-          'El número que se da por teléfono no puede ser correcto. Sin ver el sitio, cualquier respuesta es una estimación, y una estimación mal dimensionada se traduce en Either un gasto de más o un hueco de seguridad.',
+          'El número que se da por teléfono no puede ser correcto. Sin ver el sitio, cualquier respuesta es una estimación, y una estimación mal dimensionada se traduce en un gasto de más o en un hueco de seguridad.',
       },
       {
         mistake: 'Comparar cotizaciones que cubren servicios distintos',
@@ -155,13 +155,13 @@ export const GUIDES: GuidePage[] = [
       {
         heading: 'Por qué no publicamos el número',
         body: [
-          'Muchos sitios answered "cuántos guardias necesito" con una tabla de ratios por superficie o por cantidad de unidades. Puede ser un punto de partida, pero un número sin evaluación de sitio no es una recomendación profesional.',
+          'Muchos sitios responden "cuántos guardias necesito" con una tabla de ratios por superficie o por cantidad de unidades. Puede ser un punto de partida, pero un número sin evaluación de sitio no es una recomendación profesional.',
           'Más aún en seguridad privada: los ratios que circulan en internet suelen provenir de contextos de otros países, con otras normas, otras jornadas y otros niveles de riesgo. Aplicados sin ajuste a un edificio chileno, pueden quedar muy por encima o muy por debajo de lo que el sitio realmente necesita.',
           'Por eso preferimos no publicar ratios. Lo que sí hacemos es explicar cómo razonamos la dotación, para que puedas evaluar la propuesta que recibas de cualquier proveedor, incluido nosotros.',
         ],
       },
       {
-        heading: 'Qué sí puedes comparar entre proveedores',
+        heading: 'Qué sí puede comparar entre proveedores',
         body: [
           'Si el método no es público, hay señales que sí permiten comparar y que dicen más que el número final de una cotización.',
         ],
@@ -195,16 +195,16 @@ export const GUIDES: GuidePage[] = [
       },
       {
         q: '¿Qué pasa si mi edificio no necesita vigilancia privada?',
-        a: 'Es una conclusión válida y laCsvamos a decir. Si la infraestructura, la iluminación y el historial del edificio hacen innecesaria una dotación permanente, lo indicado es decirlo. Agregar personal donde no se necesita es un gasto sin retorno.',
+        a: 'Es una conclusión válida y conviene decirlo. Si la infraestructura, la iluminación y el historial del edificio hacen innecesaria una dotación permanente, lo indicado es decirlo. Agregar personal donde no se necesita es un gasto sin retorno.',
       },
       {
         q: '¿Cada cuánto conviene revisar la dotación?',
         a: 'Cada vez que cambia algo relevante: una ampliación del edificio, un nuevo acceso, un cambio de horarios de operación o un incidente que revela un punto débil. La dotación no es fija: es el resultado de una evaluación en un momento dado.',
       },
     ],
-    ctaTitle: 'Solicita una evaluación para tu condominio',
+    ctaTitle: 'Solicita una evaluación para su condominio',
     ctaBody:
-      'La visita a terreno es el primer paso y no tiene costo. Recorremos el edificio, revisamos la infraestructura existente y los antecedentes, y a partir de ahí definimos la cobertura que corresponde. Si la conclusión es que no necesitas vigilancia privada, te lo vamos a decir.',
+      'La visita a terreno es el primer paso y no tiene costo. Recorremos el edificio, revisamos la infraestructura existente y los antecedentes, y a partir de ahí definimos la cobertura que corresponde. Si la conclusión es que no necesita vigilancia privada, se lo diremos.',
   },
 
   {
@@ -288,7 +288,7 @@ export const GUIDES: GuidePage[] = [
         heading: 'El control de acceso es el grueso del trabajo',
         body: [
           'En un edificio de oficinas, la parte del turno que más se extiende es la verificación de ingresos. Con frecuencia viene con carga de Validate de que el visitante existe, de que va al lugar correcto y de que su credencial es válida.',
-          'Un proceso de acceso mal diseñado genera fricción permanente: se eliminan los tiempos de espera, pero también la verificación real. Ahí es donde la tecnología cumple su función, y donde un buen proveedor te va a proponer un sistema en vez de más horas de personal.',
+          'Un proceso de acceso mal diseñado genera fricción permanente: se eliminan los tiempos de espera, pero también la verificación real. Ahí es donde la tecnología cumple su función, y donde un buen proveedor le propondrá un sistema en vez de más horas de personal.',
         ],
       },
       {
@@ -317,7 +317,7 @@ export const GUIDES: GuidePage[] = [
         a: 'Sí, y en muchos edificios es lo que se necesita. Si la propiedad opera en horario hábil con personal propio de administración y la necesidad se concentra en la noche, la cobertura nocturna bien resuelta puede ser la solución más adecuada.',
       },
     ],
-    ctaTitle: 'Solicita una evaluación para tu edificio',
+    ctaTitle: 'Solicita una evaluación para su edificio',
     ctaBody:
       'Recorremos el edificio, revisamos accesos, flujos e infraestructura existente, y definimos la cobertura por zonas y horarios que corresponde a ese edificio en particular. La propuesta llega con el alcance declarado, para que puedas compararla con cualquiera.',
   },
@@ -445,9 +445,9 @@ export const GUIDES: GuidePage[] = [
         a: 'Solicitando el registro de cobertura efectiva. Un proveedor ordenado lleva ese control y lo entrega. Es la manera más directa de verificar un servicio cuyo resultado se ve únicamente cuando falla.',
       },
     ],
-    ctaTitle: 'Revisa tu esquema de turnos con un especialista',
+    ctaTitle: 'Revise su esquema de turnos con un especialista',
     ctaBody:
-      'Muchos contratos se hicieron con un esquema que ya no corresponde a la operación actual. Revisamos tu cobertura, el esquema de turnos y el proceso de reemplazo, y te decimos si lo que tienes vigente funciona o si conviene ajustarlo.',
+      'Muchos contratos se hicieron con un esquema que ya no corresponde a la operación actual. Revisamos su cobertura, el esquema de turnos y el proceso de reemplazo, y le decimos si lo que tiene vigente funciona o si conviene ajustarlo.',
   },
 
   {
@@ -465,8 +465,8 @@ export const GUIDES: GuidePage[] = [
         name: 'Autorización',
         question: '¿La empresa está autorizada por la Subsecretaría de Prevención del Delito?',
         body: [
-          'Bajo la Ley 21.659, solo pueden prestar servicios de seguridad privada las empresaspcs autorizadas por la Subsecretaría de Prevención del Delito. La autorización es verificable.',
-          'Una empresa que no puede acreditar su autorización, o que responde de forma vaga cuando se le pregunta, estáFuera del sistema legal. Ese es el punto de partida y no hay compensaciones por el resto de las características.',
+          'Bajo la Ley 21.659, solo pueden prestar servicios de seguridad privada las empresas autorizadas por la Subsecretaría de Prevención del Delito. La autorización es verificable.',
+          'Una empresa que no puede acreditar su autorización, o que responde de forma vaga cuando se le pregunta, está fuera del sistema legal. Ese es el punto de partida y no hay compensaciones por el resto de las características.',
         ],
       },
       {
@@ -474,14 +474,14 @@ export const GUIDES: GuidePage[] = [
         question: '¿El personal tiene acreditación vigente y hay proceso de renovación?',
         body: [
           'Todo el personal que ejerce funciones de seguridad privada necesita acreditación OS-10 vigente. La credencial tiene una vigencia de tres años y requiere renovación.',
-          'La pregunta que importa no es si el personal está acreditado hoy, sino si existe un proceso de renovación. Una empresa conProcesses ordenado lo demuestra entregando el registro de credenciales con sus fechas.',
+          'La pregunta que importa no es si el personal está acreditado hoy, sino si existe un proceso de renovación. Una empresa con procesos ordenados lo demuestra entregando el registro de credenciales con sus fechas.',
         ],
       },
       {
         name: 'Estructura',
         question: '¿Cómo se sostiene la operación día a día?',
         body: [
-          'El punto donde más se differentiates a las empresas es en la estructura: rotación, supervisión, reemplazo y documentación. Son los cuatro elementos que separan a un proveedor que opera de uno que intermediates.',
+          'El punto donde más se diferencia una empresa de otra es la estructura: rotación, supervisión, reemplazo y documentación. Son los cuatro elementos que separan a un proveedor que opera de uno que intermedia.',
           'Un intermediario puede tener mejores precios y personal acreditado, pero delega la estructura. En seguridad privada eso se traduce en que no hay nadie que responda por la continuidad del servicio.',
         ],
       },
@@ -520,7 +520,7 @@ export const GUIDES: GuidePage[] = [
       {
         heading: 'Las cuatro preguntas que más revelan la calidad de un proveedor',
         body: [
-          'Si solo puedes hacer cuatro preguntas antes de decidir, que sean estas.',
+          'Si solo puede hacer cuatro preguntas antes de decidir, que sean estas.',
         ],
         list: [
           { q: '¿El plan de rondas está por escrito?', a: 'Un proveedor que tiene un método responde con frecuencia y recorrido definidos. Uno que improvisa responde con evasivas, y esa diferencia ya dice casi todo.' },

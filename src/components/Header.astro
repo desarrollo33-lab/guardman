@@ -31,6 +31,7 @@ const sectors = Object.entries(SECTOR_NAMES).map(([slug, name]) => ({ slug, name
           </svg>
         </button>
         <div class="dropdown-menu">
+          <a href="/servicios" class="dropdown-see-all">Todos los servicios</a>
           {services.map((s) => (
             <a href={`/servicios/${s.slug}`}>{s.name}</a>
           ))}
@@ -44,6 +45,7 @@ const sectors = Object.entries(SECTOR_NAMES).map(([slug, name]) => ({ slug, name
           </svg>
         </button>
         <div class="dropdown-menu">
+          <a href="/ubicaciones" class="dropdown-see-all">Cobertura por comuna</a>
           {locations.map((l) => (
             <a href={`/ubicaciones/${l.slug}`}>{l.name}</a>
           ))}
@@ -57,6 +59,7 @@ const sectors = Object.entries(SECTOR_NAMES).map(([slug, name]) => ({ slug, name
           </svg>
         </button>
         <div class="dropdown-menu">
+          <a href="/sectores" class="dropdown-see-all">Sectores que protegemos</a>
           {sectors.map((s) => (
             <a href={`/sectores/${s.slug}`}>{s.name}</a>
           ))}
@@ -72,7 +75,7 @@ const sectors = Object.entries(SECTOR_NAMES).map(([slug, name]) => ({ slug, name
         <span set:html={ICONS.phone} />
         {SITE.PHONE}
       </a>
-      <a href="/cotizacion" class="btn btn-primary">Cotizar</a>
+      <a href="/cotizacion" class="btn btn-primary">Cotizar para mi propiedad</a>
     </div>
     <button id="mobile-toggle" class="mobile-toggle" aria-label="Menú" aria-expanded="false" aria-controls="nav-links">
       <svg class="icon-menu" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
@@ -80,5 +83,23 @@ const sectors = Object.entries(SECTOR_NAMES).map(([slug, name]) => ({ slug, name
     </button>
   </div>
 </header>
+
+<style>
+  /* El enlace al hub abre el dropdown, pero el botón de arriba no es un link:
+     poner el hub dentro del menú lo hace alcanzable desde el teclado y desde
+     móvil, donde el hover no existe. El padding de `.dropdown-menu a` (site.css)
+     no separa visualmente este del resto, por eso lleva su propio borde. */
+  .dropdown-menu .dropdown-see-all {
+    font-weight: 600;
+    color: var(--primary);
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    margin-bottom: 4px;
+    padding-bottom: 10px;
+  }
+  .dropdown-menu .dropdown-see-all:hover {
+    background: none;
+  }
+</style>
 
 

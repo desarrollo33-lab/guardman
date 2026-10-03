@@ -16,6 +16,7 @@ import {
   type LeadStatus,
   type LeadPriority,
 } from '../../lib/crm-data';
+import { apiFetch } from '../../lib/api-client';
 
 interface Props {
   leadId: string;
@@ -40,7 +41,6 @@ interface ApiLeadFull {
   source: string;
   value: number;
   assigned_to?: string | null;
-  owner_email?: string | null;
   admin_notes?: string | null;
   ip_hash?: string | null;
   user_agent?: string | null;
@@ -66,7 +66,7 @@ function apiToLead(a: ApiLeadFull): Lead {
     value: a.value,
     created_at: a.created_at,
     updated_at: a.updated_at,
-    owner_email: a.owner_email ?? undefined,
+    assigned_to: a.assigned_to ?? undefined,
   };
 }
 
@@ -85,9 +85,7 @@ export default function LeadDetail({ leadId }: Props) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/leads/${leadId}`, { credentials: 'same-origin' });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
+      const data = await apiFetch<{ lead: ApiLeadFull }>(`/api/leads/${leadId}`);
       const full: ApiLeadFull = data.lead;
       setLead(apiToLead(full));
       setAdminNotes(full.admin_notes ?? '');
@@ -107,18 +105,14 @@ export default function LeadDetail({ leadId }: Props) {
   const patch = async (body: Record<string, unknown>, successMsg?: string) => {
     setSaving(true);
     try {
-      const res = await fetch(`/api/leads/${leadId}`, {
+      await apiFetch(`/api/leads/${leadId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
         body: JSON.stringify(body),
       });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
-      if (successMsg) (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({ type: 'success', title: 'Guardado', msg: successMsg });
+      if (successMsg) window.gmToast?.({ type: 'success', title: 'Guardado', msg: successMsg });
       await load();
     } catch (err) {
-      (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({ type: 'error', title: 'No se pudo guardar', msg: err instanceof Error ? err.message : String(err) });
+      window.gmToast?.({ type: 'error', title: 'No se pudo guardar', msg: err instanceof Error ? err.message : String(err) });
     } finally {
       setSaving(false);
     }
@@ -166,7 +160,7 @@ export default function LeadDetail({ leadId }: Props) {
           <div className="lead-header-meta">
             <span>📥 {SOURCE_LABELS[lead.source] ?? lead.source}</span>
             <span>· Creado {formatDate(lead.created_at)}</span>
-            {lead.owner_email && <span>· Asignado a {lead.owner_email}</span>}
+            {lead.assigned_to && <span>· Asignado a {lead.assigned_to}</span>}
           </div>
           {lead.message && (
             <div className="lead-header-message">
@@ -277,7 +271,11 @@ export default function LeadDetail({ leadId }: Props) {
                   value={assignedTo}
                   disabled={saving}
                   onBlur={() => {
-                    if (assignedTo !== (lead.owner_email ?? '')) {
+                    // Se compara contra `assigned_to`, el mismo campo que se
+                    // envía. Antes comparaba contra `owner_email`, que nunca se
+                    // escribía: la condición era casi siempre verdadera y cada
+                    // guardado disparaba un PATCH espurio.
+                    if (assignedTo !== (lead.assigned_to ?? '')) {
                       patch({ assigned_to: assignedTo || null });
                     }
                   }}

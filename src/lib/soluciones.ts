@@ -62,7 +62,7 @@ export const SOLUTIONS: SolutionPage[] = [
     coordinationProblem: [
       {
         title: 'Las llaves y los accesos que nadie controla',
-        body: 'Las equipes de aseo necesitan llaves, códigos y acceso a espacios comunes, estacionamientos yDependenciesnáuticas de servicio. Cuando eso se resuelve con llaves enFormats formality y confianza, el control de acceso pierde su sentido en exactamente las horas en que el edificio está vacío.',
+        body: 'Las equipes de aseo necesitan llaves, códigos y acceso a espacios comunes, estacionamientos y dependencias de servicio. Cuando eso se resuelve con llaves en formato físico y confianza, el control de acceso pierde su sentido en exactamente las horas en que el edificio está vacío.',
       },
       {
         title: 'El personal de limpieza sin acreditación en un sitio vigilado',
@@ -125,7 +125,7 @@ export const SOLUTIONS: SolutionPage[] = [
       {
         heading: 'Por qué dos empresas no es un problema teórico',
         body: [
-          'La razón por la que casi todos los condominios tienen dos proveedores no es técnica, es histórica: son Decentralized compras por separado, cada una con su cotización, su contrato y su propia lógica.',
+          'La razón por la que casi todos los condominios tienen dos proveedores no es técnica, es histórica: son compras separadas por proveedor, cada una con su cotización, su contrato y su propia lógica.',
           'El resultado es que la coordinación entre ellas no la lidera nadie. El guardia no sabe qué va a pasar con la limpieza, el equipo de aseo no tiene instrucción de seguridad, y la administración termina arbitrando diferencias todos los meses.',
           'Cuando los dos servicios son provistos por una sola empresa, la coordinación deja de ser un problema de las partes y pasa a ser parte de la operación. Eso es la diferencia real entre la lista de servicios y el servicio integrado.',
         ],
@@ -134,14 +134,14 @@ export const SOLUTIONS: SolutionPage[] = [
         heading: 'El punto de mayor riesgo es la noche',
         body: [
           'En la mayoría de los condominios, la franja de mayor exposición es la noche: el edificio está vacío o con muy pocos residentes, el personal de aseo ya se retiró o entra temprano, y la operación se reduce a la vigilancia.',
-          'Es también la franja en que los accesos de servicio son más sensibles, porque la supervisión es menor y el registro importa más. Un servicio integrado puede designing la cobertura de esa franja con la información de las otras operaciones.',
+          'Es también la franja en que los accesos de servicio son más sensibles, porque la supervisión es menor y el registro importa más. Un servicio integrado puede diseñar la cobertura de esa franja con la información de las otras operaciones.',
         ],
       },
     ],
     faqs: [
       {
         q: '¿El personal de aseo necesita acreditación OS-10?',
-        a: 'No. El personal de aseo no requiere acreditación OS-10 para performar tareas de limpieza. La acreditación es necesaria cuando la persona ejerce funciones de seguridad, vigilancia o control de acceso. Lo que sí se controla en un servicio integrado es que el acceso del personal de limpieza quede registrado por el sistema de vigilancia.',
+        a: 'No. El personal de aseo no requiere acreditación OS-10 para realizar tareas de limpieza. La acreditación es necesaria cuando la persona ejerce funciones de seguridad, vigilancia o control de acceso. Lo que sí se controla en un servicio integrado es que el acceso del personal de limpieza quede registrado por el sistema de vigilancia.',
       },
       {
         q: '¿Podemos contratar solo la vigilancia o solo el aseo?',
@@ -177,11 +177,11 @@ export const SOLUTIONS: SolutionPage[] = [
       },
       {
         title: 'El aseo como variable de seguridad',
-        body: 'Un pasilloBlocked, un acceso con visibilidad reducida por acumulación de objetos, un sistema de alarma con obstrucciones o un acceso despejado de forma irregular son condiciones que afectan la seguridad y que el aseo detecta todos los días.',
+        body: 'Un pasillo bloqueado, un acceso con visibilidad reducida por acumulación de objetos, un sistema de alarma con obstrucciones o un acceso despejado de forma irregular son condiciones que afectan la seguridad y que el aseo detecta todos los días.',
       },
       {
         title: 'Mantenimiento y limpieza con el mismo activo',
-        body: 'Las cámaras y los sensores están en ceilings, pasillos y espacios que el aseo mantiene. Una coordinación deficiente termina en obstrucciones, cortes y cámaras fuera de servicio que nadie sabe que están caídas.',
+        body: 'Las cámaras y los sensores están en plafones, pasillos y espacios que el aseo mantiene. Una coordinación deficiente termina en obstrucciones, cortes y cámaras fuera de servicio que nadie sabe que están caídas.',
       },
     ],
     services: [
@@ -201,7 +201,7 @@ export const SOLUTIONS: SolutionPage[] = [
         name: 'Aseo de zonas comunes',
         role: 'Servicio de aseo',
         detail:
-          'Limpieza de halls, ascensores, cocinas comunes, bathrooms y zonas de servicio, con personal uniformado y supervisión de terreno.',
+          'Limpieza de halls, ascensores, cocinas comunes, baños y zonas de servicio, con personal uniformado y supervisión de terreno.',
       },
       {
         name: 'Inspección conjunta',
@@ -237,8 +237,8 @@ export const SOLUTIONS: SolutionPage[] = [
         heading: 'Qué revisar en un edificio antes de instalar cámaras',
         body: [
           'Antes de dimensionar un sistema, la pregunta no es cuántas cámaras se pueden instalar, sino qué tiene que pasar en el edificio que la cámara debe registrar.',
-          'Los puntos que se evalúan: accesos vehiculares y peatonales,Including áreas de stationary de carga, estacionamientos y su cobertura por zonas, halls y ascensores, salidas de emergencia, espacios de servicio, y los puntos donde se producen los incidentes históricos del edificio.',
-          'Con esa información, la instalación se dimensiona donde aporta. Una cámara bien located en un acceso tiene más valor que cuatro cámaras que cubren un pasillo donde no ocurre nada.',
+          'Los puntos que se evalúan: accesos vehiculares y peatonales, incluidas áreas de tránsito de carga, estacionamientos y su cobertura por zonas, halls y ascensores, salidas de emergencia, espacios de servicio, y los puntos donde se producen los incidentes históricos del edificio.',
+          'Con esa información, la instalación se dimensiona donde aporta. Una cámara bien ubicada en un acceso tiene más valor que cuatro cámaras que cubren un pasillo donde no ocurre nada.',
         ],
       },
       {
@@ -510,11 +510,11 @@ export const SOLUTIONS: SolutionPage[] = [
       },
       {
         title: 'Limpieza sin turno definido',
-        body: 'La limpieza de un evento no es un servicio continuo: es una operación intensive, con una ventana de ejecución corta después de que termina la actividad. Requiere personal suficiente y capacitado para trabajar en ese tiempo específico.',
+        body: 'La limpieza de un evento no es un servicio continuo: es una operación intensiva, con una ventana de ejecución corta después de que termina la actividad. Requiere personal suficiente y capacitado para trabajar en ese tiempo específico.',
       },
       {
         title: 'Accesos de proveedores y logística',
-        body: 'Durante el montaje entran proveedores, técnicos,UntributorsIRTido y vehículos. El control de esos accesos tiene consecuencias directas sobre la seguridad posterior del evento.',
+        body: 'Durante el montaje entran proveedores, técnicos, contratistas y vehículos. El control de esos accesos tiene consecuencias directas sobre la seguridad posterior del evento.',
       },
     ],
     services: [
@@ -534,7 +534,7 @@ export const SOLUTIONS: SolutionPage[] = [
         name: 'Limpieza de evento',
         role: 'Servicio de aseo',
         detail:
-          'Limpieza de recintos, bathrooms, zonas de itrANSITO y retiro de residuos después de la actividad, con equipo dimensionado para la ventana de ejecución.',
+          'Limpieza de recintos, baños, zonas de tránsito y retiro de residuos después de la actividad, con equipo dimensionado para la ventana de ejecución.',
       },
       {
         name: 'Coordinación de operación',

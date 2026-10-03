@@ -56,9 +56,8 @@ const faq = [
 ---
 
 <BaseLayout
-  title="Canal de Denuncias Ley 20.393 21.595 21.643 GuardMan Chile"
-  description="Canal oficial de denuncias anónimo de GuardMan Chile. Conforme a las Leyes 20.393 (responsabilidad penal de personas jurídicas), 21.595 (delitos económicos) y 21.643 Ley Karin (acoso y violencia laboral). Modelo de Prevención de Delitos, EPD independiente, confidencialidad y prohibición de represalias."
-  breadcrumb="Canal de Denuncias"
+  title="Canal de Denuncias | GuardMan Chile"
+  description="Canal oficial de denuncias anónimas de GuardMan Chile. Conforme a las Leyes 20.393 (responsabilidad penal de personas jurídicas), 21.595 (delitos económicos) y 21.643 Ley Karin (acoso y violencia laboral). Modelo de Prevención de Delitos, EPD independiente, confidencialidad y prohibición de represalias."
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Canal de Denuncias', url: '/canal-de-denuncias' }]}
   showCluster={true}
   clusterType="servicios"
@@ -97,7 +96,7 @@ const faq = [
             <Icon name="eye-off" size={28} />
           </div>
           <h3>Anonimato y confidencialidad</h3>
-          <p>La Ley 20.393 no exige identificación y la jurisprudencia chilena acepta denuncias anónimas como gatillo de investigación. Aquí puedes denunciar sin identificarte. Si dejas un medio de contacto, lo usamos solo para la investigación y nunca lo compartimos. Internamente, el acceso a la denuncia está restringido al EPD y al Comité de Ética.</p>
+          <p>La Ley 20.393 no exige identificación y la jurisprudencia chilena acepta denuncias anónimas como gatillo de investigación. Aquí puede denunciar sin identificarse. Si deja un medio de contacto, lo usamos solo para la investigación y nunca lo compartimos. Internamente, el acceso a la denuncia está restringido al EPD y al Comité de Ética.</p>
         </div>
         <div class="compromiso-card">
           <div class="compromiso-icon compromiso-icon-law">
@@ -126,7 +125,7 @@ const faq = [
         trackName="denuncia"
         headerLabel="Formulario de denuncia"
         headerTitle="Cuéntanos qué pasó"
-        subtitle='Todos los campos marcados con <span class="required">*</span> son obligatorios. Los datos de contacto son opcionales — la denuncia puede ser anónima.'
+        subtitle="Los campos obligatorios están marcados con un asterisco. Los datos de contacto son opcionales: la denuncia puede ser anónima."
         novalidate={true}
         autocomplete="off"
         submitText="Enviar denuncia de forma anónima"
@@ -145,7 +144,11 @@ const faq = [
           footIcon: 'clock3',
           footNote: 'Nuestro equipo revisará la denuncia en menos de 72 horas hábiles. Si proporcionó email o teléfono, le contactaremos por ese medio.',
           actions: [
-            { text: 'Consultar estado de mi denuncia', href: '/canal-de-denuncias/estado/', variant: 'primary' },
+            // El href estático apunta a la página del canal, no a /estado/: la
+            // ruta de estado exige un ID y sin él responde 404. El JS de este
+            // archivo reescribe el href con el ID real tras enviar la denuncia,
+            // y solo funciona si encuentra el nodo — de ahí el `id` explícito.
+            { text: 'Consultar estado de mi denuncia', href: '/canal-de-denuncias', id: 'denuncia-status-link', variant: 'primary' },
             { text: 'Volver al inicio', href: '/', variant: 'outline' },
             { text: 'Contactar directamente', href: '/contacto', variant: 'outline' },
           ],

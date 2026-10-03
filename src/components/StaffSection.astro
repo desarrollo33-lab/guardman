@@ -7,6 +7,7 @@
 //
 // data-od-id="staff" se mantiene para no romper tracking externo.
 import Icon from './Icon.astro';
+import { IMAGE_VERSION } from '../lib/constants';
 
 const staffPoints = [
   'Guardias con certificación OS-10, rigurosamente seleccionados y entrenados para proteger su patrimonio con profesionalismo.',
@@ -21,9 +22,14 @@ const staffPoints = [
   <div class="container split">
     <div class="split-image">
       <img
-        src="/images/nosotros_seccion.webp"
+        src={`/images/nosotros_seccion.webp?v=${IMAGE_VERSION}`}
+        srcset={`/images/nosotros_seccion-560.webp?v=${IMAGE_VERSION} 560w,
+                /images/nosotros_seccion.webp?v=${IMAGE_VERSION} 824w`}
+        sizes="(min-width: 1024px) 552px, 100vw"
         alt="Personal GuardMan Chile en formación"
         loading="lazy"
+        width="824"
+        height="558"
         onerror="this.style.display='none';this.parentElement.style.minHeight='360px'"
       />
     </div>

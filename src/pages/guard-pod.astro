@@ -4,6 +4,7 @@
 // Estructura, secciones, imágenes, colores de fondo y componentes preservados.
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
+import { IMAGE_VERSION } from '../lib/constants';
 
 const features = [
   {
@@ -71,16 +72,21 @@ const faqs = [
 ---
 
 <BaseLayout
-  title="Guardpod Sistema Autónomo de Vigilancia 24/7"
+  title="Guardpod, vigilancia autónoma 24/7 en Chile | GuardMan"
   description="Guardpod es el sistema autónomo de vigilancia desarrollado por GuardMan Chile. Integra cámaras 360°, detección IA y monitoreo 24/7 desde nuestra central propia. Único en el mercado chileno. Sin infraestructura eléctrica ni personal permanente."
   theme="dark"
   loadDarkCss={true}
-  breadcrumb="Guardpod"
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Guardpod', url: '/guard-pod' }]}
   showCluster={true}
   clusterType="servicios"
   clusterExclude="guard-pod"
   faq={faqs}
+  product={{
+    name: 'Guardpod V1',
+    description: 'Sistema autónomo de vigilancia 24/7 con cámaras 360°, detección de intrusiones por inteligencia artificial y monitoreo desde central propia. Sin infraestructura eléctrica ni personal permanente.',
+    image: '/images/guardpod-16-9.webp',
+    url: '/guard-pod',
+  }}
 >
   <!-- HERO -->
   <section class="hero" data-od-id="hero">
@@ -94,7 +100,7 @@ const faqs = [
           <h1>Guardpod, sistema autónomo de vigilancia 24/7 sin infraestructura</h1>
           <p class="hero-sub">Sistema autónomo de vigilancia con cámaras 360° y detección de intrusos por IA, supervisado desde nuestra central propia. Desarrollado durante 15 meses de I+D, sustituye guardias presenciales a una fracción del costo, sin infraestructura eléctrica ni personal permanente. Ninguna otra empresa de seguridad en Chile ofrece un sistema equivalente.</p>
           <div class="hero-ctas">
-            <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+            <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar para mi propiedad</a>
             <a href="#features" class="btn btn-ghost btn-lg">Ver ficha técnica</a>
           </div>
           <div class="hero-stats">
@@ -119,11 +125,11 @@ const faqs = [
         <div class="split-text">
           <span class="section-label">Vigilancia autónoma</span>
           <h2 class="section-title">¿Paga de más por vigilar zonas sin infraestructura?</h2>
-          <p>Contratar guardias presenciales 24/7 para faenas, terrenos o estacionamientos suele superar los $3.000.000 mensuales. Guardpod ofrece la misma cobertura, con detección por IA y respuesta inmediata, por una fracción de ese costo, sin necesidad de personal permanente, conexión eléctrica ni obras civiles.</p>
+          <p>Contratar guardias presenciales 24/7 para faenas, terrenos o estacionamientos exige una dotación permanente, con los turnos y los relevos que eso implica. Guardpod cubre lo mismo con detección por IA y respuesta inmediata, sin personal en terreno, sin conexión eléctrica y sin obras civiles.</p>
           <p>A diferencia de una cámara de seguridad convencional o de una torre CCTV solar tradicional, Guardpod es un sistema autónomo completo que integra visión nocturna, análisis de video en tiempo real y alertas inmediatas ante intrusiones. Su diseño modular permite reubicación en minutos, adaptándose a proyectos temporales o permanentes. Desarrollado durante 15 meses de investigación interna, es la primera solución de vigilancia autónoma diseñada y operada por una empresa de seguridad privada en Chile.</p>
         </div>
         <div class="split-image">
-          <img src="/images/guardpod-16-9.png" alt="Sistema autónomo Guardpod en operación nocturna" loading="lazy" onerror="this.style.display='none'" />
+          <img src={`/images/guardpod-16-9.webp?v=${IMAGE_VERSION}`} alt="Sistema autónomo Guardpod en operación nocturna" loading="lazy" decoding="async" width="1280" height="720" onerror="this.style.display='none'" />
         </div>
       </div>
     </div>
@@ -186,7 +192,7 @@ const faqs = [
       <h2 class="section-title">Proteja su obra, evento o terreno con Guardpod</h2>
       <p class="section-subtitle">Solicite una cotización sin compromiso y descubra cómo esta solución autónoma reemplaza guardias presenciales a una fracción del costo, sin perder capacidad de respuesta.</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-        <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar ahora</a>
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar para mi propiedad</a>
       </div>
     </div>
   </div>

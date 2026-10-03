@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  SITE, STATS, SERVICE_NAMES, SERVICE_SLUGS, LOCATIONS, LOCATION_SLUGS,
+  SITE, SERVICE_NAMES, SERVICE_SLUGS, LOCATIONS, LOCATION_SLUGS,
   ZONE_CONTEXT, SECTOR_NAMES, SECTOR_TO_SERVICE, API_TIMEOUT_MS, BUNDLE_VERSION,
 } from '../src/lib/constants';
 
@@ -8,14 +8,12 @@ describe('constants', () => {
   it('SITE has required fields', () => {
     expect(SITE.NAME).toBe('GuardMan Chile');
     expect(SITE.URL).toMatch(/^https?:\/\//);
-    expect(SITE.API_URL).toMatch(/^https?:\/\//);
+    // API_URL puede estar vacía a propósito: el endpoint pasa `${apiUrl}/api/...`
+    // a una ruta relativa, sin CORS ni CSP extra (ver SITE.API_URL en constants.ts).
+    expect(SITE.API_URL === '' || /^https?:\/\//.test(SITE.API_URL)).toBe(true);
     expect(SITE.PHONE).toMatch(/\+56/);
     expect(SITE.EMAIL_INFO).toMatch(/@/);
     expect(SITE.FOUNDED_YEAR).toBeGreaterThan(2010);
-  });
-
-  it('STATS has 4 numeric stats', () => {
-    expect(Object.keys(STATS)).toEqual(['GUARDIAS', 'EMPRESAS', 'COMUNAS', 'ANOS']);
   });
 
   it('SERVICE_SLUGS matches SERVICE_NAMES keys', () => {

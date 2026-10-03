@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   STATUS_FLOW,
-  STATUS_LABELS,
   STATUS_COLORS,
   PRIORITY_LABELS,
   PRIORITY_COLORS,
@@ -11,6 +10,7 @@ import {
   type Lead,
   type LeadStatus,
 } from '../../lib/crm-data';
+import { apiFetch } from '../../lib/api-client';
 
 // Alias para mantener semántica del componente (kanban = columns de status).
 // Etiquetas del header (acentos para mostrar en columnas): minúsculas con
@@ -42,7 +42,7 @@ function exportCSV(leads: Lead[]) {
     [
       l.id, l.name, l.email, l.phone, l.company ?? '', l.service, l.location ?? '',
       l.status, l.priority, l.source, String(l.value), l.created_at, l.updated_at ?? '',
-      l.owner_email ?? '', (l.message ?? '').replace(/"/g, '""'),
+      l.assigned_to ?? '', (l.message ?? '').replace(/"/g, '""'),
     ]
       .map((v) => `"${String(v).replace(/"/g, '""')}"`)
       .join(','),
@@ -71,7 +71,7 @@ interface ApiLead {
   priority: Lead['priority'];
   source: string;
   value: number;
-  owner_email?: string | null;
+  assigned_to?: string | null;
   message?: string | null;
 }
 
@@ -90,7 +90,7 @@ function apiToLead(a: ApiLead): Lead {
     value: a.value,
     created_at: a.created_at,
     updated_at: a.updated_at,
-    owner_email: a.owner_email ?? undefined,
+    assigned_to: a.assigned_to ?? undefined,
     message: a.message ?? undefined,
   };
 }
@@ -102,15 +102,16 @@ export default function Pipeline() {
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOverCol, setDragOverCol] = useState<LeadStatus | null>(null);
   const [query, setQuery] = useState('');
+  const [total, setTotal] = useState(0);
 
   const load = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/leads?limit=200', { credentials: 'same-origin' });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
-      setLeads((data.leads ?? []).map(apiToLead));
+      const data = await apiFetch<{ leads?: ApiLead[]; total?: number }>('/api/leads?limit=200');
+      const list = (data.leads ?? []).map(apiToLead);
+      setLeads(list);
+      setTotal(data.total ?? list.length);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -162,15 +163,11 @@ export default function Pipeline() {
       const prev = leads;
       setLeads((cur) => cur.map((l) => (l.id === leadId ? { ...l, status: toStatus, updated_at: new Date().toISOString() } : l)));
       try {
-        const res = await fetch(`/api/leads/${leadId}`, {
+        await apiFetch(`/api/leads/${leadId}`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'same-origin',
           body: JSON.stringify({ status: toStatus }),
         });
-        const data = await res.json();
-        if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
-        (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
+        window.gmToast?.({
           type: 'success',
           title: 'Lead movido',
           msg: `Estado actualizado a ${toStatus}`,
@@ -280,6 +277,12 @@ export default function Pipeline() {
 
   return (
     <div>
+      {total > leads.length && (
+        <div className="panel" style={{ marginBottom: 16, padding: '12px 16px' }}>
+          <strong>Mostrando los {leads.length} leads más recientes.</strong> Hay {total} en total:{' '}
+          las columnas omiten las más antiguas.
+        </div>
+      )}
       <div className="pipeline-toolbar">
         <input
           className="form-input pipeline-search"

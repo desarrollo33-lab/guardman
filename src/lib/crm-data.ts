@@ -39,17 +39,16 @@ export interface Lead {
   priority: LeadPriority;
   source: LeadSource;
   value: number;
-  monthly_value?: number;
   created_at: string;
   updated_at: string;
-  expected_close?: string;
-  assigned_to: string;
-  owner_email: string;
-  notes?: string;
+  // `owner_email` se eliminó en 0004: nunca se escribió y las islas leían esa
+  // mientras el PATCH escribía esta, así que la asignación nunca se veía.
+  // Canónica = `assigned_to` (con índice, y mismo nombre que `denuncias`).
+  assigned_to?: string | null;
+  admin_notes?: string | null;
   property_type?: string;
   guards_count?: string;
   message?: string;
-  tags?: string[];
 }
 
 // ── Flow canónico del lead (mismo orden que usa el Pipeline) ──

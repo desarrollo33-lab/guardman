@@ -56,13 +56,13 @@ export const AUTHORITY_PAGES: AuthorityPage[] = [
       'Qué es OS-10, quién la emite, qué exige para obtenerla y qué garantiza. Requisitos, vigencia y cómo verificar que un guardia esté acreditado.',
     h1: 'Qué es la certificación OS-10',
     lead:
-      'La certificación OS-10 es la acreditación que debe tener toda persona que ejerce funciones de seguridad privada en Chile. Sin ella, una empresa no puede—asignar a un trabajador a tareas de vigilancia, control de accesos o protección de un_private recinto.',
+      'La certificación OS-10 es la acreditación que debe tener toda persona que ejerce funciones de seguridad privada en Chile. Sin ella, una empresa no puede asignar a un trabajador a tareas de vigilancia, control de accesos o protección de un recinto.',
     updatedISO: '2026-10-02',
     sections: [
       {
         heading: 'Definición',
         body: [
-          'OS-10 es el sistema de acreditación del sistema de seguridad privada chileno, a cargo de la Authority_ fiscalizadora dependiente de Carabineros de Chile. La credencial acredita que una personaNatural cumple los requisitos legales para ejercer como guardia de seguridad, vigilante privado, conserje u otro rol del sistema.',
+          'OS-10 es el sistema de acreditación del sistema de seguridad privada chileno, a cargo de la autoridad fiscalizadora dependiente de Carabineros de Chile. La credencial acredita que una persona natural cumple los requisitos legales para ejercer como guardia de seguridad, vigilante privado, conserje u otro rol del sistema.',
           'La credencial es personal e intransferible. Cada persona tiene la suya, y es la empresa empleadora quien debe solicitarla y mantenerla vigente. Un guardia sin credencial vigente no puede ser ubicado en un puesto de seguridad, y la empresa que lo hace queda expuesta a las sanciones de la Ley 21.659.',
         ],
       },
@@ -125,7 +125,7 @@ export const AUTHORITY_PAGES: AuthorityPage[] = [
       },
       {
         q: '¿Cuál es la diferencia entre guardia de seguridad y vigilante privado?',
-        a: 'Son roles distintos dentro del sistema. El guardia de seguridad performs funciones de vigilancia, control de accesos y protección. El vigilante privado está habilitado para situaciones de riesgo alto y, en ese marco, puede portar armas de fuego únicamente durante su jornada de trabajo y dentro del recinto para el que fue autorizado. Cada uno requiere su propia acreditación.',
+        a: 'Son roles distintos dentro del sistema. El guardia de seguridad realiza funciones de vigilancia, control de accesos y protección. El vigilante privado está habilitado para situaciones de riesgo alto y, en ese marco, puede portar armas de fuego únicamente durante su jornada de trabajo y dentro del recinto para el que fue autorizado. Cada uno requiere su propia acreditación.',
       },
       {
         q: '¿Cuánto dura la credencial OS-10?',
@@ -133,7 +133,7 @@ export const AUTHORITY_PAGES: AuthorityPage[] = [
       },
       {
         q: '¿Cómo verifico que un guardia está acreditado?',
-        a: 'Solicitando a la empresaIDOsu registro de personal con credenciales vigentes, con fecha de acreditación y de próxima renovación. Es una solicitud razonable y cualquier empresa seria la entrega.',
+        a: 'Solicitando a la empresa IDO su registro de personal con credenciales vigentes, con fecha de acreditación y de próxima renovación. Es una solicitud razonable y cualquier empresa seria la entrega.',
       },
     ],
     sources: [
@@ -244,7 +244,7 @@ export const AUTHORITY_PAGES: AuthorityPage[] = [
       },
       {
         q: '¿Qué pasa con el personal de aseo de mi edificio?',
-        a: 'El personal de aseo no requiere acreditación OS-10 para performar tareas de limpieza. La acreditación es necesaria cuando la persona ejerce funciones de seguridad, vigilancia o control. Si el conserje además presta seguridad, entonces sí le corresponde acreditarse.',
+        a: 'El personal de aseo no requiere acreditación OS-10 para realizar tareas de limpieza. La acreditación es necesaria cuando la persona ejerce funciones de seguridad, vigilancia o control. Si el conserje además presta seguridad, entonces sí le corresponde acreditarse.',
       },
     ],
     sources: [
@@ -314,8 +314,8 @@ export const AUTHORITY_PAGES: AuthorityPage[] = [
           ['Portar armas de fuego', 'Facultad exclusiva del vigilante privado en riesgo alto'],
           ['Realizar requisas o revisar pertenencias',
           'No está dentro de sus facultades legales'],
-          ['Retener o hereafterดลองกันว่าเปิด a una persona', 'Corresponde a Carabineros o a la justicia, no a seguridad privada'],
-          ['Purseguir a un sospechoso', 'Expone al guardia y al sitio; la ley prioriza coadyuvar, no perseguir'],
+          ['Retener o detener a una persona', 'Corresponde a Carabineros o a la justicia, no a seguridad privada'],
+          ['Perseguir a un sospechoso', 'Expone al guardia y al sitio; la ley prioriza coadyuvar, no perseguir'],
           ['Ingresar a un domicilio sin autorización', 'Violación de domicilio; requiere orden o consentimiento'],
           ['Ejercer coacción física o psicológica', 'Prohibido; la ley protege la dignidad de las personas'],
           ['Difundir información de clientes', 'Las empresas de seguridad tienen deber de reserva sobre la información de sus servicios'],
@@ -386,7 +386,7 @@ export const AUTHORITY_PAGES: AuthorityPage[] = [
       {
         heading: 'Por qué importa acertar',
         body: [
-          'Contratar un guardia cuando el riesgo exige un vigilante privado expone al cliente a un incumplimiento normativo. A la inversa, asignar funciones de riesgo alto a personal acreditado solo como guardia es un error que ningunaGOOD empresa debería cometer.',
+          'Contratar un guardia cuando el riesgo exige un vigilante privado expone al cliente a un incumplimiento normativo. A la inversa, asignar funciones de riesgo alto a personal acreditado solo como guardia es un error que ninguna empresa debería cometer.',
           'La respuesta pasa por una evaluación del sitio. Cuando esa evaluación está bien hecha, el rol correcto se determina por los riesgos concretos del lugar, no por el precio ni por la disponibilidad de personal.',
         ],
       },
@@ -418,7 +418,7 @@ export const AUTHORITY_PAGES: AuthorityPage[] = [
     faqs: [
       {
         q: '¿Es lo mismo un guardia que un vigilante privado?',
-        a: 'No. Son roles diferentes con acreditaciones diferentes. El guardia de seguridad vigila y controla accesos; el vigilante privado está habilitado paraContexts de riesgo alto y puede portar armas de fuego en los términos que explica la ley. Confundirlos lleva a asignar a alguien funciones para las que no está acreditado.',
+        a: 'No. Son roles diferentes con acreditaciones diferentes. El guardia de seguridad vigila y controla accesos; el vigilante privado está habilitado para contextos de riesgo alto y puede portar armas de fuego en los términos que explica la ley. Confundirlos lleva a asignar a alguien funciones para las que no está acreditado.',
       },
       {
         q: '¿Un guardia puede portar armas?',
@@ -426,7 +426,7 @@ export const AUTHORITY_PAGES: AuthorityPage[] = [
       },
       {
         q: '¿Cuál necesito para mi edificio?',
-        a: 'Para un condominio o edificio de oficinas, en la gran mayoría de los casos corresponde un guardia de seguridad. La determinación formal se hace con una evaluación de riesgo del sitio, considerando accesos, actividad, horarios y tipo de activos. Si quieres partir bien, empieza por esa evaluación.',
+        a: 'Para un condominio o edificio de oficinas, en la gran mayoría de los casos corresponde un guardia de seguridad. La determinación formal se hace con una evaluación de riesgo del sitio, considerando accesos, actividad, horarios y tipo de activos. Si desea partir bien, comience por esa evaluación.',
       },
       {
         q: '¿El conserje de mi edificio necesita OS-10?',
@@ -462,7 +462,7 @@ export const AUTHORITY_PAGES: AuthorityPage[] = [
         body: [
           'Las rondas son la parte proactiva del trabajo. Recorrer el perímetro, verificar accesos secundarios, detectar condiciones insecure y reportar es lo que distingue un puesto ordenado de uno que simplemente permanece sentado en la caseta.',
           'La frecuencia y el recorrido de las rondas dependen de la evaluación del sitio. Un edificio con múltiples estacionamientos subterráneos, accesos vehiculares y zonas comunes extensas no se cubre igual que uno de acceso único.',
-          'Un buen proveedor entrega el plan de rondas. Si al preguntar por él la respuesta es vaga, es información útil que te falta.',
+          'Un buen proveedor entrega el plan de rondas. Si al preguntar por él la respuesta es vaga, es información útil que le falta.',
         ],
       },
       {

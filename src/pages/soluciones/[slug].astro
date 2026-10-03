@@ -11,6 +11,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { SOLUTIONS } from '../../lib/soluciones';
 import Icon from '../../components/Icon.astro';
 import LeadCTA from '../../components/LeadCTA.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+import { EDITORIAL_BRIDGE, bridgeItems } from '../../lib/internal-links';
 
 export const prerender = true;
 
@@ -42,7 +44,6 @@ const solutionLd = {
     datePublished: page.updatedISO,
     dateModified: page.updatedISO,
   }}
-  breadcrumb={page.title}
   breadcrumbs={[
     { name: 'Inicio', url: '/' },
     { name: 'Soluciones', url: '/soluciones' },
@@ -105,6 +106,13 @@ const solutionLd = {
             </div>
           </div>
 
+          <RelatedLinks
+            items={bridgeItems(EDITORIAL_BRIDGE[page.slug])}
+            title="Los servicios que se integran"
+            subtitle="Cada línea de esta solución se contrata por separado en el mercado. Aquí se operan bajo un mismo responsable."
+            odId="block-bridge"
+          />
+
           <div class="block" data-od-id="block-operacion">
             <h2>Cómo se opera</h2>
             <p>
@@ -151,8 +159,8 @@ const solutionLd = {
                 Un solo interlocutor para seguridad y mantención, con alcance declarado y
                 responsable único ante cualquier incidente.
               </p>
-              <a href="/cotizacion" class="btn btn-primary">Cotizar ahora</a>
-              <a href="/contacto" class="btn btn-outline">Hablar con un experto</a>
+              <a href="/cotizacion" class="btn btn-primary">Cotizar para mi propiedad</a>
+              <a href="/contacto" class="btn btn-outline">Enviar mi consulta</a>
             </div>
             <div class="sidebar-body">
               <div class="sb-section">

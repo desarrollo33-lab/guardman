@@ -12,7 +12,9 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:coverage": "vitest run --coverage",
-    "lighthouse": "node scripts/lighthouse-audit.mjs"
+    "lighthouse": "node scripts/lighthouse-audit.mjs",
+    "verify:links": "node scripts/verify-internal-links.mjs",
+    "measure:links": "node scripts/measure-internal-links.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.6.0",
@@ -35,6 +37,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitest/coverage-v8": "^4.1.10",
+    "ajv": "^8.20.0",
     "jsdom": "^29.1.1",
     "lighthouse": "^12.8.2",
     "tailwindcss": "^4.0.0",

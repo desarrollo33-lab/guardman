@@ -16,11 +16,29 @@ interface Props {
   trustBadges?: boolean;
 }
 
+// COPY DE CTA — regla única del sitio, 2026-10-03.
+//
+// El CTA dice QUÉ hace el cliente al pulsarlo y QUÉ recibe. "Solicitar
+// cotización" y "Cotizar ahora" son el mismo botón con dos_redacciones, y
+// ninguno de los dos dice qué obtiene. "Cotizar para mi propiedad" sí.
+//
+// Este es el widget canónico: 6 de los 7 CTAs del sitio salen de acá, así que
+// un cambio en `primaryTextDefault` se propaga solo. Los que quedan hardcodeados
+// en páginas están en `tests/cta-consistencia.test.ts`, que falla si aparece una
+// variante nueva sin objeto.
+//
+// Los tres que NO cambian, y por qué:
+//   - "Denunciar ahora" (canal-de-denuncias): la intención es evidente y no es
+//     comercial. Le agregar "para mi propiedad" la volvería falsa.
+//   - "Solicitar evaluación" (guias/*): pide una visita, no un precio.
+//   - "Cotizar solución integrada" (soluciones/*): ya nombra el objeto.
+const CTA_COTIZAR = 'Cotizar para mi propiedad';
+
 const {
   variant = 'inline',
   title,
   subtitle,
-  primaryText = 'Solicitar cotización',
+  primaryText = CTA_COTIZAR,
   primaryHref = '/cotizacion',
   secondaryText,
   secondaryHref,
@@ -39,7 +57,7 @@ const defaultTitles: Record<string, { title: string; subtitle: string }> = {
   },
   sticky: {
     title: 'Cotización en 24 horas hábiles',
-    subtitle: 'Sin compromiso. Hable con un experto en seguridad.',
+    subtitle: 'Sin compromiso. Un asesor revisa su caso y responde sus preguntas antes de cotizar.',
   },
   footer: {
     title: 'Hablemos de su seguridad',
@@ -53,7 +71,7 @@ const defaultTitles: Record<string, { title: string; subtitle: string }> = {
 
 const content = { ...defaultTitles[variant], title: title ?? defaultTitles[variant].title, subtitle: subtitle ?? defaultTitles[variant].subtitle };
 
-const primaryTextDefault = 'Solicitar cotización';
+const primaryTextDefault = CTA_COTIZAR;
 const finalPrimaryText = primaryText || primaryTextDefault;
 ---
 

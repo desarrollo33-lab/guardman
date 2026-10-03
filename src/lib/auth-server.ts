@@ -343,12 +343,22 @@ export async function recordLoginAttempt(adminId: number, success: boolean): Pro
       .run();
     return;
   }
+  // El contador se reinicia cuando el bloqueo ya venció. Antes el `+1` se
+  // acumulaba para siempre: con `failed_attempts` en 5 o más, CUALQUIER
+  // intento posterior volvía a armar el lock (`5+1 >= 5`), así que cinco
+  // errores quedaban bloqueando la cuenta indefinidamente y nadie podía
+  // volver a entrar, ni con la contraseña correcta si otro error se colaba.
   await env.DB.prepare(
     `UPDATE admin_users
-        SET failed_attempts = failed_attempts + 1,
+        SET failed_attempts = CASE
+              WHEN locked_until IS NOT NULL AND locked_until < unixepoch() THEN 1
+              ELSE failed_attempts + 1
+            END,
             locked_until = CASE
-              WHEN failed_attempts + 1 >= 5 THEN unixepoch() + 900
-              ELSE locked_until
+              WHEN (locked_until IS NOT NULL AND locked_until < unixepoch())
+                OR failed_attempts + 1 >= 5
+              THEN unixepoch() + 900
+              ELSE NULL
             END
       WHERE id = ?1`,
   )

@@ -13,14 +13,14 @@ const title = isQuote ? 'Cotización enviada' : 'Mensaje enviado';
 // Timeline de próximos pasos según el tipo
 const nextSteps = isQuote
   ? [
-      { icon: 'check', label: 'Solicitud recibida', desc: 'Registramos tu requerimiento en nuestro sistema.' },
-      { icon: 'phone', label: 'Te contactaremos en menos de 24h hábiles', desc: 'Un ejecutivo comercial revisará tu caso y te llamará.' },
-      { icon: 'location', label: 'Visita técnica gratuita', desc: 'Evaluamos tu propiedad en terreno para diseñar la solución.' },
+      { icon: 'check', label: 'Solicitud recibida', desc: 'Registramos su requerimiento en nuestro sistema.' },
+      { icon: 'phone', label: 'Lo contactaremos en menos de 24h hábiles', desc: 'Un ejecutivo comercial revisará su caso y lo llamará.' },
+      { icon: 'location', label: 'Visita técnica gratuita', desc: 'Evaluamos su propiedad en terreno para diseñar la solución.' },
       { icon: 'doc', label: 'Cotización formal', desc: 'Recibirás una propuesta personalizada sin compromiso.' },
     ]
   : [
-      { icon: 'check', label: 'Mensaje recibido', desc: 'Registramos tu consulta en nuestro sistema.' },
-      { icon: 'phone', label: 'Te responderemos pronto', desc: 'Nuestro equipo te contactará en menos de 24 horas hábiles.' },
+      { icon: 'check', label: 'Mensaje recibido', desc: 'Registramos su consulta en nuestro sistema.' },
+      { icon: 'phone', label: 'Le responderemos pronto', desc: 'Nuestro equipo lo contactará en menos de 24 horas hábiles.' },
     ];
 ---
 
@@ -39,13 +39,13 @@ const nextSteps = isQuote
         <span class="thanks-eyebrow">{isQuote ? 'Cotización' : 'Contacto'} recibido</span>
         <h1 class="thanks-title">¡Gracias por contactarnos!</h1>
         <p class="thanks-sub">
-          Hemos recibido tu {isQuote ? 'solicitud de cotización' : 'mensaje'}.<br />
-          Nuestro equipo comercial la revisará y te contactará <strong>en menos de 24 horas hábiles</strong>.
+          Hemos recibido su {isQuote ? 'solicitud de cotización' : 'mensaje'}.<br />
+          Nuestro equipo comercial la revisará y lo contactará <strong>en menos de 24 horas hábiles</strong>.
         </p>
 
         {leadId && (
           <div class="thanks-id-box">
-            <div class="thanks-id-label">Tu número de seguimiento</div>
+            <div class="thanks-id-label">Su número de seguimiento</div>
             <div class="thanks-id-row">
               <code class="thanks-id-value" id="lead-tracking-id">{leadId}</code>
               <button type="button" class="thanks-id-copy" id="lead-copy-btn" aria-label="Copiar número de seguimiento">
@@ -56,7 +56,7 @@ const nextSteps = isQuote
                 <span>Copiar</span>
               </button>
             </div>
-            <p class="thanks-id-hint">Guarda este número para consultar el estado de tu solicitud.</p>
+            <p class="thanks-id-hint">Guarda este número para consultar el estado de su solicitud.</p>
           </div>
         )}
 
@@ -82,7 +82,7 @@ const nextSteps = isQuote
         </div>
 
         <div class="thanks-contact">
-          <p class="thanks-contact-label">Si necesitas atención inmediata:</p>
+          <p class="thanks-contact-label">Si necesita atención inmediata:</p>
           <div class="thanks-contact-channels">
             <a href={`tel:${SITE.PHONE_TEL}`} class="thanks-channel">
               <span class="thanks-channel-icon">📞</span>

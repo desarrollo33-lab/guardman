@@ -29,7 +29,7 @@ import Icon from './Icon.astro';
 
 type FieldType = 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'date' | 'radio' | 'acceptance';
 type SectionType = { title?: string; number?: number | string; optionalTag?: string; help?: string; fields: Field[] };
-type SuccessAction = { text: string; href: string; variant?: 'primary' | 'outline' };
+type SuccessAction = { text: string; href: string; variant?: 'primary' | 'outline'; id?: string };
 
 interface Field {
   name: string;
@@ -104,7 +104,7 @@ const {
   id, title, subtitle, headerLabel, headerTitle,
   sections, submitText, submitIcon, submitClass,
   mode = 'lead', trackName, successRedirect,
-  footNote, errorText = 'Hubo un error. Por favor intenta nuevamente o llámanos.',
+  footNote, errorText = 'Hubo un error. Por favor intente nuevamente o llámenos.',
   novalidate, autocomplete,
   successPanel,
   webmcp = null,
@@ -193,7 +193,7 @@ const sectionRows = (section: SectionType): RowItem[] => {
                   </label>
                   {f.type === 'select' ? (
                     <select name={f.name} id={f.id} required={f.required} {...toolAttrs(f)}>
-                      <option value="">Selecciona</option>
+                      <option value="">Seleccione</option>
                       {f.options?.map((opt) => <option value={opt}>{opt}</option>)}
                     </select>
                   ) : f.type === 'date' ? (
@@ -264,7 +264,7 @@ const sectionRows = (section: SectionType): RowItem[] => {
                 </>
               ) : row.field.type === 'select' ? (
                 <select name={row.field.name} id={row.field.id} required={row.field.required} {...toolAttrs(row.field)}>
-                  <option value="">Selecciona</option>
+                  <option value="">Seleccione</option>
                   {row.field.options?.map((opt) => <option value={opt}>{opt}</option>)}
                 </select>
               ) : row.field.type === 'date' ? (
@@ -334,7 +334,7 @@ const sectionRows = (section: SectionType): RowItem[] => {
       </div>
       <div class="denuncia-success-actions">
         {successPanel.actions.map((a) => (
-          <a href={a.href} class={`btn ${a.variant === 'outline' ? 'btn-outline' : 'btn-primary'}`}>{a.text}</a>
+          <a href={a.href} id={a.id} class={`btn ${a.variant === 'outline' ? 'btn-outline' : 'btn-primary'}`}>{a.text}</a>
         ))}
       </div>
       {successPanel.footNote && (
@@ -358,7 +358,7 @@ const sectionRows = (section: SectionType): RowItem[] => {
           form.dataset.leadBound = '1';
           var trackName = form.dataset.track;
           var successRedirect = form.dataset.successRedirect || '/gracias';
-          var errorText = form.dataset.errorText || 'Hubo un error. Por favor intenta nuevamente o llámanos.';
+          var errorText = form.dataset.errorText || 'Hubo un error. Por favor intente nuevamente o llámenos.';
           var submitOriginal = (form.querySelector('button[type="submit"]') || {}).textContent || 'Enviar';
 
           form.addEventListener('submit', function (e) {
@@ -367,10 +367,10 @@ const sectionRows = (section: SectionType): RowItem[] => {
             var btn = form.querySelector('button[type="submit"]');
             var raw = Object.fromEntries(new FormData(form));
             var errs = [];
-            if (!raw.name || String(raw.name).trim().length < 2) errs.push('Ingresa tu nombre completo.');
+            if (!raw.name || String(raw.name).trim().length < 2) errs.push('Ingrese su nombre completo.');
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(raw.email || ''))) errs.push('Correo electrónico inválido.');
             if (!/^\+?56\s?9\s?[\d\s]{8,}$|^9[\d\s]{8,}$|^[\d\s+\-()]{8,}$/.test(String(raw.phone || ''))) errs.push('Teléfono inválido. Usa formato +56 9 XXXX XXXX.');
-            if (!raw.service) errs.push('Selecciona un servicio.');
+            if (!raw.service) errs.push('Seleccione un servicio.');
             if (errs.length) {
               if (status) {
                 status.hidden = false;

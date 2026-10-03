@@ -1,5 +1,8 @@
 // @ts-check
 import { defineConfig } from 'vitest/config';
+import { fileURLToPath } from 'node:url';
+
+const fromHere = (relative: string) => fileURLToPath(new URL(relative, import.meta.url));
 
 export default defineConfig({
   test: {
@@ -15,7 +18,12 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': new URL('./src', import.meta.url).pathname,
+      '@': fromHere('./src'),
+      // Módulos virtuales que solo existen dentro del runtime de Astro/Workers.
+      // Sin estos alias, `src/middleware.ts` no se puede importar desde vitest
+      // y el guard de host canónico queda sin cobertura real.
+      'astro:middleware': fromHere('./tests/stubs/astro-middleware.ts'),
+      'cloudflare:workers': fromHere('./tests/stubs/cloudflare-workers.ts'),
     },
   },
 });

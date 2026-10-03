@@ -499,37 +499,43 @@
 }
 
 /* ── Empty states consistentes ────────────────────────── */
-.empty-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 56px 24px;
-  min-height: 240px;
-  gap: 12px;
+/* Este bloque va dentro del media query a propósito: estaba en el nivel raíz
+   de admin-mobile.css, que se importa DESPUÉS de admin.css a igual
+   especificidad, así que ganaba también en escritorio y dejaba todos los
+   estados vacíos del CRM con 240px de alto donde el diseño dice 40px. */
+@media (max-width: 768px) {
+  .empty-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 56px 24px;
+    min-height: 240px;
+    gap: 12px;
+  }
+  .empty-state-graphic {
+    font-size: 56px;
+    line-height: 1;
+    margin-bottom: 4px;
+    filter: grayscale(0.2);
+    opacity: 0.85;
+  }
+  .empty-state-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--fg);
+    margin: 0;
+  }
+  .empty-state-msg {
+    font-size: 13px;
+    color: var(--fg-muted);
+    max-width: 420px;
+    line-height: 1.5;
+    margin: 0 0 12px;
+  }
+  .empty-state-msg + .admin-btn { margin-top: 4px; }
 }
-.empty-state-graphic {
-  font-size: 56px;
-  line-height: 1;
-  margin-bottom: 4px;
-  filter: grayscale(0.2);
-  opacity: 0.85;
-}
-.empty-state-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--fg);
-  margin: 0;
-}
-.empty-state-msg {
-  font-size: 13px;
-  color: var(--fg-muted);
-  max-width: 420px;
-  line-height: 1.5;
-  margin: 0 0 12px;
-}
-.empty-state-msg + .admin-btn { margin-top: 4px; }
 @media (max-width: 480px) {
   .empty-panel { padding: 40px 18px; min-height: 180px; }
   .empty-state-graphic { font-size: 44px; }

@@ -47,10 +47,10 @@ if (validFormat) {
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string; desc: string }> = {
-  pending:     { label: 'Recibida',          color: 'amber',  desc: 'Tu denuncia fue registrada y está en cola para revisión inicial por el EPD.' },
+  pending:     { label: 'Recibida',          color: 'amber',  desc: 'Su denuncia fue registrada y está en cola para revisión inicial por el EPD.' },
   reviewing:   { label: 'En revisión',       color: 'blue',   desc: 'El Encargado de Prevención de Delitos está evaluando los antecedentes.' },
   investigating:{ label: 'En investigación', color: 'violet', desc: 'Se están realizando indagaciones para esclarecer los hechos denunciados.' },
-  resolved:    { label: 'Resuelta',          color: 'green',  desc: 'La investigación se cerró. Si proporcionaste un medio de contacto, te informamos las conclusiones.' },
+  resolved:    { label: 'Resuelta',          color: 'green',  desc: 'La investigación se cerró. Si proporcionaste un medio de contacto, le informamos las conclusiones.' },
   archived:    { label: 'Archivada',         color: 'gray',   desc: 'La denuncia fue cerrada y archivada conforme al protocolo del MPD.' },
 };
 
@@ -70,9 +70,8 @@ const current = initial.denuncia ? STATUS_LABELS[initial.denuncia.status] ?? nul
 ---
 
 <BaseLayout
-  title={initial.denuncia ? `Estado de denuncia ${initial.denuncia.id} | GuardMan Chile` : 'Consulta el estado de tu denuncia | GuardMan Chile'}
-  description="Consulta el estado de tu denuncia anónima en el Canal de Denuncias de GuardMan Chile."
-  breadcrumb="Estado de denuncia"
+  title={initial.denuncia ? `Estado de denuncia ${initial.denuncia.id} | GuardMan Chile` : 'Consulta el estado de su denuncia | GuardMan Chile'}
+  description="Consulta el estado de su denuncia anónima en el Canal de Denuncias de GuardMan Chile."
   breadcrumbs={[
     { name: 'Inicio', url: '/' },
     { name: 'Canal de Denuncias', url: '/canal-de-denuncias' },
@@ -84,7 +83,7 @@ const current = initial.denuncia ? STATUS_LABELS[initial.denuncia.status] ?? nul
     <div class="container" style="max-width:760px">
       <div class="estado-header">
         <a href="/canal-de-denuncias" class="estado-back">← Volver al canal</a>
-        <h1 style="margin-top:12px">Estado de tu denuncia</h1>
+        <h1 style="margin-top:12px">Estado de su denuncia</h1>
         {validFormat && (
           <p class="estado-id-label">ID consultado: <code>{rawId}</code></p>
         )}
@@ -143,8 +142,8 @@ const current = initial.denuncia ? STATUS_LABELS[initial.denuncia.status] ?? nul
             <a href={`mailto:${SITE.EMAIL_INFO}?subject=Consulta sobre denuncia ${initial.denuncia.id}`} class="btn btn-outline">Escribir a cumplimiento</a>
           </div>
           <p class="estado-foot">
-            Por seguridad, no mostramos el contenido de tu denuncia ni tus datos de contacto.
-            Si necesitas agregar antecedentes, contáctanos directamente indicando el ID.
+            Por seguridad, no mostramos el contenido de su denuncia ni sus datos de contacto.
+            Si necesita agregar antecedentes, comuníquese con nosotros indicando el ID.
           </p>
         </div>
       )}
@@ -165,7 +164,7 @@ const current = initial.denuncia ? STATUS_LABELS[initial.denuncia.status] ?? nul
           <div class="estado-pill estado-pill-red">ID inválido</div>
           <h2 class="estado-status-title">El formato del ID no es correcto</h2>
           <p class="estado-status-desc">
-            El ID de seguimiento tiene el formato <code>D-YYYYMMDD-XXXX</code> (por ejemplo <code>D-20260715-43NV</code>). Si lo perdiste, contáctanos directamente.
+            El ID de seguimiento tiene el formato <code>D-YYYYMMDD-XXXX</code> (por ejemplo <code>D-20260715-43NV</code>). Si lo perdió, comuníquese con nosotros.
           </p>
           <a href="/canal-de-denuncias" class="btn btn-primary">Hacer una nueva denuncia</a>
         </div>

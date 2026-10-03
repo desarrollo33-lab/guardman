@@ -2,10 +2,12 @@
 // /servicios/[slug] — detalle de servicio (migración 1:1 del live).
 // Estructura idéntica al live: hero + contenido (con blocks anidados) + block-related.
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { SERVICE_NAMES, LOCATIONS, COVERAGE_TOTAL } from '../../lib/constants';
+import { SERVICE_NAMES, LOCATIONS, COVERAGE_TOTAL, COVERAGE_PHRASE_LONG, serviceNameInSentence } from '../../lib/constants';
 import { SERVICES } from '../../lib/content';
 import Icon from '../../components/Icon.astro';
 import StaffSection from '../../components/StaffSection.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+import { SERVICE_BRIDGE, bridgeItems } from '../../lib/internal-links';
 
 export const prerender = true;
 
@@ -32,15 +34,19 @@ const relacionados = Object.entries(SERVICE_NAMES)
 // vigilancia. Para aseo se emiten título y descripción propios. Verificado 2026-10-02.
 const certified = svc.certified !== false;
 const seoTitle = certified ? `${name} con Certificación OS-10` : name;
+// La cifra sale de `COVERAGE_PHRASE_LONG`, no de un string. Publicaba
+// "14 comunas: 12 en la RM y 2 en Valparaíso" (14 en total) cuando la
+// cobertura real son 16, y era la meta description de las diez páginas de
+// servicio. Además contradecía la description de /servicios en la misma
+// sesión de búsqueda.
 const seoDescription = certified
-  ? `${name} con certificación OS-10 en 14 comunas: 12 en la Región Metropolitana y 2 en Valparaíso. Personal propio, central de monitoreo 24/7 y tecnología Guardpod. Cotización personalizada en 24 horas.`
-  : `${svc.shortDesc}. Servicio en 14 comunas: 12 en la Región Metropolitana y 2 en Valparaíso, con personal uniformado y supervisión de terreno. Cotización personalizada en 24 horas.`;
+  ? `${name} con certificación OS-10 en ${COVERAGE_PHRASE_LONG}. Personal propio, central de monitoreo 24/7 y tecnología Guardpod. Cotización personalizada en 24 horas.`
+  : `${svc.shortDesc}. Servicio en ${COVERAGE_PHRASE_LONG}, con personal uniformado y supervisión de terreno. Cotización personalizada en 24 horas.`;
 ---
 
 <BaseLayout
   title={seoTitle}
   description={seoDescription}
-  breadcrumb={name}
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Servicios', url: '/servicios' }, { name, url: `/servicios/${slug}` }]}
   service={{
     slug,
@@ -65,7 +71,7 @@ const seoDescription = certified
       <h1>{svc.heroTitle}</h1>
       <p>{svc.heroSub}</p>
       <div class="detail-hero-ctas">
-        <a href="/cotizacion" class="btn btn-primary">Cotizar Ahora</a>
+        <a href="/cotizacion" class="btn btn-primary">Cotizar para mi propiedad</a>
         <a href="/ubicaciones" class="btn btn-outline-light">Ver cobertura</a>
       </div>
     </div>
@@ -86,7 +92,7 @@ const seoDescription = certified
           </div>
 
           <div class="block" data-od-id="block-features">
-            <h2>Por qué elegir {name.toLowerCase()} de GuardMan Chile</h2>
+            <h2>Por qué elegir {name} de GuardMan Chile</h2>
             <div class="detail-features-grid">
               {svc.features.map((f) => (
                 <div class="detail-feature-item">
@@ -113,10 +119,18 @@ const seoDescription = certified
 
           <div class="block" data-od-id="block-locations">
             <h2>Disponible en {COVERAGE_TOTAL} comunas</h2>
-            <p>Seleccione su comuna para ver detalles específicos y solicitar cotización.</p>
+            <p>Seleccione su comuna para ver el detalle de {svc.shortDesc.toLowerCase()} en esa zona y solicitar cotización.</p>
             <div class="locations-tags">
               {allLocations.map((l) => (
-                <a href={`/ubicaciones/${l.slug}`} class="loc-tag">{l.name}</a>
+                // A la variante de ESTE servicio en esa comuna, no a la página
+                // genérica de la comuna. El grafo era asimétrico: cada comuna
+                // alcanzaba a sus diez servicios, pero ningún servicio bajaba
+                // a sus dieciséis comunas, así que las 160 páginas combo solo
+                // se alcanzaban desde /ubicaciones y /servicios/{svc} era un
+                // callejón sin salida hacia abajo. Además el destino viejo
+                // perdía el servicio: alguien en "Guardias de Seguridad" que
+                // elige Las Condes llegaba a la cobertura general de la comuna.
+                <a href={`/servicios/${slug}/${l.slug}`} class="loc-tag">{l.name}</a>
               ))}
             </div>
             <div style="margin-top:16px">
@@ -135,14 +149,21 @@ const seoDescription = certified
               ))}
             </div>
           </div>
+
+          <RelatedLinks
+            items={bridgeItems(SERVICE_BRIDGE[slug])}
+            title="Antes de contratar este servicio"
+            subtitle="Lo que conviene revisar antes de decidir, independiente de quién lo ejecute."
+            odId="block-bridge"
+          />
         </div>
 
         <aside data-od-id="sidebar">
           <div class="sidebar-sticky">
             <div class="sidebar-cta-top">
               <h3>¿Necesita este servicio?</h3>
-              <a href="/cotizacion" class="btn btn-primary">Cotizar ahora</a>
-              <a href="/contacto" class="btn btn-outline">Hablar con un experto</a>
+              <a href="/cotizacion" class="btn btn-primary">Cotizar para mi propiedad</a>
+              <a href="/contacto" class="btn btn-outline">Enviar mi consulta</a>
             </div>
             <div class="sidebar-body">
               <div class="sb-section">
@@ -191,8 +212,8 @@ const seoDescription = certified
   <section class="bg-dark cta-section-detail" data-od-id="block-cta">
     <div class="container" style="text-align:center">
       <h2 class="section-title" style="color:#fff">Solicite una cotización sin compromiso</h2>
-      <p class="section-subtitle" style="color:rgba(255,255,255,.7)">Proteja su empresa, condominio o residencia con {name.toLowerCase()} de GuardMan Chile. Respuesta personalizada en menos de 24 horas hábiles.</p>
-      <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar ahora</a>
+      <p class="section-subtitle" style="color:rgba(255,255,255,.7)">Proteja su empresa, condominio o residencia con {serviceNameInSentence(name)} de GuardMan Chile. Respuesta personalizada en menos de 24 horas hábiles.</p>
+      <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar para mi propiedad</a>
     </div>
   </section>
 </BaseLayout>

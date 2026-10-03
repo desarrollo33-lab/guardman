@@ -12,6 +12,63 @@ export interface BreadcrumbItem {
   url: string;
 }
 
+// ───────────────────────────────────────────────────────────────
+// Presupuesto de SERP
+//
+// Google recorta el title alrededor de los 580px (≈60 caracteres) y la meta
+// description alrededor de los 920px (≈160). Medido contra producción el
+// 2026-10-03: 164 de 242 titles pasaban de 60 y 225 de 244 descriptions de
+// 160, porque el nombre de la comuna, el de la comuna larga y el sufijo de marca
+// se acumulaban sin que nadie lo midiera. Ninguna de las dos cosas es una
+// penalización: es pérdida directa de CTR, y es la más barata de arreglar.
+//
+// Los dos helpers de abajo hacen que el presupuesto se respete siempre, sin
+// depender de que quien escribe la página haga la cuenta. Recortan en el
+// límite de palabra y limpian la palabra colgante, porque un corte a media
+// palabra deja cola ("... con GuardMan Chile") que se lee como error.
+// ───────────────────────────────────────────────────────────────
+
+export const TITLE_MAX = 60;
+export const DESC_MAX = 160;
+
+/** Palabras que no pueden cerrar un título o una descripción. */
+const DANGLING = /\s(?:con|de|del|en|para|por|al|y|o|la|el|los|las|un|una|a|sin|que|cada)\s*$/i;
+
+/** Quita la palabra colgante y la puntuación del final. */
+const tidy = (s: string) => s.replace(/[\s,.;:·—–-]+$/, '').replace(DANGLING, '').replace(/[\s,.;:·—–-]+$/, '');
+
+/**
+ * Compone el title final, con la marca, dentro del presupuesto.
+ *
+ * La marca nunca se recorta: es la señal de entidad, y un title como
+ * "Guardias de Seguridad en Las Condes GuardMan Chile" le dice a Google qué
+ * empresa es. Lo que se cae es el calificador de la cola.
+ */
+export function composeTitle(pageTitle: string, brand: string, max: number = TITLE_MAX): string {
+  const full = pageTitle.includes(brand) ? pageTitle : `${pageTitle} ${brand}`;
+  if (full.length <= max) return full;
+
+  const budget = max - brand.length - 1;
+  const cut = tidy(pageTitle.slice(0, Math.max(0, budget)));
+  const lastSpace = cut.lastIndexOf(' ');
+  const body = lastSpace > 0 ? tidy(cut.slice(0, lastSpace)) : cut;
+  return `${body} ${brand}`;
+}
+
+/**
+ * Meta description dentro del presupuesto, cortada en límite de palabra.
+ *
+ * La información se ordena con lo importante primero en la plantilla de cada
+ * página; acá solo se garantiza que no se pase. Un `…` al final avisa de que
+ * el texto sigue en la página, que es mejor que un corte seco.
+ */
+export function fitDescription(text: string, max: number = DESC_MAX): string {
+  if (text.length <= max) return text;
+  const cut = tidy(text.slice(0, max - 1));
+  const lastSpace = cut.lastIndexOf(' ');
+  return `${lastSpace > 0 ? cut.slice(0, lastSpace) : cut}…`;
+}
+
 /**
  * PostalAddress única. Estaba duplicada literal en `organizationSchema` y
  * `localBusinessSchema`; cualquier corrección had que hacerse dos veces y
@@ -39,9 +96,13 @@ export function organizationSchema() {
     url: SITE.URL,
     logo: {
       '@type': 'ImageObject',
-      url: `${SITE.URL}/favicon.svg`,
-      width: 512,
-      height: 512,
+      // PNG, no el favicon SVG. Google procesa `logo` como ImageObject y el
+      // SVG no rinde en el panel de conocimiento ni en los resultados con
+      // imagen: el sitio ya tenía `logo-byn.png` (681×250) y no se usaba.
+      // Medido 2026-10-03 en producción.
+      url: `${SITE.URL}/images/logo-byn.png`,
+      width: 681,
+      height: 250,
     },
     image: `${SITE.URL}/images/hero-home.webp`,
     telephone: SITE.PHONE,
@@ -109,7 +170,7 @@ export function localBusinessSchema() {
     name: SITE.NAME,
     legalName: SITE.LEGAL_NAME,
     description: SITE_DESCRIPTION,
-    image: [`${SITE.URL}/images/hero-home.webp`, `${SITE.URL}/favicon.svg`],
+    image: [`${SITE.URL}/images/hero-home.webp`, `${SITE.URL}/images/logo-byn.png`],
     url: SITE.URL,
     telephone: SITE.PHONE,
     email: SITE.EMAIL_INFO,
@@ -185,25 +246,24 @@ export function serviceSchema(opts: {
         name: 'Chile',
       },
     ],
-    hasOfferCatalog: {
-      '@type': 'OfferCatalog',
-      name: 'Planes de Seguridad Privada',
-      itemListElement: [
-        {
-          '@type': 'Offer',
-          itemOffered: { '@type': 'Service', name: opts.name },
-          priceCurrency: 'CLP',
-          priceSpecification: {
-            '@type': 'PriceSpecification',
-            priceCurrency: 'CLP',
-            minPrice: 350000,
-            maxPrice: 6800000,
-            valueAddedTaxIncluded: true,
-          },
-          availability: 'https://schema.org/InStock',
-        },
-      ],
-    },
+    // SIN `hasOfferCatalog`.
+    //
+    // Se eliminó el 2026-10-03 por decisión del cliente. Publicaba
+    // `minPrice: 350000 / maxPrice: 6800000`, y eso rompía dos cosas a la vez:
+    //
+    //   1. Contradecía la regla del repo (authority.ts:12): "Prohibido publicar
+    //      ratios de dotación, tarifas ni operativas sensibles". El precio de
+    //      un contrato de seguridad privada es exactamente eso.
+    //   2. Los precios no estaban visibles en la página. La guía de datos
+    //      estructurados de Google exige que el marcado describa contenido
+    //      visible: un `Offer` con precio que no aparece en el HTML es un
+    //      enriquecimiento que el buscador no puede verificar, y es la forma
+    //      más común de disparar una acción manual por discrepancia de precio.
+    //
+    // Un `Offer` sin precio tampoco sirve: schema.org lo trata como oferta sin
+    // información de compra, que es peor que no declarar oferta. Si alguna vez
+    // se publican tarifas, el bloque vuelve CON el precio visible en la misma
+    // página, y no antes.
     audience: { '@type': 'BusinessAudience', audienceType: 'Empresas y residencias en Chile' },
   };
 }
@@ -268,6 +328,47 @@ export function locationSchema(opts: { location: Location; service?: string }) {
   return [base, place, serviceSchema].filter(Boolean);
 }
 
+/**
+ * Schema LocalBusiness por comuna.
+ *
+ * El `localBusinessSchema()` de la home describe la empresa, y por eso lleva un
+ * `@id` único. Reusarlo en las 16 páginas de comuna publicaría 16 nodos con el
+ * mismo `@id` y el mismo nombre: Google no puede saber si son 16 locales o 16
+ * copias de la misma, que es el error clásico del multi-local.
+ *
+ * La forma correcta es un nodo por comuna, con `@id` propio, `areaServed`
+ * apuntando a esa comuna y `parentOrganization` colgando de la Organization
+ * principal. Se emite SOLO en `/ubicaciones/[slug]`, que es la página canónica
+ * de cada comuna: las 176 páginas servicio×comuna ya declaran `Service` +
+ * `areaServed`, y sumarles el mismo LocalBusiness diluiría la señal en vez de
+ * reforzarla.
+ */
+export function localBusinessAtLocation(loc: Location) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    '@id': `${SITE.URL}/ubicaciones/${loc.slug}/#localbusiness`,
+    name: `${SITE.NAME} en ${loc.name}`,
+    url: `${SITE.URL}/ubicaciones/${loc.slug}/`,
+    telephone: SITE.PHONE,
+    email: SITE.EMAIL_INFO,
+    image: `${SITE.URL}/images/hero-home.webp`,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: loc.name,
+      addressRegion: loc.region === 'VS' ? 'Región de Valparaíso' : 'Región Metropolitana',
+      addressCountry: SITE.ADDRESS_COUNTRY,
+    },
+    geo: { '@type': 'GeoCoordinates', latitude: loc.lat, longitude: loc.lng },
+    areaServed: {
+      '@type': 'City',
+      name: loc.name,
+      sameAs: `https://www.wikidata.org/wiki/${loc.qid}`,
+    },
+    parentOrganization: { '@type': 'Organization', name: SITE.LEGAL_NAME, '@id': `${SITE.URL}/#organization` },
+  };
+}
+
 /** Schema BreadcrumbList enriquecido. */
 export function breadcrumbSchema(items: BreadcrumbItem[]) {
   return {
@@ -324,7 +425,9 @@ export function articleSchema(opts: {
       '@id': `${SITE.URL}/#organization`,
       logo: {
         '@type': 'ImageObject',
-        url: `${SITE.URL}/favicon.svg`,
+        url: `${SITE.URL}/images/logo-byn.png`,
+        width: 681,
+        height: 250,
       },
     },
     mainEntityOfPage: {

@@ -16,10 +16,13 @@ Sitio público + panel admin de GuardMan Chile, la empresa de seguridad privada 
 ## Deploy
 
 - **Versión:** v0.1.0 (master baseline)
-- **URL live:** https://guardman-astro.oficinadesarrollo33.workers.dev
-- **Custom domain:** `guardman.cl` — NO apunta a este worker (sigue en Google Sites, pendiente de migrar DNS)
+- **URL live:** https://guardman.cl
+- **Dominio de servicio:** el worker NO se publica en `*.workers.dev`
+  (`workers_dev: false` en `wrangler.jsonc`). `www.guardman.cl` y cualquier
+  host de servicio responden 301 al canónico (`src/lib/canonical-host.ts`).
 - **Build:** `npm run build`
-- **Deploy:** `npx wrangler deploy`
+- **Deploy:** `npx wrangler deploy --config dist/server/wrangler.json`
+  (o `npm run deploy`, que encadena build + deploy con esa config)
 - **Wrangler auth:** oficinadesarrollo33@gmail.com (account `b3a89fc9524552b7ab3202269f1ab6f3`)
 
 ## Comandos
@@ -39,13 +42,17 @@ npm run lighthouse  # Auditoría Lighthouse
 
 ```bash
 # .env (dev local)
-PUBLIC_API_URL=https://guardman.oficinadesarrollo33.workers.dev
+PUBLIC_API_URL=""
 PUBLIC_SITE_URL=http://localhost:4321
 
 # Producción (wrangler.jsonc vars)
-PUBLIC_API_URL=https://guardman.oficinadesarrollo33.workers.dev
+PUBLIC_API_URL=""
 PUBLIC_SITE_URL=https://guardman.cl
 ```
+
+`PUBLIC_API_URL` va vacía en ambos casos: la API se sirve desde el mismo
+worker que las páginas, así que las llamadas son same-origin y no hay ni CORS
+ni CSP que configurar.
 
 ## Bindings Cloudflare (verificados en deploy)
 
@@ -122,7 +129,7 @@ guardman/
 - `GET /api/health`
 - `POST /api/leads/capture`, `GET/POST /api/leads`, `GET /api/leads/[id]`
 - `POST /api/denuncias`, `GET /api/denuncias/[id]`
-- `GET/POST /api/guardpod/session`, `POST /api/guardpod/answer`, `POST /api/guardpod/answer/batch`, `GET /api/guardpod/export`, `GET /api/guardpod/progress`
+- `GET/POST /api/guardpod/session`, `POST /api/guardpod/answer`, `POST /api/guardpod/answer/batch`, `GET /api/guardpod/export`
 - `POST /api/analytics/pageview`
 - `GET/POST /api/admin/session`
 

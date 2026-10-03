@@ -24,7 +24,10 @@ jobs:
       - name: Build
         env:
           PUBLIC_SITE_URL: https://guardman.cl
-          PUBLIC_API_URL: https://guardman.oficinadesarrollo33.workers.dev
+          # Vacía a propósito: login/leads/denuncias viven en este mismo worker
+          # (same-origin). Apuntar acá a un host externo reintroducía CORS y CSP
+          # para un origen que ya no existe.
+          PUBLIC_API_URL: ""
         run: npm run build
 
   deploy:
@@ -42,7 +45,10 @@ jobs:
       - name: Build
         env:
           PUBLIC_SITE_URL: https://guardman.cl
-          PUBLIC_API_URL: https://guardman.oficinadesarrollo33.workers.dev
+          # Vacía a propósito: login/leads/denuncias viven en este mismo worker
+          # (same-origin). Apuntar acá a un host externo reintroducía CORS y CSP
+          # para un origen que ya no existe.
+          PUBLIC_API_URL: ""
         run: npm run build
       - name: Deploy to Cloudflare Workers
         env:
