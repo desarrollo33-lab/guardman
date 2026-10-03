@@ -69,7 +69,15 @@ export const POST: APIRoute = async ({ request }) => {
     .first<{ answer_text: string | null }>();
 
   const now = new Date().toISOString();
-  const isEmpty = valueText === null || valueText === '' || valueText === 'null';
+  // "[]" es lo que produce un multiselect marcado y luego desmarcado. Sin
+  // este caso se guardaba, contaba como respondida en el progreso y el export
+  // la reportaba como `answered: true` con nada seleccionado.
+  const isEmpty =
+    valueText === null ||
+    valueText === '' ||
+    valueText === 'null' ||
+    valueText === '[]' ||
+    valueText === '{}';
 
   // UPSERT respuesta
   if (isEmpty) {
@@ -117,17 +125,43 @@ export const POST: APIRoute = async ({ request }) => {
     .prepare('SELECT COUNT(*) AS total FROM guardpod_questions WHERE version = ?')
     .bind(session2.active_version)
     .first<{ total: number }>();
+  // El JOIN importa: re-seedear el question set deja respuestas de keys que
+  // ya no existen, y sin filtrar por la versión activa `answered` no baja
+  // mientras `total` sí — el progreso terminaba en 130%.
   const answeredRes = await db
-    .prepare('SELECT COUNT(*) AS answered FROM guardpod_answers WHERE session_id = ? AND answer_text IS NOT NULL AND answer_text <> ""')
-    .bind(body.session_id)
+    .prepare(
+      `SELECT COUNT(*) AS answered
+         FROM guardpod_answers a
+         JOIN guardpod_questions q
+           ON q.question_key = a.question_key
+          AND q.version = ?
+        WHERE a.session_id = ?
+          AND a.answer_text IS NOT NULL
+          AND TRIM(a.answer_text) <> ''
+          AND a.answer_text <> '[]'
+          AND a.answer_text <> '{}'`,
+    )
+    .bind(session2.active_version, body.session_id)
     .first<{ answered: number }>();
   const total = totalRes?.total ?? 0;
   const answered = answeredRes?.answered ?? 0;
   const pct = total > 0 ? Math.round((answered / total) * 1000) / 10 : 0;
 
+  // `completed_at` no lo escribía nadie: aparecía en el DDL y en los SELECT,
+  // así que el export reportaba siempre `completed_at: null` por más que el
+  // cuestionario estuviera al 100%. Se sella la primera vez que se llega.
   await db
-    .prepare('UPDATE guardpod_sessions SET progress_pct = ?, answered_count = ?, total_questions = ?, last_activity = ? WHERE id = ?')
-    .bind(pct, answered, total, now, body.session_id)
+    .prepare(
+      `UPDATE guardpod_sessions
+          SET progress_pct = ?, answered_count = ?, total_questions = ?, last_activity = ?,
+              completed_at = CASE
+                WHEN ? >= 100 AND completed_at IS NULL
+                  THEN strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+                ELSE completed_at
+              END
+        WHERE id = ?`,
+    )
+    .bind(pct, answered, total, now, pct, body.session_id)
     .run();
 
   return json({ ok: true, saved_at: now, progress_pct: pct, answered_count: answered, total_questions: total });

@@ -1,9 +1,10 @@
 // GuardpodWizard — Cuestionario profundo del producto GuardPod.
-//   Carga sesión, muestra 14 secciones con sidebar de progreso,
+//   Carga sesión, muestra las secciones con sidebar de progreso,
 //   autoguardado por pregunta (debounce 1.5s), indicador visual,
 //   help tooltips con icono ?, banner "conocimiento real".
 // v5.5.0
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { apiFetch } from '../../lib/api-client';
 
 interface Section {
   name: string;
@@ -51,9 +52,6 @@ interface InitialData {
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
-const fetchOpts = { credentials: 'same-origin' as RequestCredentials };
-const headers = { 'Content-Type': 'application/json' };
-
 export default function GuardpodWizard() {
   const [data, setData] = useState<InitialData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -78,14 +76,8 @@ export default function GuardpodWizard() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/guardpod/session', { ...fetchOpts });
-        const json = await res.json();
+        const json = await apiFetch<InitialData>('/api/guardpod/session');
         if (cancelled) return;
-        if (!res.ok || !json.ok) {
-          setError(json.error || `Error ${res.status}`);
-          setLoading(false);
-          return;
-        }
         setData(json);
         // Inicializar drafts y saveStates desde answers existentes
         const initialDrafts: Record<string, string> = {};
@@ -187,19 +179,18 @@ export default function GuardpodWizard() {
     const value = draftsRef.current[key] ?? '';
     setSaveStates((s) => ({ ...s, [key]: 'saving' }));
     try {
-      const res = await fetch('/api/guardpod/answer', {
-        method: 'POST',
-        ...fetchOpts,
-        headers,
-        body: JSON.stringify({
-          session_id: data.session.id,
-          question_key: key,
-          value,
-          answer_type: q.type,
-        }),
-      });
-      const json = await res.json();
-      if (!res.ok || !json.ok) throw new Error(json.error || `Error ${res.status}`);
+      const json = await apiFetch<{ saved_at: string; progress_pct: number; answered_count: number; total_questions: number }>(
+        '/api/guardpod/answer',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            session_id: data.session.id,
+            question_key: key,
+            value,
+            answer_type: q.type,
+          }),
+        },
+      );
       setSaveStates((s) => ({ ...s, [key]: 'saved' }));
       setLastSavedAt((s) => ({ ...s, [key]: json.saved_at }));
       dirtyRef.current.delete(key);
@@ -231,14 +222,33 @@ export default function GuardpodWizard() {
     };
     for (const k of dirty) setSaveStates((s) => ({ ...s, [k]: 'saving' }));
     try {
-      const res = await fetch('/api/guardpod/answer/batch', {
-        method: 'POST',
-        ...fetchOpts,
-        headers,
-        body: JSON.stringify(payload),
-      });
-      const json = await res.json();
-      if (!res.ok || !json.ok) throw new Error(json.error || `Error ${res.status}`);
+      const json = await apiFetch<{
+        saved_at: string;
+        saved: number;
+        skipped: number;
+        progress_pct: number;
+        answered_count: number;
+        total_questions: number;
+      }>('/api/guardpod/answer/batch', { method: 'POST', body: JSON.stringify(payload) });
+
+      // El endpoint responde ok:true aunque haya descartado ítems. Antes se
+      // marcaban TODOS como guardados y se sacaban de la cola de pendientes,
+      // así que una respuesta perdida no se reintentaba nunca y el admin veía
+      // "Guardado ✓" en una pregunta que no estaba en el export.
+      if (json.skipped > 0) {
+        for (const k of dirty) {
+          setSaveStates((s) => ({ ...s, [k]: 'error' }));
+        }
+        if (window.gmToast) {
+          window.gmToast({
+            type: 'error',
+            title: 'Guardado parcial',
+            msg: `${json.saved} guardadas · ${json.skipped} rechazadas. Esas quedaron marcadas y se reintentan al cambiar de sección.`,
+          });
+        }
+        return;
+      }
+
       for (const k of dirty) {
         setSaveStates((s) => ({ ...s, [k]: 'saved' }));
         setLastSavedAt((s) => ({ ...s, [k]: json.saved_at }));
@@ -281,7 +291,7 @@ export default function GuardpodWizard() {
   async function exportJson() {
     if (!data) return;
     try {
-      const res = await fetch('/api/guardpod/export', { ...fetchOpts });
+      const res = await fetch('/api/guardpod/export', { credentials: 'same-origin' });
       if (!res.ok) throw new Error(`Error ${res.status}`);
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);

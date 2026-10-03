@@ -102,7 +102,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       `SELECT id, created_at, updated_at, name, email, phone, company,
               service, location, sector, property_type, guards_count,
               message, status, priority, source, value,
-              assigned_to, owner_email
+              assigned_to
          FROM leads
          ${whereClause}
          ORDER BY created_at DESC

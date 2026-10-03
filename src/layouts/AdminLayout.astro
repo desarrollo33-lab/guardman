@@ -53,6 +53,7 @@ const { title, section, requireAuth = true, breadcrumb = [] } = Astro.props;
       //   • window.gmToast({ type, title, msg, duration })
       //   • window.gmMoveMenu({ x, y, items, onSelect, onCancel })
       //   • window.gmConfirm({ title, msg, danger, onConfirm, onCancel })
+      //   • window.gmLogout()  — revoca el refresh token y limpia la sesión
       // Reemplazan alert()/confirm() con componentes accesibles y mobile-friendly.
       // ══════════════════════════════════════════════════════════
       (() => {
@@ -233,6 +234,50 @@ const { title, section, requireAuth = true, breadcrumb = [] } = Astro.props;
           menu.style.top  = Math.max(8, (vh - r.height) / 3) + 'px';
           activeMenu = { backdrop, menu };
         };
+
+        // ── Logout real ────────────────────────────────────
+        // Único punto de salida de sesión del panel. Antes cada botón
+        // (topbar, mobile nav, settings) repetía el mismo bloque: borraba
+        // localStorage y la cookie, pero NUNCA revocaba el refresh token en
+        // D1 — quedaba con revoked_at IS NULL y se podía canjear por un
+        // access token nuevo durante los 30 días siguientes, incluso con la
+        // sesión ya cerrada.
+        window.gmLogout = async () => {
+          try {
+            const rt = localStorage.getItem('gm_refresh_token');
+            if (rt) {
+              await fetch('/api/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ refresh_token: rt }),
+              }).catch(() => {});
+            }
+            await fetch('/api/admin/session', { method: 'DELETE', credentials: 'same-origin' })
+              .catch(() => {});
+          } finally {
+            for (const k of ['gm_token', 'gm_token_expires_at', 'gm_refresh_token', 'gm_refresh_expires_at']) {
+              try { localStorage.removeItem(k); } catch { /* modo privado */ }
+            }
+            window.location.href = '/admin/login';
+          }
+        };
+
+        // ── Badge de la bandeja ────────────────────────────
+        // Estaba hardcodeado en los dos navs (siempre "3"), así que anunciaba
+        // leads que no existían. Ahora se pinta con el conteo real de `new`.
+        // Si el request falla se oculta el badge: la navegación no depende.
+        (async () => {
+          try {
+            const res = await fetch('/api/leads?status=new&limit=1', { credentials: 'same-origin' });
+            const j = await res.json();
+            const n = res.ok && j.ok ? (j.total ?? 0) : 0;
+            for (const el of document.querySelectorAll('[data-badge="inbox"]')) {
+              el.textContent = n > 99 ? '99+' : String(n);
+              el.hidden = n === 0;
+            }
+          } catch { /* sin badge, no hay navegación rota */ }
+        })();
 
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape' && activeMenu) closeActiveMenu();

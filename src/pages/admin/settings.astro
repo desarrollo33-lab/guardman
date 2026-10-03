@@ -62,17 +62,7 @@ import { SITE, BUNDLE_VERSION } from '../../lib/constants';
 
   <script is:inline>
     document.getElementById('logout-btn')?.addEventListener('click', () => {
-      localStorage.removeItem('gm_token');
-      localStorage.removeItem('gm_token_expires_at');
-      localStorage.removeItem('gm_refresh_token');
-      localStorage.removeItem('gm_refresh_expires_at');
-      // Limpia la cookie httpOnly server-side via endpoint dedicado.
-      // fire-and-forget: si falla, igual redirigimos a login.
-      fetch('/api/admin/session', { method: 'DELETE', credentials: 'same-origin' })
-        .catch(() => {})
-        .finally(() => {
-          window.location.href = '/admin/login';
-        });
+      window.gmLogout?.();
     });
   </script>
 

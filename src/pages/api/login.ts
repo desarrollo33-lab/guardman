@@ -7,12 +7,18 @@
 // El frontend espera el shape { ok, data: { access_token, refresh_token,
 // expires_in, user } } o { ok: false, error }. Ver:
 //   src/pages/admin/login.astro líneas 207-220
-//   src/lib/api.ts líneas 130-140
+//   src/lib/api-client.ts (cliente HTTP único del panel)
 //
 // Rate-limit server-side (5 intentos fallidos → 15 min lockout) se aplica
 // vía `failed_attempts` + `locked_until` en `admin_users`. El lockout
 // client-side (localStorage) sigue activo como primera barrera.
 // ════════════════════════════════════════════════════════════════
+
+// Hash Argon2id descartable, con los mismos parámetros que los hashes reales
+// del panel (m=64MiB, t=3, p=4) para que el tiempo de respuesta sea
+// equivalente. No corresponde a ninguna contraseña: solo iguala el costo.
+const DUMMY_PHC =
+  '$argon2id$v=19$m=65536,t=3,p=4$zJzVTgRX9xkSmy46bJzqjg$ZLZVsO-WxF6RFD5RQEcpOU4BvxncCxzmkg6CGQiZVlE';
 
 import type { APIRoute } from 'astro';
 import {
@@ -53,10 +59,15 @@ export const POST: APIRoute = async ({ request }) => {
   const genericInvalid = () => errJson('Credenciales inválidas.', 401);
 
   if (!admin) {
-    // Nota: timing-attack mitigation se delega al lockout client-side
-    // (5 intentos/min, src/pages/admin/login.astro). Hacer un dummy
-    // verify aquí puede tirar excepciones no capturables en Workers
-    // runtime si el hash dummy no es PHC-válido.
+    // Se verifica igual contra un hash descartable para que la respuesta
+    // tarde lo mismo que con un email existente. Antes esto devolvía de
+    // inmediato: postprobing emails candidatos y midiendo, todo admin
+    // válido respondía ~100ms más lento — justo lo que después acota el
+    // objetivo del ataque de fuerza bruta contra el lockout.
+    //
+    // verifyPassword ya valida el formato PHC y devuelve false ante
+    // cualquier cosa rara, así que un hash inválido no puede tirar.
+    await verifyPassword(password, DUMMY_PHC).catch(() => false);
     return genericInvalid();
   }
 

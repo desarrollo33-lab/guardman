@@ -7,21 +7,21 @@ interface Props {
 }
 const { title, section, breadcrumb = [] } = Astro.props;
 
+// Una clave por sección REAL del panel. Antes faltaban `guardpod` y
+// `denuncias`, así que el breadcrumb de esas dos pantallas decía
+// "Admin / Dashboard" encima de un título que decía otra cosa, y el fallback
+// era un literal en vez del propio `section`.
 const SECTIONS: Record<string, string> = {
   dashboard: 'Dashboard',
   inbox: 'Bandeja de Leads',
   pipeline: 'Pipeline',
   leads: 'Leads',
-  quotes: 'Cotizaciones',
-  clients: 'Clientes',
-  cms: 'CMS',
-  media: 'Biblioteca de Medios',
-  reports: 'Reportes',
-  team: 'Equipo',
+  guardpod: 'GuardPod',
+  denuncias: 'Denuncias',
   settings: 'Configuración',
   login: 'Acceso',
 };
-const bc = SECTIONS[section] ?? 'Dashboard';
+const bc = SECTIONS[section] ?? section;
 ---
 
 <header id="topbar">
@@ -476,17 +476,13 @@ const bc = SECTIONS[section] ?? 'Dashboard';
     }
 
     // ── Topbar logout ───────────────────────────────────────
+    // El cierre real vive en logout-client.ts: revoca el refresh token en
+    // el servidor y recién después borra la sesión local. Antes este bloque
+    // solo borraba localStorage y la cookie: el refresh token seguía con
+    // revoked_at IS NULL y se podía canjear durante 30 días.
     const topbarLogout = document.getElementById('topbar-logout-btn');
     topbarLogout?.addEventListener('click', () => {
-      try {
-        localStorage.removeItem('gm_token');
-        localStorage.removeItem('gm_token_expires_at');
-        localStorage.removeItem('gm_refresh_token');
-        localStorage.removeItem('gm_refresh_expires_at');
-      } catch {}
-      fetch('/api/admin/session', { method: 'DELETE', credentials: 'same-origin' })
-        .catch(() => {})
-        .finally(() => { window.location.href = '/admin/login'; });
+      window.gmLogout?.();
     });
 
     // ── Search modal (global) ───────────────────────────────
@@ -507,7 +503,7 @@ const bc = SECTIONS[section] ?? 'Dashboard';
       if (!searchModal) return;
       searchModal.hidden = true;
       if (searchModalInput) searchModalInput.value = '';
-      if (searchResults) searchResults.innerHTML = '<p class="search-hint">Empieza a escribir para buscar en tus leads. Mínimo 2 caracteres.</p>';
+      setHint('Empieza a escribir para buscar en tus leads. Mínimo 2 caracteres.');
     };
     searchTrigger?.addEventListener('click', openSearch);
     searchInput?.addEventListener('focus', openSearch);
@@ -528,31 +524,64 @@ const bc = SECTIONS[section] ?? 'Dashboard';
     const STATUS_COLORS = { new: '#3B82F6', contacted: '#10B981', visit: '#F59E0B', proposal: '#8B5CF6', negotiation: '#8B5CF6', won: '#10B981', lost: '#EF4444' };
     const STATUS_LABELS = { new: 'Nuevo', contacted: 'Contactado', visit: 'Visita', proposal: 'Cotización', negotiation: 'Negociación', won: 'Ganado', lost: 'Perdido' };
 
+    // Los leads vienen de un endpoint PÚBLICO sin autenticación
+    // (`POST /api/leads/capture` no valida markup), así que ningún campo de
+    // ellos puede tocar innerHTML. Se construye el DOM con textContent.
+    const setHint = (text) => {
+      if (!searchResults) return;
+      const p = document.createElement('p');
+      p.className = 'search-hint';
+      p.textContent = text;
+      searchResults.replaceChildren(p);
+    };
+
     const renderResults = (leads) => {
       if (!searchResults) return;
-      if (!leads.length) {
-        searchResults.innerHTML = '<p class="search-hint">No se encontraron leads.</p>';
-        return;
-      }
-      searchResults.innerHTML = leads.slice(0, 8).map((l) => {
+      if (!leads.length) return setHint('No se encontraron leads.');
+
+      const frag = document.createDocumentFragment();
+      for (const l of leads.slice(0, 8)) {
         const color = STATUS_COLORS[l.status] || '#3B82F6';
-        const initial = (l.name || '?').slice(0, 2).toUpperCase();
-        return `<a class="search-result" href="/admin/leads/${l.id}">
-          <span class="search-result-avatar" style="background:${color}">${initial}</span>
-          <span class="search-result-body">
-            <span class="search-result-name">${l.name || '(sin nombre)'}</span>
-            <span class="search-result-meta">${l.email || ''}${l.phone ? ' · ' + l.phone : ''}</span>
-          </span>
-          <span class="search-result-pill" style="background:${color}22; color:${color}">${STATUS_LABELS[l.status] || l.status}</span>
-        </a>`;
-      }).join('');
+
+        const link = document.createElement('a');
+        link.className = 'search-result';
+        link.href = `/admin/leads/${encodeURIComponent(l.id ?? '')}`;
+
+        const avatar = document.createElement('span');
+        avatar.className = 'search-result-avatar';
+        avatar.style.background = color;
+        avatar.textContent = (l.name || '?').slice(0, 2).toUpperCase();
+
+        const body = document.createElement('span');
+        body.className = 'search-result-body';
+
+        const name = document.createElement('span');
+        name.className = 'search-result-name';
+        name.textContent = l.name || '(sin nombre)';
+
+        const meta = document.createElement('span');
+        meta.className = 'search-result-meta';
+        meta.textContent = [l.email, l.phone].filter(Boolean).join(' · ');
+
+        body.append(name, meta);
+
+        const pill = document.createElement('span');
+        pill.className = 'search-result-pill';
+        pill.style.background = color + '22';
+        pill.style.color = color;
+        pill.textContent = STATUS_LABELS[l.status] || l.status || '';
+
+        link.append(avatar, body, pill);
+        frag.append(link);
+      }
+      searchResults.replaceChildren(frag);
     };
 
     const runSearch = async (q) => {
       if (q === lastQuery) return;
       lastQuery = q;
       if (q.length < 2) {
-        if (searchResults) searchResults.innerHTML = '<p class="search-hint">Empieza a escribir para buscar en tus leads. Mínimo 2 caracteres.</p>';
+        setHint('Empieza a escribir para buscar en tus leads. Mínimo 2 caracteres.');
         return;
       }
       try {
@@ -561,7 +590,7 @@ const bc = SECTIONS[section] ?? 'Dashboard';
         if (!res.ok || !data.ok) throw new Error(data.error || 'Error');
         renderResults(data.leads || []);
       } catch (err) {
-        if (searchResults) searchResults.innerHTML = `<p class="search-hint">Error: ${err.message}</p>`;
+        setHint(`Error: ${err instanceof Error ? err.message : String(err)}`);
       }
     };
 

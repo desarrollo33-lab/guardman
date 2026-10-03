@@ -343,14 +343,6 @@ export const ADMIN_NAV_GROUPS = [
   },
 ] as const;
 
-// Compat con AdminSidebar legacy (ya no se usa, mantenido para refs externas)
-export const ADMIN_NAV = [
-  { id: 'dashboard', label: 'Dashboard', href: '/admin', icon: 'gauge' },
-  { id: 'inbox', label: 'Bandeja', href: '/admin/inbox', icon: 'inbox' },
-  { id: 'pipeline', label: 'Pipeline', href: '/admin/pipeline', icon: 'pipeline' },
-  { id: 'leads', label: 'Leads', href: '/admin/leads', icon: 'users' },
-] as const;
-
 export const API_TIMEOUT_MS = 15_000;
 
 // ────────────────────────────────────────────────────────────────

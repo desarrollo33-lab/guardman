@@ -13,6 +13,7 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { isAdminRequest } from '../../../lib/auth-server';
+import { readNullableText } from '../../../lib/validation';
 
 export const prerender = false;
 
@@ -122,10 +123,12 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       origin,
     );
   }
-  const admin_notes = body.admin_notes !== undefined ? String(body.admin_notes).slice(0, 4000) : null;
-  const assigned_to = body.assigned_to !== undefined ? String(body.assigned_to).slice(0, 200) : null;
+  const admin_notes = readNullableText(body, 'admin_notes', 4000);
+  const assigned_to = readNullableText(body, 'assigned_to', 200);
 
-  if (!status && admin_notes === null && assigned_to === null) {
+  // `status` llega como string (vacío si no viene); para los otros dos campos
+  // `undefined` = la clave no vino, `null` = limpiar a propósito.
+  if (!status && admin_notes === undefined && assigned_to === undefined) {
     return json({ ok: false, error: 'Debes enviar al menos un campo a actualizar.' }, 400, origin);
   }
 
@@ -147,8 +150,8 @@ export const PATCH: APIRoute = async ({ params, request }) => {
   const sets: string[] = ["updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')"];
   const args: unknown[] = [];
   if (status) { sets.push('status = ?'); args.push(status); }
-  if (admin_notes !== null) { sets.push('admin_notes = ?'); args.push(admin_notes); }
-  if (assigned_to !== null) { sets.push('assigned_to = ?'); args.push(assigned_to); }
+  if (admin_notes !== undefined) { sets.push('admin_notes = ?'); args.push(admin_notes); }
+  if (assigned_to !== undefined) { sets.push('assigned_to = ?'); args.push(assigned_to); }
   args.push(id);
 
   try {

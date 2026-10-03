@@ -8,6 +8,7 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { isAdminRequest } from '../../../lib/auth-server';
+import { readNullableText } from '../../../lib/validation';
 
 export const prerender = false;
 
@@ -115,9 +116,19 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     );
   }
 
-  const admin_notes = body.admin_notes !== undefined ? String(body.admin_notes).slice(0, 4000) : undefined;
-  const assigned_to = body.assigned_to !== undefined ? String(body.assigned_to).slice(0, 200) : undefined;
-  const value = body.value !== undefined ? Math.max(0, Math.floor(Number(body.value))) : undefined;
+  const admin_notes = readNullableText(body, 'admin_notes', 4000);
+  const assigned_to = readNullableText(body, 'assigned_to', 200);
+
+  let value: number | undefined;
+  if ('value' in body) {
+    const n = Number(body.value);
+    // `Number('abc')` es NaN y `Math.max(0, NaN)` también: terminaba boundeando
+    // NaN a una columna INTEGER. Ahora se rechaza con 400.
+    if (!Number.isFinite(n)) {
+      return json({ ok: false, error: 'value debe ser un número.' }, 400, origin);
+    }
+    value = Math.max(0, Math.floor(n));
+  }
 
   if (
     status === undefined &&

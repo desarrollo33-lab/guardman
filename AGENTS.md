@@ -55,7 +55,26 @@
 - Un `?v=` también se necesita para el **`poster` de un `<video>`**: al cambiar sus bytes, la
   referencia en el HTML cambia aunque el `.mp4` no se toque.
 
-## Custom domain `guardman.cl` — ESTADO
+## Regla del panel admin: nunca interpolar datos en innerHTML
+- `POST /api/leads/capture` es **público y sin autenticación** (es el form de contacto).
+  `validateLead` (`src/lib/validation.ts`) rechaza `<` y `>` en el nombre, porque un nombre
+  propio no lleva markup y ese campo se renderiza en el panel.
+- Aun con eso, el buscador global de `AdminTopbar.astro` construye sus resultados con
+  `createElement` + `textContent`. Si alguna vez vuelve a `innerHTML` con `l.name`/`l.email`/
+  `l.phone` interpolados, es un XSS almacenado: cualquiera puede ejecutar script en el origen
+  del admin con `gm_session` puesta. Hay regresión en `tests/security-regressions.test.ts`.
+- Regla general del panel: datos que vienen de la API se escriben con `textContent`, nunca
+  se interpolan en una cadena de HTML. Los literales estáticos sí pueden usar `innerHTML`.
+- `leads` tiene UNA columna de asignación, `assigned_to` (la escribe el PATCH, la leen las
+  islas, tiene índice). `owner_email` se eliminó en la migración `0004`; si vuelve a
+  aparecer en un SELECT, es un bug.
+
+## E2E nunca contra producción por defecto
+- `tests/e2e/guardpod-wizard.spec.ts` **borra y escribe filas reales** de `guardpod_answers`.
+  Apunta a `127.0.0.1:8788` y falla ruidosamente si el host resuelto no es local, salvo que
+  se exporte `ALLOW_PROD_TESTS=1` a propósito. Exige `ADMIN_TOKEN` real: la cookie falsa de
+  32 caracteres que usaba antes dejó de funcionar cuando `isAdminRequest` pasó a verificar
+  la firma del JWT (2026-10-02) y el test moría en el setup sin proteger nada.
 - **RESUELTO (verificado 2026-10-02).** El dominio SÍ sirve este worker.
 - `guardman.cl`, `www.guardman.cl` y `guardman-astro.oficinadesarrollo33.workers.dev` devuelven
   el mismo deploy. Evidencia: `/api/health` responde `{"service":"guardman-astro"}`, el
@@ -78,13 +97,24 @@
 ## Auth del panel admin
 - Cookie httpOnly `gm_session` = **access token JWT** (HS256, `JWT_SECRET` de Wrangler secrets).
 - `isAdminRequest` (`src/lib/auth-server.ts`) verifica la firma, `iss`, `aud`, `exp` y `type`.
-  Es `async`; los 9 endpoints de datos lo esperan con `await`.
-- Invariante: si se cambia la expiración del access token, hay que revisar `SESSION_MAX_AGE`
-  en `src/pages/api/admin/session.ts` y que `syncSessionCookie()` siga re-emitiendo la cookie
-  tras cada refresh en `src/lib/api.ts`. Sin ese re-sync, la cookie queda con un JWT vencido y
-  el SSR expulsa al admin aunque su sesión en localStorage siga viva.
+  Es `async`; los endpoints de datos lo esperan con `await`.
+- **Todo el HTTP del panel pasa por `src/lib/api-client.ts`** (`apiFetch(path, options)`).
+  Ninguna isla ni componente debe hacer `fetch('/api/...')` suelto: ahí es donde vivía el
+  bug de sesión. Ese módulo adjunta el Bearer, refresca el access token con single-flight al
+  recibir 401, **re-emite la cookie `gm_session`** y, si la sesión murió de verdad, limpia y
+  manda a `/admin/login` en vez de pintar un error con botón "Reintentar".
+  Excepción conocida: la descarga del export de GuardPod usa `fetch` directo porque lee un blob.
+- **Invariante:** si cambia el TTL del access token, hay que revisar `ACCESS_TTL_SEC` en
+  `auth-server.ts` y las constantes de expiración en `api-client.ts` y `login.astro`, que
+  guardan `2h`/`30d` en tres lugares. `SESSION_MAX_AGE` en `api/admin/session.ts` sigue la
+  misma cifra. El TTL solo no basta: si el cliente deja de llamar a `apiFetch`, el refresh y
+  el re-sync de cookie dejan de ejecutarse y el panel vuelve a morir a las 2h sin avisar.
+- **Logout:** un solo punto de salida, `window.gmLogout()` definido en `AdminLayout.astro`.
+  Revoca el refresh token con `POST /api/logout` ANTES de borrar localStorage y la cookie.
+  Los tres botones (topbar, mobile nav, settings) lo llaman; ninguno reimprime el flujo.
 - Escape hatch para integraciones: header `X-Admin-Token` / `Authorization: Bearer` con el
-  secreto `DENUNCIAS_ADMIN_TOKEN`.
+  secreto `DENUNCIAS_ADMIN_TOKEN`. Aceptado en los 9 endpoints, sin expiración ni alcance:
+  una fuga concede lectura/escritura total, incluido el export completo de GuardPod.
 
 ## AEO / descubrimiento para agentes
 - `/llms.txt`, `/.well-known/ard.json` y `/.well-known/ai-catalog.json` se **generan** desde

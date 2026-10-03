@@ -84,7 +84,7 @@ astro.config.mjs
 - `/api/health` — health check
 - `/api/leads/*` — captura + gestión
 - `/api/denuncias/*` — creación + estado
-- `/api/guardpod/session`, `/api/guardpod/answer`, `/api/guardpod/answer/batch`, `/api/guardpod/export`, `/api/guardpod/progress`
+- `/api/guardpod/session`, `/api/guardpod/answer`, `/api/guardpod/answer/batch`, `/api/guardpod/export`
 - `/api/analytics/pageview`
 - `/api/admin/session`
 

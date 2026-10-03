@@ -84,27 +84,32 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ ok: false, error: 'DB no configurada' }, 500, origin);
   }
 
-  // Anti-spam: 10 leads por IP-hash en 24h
+  // Anti-spam: 10 leads por IP-hash en 24h.
+  // Falla CERRADO si falta el secreto, igual que /api/denuncias: antes el
+  // bloque entero vivía dentro de `if (salt)`, así que perder LEADS_SALT
+  // desactivaba el límite en silencio y el endpoint público aceptaba envíos
+  // ilimitados siga respondiendo 201.
   const ip =
     request.headers.get('cf-connecting-ip') ??
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
     '0.0.0.0';
   const salt = (env as { LEADS_SALT?: string }).LEADS_SALT;
-  let ip_hash: string | null = null;
-  if (salt) {
-    ip_hash = await hashIp(ip, salt);
-    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const recent = await db
-      .prepare('SELECT COUNT(*) AS c FROM leads WHERE ip_hash = ? AND created_at >= ?')
-      .bind(ip_hash, since24h)
-      .first<{ c: number }>();
-    if (recent && recent.c >= 10) {
-      return json(
-        { ok: false, error: 'Has alcanzado el límite diario de consultas. Intenta mañana.' },
-        429,
-        origin,
-      );
-    }
+  if (!salt) {
+    return json({ ok: false, error: 'Servicio no configurado' }, 500, origin);
+  }
+  const ip_hash = await hashIp(ip, salt);
+
+  const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const recent = await db
+    .prepare('SELECT COUNT(*) AS c FROM leads WHERE ip_hash = ? AND created_at >= ?')
+    .bind(ip_hash, since24h)
+    .first<{ c: number }>();
+  if (recent && recent.c >= 10) {
+    return json(
+      { ok: false, error: 'Has alcanzado el límite diario de consultas. Intenta mañana.' },
+      429,
+      origin,
+    );
   }
 
   const id = generateLeadId();

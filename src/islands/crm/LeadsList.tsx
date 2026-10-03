@@ -19,6 +19,7 @@ import {
   type Lead,
   type LeadStatus,
 } from '../../lib/crm-data';
+import { apiFetch } from '../../lib/api-client';
 
 type SortKey = 'created_at' | 'value' | 'updated_at' | 'name';
 
@@ -36,7 +37,7 @@ interface ApiLead {
   priority: Lead['priority'];
   source: string;
   value: number;
-  owner_email?: string | null;
+  assigned_to?: string | null;
 }
 
 function apiToLead(a: ApiLead): Lead {
@@ -54,7 +55,7 @@ function apiToLead(a: ApiLead): Lead {
     value: a.value,
     created_at: a.created_at,
     updated_at: a.updated_at,
-    owner_email: a.owner_email ?? undefined,
+    assigned_to: a.assigned_to ?? undefined,
   };
 }
 
@@ -64,7 +65,7 @@ function exportLeadsCSV(leads: Lead[], filename: string) {
     [
       l.id, l.name, l.email, l.phone, l.company ?? '', l.service, l.location ?? '',
       l.status, l.priority, l.source, String(l.value), l.created_at, l.updated_at ?? '',
-      l.owner_email ?? '', (l.message ?? '').replace(/"/g, '""'),
+      l.assigned_to ?? '', (l.message ?? '').replace(/"/g, '""'),
     ]
       .map((v) => `"${String(v).replace(/"/g, '""')}"`)
       .join(','),
@@ -106,9 +107,7 @@ export default function LeadsList() {
       params.set('limit', '200');
       if (statusRef.current) params.set('status', statusRef.current);
       if (queryRef.current) params.set('q', queryRef.current);
-      const res = await fetch(`/api/leads?${params.toString()}`, { credentials: 'same-origin' });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error ?? `Error ${res.status}`);
+      const data = await apiFetch<{ leads?: ApiLead[]; total?: number }>(`/api/leads?${params.toString()}`);
       const newLeads = (data.leads ?? []).map(apiToLead);
       setLeads(newLeads);
       setTotal(data.total ?? newLeads.length);
@@ -175,33 +174,50 @@ export default function LeadsList() {
     });
   };
 
-  // ── Bulk: PATCH en paralelo (la API no expone bulk, pero PATCH individual es idempotente) ──
+  // ── Bulk: la API no expone endpoint bulk, así que va PATCH por lead.
+  // Se manda en tandas de 10: con 200 en paralelo se agotan los subrequests
+  // del runtime y el admin veía "120 OK · 80 con error" sin poder saber
+  // cuáles. Los que fallan quedan seleccionados para poder reintentar.
+  const BULK_CHUNK = 10;
+
   const runBulkPatch = async (field: 'assigned_to' | 'status', value: string | null) => {
     if (selected.size === 0) return;
     setBusy(true);
     const ids = Array.from(selected);
+    const failed: string[] = [];
     let ok = 0;
-    let fail = 0;
-    await Promise.all(ids.map(async (id) => {
-      try {
-        const body: Record<string, unknown> = {};
-        if (field === 'assigned_to') body.assigned_to = value;
-        else if (field === 'status') body.status = value;
-        const res = await fetch(`/api/leads/${id}`, {
-          method: 'PATCH', credentials: 'same-origin',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-        if (!res.ok) throw new Error();
-        ok++;
-      } catch { fail++; }
-    }));
+
+    for (let i = 0; i < ids.length; i += BULK_CHUNK) {
+      const chunk = ids.slice(i, i + BULK_CHUNK);
+      const results = await Promise.all(
+        chunk.map(async (id) => {
+          const body: Record<string, unknown> = {};
+          if (field === 'assigned_to') body.assigned_to = value;
+          else if (field === 'status') body.status = value;
+          try {
+            await apiFetch(`/api/leads/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+            return null;
+          } catch (err) {
+            return { id, msg: err instanceof Error ? err.message : String(err) };
+          }
+        }),
+      );
+      for (const r of results) {
+        if (r) failed.push(r.id);
+        else ok++;
+      }
+    }
+
     setBusy(false);
-    setSelected(new Set());
-    if (fail === 0) {
+    setSelected(new Set(failed));
+    if (failed.length === 0) {
       TOAST({ type: 'success', title: 'Acción masiva aplicada', msg: `${ok} lead${ok === 1 ? '' : 's'} actualizado${ok === 1 ? '' : 's'}` });
     } else {
-      TOAST({ type: fail === ids.length ? 'error' : 'warning', title: 'Resultado parcial', msg: `${ok} OK · ${fail} con error` });
+      TOAST({
+        type: 'warning',
+        title: 'Resultado parcial',
+        msg: `${ok} OK · ${failed.length} con error. Quedan seleccionados para reintentar.`,
+      });
     }
     await load();
   };

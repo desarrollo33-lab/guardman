@@ -122,7 +122,7 @@ guardman/
 - `GET /api/health`
 - `POST /api/leads/capture`, `GET/POST /api/leads`, `GET /api/leads/[id]`
 - `POST /api/denuncias`, `GET /api/denuncias/[id]`
-- `GET/POST /api/guardpod/session`, `POST /api/guardpod/answer`, `POST /api/guardpod/answer/batch`, `GET /api/guardpod/export`, `GET /api/guardpod/progress`
+- `GET/POST /api/guardpod/session`, `POST /api/guardpod/answer`, `POST /api/guardpod/answer/batch`, `GET /api/guardpod/export`
 - `POST /api/analytics/pageview`
 - `GET/POST /api/admin/session`
 

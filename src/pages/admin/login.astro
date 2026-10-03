@@ -10,7 +10,16 @@ import '../../styles/admin.css';
 import '../../styles/admin-mobile.css';
 import { SITE } from '../../lib/constants';
 
-const redirect = Astro.url.searchParams.get('redirect') ?? '/admin';
+// `redirect` se usa tal cual en `window.location.href` después del login, así
+// que tiene que ser SIEMPRE una ruta interna. Sin esto, un
+// `?redirect=https://clone-guardman.evil` manda al admin —que acaba de
+// escribir su contraseña real en esta página de verdad— a un clon que vuelve
+// a pedirla, y `javascript:…` se ejecutaría en el origen del sitio.
+// Se acepta solo un `/` inicial que no sea `//` ni `/\` (protocol-relative).
+const rawRedirect = Astro.url.searchParams.get('redirect') ?? '';
+const redirect = /^\/(?![/\\])/.test(rawRedirect) && !/[\r\n]/.test(rawRedirect)
+  ? rawRedirect
+  : '/admin';
 ---
 
 <!doctype html>

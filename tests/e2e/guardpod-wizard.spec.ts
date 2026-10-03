@@ -11,17 +11,36 @@
 //   Pre-fix: saved value would be 1 char short (the last keystroke
 //   was lost to closure stale).
 //
-//   Auth bypass: isAdminRequest only checks cookie length (>= 16 chars).
-//   We set a fake 32-char cookie so the test can exercise the wizard
-//   without a real login flow. Test runs against the LIVE URL
-//   (BASE_URL env var) so it doesn't need wrangler dev or local D1.
-// ════════════════════════════════════════════════════════════════
-
+//   Auth: se usa un access token REAL (ADMIN_TOKEN). Hasta 2026-10-02
+//   isAdminRequest solo miraba la longitud de la cookie y una cookie falsa
+//   de 32 caracteres alcanzaba; desde entonces verifica la firma del JWT, así
+//   que una cookie fabricada devuelve 401 y el test moría en el setup sin
+//   proteger nada.
+//
+//   Target: LOCAL por defecto. Este test borra y escribe filas reales de
+//   `guardpod_answers`; apuntarlo a producción por defecto corrompía datos.
+//   Correr contra producción exige ALLOW_PROD_TESTS=1 a propósito.
 import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
 
-const BASE_URL = process.env.BASE_URL ?? 'https://guardman-astro.oficinadesarrollo33.workers.dev';
-// 32-char fake session token (>= 16 char minimum)
-const FAKE_SESSION = 'test-fake-session-token-1234567890ab';
+const BASE_URL = process.env.BASE_URL ?? 'http://127.0.0.1:8788';
+
+const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/i.test(BASE_URL);
+if (!isLocal && process.env.ALLOW_PROD_TESTS !== '1') {
+  throw new Error(
+    `Refusando correr contra ${BASE_URL}: este test ESCRIBE en guardpod_answers. ` +
+      `Para hacerlo a propósito: ALLOW_PROD_TESTS=1 BASE_URL=<host>.`,
+  );
+}
+
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
+if (!ADMIN_TOKEN) {
+  throw new Error(
+    'Falta ADMIN_TOKEN. Exporta un access token de admin válido: ' +
+      '  node -e "fetch(process.env.BASE_URL+\'/api/login\',{method:\'POST\',...})"',
+  );
+}
+const SESSION_TOKEN = ADMIN_TOKEN;
+
 // Known existing answer row we'll overwrite then verify
 const TARGET_KEY = 'identidad.nombre_oficial';
 const TARGET_TYPE = 'text';
@@ -32,7 +51,7 @@ const TEST_VALUE = 'TRACER-' + 'abcdefghij'.repeat(5) + '-END'; // 60 chars
 async function clearAnswer(req: APIRequestContext, sessionId: string) {
   // Empty value triggers DELETE in the API handler
   await req.post(`${BASE_URL}/api/guardpod/answer`, {
-    headers: { cookie: `gm_session=${FAKE_SESSION}` },
+    headers: { cookie: `gm_session=${SESSION_TOKEN}` },
     data: {
       session_id: sessionId,
       question_key: TARGET_KEY,
@@ -44,7 +63,7 @@ async function clearAnswer(req: APIRequestContext, sessionId: string) {
 
 async function getSessionId(req: APIRequestContext): Promise<string> {
   const r = await req.get(`${BASE_URL}/api/guardpod/session`, {
-    headers: { cookie: `gm_session=${FAKE_SESSION}` },
+    headers: { cookie: `gm_session=${SESSION_TOKEN}` },
   });
   const j = await r.json();
   return j.session.id as string;
@@ -52,7 +71,7 @@ async function getSessionId(req: APIRequestContext): Promise<string> {
 
 async function getSavedValue(req: APIRequestContext, key: string): Promise<string | null> {
   const r = await req.get(`${BASE_URL}/api/guardpod/export`, {
-    headers: { cookie: `gm_session=${FAKE_SESSION}` },
+    headers: { cookie: `gm_session=${SESSION_TOKEN}` },
   });
   const j = await r.json();
   const v = (j.flat_answers ?? {})[key];
@@ -69,18 +88,18 @@ test.describe('guardpod wizard — save regression (v5.5.6)', () => {
     // Set the fake session cookie and load the wizard
     await page.context().addCookies([{
       name: 'gm_session',
-      value: FAKE_SESSION,
+      value: SESSION_TOKEN,
       domain: new URL(BASE_URL).hostname,
       path: '/',
     }]);
     // The client-side admin-auth-guard.js checks localStorage for
     // gm_token + gm_token_expires_at. Seed them BEFORE navigating so
     // the guard doesn't redirect us to /admin/login.
-    await page.addInitScript(() => {
-      window.localStorage.setItem('gm_token', 'test-fake-token-1234567890abcdef');
+    await page.addInitScript((token) => {
+      window.localStorage.setItem('gm_token', token);
       // 24h from now
       window.localStorage.setItem('gm_token_expires_at', String(Date.now() + 86_400_000));
-    });
+    }, SESSION_TOKEN);
     await page.goto('/admin/guardpod');
 
     // Welcome modal may appear on first visit; dismiss it
