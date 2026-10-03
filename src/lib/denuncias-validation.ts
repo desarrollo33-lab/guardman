@@ -46,7 +46,7 @@ export function validateDenuncia(raw: Record<string, unknown>): DenunciaValidati
 
   const categoria = stripControl(String(raw.categoria ?? ''));
   if (!categoria) {
-    errors.categoria = 'Selecciona una categoría.';
+    errors.categoria = 'Seleccione una categoría.';
   } else if (!VALID_CATEGORIAS.includes(categoria)) {
     errors.categoria = 'Categoría inválida.';
   }

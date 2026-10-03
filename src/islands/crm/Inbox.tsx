@@ -264,7 +264,7 @@ export default function Inbox() {
               <p className="empty-state-title">Bandeja vacía</p>
               <p className="empty-state-msg">
                 {query
-                  ? 'No hay leads que coincidan con tu búsqueda.'
+                  ? 'No hay leads que coincidan con su búsqueda.'
                   : 'Todos los leads han sido procesados. ¡Buen trabajo!'}
               </p>
               {query && (
@@ -334,7 +334,7 @@ export default function Inbox() {
           ) : (
             <div className="panel empty-panel">
               <div className="empty-state-graphic">👈</div>
-              <p className="empty-state-title">Selecciona un lead</p>
+              <p className="empty-state-title">Seleccione un lead</p>
               <p className="empty-state-msg">Toca una tarjeta para ver el detalle completo, llamar o cambiar estado.</p>
             </div>
           )}

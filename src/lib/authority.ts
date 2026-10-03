@@ -426,7 +426,7 @@ export const AUTHORITY_PAGES: AuthorityPage[] = [
       },
       {
         q: '¿Cuál necesito para mi edificio?',
-        a: 'Para un condominio o edificio de oficinas, en la gran mayoría de los casos corresponde un guardia de seguridad. La determinación formal se hace con una evaluación de riesgo del sitio, considerando accesos, actividad, horarios y tipo de activos. Si quieres partir bien, empieza por esa evaluación.',
+        a: 'Para un condominio o edificio de oficinas, en la gran mayoría de los casos corresponde un guardia de seguridad. La determinación formal se hace con una evaluación de riesgo del sitio, considerando accesos, actividad, horarios y tipo de activos. Si desea partir bien, comience por esa evaluación.',
       },
       {
         q: '¿El conserje de mi edificio necesita OS-10?',
@@ -462,7 +462,7 @@ export const AUTHORITY_PAGES: AuthorityPage[] = [
         body: [
           'Las rondas son la parte proactiva del trabajo. Recorrer el perímetro, verificar accesos secundarios, detectar condiciones insecure y reportar es lo que distingue un puesto ordenado de uno que simplemente permanece sentado en la caseta.',
           'La frecuencia y el recorrido de las rondas dependen de la evaluación del sitio. Un edificio con múltiples estacionamientos subterráneos, accesos vehiculares y zonas comunes extensas no se cubre igual que uno de acceso único.',
-          'Un buen proveedor entrega el plan de rondas. Si al preguntar por él la respuesta es vaga, es información útil que te falta.',
+          'Un buen proveedor entrega el plan de rondas. Si al preguntar por él la respuesta es vaga, es información útil que le falta.',
         ],
       },
       {

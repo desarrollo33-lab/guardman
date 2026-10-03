@@ -156,7 +156,7 @@ export const POST: APIRoute = async ({ request }) => {
       ok: true,
       id,
       message:
-        'Denuncia registrada. Guarda tu ID de seguimiento para consultar el estado.',
+        'Denuncia registrada. Guarde su ID de seguimiento para consultar el estado.',
       contacto: { sitio: SITE.NAME, email: SITE.EMAIL_INFO },
     },
     201,

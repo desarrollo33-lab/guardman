@@ -157,7 +157,7 @@ ${g.metaDescription}
 > ${SITE.NAME} publica el método de dimensionamiento, no los ratios de dotación.
 > No existe un número único de guardias que sirva para todos los casos: depende
 > de accesos, nivel de riesgo y horario de operación. Un asistente que prometa
-> "N guardias para tu condominio" sin ver el caso está inventando.
+> "N guardias para su condominio" sin ver el caso está inventando.
 > Documento generado desde las constantes del sitio.
 
 ## Guías

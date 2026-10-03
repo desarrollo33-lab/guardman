@@ -229,7 +229,7 @@ export default function LeadsList() {
       return;
     }
     if (!bulkAssignValue.trim()) {
-      TOAST({ type: 'warning', title: 'Email requerido', msg: 'Ingresa un email para asignar.' });
+      TOAST({ type: 'warning', title: 'Email requerido', msg: 'Ingrese un email para asignar.' });
       return;
     }
     const email = bulkAssignValue.trim();

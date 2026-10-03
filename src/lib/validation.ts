@@ -42,7 +42,7 @@ export function validateLead(raw: Record<string, unknown>): ValidationResult {
   const errors: Record<string, string> = {};
 
   const name = stripControl(String(raw.name ?? ''));
-  if (name.length < 2) errors.name = 'Ingresa tu nombre completo.';
+  if (name.length < 2) errors.name = 'Ingrese su nombre completo.';
   else if (HAS_MARKUP.test(name)) errors.name = 'El nombre no puede contener caracteres < ni >.';
   if (name.length > 120) errors.name = 'El nombre es demasiado largo.';
 
@@ -53,7 +53,7 @@ export function validateLead(raw: Record<string, unknown>): ValidationResult {
   if (!PHONE_RE.test(phone)) errors.phone = 'Teléfono inválido. Usa formato +56 9 XXXX XXXX.';
 
   const service = stripControl(String(raw.service ?? ''));
-  if (!service) errors.service = 'Selecciona un servicio.';
+  if (!service) errors.service = 'Seleccione un servicio.';
 
   const location = raw.location ? stripControl(String(raw.location)) : undefined;
   const message = raw.message ? trimTo(stripControl(String(raw.message)), 2000) : undefined;

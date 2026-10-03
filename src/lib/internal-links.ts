@@ -183,7 +183,7 @@ export const EDITORIAL_BRIDGE: Record<string, BridgeLink[]> = {
     {
       href: '/servicios/guardias-de-seguridad',
       label: 'Guardias de seguridad',
-      note: 'La figura que contratas cuando necesitas respaldo armado y escalamiento.',
+      note: 'La figura que contrata cuando necesita respaldo armado y escalamiento.',
     },
   ],
   'funciones-guardia-en-condominio': [

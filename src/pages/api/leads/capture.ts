@@ -151,7 +151,7 @@ export const POST: APIRoute = async ({ request }) => {
     return json(
       {
         ok: false,
-        error: 'No pudimos registrar tu consulta. Intenta nuevamente.',
+        error: 'No pudimos registrar su consulta. Intente nuevamente.',
         detail: err instanceof Error ? err.message : String(err),
       },
       500,
@@ -163,7 +163,7 @@ export const POST: APIRoute = async ({ request }) => {
     {
       ok: true,
       id,
-      message: 'Consulta registrada. Te contactaremos en menos de 24 horas hábiles.',
+      message: 'Consulta registrada. Lo contactaremos en menos de 24 horas hábiles.',
     },
     201,
     origin,

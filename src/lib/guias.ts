@@ -161,7 +161,7 @@ export const GUIDES: GuidePage[] = [
         ],
       },
       {
-        heading: 'Qué sí puedes comparar entre proveedores',
+        heading: 'Qué sí puede comparar entre proveedores',
         body: [
           'Si el método no es público, hay señales que sí permiten comparar y que dicen más que el número final de una cotización.',
         ],
@@ -202,9 +202,9 @@ export const GUIDES: GuidePage[] = [
         a: 'Cada vez que cambia algo relevante: una ampliación del edificio, un nuevo acceso, un cambio de horarios de operación o un incidente que revela un punto débil. La dotación no es fija: es el resultado de una evaluación en un momento dado.',
       },
     ],
-    ctaTitle: 'Solicita una evaluación para tu condominio',
+    ctaTitle: 'Solicita una evaluación para su condominio',
     ctaBody:
-      'La visita a terreno es el primer paso y no tiene costo. Recorremos el edificio, revisamos la infraestructura existente y los antecedentes, y a partir de ahí definimos la cobertura que corresponde. Si la conclusión es que no necesitas vigilancia privada, te lo vamos a decir.',
+      'La visita a terreno es el primer paso y no tiene costo. Recorremos el edificio, revisamos la infraestructura existente y los antecedentes, y a partir de ahí definimos la cobertura que corresponde. Si la conclusión es que no necesita vigilancia privada, se lo diremos.',
   },
 
   {
@@ -288,7 +288,7 @@ export const GUIDES: GuidePage[] = [
         heading: 'El control de acceso es el grueso del trabajo',
         body: [
           'En un edificio de oficinas, la parte del turno que más se extiende es la verificación de ingresos. Con frecuencia viene con carga de Validate de que el visitante existe, de que va al lugar correcto y de que su credencial es válida.',
-          'Un proceso de acceso mal diseñado genera fricción permanente: se eliminan los tiempos de espera, pero también la verificación real. Ahí es donde la tecnología cumple su función, y donde un buen proveedor te va a proponer un sistema en vez de más horas de personal.',
+          'Un proceso de acceso mal diseñado genera fricción permanente: se eliminan los tiempos de espera, pero también la verificación real. Ahí es donde la tecnología cumple su función, y donde un buen proveedor le propondrá un sistema en vez de más horas de personal.',
         ],
       },
       {
@@ -317,7 +317,7 @@ export const GUIDES: GuidePage[] = [
         a: 'Sí, y en muchos edificios es lo que se necesita. Si la propiedad opera en horario hábil con personal propio de administración y la necesidad se concentra en la noche, la cobertura nocturna bien resuelta puede ser la solución más adecuada.',
       },
     ],
-    ctaTitle: 'Solicita una evaluación para tu edificio',
+    ctaTitle: 'Solicita una evaluación para su edificio',
     ctaBody:
       'Recorremos el edificio, revisamos accesos, flujos e infraestructura existente, y definimos la cobertura por zonas y horarios que corresponde a ese edificio en particular. La propuesta llega con el alcance declarado, para que puedas compararla con cualquiera.',
   },
@@ -445,9 +445,9 @@ export const GUIDES: GuidePage[] = [
         a: 'Solicitando el registro de cobertura efectiva. Un proveedor ordenado lleva ese control y lo entrega. Es la manera más directa de verificar un servicio cuyo resultado se ve únicamente cuando falla.',
       },
     ],
-    ctaTitle: 'Revisa tu esquema de turnos con un especialista',
+    ctaTitle: 'Revise su esquema de turnos con un especialista',
     ctaBody:
-      'Muchos contratos se hicieron con un esquema que ya no corresponde a la operación actual. Revisamos tu cobertura, el esquema de turnos y el proceso de reemplazo, y te decimos si lo que tienes vigente funciona o si conviene ajustarlo.',
+      'Muchos contratos se hicieron con un esquema que ya no corresponde a la operación actual. Revisamos su cobertura, el esquema de turnos y el proceso de reemplazo, y le decimos si lo que tiene vigente funciona o si conviene ajustarlo.',
   },
 
   {
@@ -520,7 +520,7 @@ export const GUIDES: GuidePage[] = [
       {
         heading: 'Las cuatro preguntas que más revelan la calidad de un proveedor',
         body: [
-          'Si solo puedes hacer cuatro preguntas antes de decidir, que sean estas.',
+          'Si solo puede hacer cuatro preguntas antes de decidir, que sean estas.',
         ],
         list: [
           { q: '¿El plan de rondas está por escrito?', a: 'Un proveedor que tiene un método responde con frecuencia y recorrido definidos. Uno que improvisa responde con evasivas, y esa diferencia ya dice casi todo.' },

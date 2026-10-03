@@ -341,7 +341,7 @@ export default function GuardpodWizard() {
         <div className="gp-welcome-backdrop" role="dialog" aria-modal="true" aria-labelledby="gp-welcome-title">
           <div className="gp-welcome">
             <h2 id="gp-welcome-title">Estás por llenar la base de conocimiento de Guardpod</h2>
-            <p>Este cuestionario <strong>no es un formulario de marketing</strong>. No queremos respuestas "bonitas" ni frases pulidas. Queremos la realidad de tu trabajo.</p>
+            <p>Este cuestionario <strong>no es un formulario de marketing</strong>. No queremos respuestas "bonitas" ni frases pulidas. Queremos la realidad de su trabajo.</p>
             <p><strong>Responde con lo que has visto en terreno:</strong></p>
             <ul>
               <li>Casos reales (no hipotéticos)</li>
@@ -362,7 +362,7 @@ export default function GuardpodWizard() {
 
       <div className="gp-banner" role="note">
         <span className="gp-banner-icon" aria-hidden="true">💡</span>
-        <span>Responde con tu experiencia real. Si no la tienes, márcalo como "no sé". Esto NO es marketing — es la base de <code>guardpod.cl</code>.</span>
+        <span>Responda con su experiencia real. Si no la tiene, márquelo como "no sé". Esto NO es marketing — es la base de <code>guardpod.cl</code>.</span>
       </div>
 
       <div className="gp-header">
@@ -485,7 +485,7 @@ function QuestionCard(props: {
         <h3 className="gp-card-label">
           {q.label}
           {q.required && <span className="gp-req" aria-label="requerida">*</span>}
-          {q.real_world_required && <span className="gp-tag-critical" title="Requiere respuesta basada en tu experiencia real">Experiencia real</span>}
+          {q.real_world_required && <span className="gp-tag-critical" title="Requiere respuesta basada en su experiencia real">Experiencia real</span>}
         </h3>
         {q.help_text && (
           <button

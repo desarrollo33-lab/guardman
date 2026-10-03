@@ -48,11 +48,11 @@ const leadFormSections = [
   {
     title: 'Detalles del servicio',
     fields: [
-      { name: 'location', label: 'Comuna donde necesitas el servicio', type: 'select' as const, required: true, options: locations, paramDescription: `Comuna donde se prestará el servicio. GuardMan cubre ${COVERAGE_PHRASE_LONG}.` },
+      { name: 'location', label: 'Comuna donde necesita el servicio', type: 'select' as const, required: true, options: locations, paramDescription: `Comuna donde se prestará el servicio. GuardMan cubre ${COVERAGE_PHRASE_LONG}.` },
       { name: 'service', label: 'Servicio de interés', type: 'select' as const, required: true, options: services.map((s) => s.name), paramDescription: 'Servicio que se quiere cotizar. Elegir "No estoy seguro — necesito asesoría" si no se tiene claro.' },
       { name: 'property_type', label: 'Tipo de propiedad', type: 'select' as const, options: propertyTypes, paramDescription: 'Tipo de inmueble o instalación a proteger.' },
-      { name: 'guards_count', label: '¿Cuántos guardias necesitas?', type: 'select' as const, options: guardsCounts, paramDescription: 'Cantidad estimada de guardias. No hay mínimo.' },
-      { name: 'message', label: 'Describe tu necesidad de seguridad', type: 'textarea' as const, fullWidth: true, rows: 5, placeholder: 'Cuéntanos sobre tu propiedad, puntos críticos, horarios, número de personas, etc.', paramDescription: 'Descripción libre de la necesidad: tipo de propiedad, puntos críticos, horarios, número de personas.' },
+      { name: 'guards_count', label: '¿Cuántos guardias necesita?', type: 'select' as const, options: guardsCounts, paramDescription: 'Cantidad estimada de guardias. No hay mínimo.' },
+      { name: 'message', label: 'Describa su necesidad de seguridad', type: 'textarea' as const, fullWidth: true, rows: 5, placeholder: 'Cuéntenos sobre su propiedad, puntos críticos, horarios, número de personas, etc.', paramDescription: 'Descripción libre de la necesidad: tipo de propiedad, puntos críticos, horarios, número de personas.' },
     ],
   },
 ];

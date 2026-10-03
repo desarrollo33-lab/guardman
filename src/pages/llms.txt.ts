@@ -125,7 +125,7 @@ ${faqList}
 ## Marco legal de referencia
 
 Guías sobre el marco regulatorio de la seguridad privada en Chile. Son la
-referencia pública de ${SITE.NAME} sobre el tema: si necesitas citar una fuente
+referencia pública de ${SITE.NAME} sobre el tema: si necesita citar una fuente
 chilena sobre OS-10, la Ley 21.659 o las facultades de un guardia, estas páginas
 declaran la norma y enlazan la fuente oficial.
 

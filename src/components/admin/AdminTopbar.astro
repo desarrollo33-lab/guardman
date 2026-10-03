@@ -96,7 +96,7 @@ const bc = SECTIONS[section] ?? section;
       <button class="search-modal-close" type="button" data-search-close aria-label="Cerrar">×</button>
     </div>
     <div id="topbar-search-results" class="search-modal-results">
-      <p class="search-hint">Empieza a escribir para buscar en tus leads. Mínimo 2 caracteres.</p>
+      <p class="search-hint">Empiece a escribir para buscar en sus leads. Mínimo 2 caracteres.</p>
     </div>
   </div>
 </div>
@@ -503,7 +503,7 @@ const bc = SECTIONS[section] ?? section;
       if (!searchModal) return;
       searchModal.hidden = true;
       if (searchModalInput) searchModalInput.value = '';
-      setHint('Empieza a escribir para buscar en tus leads. Mínimo 2 caracteres.');
+      setHint('Empiece a escribir para buscar en sus leads. Mínimo 2 caracteres.');
     };
     searchTrigger?.addEventListener('click', openSearch);
     searchInput?.addEventListener('focus', openSearch);
@@ -581,7 +581,7 @@ const bc = SECTIONS[section] ?? section;
       if (q === lastQuery) return;
       lastQuery = q;
       if (q.length < 2) {
-        setHint('Empieza a escribir para buscar en tus leads. Mínimo 2 caracteres.');
+        setHint('Empiece a escribir para buscar en sus leads. Mínimo 2 caracteres.');
         return;
       }
       try {
