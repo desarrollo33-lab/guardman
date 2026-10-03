@@ -8,6 +8,8 @@ import { SERVICES, LOCATIONS as LOC_CONTENT } from '../../../lib/content';
 import { SERVICE_ICONS } from '../../../lib/icons';
 import Icon from '../../../components/Icon.astro';
 import StaffSection from '../../../components/StaffSection.astro';
+import RelatedLinks from '../../../components/RelatedLinks.astro';
+import { SERVICE_BRIDGE, bridgeItems } from '../../../lib/internal-links';
 
 export const prerender = true;
 
@@ -136,8 +138,13 @@ const otrosServicios = Object.entries(SERVICE_NAMES)
   .slice(0, 3)
   .map(([s, n]) => ({ slug: s, name: n }));
 
-// Otras comunas donde se ofrece este servicio
-const otrasUbicaciones = LOCATIONS.filter((l) => l.slug !== locationSlug).slice(0, 8);
+// Otras comunas donde se ofrece este servicio.
+// Sin truncar: con `.slice(0, 8)` las 7 comunas finales (Vitacura, Conchalí,
+// Pudahuel, Renca, La Pintana, Los Andes, San Felipe) nunca aparecían en el
+// listado de ninguna página hermana, así que sus 42 páginas servicio×comuna
+// quedaban con un solo enlace entrante —el de su página de comuna—. La lista
+// completa además hace simétrico el vínculo entre hermanas.
+const otrasUbicaciones = LOCATIONS.filter((l) => l.slug !== locationSlug);
 
 // OS-10 / central de monitoreo / Guardpod solo aplican a servicios de
 // vigilancia. Para aseo se emiten título, descripción y hero propios.
@@ -298,6 +305,13 @@ const heroLead = certified
               ))}
             </div>
           </div>
+
+          <RelatedLinks
+            items={bridgeItems(SERVICE_BRIDGE[serviceSlug])}
+            title="Antes de contratar este servicio"
+            subtitle="Lo que conviene revisar antes de decidir, independiente de quién lo ejecute."
+            odId="block-bridge"
+          />
         </div>
 
         <aside data-od-id="sidebar">

@@ -145,7 +145,11 @@ const faq = [
           footIcon: 'clock3',
           footNote: 'Nuestro equipo revisará la denuncia en menos de 72 horas hábiles. Si proporcionó email o teléfono, le contactaremos por ese medio.',
           actions: [
-            { text: 'Consultar estado de mi denuncia', href: '/canal-de-denuncias/estado/', variant: 'primary' },
+            // El href estático apunta a la página del canal, no a /estado/: la
+            // ruta de estado exige un ID y sin él responde 404. El JS de este
+            // archivo reescribe el href con el ID real tras enviar la denuncia,
+            // y solo funciona si encuentra el nodo — de ahí el `id` explícito.
+            { text: 'Consultar estado de mi denuncia', href: '/canal-de-denuncias', id: 'denuncia-status-link', variant: 'primary' },
             { text: 'Volver al inicio', href: '/', variant: 'outline' },
             { text: 'Contactar directamente', href: '/contacto', variant: 'outline' },
           ],

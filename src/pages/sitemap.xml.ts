@@ -36,7 +36,10 @@ const buildUrls = (today: string): SitemapUrl[] => [
   { loc: '/contacto', changefreq: cf('monthly'), priority: 0.6, lastmod: today },
   { loc: '/cotizacion', changefreq: cf('monthly'), priority: 0.6, lastmod: today },
   { loc: '/canal-de-denuncias', changefreq: cf('monthly'), priority: 0.7, lastmod: today },
-  { loc: '/gracias', changefreq: cf('never'), priority: 0.1 },
+  // `/gracias` NO va aquí: es la pantalla de confirmación, declara
+  // `noindex,nofollow` en su <head> y no recibe enlaces internos. Listarla
+  // pedía una contradicción entre las dos señales y gastaba una URL del
+  // presupuesto de rastreo para nada.
   { loc: '/privacidad', changefreq: cf('yearly'), priority: 0.3, lastmod: today },
   { loc: '/terminos', changefreq: cf('yearly'), priority: 0.3, lastmod: today },
 

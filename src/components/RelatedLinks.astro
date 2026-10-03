@@ -1,35 +1,69 @@
 ---
-// RelatedLinks — cluster de links relacionados para SEO interno.
+// RelatedLinks — cluster de links relacionados. Widget canónico del sitio para
+// cualquier grupo de enlaces: los presets de páginas hermanas y los puentes
+// entre la capa editorial y la comercial.
+//
 // Variantes: servicios | ubicaciones | sectores | servicio | ubicacion | sector
-// Cada variante muestra tarjetas con enlaces contextuales.
+//
+// Uso con lista explícita (puentes entre capas):
+//   <RelatedLinks
+//     items={EDITORIAL_BRIDGE[page.slug]}
+//     title="Los servicios detrás de esta guía"
+//     subtitle="..."
+//   />
+//
+// Por qué `items` en vez de un componente aparte: el sitio ya tenía dos
+// componentes de cluster con el mismo markup y clases, y cada uno arrastraba su
+// propia versión del encabezado. Un widget con dos formas de alimentarse evita
+// que la página siguiente vuelva a inventar el suyo.
 import { SERVICE_NAMES, LOCATIONS, SECTOR_NAMES, SECTOR_DESCRIPTIONS, SERVICE_DESCRIPTIONS, ZONE_CONTEXT } from '../lib/constants';
 import { SECTOR_ICONS } from '../lib/icons';
 import Icon from './Icon.astro';
 
-interface Props {
-  type: 'servicios' | 'ubicaciones' | 'sectores' | 'servicio' | 'ubicacion' | 'sector';
-  exclude?: string;
-  title?: string;
-  limit?: number;
+type Preset = 'servicios' | 'ubicaciones' | 'sectores' | 'servicio' | 'ubicacion' | 'sector';
+
+interface ClusterItem {
+  url: string;
+  name: string;
+  desc?: string;
+  /** Texto largo opcional (detalle de cobertura). */
+  meta?: string;
+  /** Icono por ítem; si no, se usa el del tipo. */
+  icon?: string;
 }
 
-const { type, exclude, title, limit = 8 } = Astro.props;
+interface Props {
+  type?: Preset;
+  exclude?: string;
+  title?: string;
+  /** Texto bajo el título. Por defecto, la frase genérica del sitio. */
+  subtitle?: string;
+  limit?: number;
+  odId?: string;
+  /**
+   * Lista explícita. Cuando viene, ignora `type`/`exclude`/`limit` y no
+   * renderiza el enlace "ver todos": no es un listado de hermanos del que haya
+   * un subconjunto, sino un conjunto curado que no tiene hub al que apuntar.
+   */
+  items?: ClusterItem[];
+}
 
-const sections: Record<Props['type'], { label: string; items: { slug: string; name: string; url: string; desc?: string; meta?: string }[] }> = {
+const { type, exclude, title, subtitle, limit = 8, odId = 'related-cluster', items } = Astro.props;
+
+const sections: Record<Preset, { label: string; items: ClusterItem[] }> = {
   servicios: {
     label: 'Servicios de seguridad',
     items: Object.entries(SERVICE_NAMES).map(([slug, name]) => ({
-      slug, name,
       url: `/servicios/${slug}`,
+      name,
       desc: SERVICE_DESCRIPTIONS[slug],
     })),
   },
   ubicaciones: {
     label: 'Cobertura por comuna',
     items: LOCATIONS.map((l) => ({
-      slug: l.slug,
-      name: l.name,
       url: `/ubicaciones/${l.slug}`,
+      name: l.name,
       desc: `Zona ${l.zone}`,
       meta: ZONE_CONTEXT[l.slug]?.slice(0, 80),
     })),
@@ -37,87 +71,96 @@ const sections: Record<Props['type'], { label: string; items: { slug: string; na
   sectores: {
     label: 'Sectores que atendemos',
     items: Object.entries(SECTOR_NAMES).map(([slug, name]) => ({
-      slug, name,
       url: `/sectores/${slug}`,
+      name,
       desc: SECTOR_DESCRIPTIONS[slug],
     })),
   },
   servicio: {
     label: 'Otros servicios relacionados',
     items: Object.entries(SERVICE_NAMES).map(([slug, name]) => ({
-      slug, name,
       url: `/servicios/${slug}`,
+      name,
       desc: SERVICE_DESCRIPTIONS[slug],
     })),
   },
   ubicacion: {
     label: 'Otras comunas con cobertura',
     items: LOCATIONS.map((l) => ({
-      slug: l.slug,
-      name: l.name,
       url: `/ubicaciones/${l.slug}`,
+      name: l.name,
       desc: `Zona ${l.zone}`,
     })),
   },
   sector: {
     label: 'Otros sectores que protegemos',
     items: Object.entries(SECTOR_NAMES).map(([slug, name]) => ({
-      slug, name,
       url: `/sectores/${slug}`,
+      name,
       desc: SECTOR_DESCRIPTIONS[slug],
     })),
   },
 };
 
-const section = sections[type];
-const items = section.items.filter((i) => i.slug !== exclude).slice(0, limit);
-const heading = title ?? section.label;
-
-const iconByType: Record<Props['type'], string> = {
+const iconByType: Record<Preset, string> = {
   servicios: 'shield',
   ubicaciones: 'location',
-  sectores: 'radar', // fallback — preferimos SECTOR_ICONS[slug] abajo
+  sectores: 'radar',
   servicio: 'shield',
   ubicacion: 'location',
-  sector: 'radar',   // fallback — preferimos SECTOR_ICONS[slug] abajo
+  sector: 'radar',
 };
+
+const isExplicit = Array.isArray(items) && items.length > 0;
+
+/** `exclude` llega como slug (BaseLayout), no como ruta. */
+const slugOf = (u: string) => u.split('/').filter(Boolean).pop() ?? '';
+
+const section = type ? sections[type] : null;
+const resolved: ClusterItem[] = isExplicit
+  ? items
+  : (section?.items ?? []).filter((i) => slugOf(i.url) !== exclude).slice(0, limit);
+
+const heading = title ?? (isExplicit ? 'Relacionados' : section!.label);
+const sub = subtitle ?? (isExplicit ? '' : 'Explora contenido relacionado de GuardMan Chile');
+const defaultIcon = type ? iconByType[type] : 'shield';
+const hubForType = type === 'servicios' ? '/servicios' : type === 'ubicaciones' ? '/ubicaciones' : type === 'sectores' ? '/sectores' : null;
+const hubLabel = type === 'servicios' ? 'servicios' : type === 'ubicaciones' ? 'ubicaciones' : 'sectores';
 ---
 
-<section class="related-cluster" aria-label={heading} data-od-id="related-cluster">
+<section class="related-cluster" aria-label={heading} data-od-id={odId}>
   <div class="container">
     <div class="cluster-header">
       <h2>{heading}</h2>
-      <p class="cluster-sub">Explora contenido relacionado de GuardMan Chile</p>
+      {sub && <p class="cluster-sub">{sub}</p>}
     </div>
     <ul class="cluster-grid" role="list">
-      {items.map((item) => {
-        // Sectores: usar el icono específico del slug (casa, fábrica, casco, gorro, etc).
-        // Otros tipos: usar el icono genérico del tipo (shield, location).
+      {resolved.map((item) => {
+        // Sectores usan su icono propio; el resto, el del tipo.
+        const slug = slugOf(item.url);
         const isSectorType = type === 'sectores' || type === 'sector';
-        const itemIcon = isSectorType && SECTOR_ICONS[item.slug]
-          ? item.slug
-          : iconByType[type];
+        const itemIcon = item.icon ?? (isSectorType && SECTOR_ICONS[slug] ? slug : defaultIcon);
         return (
-        <li role="listitem"><a href={item.url} class="cluster-card">
-          <div class="cluster-card-icon">
-            <Icon name={itemIcon} size={18} />
-          </div>
-          <div class="cluster-card-body">
-            <h3>{item.name}</h3>
-            {item.desc && <span class="cluster-card-meta">{item.desc}</span>}
-            {item.meta && <p class="cluster-card-text">{item.meta}…</p>}
-          </div>
-          <span class="cluster-card-arrow" aria-hidden="true">
-            <Icon name="arrowRight" size={14} />
-          </span>
-        </a></li>
+          <li role="listitem"><a href={item.url} class="cluster-card">
+            <div class="cluster-card-icon">
+              <Icon name={itemIcon} size={18} />
+            </div>
+            <div class="cluster-card-body">
+              <h3>{item.name}</h3>
+              {item.desc && <span class="cluster-card-meta">{item.desc}</span>}
+              {item.meta && <p class="cluster-card-text">{item.meta}…</p>}
+            </div>
+            <span class="cluster-card-arrow" aria-hidden="true">
+              <Icon name="arrowRight" size={14} />
+            </span>
+          </a></li>
         );
       })}
     </ul>
-    {(type === 'servicios' || type === 'ubicaciones' || type === 'sectores') && (
+    {hubForType && (
       <div class="cluster-footer">
-        <a href={type === 'servicios' ? '/servicios' : type === 'ubicaciones' ? '/ubicaciones' : '/sectores'} class="cluster-see-all">
-          Ver todos los {type === 'servicios' ? 'servicios' : type === 'ubicaciones' ? 'ubicaciones' : 'sectores'}
+        <a href={hubForType} class="cluster-see-all">
+          Ver todos los {hubLabel}
           <Icon name="arrowRight" size={14} />
         </a>
       </div>

@@ -6,6 +6,8 @@ import { SECTOR_NAMES, SECTOR_TO_SERVICE, SERVICE_NAMES, SITE } from '../../lib/
 import { SECTORS } from '../../lib/content';
 import Icon from '../../components/Icon.astro';
 import StaffSection from '../../components/StaffSection.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+import { SECTOR_BRIDGE, bridgeItems } from '../../lib/internal-links';
 
 export const prerender = true;
 
@@ -137,6 +139,13 @@ const sectoresRelacionados = Object.entries(SECTOR_NAMES)
               ))}
             </div>
           </div>
+
+          <RelatedLinks
+            items={bridgeItems(SECTOR_BRIDGE[slug])}
+            title="Para este sector"
+            subtitle="Las soluciones y guías que se escribieron pensando en este tipo de operación."
+            odId="block-bridge"
+          />
         </div>
 
         <aside data-od-id="sidebar">

@@ -9,6 +9,8 @@ import Icon from '../components/Icon.astro';
 import LeadCTA from '../components/LeadCTA.astro';
 import TrustSignals from '../components/TrustSignals.astro';
 import HowItWorks from '../components/HowItWorks.astro';
+import { GUIDES } from '../lib/guias';
+import RelatedLinks from '../components/RelatedLinks.astro';
 
 // srcset only when source >= 732w; small assets (<500w) ship as-is
 // (re-encoding makes them larger — verified via sharp).
@@ -39,6 +41,37 @@ const nosotrosFeatures = [
   { title: 'Personal certificado OS-10' },
   { title: 'Centro de monitoreo propio' },
   { title: 'Cobertura regional amplia' },
+];
+
+// Bloque editorial de la home. La home enlazaba a 19 páginas de servicio y a
+// cero de guías, marco legal o soluciones: la capa que explica el marco de
+// contratación era invisible desde el punto de entrada del sitio, y se conocía
+// sobre todo desde búsqueda. Las cuatro guías son las de mayor intención
+// ("cuántos guardias", "cómo elegir"): son las que un comprador lee antes de
+// pedir una cotización, y las que lo devuelven a la página cuando decide.
+//
+// Los items se arman aquí y no en `internal-links.ts` porque son enlaces de
+// navegación desde la home, no puentes entre capas: el puente editorial ya vive
+// en el mapa y se inyecta desde cada artículo.
+const homeEditorial = [
+  ...GUIDES.map((g) => ({
+    url: `/guias/${g.slug}`,
+    name: g.title,
+    desc: g.metaDescription,
+    icon: 'book',
+  })),
+  {
+    url: '/seguridad-privada',
+    name: 'Marco legal de la seguridad privada',
+    desc: 'Qué exige la Ley 21.659, qué es la certificación OS-10 y qué puede o no puede hacer un guardia.',
+    icon: 'scale',
+  },
+  {
+    url: '/soluciones',
+    name: 'Soluciones integradas',
+    desc: 'Seguridad y mantención bajo un mismo responsable: condominios, oficinas, centros comerciales, obras y eventos.',
+    icon: 'users',
+  },
 ];
 
 const guardPodFeatures = [
@@ -303,6 +336,21 @@ const markers = LOCATIONS.map((l) => {
         ))}
       </div>
     </div>
+  </section>
+
+  <!-- EDITORIAL: guías de contratación, marco legal y soluciones.
+       Va entre "sectores" y "ajax" porque es el punto donde el visitante ya
+       sabe qué protegemos y todavía no ha decidido con quién: ahí la pregunta
+       natural es "¿cómo elijo a la empresa?", no "¿qué producto tienen?".
+       Usa el widget RelatedLinks como el resto de los clusters del sitio,
+       en vez de un grid de cards propio. -->
+  <RelatedLinks
+    items={homeEditorial}
+    title="Cómo elegir una empresa de seguridad"
+    subtitle="Publicamos lo que le exigimos a cualquier proveedor. Sirve igual para evaluarnos a nosotros."
+    odId="guias"
+  />
+
   </section>
 
   <!-- AJAX SYSTEMS (dark split) -->

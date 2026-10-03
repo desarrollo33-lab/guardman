@@ -29,7 +29,7 @@ import Icon from './Icon.astro';
 
 type FieldType = 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'date' | 'radio' | 'acceptance';
 type SectionType = { title?: string; number?: number | string; optionalTag?: string; help?: string; fields: Field[] };
-type SuccessAction = { text: string; href: string; variant?: 'primary' | 'outline' };
+type SuccessAction = { text: string; href: string; variant?: 'primary' | 'outline'; id?: string };
 
 interface Field {
   name: string;
@@ -334,7 +334,7 @@ const sectionRows = (section: SectionType): RowItem[] => {
       </div>
       <div class="denuncia-success-actions">
         {successPanel.actions.map((a) => (
-          <a href={a.href} class={`btn ${a.variant === 'outline' ? 'btn-outline' : 'btn-primary'}`}>{a.text}</a>
+          <a href={a.href} id={a.id} class={`btn ${a.variant === 'outline' ? 'btn-outline' : 'btn-primary'}`}>{a.text}</a>
         ))}
       </div>
       {successPanel.footNote && (

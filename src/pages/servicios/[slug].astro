@@ -6,6 +6,8 @@ import { SERVICE_NAMES, LOCATIONS, COVERAGE_TOTAL } from '../../lib/constants';
 import { SERVICES } from '../../lib/content';
 import Icon from '../../components/Icon.astro';
 import StaffSection from '../../components/StaffSection.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+import { SERVICE_BRIDGE, bridgeItems } from '../../lib/internal-links';
 
 export const prerender = true;
 
@@ -135,6 +137,13 @@ const seoDescription = certified
               ))}
             </div>
           </div>
+
+          <RelatedLinks
+            items={bridgeItems(SERVICE_BRIDGE[slug])}
+            title="Antes de contratar este servicio"
+            subtitle="Lo que conviene revisar antes de decidir, independiente de quién lo ejecute."
+            odId="block-bridge"
+          />
         </div>
 
         <aside data-od-id="sidebar">

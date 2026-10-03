@@ -19,6 +19,8 @@ import { GUIDES } from '../../lib/guias';
 import Icon from '../../components/Icon.astro';
 import LeadCTA from '../../components/LeadCTA.astro';
 import FaqList from '../../components/FaqList.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+import { EDITORIAL_BRIDGE, bridgeItems } from '../../lib/internal-links';
 
 export const prerender = true;
 
@@ -158,6 +160,13 @@ const guideLd = {
               ))}
             </div>
           </div>
+
+          <RelatedLinks
+            items={bridgeItems(EDITORIAL_BRIDGE[page.slug])}
+            title="Los servicios detrás de esta guía"
+            subtitle="Una vez definida la dotación o el proceso, estos son los servicios concretos que lo ejecutan."
+            odId="block-bridge"
+          />
         </div>
 
         <aside data-od-id="sidebar">
@@ -178,7 +187,7 @@ const guideLd = {
               <div class="sb-section">
                 <h4>Marco legal</h4>
                 <a href="/seguridad-privada" class="sb-link">Guías de referencia</a>
-                <a href="/seguridad-privada/como-elegir-empresa-de-seguridad" class="sb-link">Cómo verificar un proveedor</a>
+                <a href="/guias/como-elegir-empresa-de-seguridad" class="sb-link">Cómo verificar un proveedor</a>
                 <a href="/seguridad-privada/que-es-os-10" class="sb-link">Qué es la certificación OS-10</a>
               </div>
               <div class="sb-section">

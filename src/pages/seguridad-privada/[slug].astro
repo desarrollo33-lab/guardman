@@ -17,6 +17,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { AUTHORITY_PAGES } from '../../lib/authority';
 import Icon from '../../components/Icon.astro';
 import LeadCTA from '../../components/LeadCTA.astro';
+import RelatedLinks from '../../components/RelatedLinks.astro';
+import { EDITORIAL_BRIDGE, bridgeItems } from '../../lib/internal-links';
 
 export const prerender = true;
 
@@ -141,6 +143,13 @@ const citationLd = {
               ))}
             </div>
           </div>
+
+          <RelatedLinks
+            items={bridgeItems(EDITORIAL_BRIDGE[page.slug])}
+            title="Dónde se aplica esto"
+            subtitle="Lo que exige la normativa no es teórico: son puntos concretos del contrato que se compran como servicio."
+            odId="block-bridge"
+          />
         </div>
 
         <aside data-od-id="sidebar">
@@ -149,7 +158,7 @@ const citationLd = {
               <h3>Necesitas un proveedor que cumpla esto</h3>
               <p>
                 Todos los puntos de esta página son exigibles en un contrato. Si tu
-                proveedor actual no puede acreditarlos, hay conversation pendiente.
+                proveedor actual no puede acreditarlos, conviene revisar el contrato.
               </p>
               <a href="/cotizacion" class="btn btn-primary">Cotizar ahora</a>
               <a href="/contacto" class="btn btn-outline">Hablar con un experto</a>
