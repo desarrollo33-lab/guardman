@@ -29,6 +29,18 @@ const addSecurityHeaders = (
 ): Response => {
   const headers = new Headers(response.headers);
 
+  // Charset a nivel HTTP para todo el texto. El sitio es UTF-8 y las páginas
+  // ya lo declaran con <meta charset>, pero según el estándar la cabecera
+  // gana sobre el meta: si el meta se moviera, o una respuesta se sirviera
+  // sin él, los acentos y la ñ se verían rotos. Con `nosniff` ya activo, el
+  // navegador no puede deducirlo, así que conviene declararlo una vez y
+  // listo. El sitio entero es español, no hay variantes con otro charset.
+  if (contentType && !/charset=/i.test(contentType)) {
+    if (/^text\//i.test(contentType) || /^application\/(json|javascript|xml|ld\+json)/i.test(contentType)) {
+      headers.set('Content-Type', `${contentType}; charset=utf-8`);
+    }
+  }
+
   // X-Content-Type-Options: previene MIME sniffing.
   headers.set('X-Content-Type-Options', 'nosniff');
 
