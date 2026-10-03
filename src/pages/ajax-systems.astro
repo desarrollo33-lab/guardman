@@ -9,12 +9,12 @@ const features = [
   { icon: 'settings', title: 'OS Malevich', description: 'Sistema operativo propietario de Ajax, diseñado para máxima estabilidad y seguridad. Permite actualizaciones remotas, configuración granular y monitoreo en tiempo real desde cualquier dispositivo.' },
   { icon: 'eye', title: 'Detección Inteligente', description: 'Sensores con algoritmos de inteligencia artificial que distinguen entre intrusiones reales y falsas alarmas (mascotas, cambios climáticos, vibraciones). Reduce hasta un 95% las falsas activaciones.' },
   { icon: 'bolt', title: 'Batería de Larga Duración', description: 'Dispositivos con baterías de litio que ofrecen hasta 5 años de autonomía. Sin cables, sin mantenimiento frecuente, ideal para instalaciones en lugares de difícil acceso.' },
-  { icon: 'device', title: 'App Ajax para Automonitoreo', description: 'Aplicación móvil Ajax permite armar/desarmar, recibir notificaciones instantáneas, ver historial de eventos y gestionar usuarios. Compatible con iOS y Android. Sin contrato forzado: usted monitorea desde su smartphone sin pagar mensualidad.' },
+  { icon: 'device', title: 'Aplicación Ajax para Automonitoreo', description: 'Aplicación móvil Ajax permite armar/desarmar, recibir notificaciones instantáneas, ver historial de eventos y gestionar usuarios. Compatible con iOS y Android. Sin contrato forzado: usted monitorea desde su smartphone sin pagar mensualidad.' },
 ];
 
 const whyUs = [
   { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>', title: 'Instaladores oficiales', text: 'Equipo técnico certificado por Ajax Systems. Instalación profesional con productos originales y soporte técnico en español.' },
-  { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', title: 'Monitoreo 24/7 opcional', text: 'Si lo desea, agregue monitoreo profesional desde nuestra central propia como servicio mensual, sin contrato forzado. Si no, use la app Ajax para automonitoreo gratuito desde su smartphone.' },
+  { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', title: 'Monitoreo 24/7 opcional', text: 'Si lo desea, agregue monitoreo profesional desde nuestra central propia como servicio mensual, sin contrato forzado. Si no, use la aplicación Ajax para automonitoreo gratuito desde su smartphone.' },
   { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857"/></svg>', title: 'Apoyo con guardias OS-10', text: 'Si la alarma se activa, nuestros guardias certificados pueden responder en terreno como servicio opcional. Sin compromiso de contratación permanente.' },
 ];
 
@@ -31,7 +31,7 @@ const faqs = [
   { question: '¿Puedo instalar Ajax Systems yo mismo o debo contratar a un instalador certificado?', answer: 'Para garantizar el rendimiento y la validez de la garantía, recomendamos instalación por parte de un partner certificado como GuardMan Chile. Nuestros técnicos configuran el sistema según las características de su propiedad, optimizando la cobertura y evitando errores comunes.' },
   { question: '¿Qué pasa si se corta la luz o el internet? ¿El sistema sigue funcionando?', answer: 'Sí, los dispositivos Ajax funcionan con baterías de respaldo que duran hasta 5 años. Además, la central cuenta con batería interna y puede usar datos móviles (3G/4G) como respaldo si falla la conexión WiFi. La comunicación Jeweller no depende de internet para transmitir alarmas.' },
   { question: '¿Ajax Systems se integra con otros sistemas de seguridad como cámaras o sensores de humo?', answer: 'Sí, Ajax es compatible con una amplia gama de dispositivos de terceros mediante su plataforma abierta. Puede integrar cámaras IP, sensores de humo, detectores de gas, cerraduras inteligentes y más, todo controlado desde la misma aplicación. GuardMan le asesora en la selección de dispositivos compatibles.' },
-  { question: '¿Necesito contratar un plan mensual con GuardMan para usar Ajax Systems?', answer: 'No. El sistema Ajax funciona con la app oficial para automonitoreo desde su smartphone, sin contrato ni mensualidad con GuardMan. Si más adelante desea monitoreo profesional 24/7 desde nuestra central o respuesta en terreno con guardias OS-10, puede agregarlos como servicios opcionales.' },
+  { question: '¿Necesito contratar un plan mensual con GuardMan para usar Ajax Systems?', answer: 'No. El sistema Ajax funciona con la aplicación oficial para automonitoreo desde su smartphone, sin contrato ni mensualidad con GuardMan. Si más adelante desea monitoreo profesional 24/7 desde nuestra central o respuesta en terreno con guardias OS-10, puede agregarlos como servicios opcionales.' },
   { question: '¿Ajax Systems tiene sensores aptos para exterior?', answer: 'Sí. Ajax ofrece detectores de movimiento para exterior con tecnología de doble PIR, anti-masking y resistencia a la intemperie (IP54/IP65). Son ideales para perímetros, jardines, estacionamientos y fachadas, con comunicación inalámbrica Jeweller y batería de hasta 5 años.' },
 ];
 
@@ -39,8 +39,8 @@ const faqs = [
 ---
 
 <BaseLayout
-  title="Ajax Systems en Chile sin Contrato y con App de Automonitoreo"
-  description="Ajax Systems en Chile: alarmas inalámbricas con app de automonitoreo, sin contrato forzado. Sensores para exterior, instalación profesional y opción de monitoreo 24/7 desde nuestra central si lo necesita."
+  title="Ajax Systems en Chile sin Contrato y con Aplicación de Automonitoreo"
+  description="Ajax Systems en Chile: alarmas inalámbricas con aplicación de automonitoreo, sin contrato forzado. Sensores para exterior, instalación profesional y opción de monitoreo 24/7 desde nuestra central si lo necesita."
   theme="dark"
   loadDarkCss={true}
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Ajax Systems', url: '/ajax-systems' }]}
@@ -49,7 +49,7 @@ const faqs = [
   faq={faqs}
   product={{
     name: 'Ajax Systems (instalación oficial)',
-    description: 'Sistema de alarma inalámbrico con certificación Grade 3 Professional, app de automonitoreo sin contrato forzado y opción de monitoreo 24/7 desde la central de GuardMan. Instalación profesional de sensores para interior y exterior.',
+    description: 'Sistema de alarma inalámbrico con certificación Grade 3 Professional, aplicación de automonitoreo sin contrato forzado y opción de monitoreo 24/7 desde la central de GuardMan. Instalación profesional de sensores para interior y exterior.',
     image: '/images/Ajax-systems-header-960.webp',
     url: '/ajax-systems',
   }}
