@@ -7,7 +7,6 @@ import { env } from 'cloudflare:workers';
 const ALLOWED_ORIGINS = new Set([
   'https://guardman.cl',
   'https://www.guardman.cl',
-  'https://guardman-astro.oficinadesarrollo33.workers.dev',
   'http://localhost:4321',
   'http://127.0.0.1:4321',
 ]);

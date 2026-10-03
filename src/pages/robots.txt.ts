@@ -26,7 +26,7 @@
 // cumple RFC 9309 estricto (mismos Disallow, mismo Sitemap, sin la directiva
 // desconocida). Es legal y es justamente para lo que existe el matching por
 // User-Agent: cada crawler recibe el archivo que puede cumplir.
-import { SITE } from '../lib/constants';
+import { SITE, CONTENT_SIGNALS } from '../lib/constants';
 
 // Quién recibe el archivo con `Content-Signal` y quién recibe el limpio.
 //
@@ -67,7 +67,7 @@ ${contentSignal(ua) ? `
 # intención del sitio — de hecho /llms.txt existe justo para eso.
 # ai-train=no: no se autoriza usar el contenido para entrenar modelos.
 # search=yes: los buscadores tradicionales siguen/indexando normal.
-Content-Signal: ai-train=no, search=yes, ai-input=yes
+Content-Signal: ${CONTENT_SIGNALS}
 ` : ''}
 # Bots específicos
 User-agent: Googlebot

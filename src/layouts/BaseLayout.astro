@@ -17,6 +17,7 @@ import {
   localBusinessSchema,
   serviceSchema,
   locationSchema,
+  localBusinessAtLocation,
   breadcrumbSchema,
   faqSchema,
   articleSchema,
@@ -24,6 +25,8 @@ import {
   websiteSchema,
   geoMetaTags,
   hreflangTags,
+  composeTitle,
+  fitDescription,
   type BreadcrumbItem,
 } from '../lib/seo';
 import { INTER_FONT_URL, type Location } from '../lib/constants';
@@ -40,6 +43,9 @@ interface Props {
   loadDarkCss?: boolean;
   /** Schema LocalBusiness (homepage). */
   localBusiness?: boolean;
+  /** Schema LocalBusiness con `@id` propio para una comuna. Solo en
+   *  `/ubicaciones/[slug]`, que es la página canónica de cada comuna. */
+  localBusinessAt?: Location;
   /** Schema Product/Servicio (páginas de servicio). */
   product?: {
     name: string;
@@ -99,6 +105,7 @@ const {
   theme = 'light',
   loadDarkCss = false,
   localBusiness = false,
+  localBusinessAt,
   product,
   service,
   location,
@@ -123,7 +130,15 @@ const canonicalPath = Astro.url.pathname === '/'
 const url = canonical ?? new URL(canonicalPath, SITE.URL).href;
 // v5.2: títulos sin separadores `|` o `-`. Se concatena con espacio natural.
 // Cada page ya entrega su title en español neutro sin guiones ni pipes.
-const fullTitle = title.includes(SITE.NAME) ? title : `${title} ${SITE.NAME}`;
+//
+// El title pasa por `composeTitle`: si la marca más el título de página se pasa
+// del presupuesto de SERP, se cae el calificador de la cola, nunca la marca.
+// Antes la concatenación era a ciegas y por eso 164 de 242 titles quedaban
+// truncados en el resultado de búsqueda. Ver `TITLE_MAX` en `lib/seo.ts`.
+const fullTitle = composeTitle(title, SITE.NAME);
+// Idem para la description: 225 de 242 pasaban de 160 caracteres y Google
+// cortaba a mitad de frase.
+const metaDescription = fitDescription(description);
 const ogType = article ? 'article' : 'website';
 const publishedISO = article?.datePublished ?? '2024-01-01';
 const modifiedISO = article?.dateModified ?? new Date().toISOString().slice(0, 10);
@@ -175,6 +190,7 @@ header.site-header{position:sticky;top:0;z-index:1100;background:#fff;box-shadow
 const orgLd = organizationSchema();
 const websiteLd = websiteSchema();
 const localBusinessLd = localBusiness ? localBusinessSchema() : null;
+const localBusinessAtLd = localBusinessAt ? localBusinessAtLocation(localBusinessAt) : null;
 const serviceLd = service ? serviceSchema(service) : null;
 const productLd = product
   ? {
@@ -204,7 +220,7 @@ const speakableLd = speakableSchema(Astro.url.pathname);
 
 // Todos los JSON-LD en un array para imprimir
 const allSchemas = [
-  orgLd, websiteLd, localBusinessLd, serviceLd, productLd,
+  orgLd, websiteLd, localBusinessLd, localBusinessAtLd, serviceLd, productLd,
   ...(locationLd ?? []), articleLd, faqLd, breadcrumbLd, speakableLd,
   ...(extraSchemas ?? []),
 ].filter(Boolean);
@@ -226,7 +242,7 @@ const hreflangs = hreflangTags(Astro.url.pathname);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{fullTitle}</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescription} />
     <meta name="author" content={SITE.LEGAL_NAME} />
     <meta name="language" content="Spanish" />
     <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'} />
@@ -247,7 +263,7 @@ const hreflangs = hreflangTags(Astro.url.pathname);
     {/* OpenGraph */}
     <meta property="og:type" content={ogType} />
     <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={metaDescription} />
     <meta property="og:url" content={url} />
     <meta property="og:image" content={new URL(ogImage, SITE.URL).href} />
     <meta property="og:image:width" content={String(OG_IMAGE.WIDTH)} />
@@ -270,7 +286,7 @@ const hreflangs = hreflangTags(Astro.url.pathname);
     {/* Twitter Card */}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:description" content={metaDescription} />
     <meta name="twitter:image" content={new URL(ogImage, SITE.URL).href} />
     <meta name="twitter:image:alt" content={fullTitle} />
     <meta name="twitter:label1" content="Escrito por" />

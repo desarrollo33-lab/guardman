@@ -14,11 +14,11 @@
   `site.css:30` no son los finales.
 
 ## Deploy
-- Worker: `guardman-astro` (https://guardman-astro.oficinadesarrollo33.workers.dev)
+- Worker: `guardman-astro` (https://guardman.cl — único host público)
 - Cuenta Cloudflare: oficinadesarrollo33@gmail.com (account ID b3a89fc9524552b7ab3202269f1ab6f3)
 - Astro 6 SSR + @astrojs/cloudflare
 - Build: `npm run build` (debe correrse antes de `wrangler deploy`, ver gotcha en MEMORY.md)
-- Deploy: `npx wrangler deploy`
+- Deploy: `npx wrangler deploy --config dist/server/wrangler.json` (el `npm run deploy` usa esa config, no la raíz)
 
 ## Cache de assets estáticos — INVARIANTE
 - `public/_headers` sirve `/styles/site.css` con `Cache-Control: public, max-age=31536000,
@@ -75,15 +75,21 @@
   se exporte `ALLOW_PROD_TESTS=1` a propósito. Exige `ADMIN_TOKEN` real: la cookie falsa de
   32 caracteres que usaba antes dejó de funcionar cuando `isAdminRequest` pasó a verificar
   la firma del JWT (2026-10-02) y el test moría en el setup sin proteger nada.
-- **RESUELTO (verificado 2026-10-02).** El dominio SÍ sirve este worker.
-- `guardman.cl`, `www.guardman.cl` y `guardman-astro.oficinadesarrollo33.workers.dev` devuelven
-  el mismo deploy. Evidencia: `/api/health` responde `{"service":"guardman-astro"}`, el
-  `robots.txt` en vivo es idéntico a `src/pages/robots.txt.ts`, y el HTML referencia
-  `/_astro/page.*.js`.
-- La anotación anterior ("responde `Server: ESF` / Google Sites") quedó obsoleta: ese bloqueo
-  se cerró solo o por consola de Cloudflare, no desde el repo. El `wrangler.jsonc` sigue sin
-  `routes` ni `custom_domains` porque la conexión se hizo a nivel de zona (Custom Domain en el
+- **El dominio SÍ sirve este worker** (verificado 2026-10-02). `guardman.cl` y
+  `www.guardman.cl` lo sirven; `wrangler.jsonc` no tiene `routes` ni
+  `custom_domains` porque la conexión se hizo a nivel de zona (Custom Domain en el
   dashboard), no con un route pattern.
+- **`*.workers.dev` está APAGADO a propósito (2026-10-03).** El cliente reportó que la
+  dirección del worker aparecía en búsquedas. Antes los tres hosts
+  (`guardman.cl`, `www.guardman.cl`, `*.workers.dev`) servían una copia completa con
+  200; el canonical a `guardman.cl` no alcanzaba porque canonical es sugerencia, no
+  orden, y el hostname además publica el nombre de la cuenta que hospeda el proyecto.
+  Estado final: `workers_dev: false` en `wrangler.jsonc` (el flag, no solo el toggle del
+  dashboard, porque sin él cada `wrangler deploy` volvía a publicar el host), más
+  `src/lib/canonical-host.ts` que responde 301 al canónico desde cualquier otro host.
+  **El 301 no es decorativo:** si alguien vuelve a prender el toggle, el sitio sigue
+  sirviendo un clon indexable. Si el host reaparece, el problema es el flag, no el
+  middleware.
 - **No volver a documentar esto como pendiente.** Si hay que reconfirmar, es un `Invoke-WebRequest`
   a `https://guardman.cl/api/health`.
 
