@@ -101,6 +101,18 @@
   `application/json` quedan fuera de esa lista a propósito: son los tipos honestos de páginas
   públicas y de catálogos propios, y etiquetarlos como `application/ai-catalog+json` haría que un
   consumidor conforme intente parsearlos como manifiesto y falle.
+- **Los 403 en `/.well-known/*` y `/llms*` vienen del edge, no del Worker.** Medido el 2026-10-02:
+  la **Browser Integrity Check** bloquea los User-Agent que no son navegadores (típicamente
+  `Python-urllib/x.y`, que es el que usa el conformance tester oficial de la spec), y una regla
+  gestionada de Cloudflare ("Cloudflare Bot Management rules for all plans" → "Block AI bots on ad
+  pages") bloquea a GPTBot y ClaudeBot en todo el sitio **salvo `/.well-known/`**. Resolverlo:
+  custom rule `Allow discovery paths (ARD + llms)` con acción Skip sobre
+  `starts_with(path, "/.well-known/") or starts_with(path, "/llms")`, marcando **Browser Integrity
+  Check** en "More components to skip" — sin esa casilla el Skip matchea pero no cambia nada.
+  Con eso `conformance-test publisher guardman.cl` da PASS.
+- **El bloqueo a GPTBot/ClaudeBot no es una decisión del cliente**, es el default de Cloudflare, y
+  es coherente con `ai-train=no`. Los crawlers que CITAN (OAI-SearchBot, ChatGPT-User, Claude-User,
+  Claude-SearchBot, PerplexityBot) no están bloqueados. No tocar AI Crawl Control ni Bot Fight Mode.
 - `Link:` headers en respuestas HTML salen de `src/middleware.ts`, no de `public/_headers`:
   ese archivo solo aplica a assets estáticos y nunca aparece en páginas SSR.
 - `robots.txt` declara `ai-train=no, search=yes, ai-input=yes`: GuardMan quiere ser citado por
