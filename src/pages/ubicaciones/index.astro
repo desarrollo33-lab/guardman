@@ -2,7 +2,7 @@
 // /ubicaciones — hub de comunas con mapa Leaflet.
 // v5.2 — Copy único, español neutro, estructura y componentes preservados.
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { LOCATIONS, ZONE_CONTEXT, ZONE_COLORS, SITE, COVERAGE_RM, COVERAGE_VS, COVERAGE_PHRASE_LONG, COVERAGE_PHRASE_RM } from '../../lib/constants';
+import { LOCATIONS, ZONE_CONTEXT, ZONE_COLORS, SITE, COVERAGE_RM, COVERAGE_VS, COVERAGE_PHRASE_LONG, COVERAGE_PHRASE_RM, VS_COMMUNES_LIST } from '../../lib/constants';
 import Icon from '../../components/Icon.astro';
 import CoverageMap from '../../components/CoverageMap.astro';
 
@@ -36,7 +36,7 @@ const locationsByZone = ZONES.map((zone) => ({
   <section class="hub-hero" data-od-id="hero">
     <div class="container">
       <h1>Nuestra cobertura</h1>
-      <p>Presencia directa en ${COVERAGE_PHRASE_RM}, más ${COVERAGE_VS.map((c) => c.name).join(' y ')} en Valparaíso. Personal y supervisores zonales que conocen el territorio, con capacidad de respuesta coordinada entre comunas y respaldo de la central de monitoreo propia 24/7.</p>
+      <p>Presencia directa en {COVERAGE_PHRASE_RM}, más {VS_COMMUNES_LIST} en Valparaíso. Personal y supervisores zonales que conocen el territorio, con capacidad de respuesta coordinada entre comunas y respaldo de la central de monitoreo propia 24/7.</p>
     </div>
   </section>
 
