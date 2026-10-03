@@ -48,7 +48,7 @@ export const POST: APIRoute = async ({ request }) => {
   const email = typeof body.email === 'string' ? body.email : '';
   const password = typeof body.password === 'string' ? body.password : '';
   if (!email || !password) {
-    return errJson('El correo electrónico y la contraseña son obligatorios.', 400);
+    return errJson('Email y password son obligatorios.', 400);
   }
   if (password.length > 256 || email.length > 320) {
     return errJson('Credenciales fuera de rango.', 400);

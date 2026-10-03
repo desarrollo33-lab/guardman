@@ -31,44 +31,47 @@ function walk(dir: string): string[] {
 const W = '[\\p{L}\\p{N}_-]';
 const w = (x: string) => new RegExp(`(?<!${W})(?:${x})(?!${W})`, 'giu');
 
-/** [patrón, sustitucion] */
+/**
+ * Lista de prohibidos. CORTA a propósito.
+ *
+ * Kammler, 2026-10-03: "app para ajax systems está bien, partner también
+ * está bien, email también. Hay algunos anglicismos que se usan de forma
+ * convencional en Chile."
+ *
+ * La primera versión de este test prohibía unas 40 palabras y "corrigió" 63
+ * lugares del sitio. Casi todo estaba bien. La regla no es "sin inglés": es
+ * "sin inglés que un Chilean no escribiría".
+ *
+ * CONVENCIONALES EN CHILE, se permiten (ya se "corrigieron" y se revirtieron):
+ *   app, email, mail, partner, checklist, dashboard, lead/leads, follow-up,
+ *   feedback, deadline, link, upload, download, online, tips, meeting,
+ *   tracking, password, quality, tracking de envíos.
+ *
+ * INDEFENSABLES, se prohíben: son o traducciones Disponibles de siempre, o
+ * están fuera de registro para el público de este sitio.
+ */
 const ANGLICISMOS: [string, string][] = [
-  ['e-?mails?', 'correo electrónico'],
-  ['mails?', 'correo'],
-  ['follow[- ]?ups?', 'seguimiento'],
-  ['check-?ins?', 'registro de asistencia'],
+  // Seguridad: es una empresa de seguridad chilena. "security" y "safety"
+  // acá no son anglicismos, son el término equivocado.
+  ['security', 'seguridad'],
+  ['safety', 'seguridad'],
+  ['securing', 'protegiendo'],
+  // organigrama y comercial directo
   ['staff', 'personal'],
-  ['deadlines?', 'fecha límite'],
-  ['feedback', 'retroalimentación'],
-  ['checklists?', 'lista de verificación'],
   ['stakeholders?', 'interesados'],
   ['deliverables?', 'entregables'],
+  ['benchmarks?', 'referencia comparativa'],
   ['sign[- ]?off', 'aprobación'],
   ['newsletter', 'boletín'],
-  ['partners?', 'socios'],
   ['webinar', 'seminario web'],
   ['landing page', 'página de destino'],
+  // Cadenas de interfaz en inglés: nadie las escribe así en español
   ['click here', 'haga clic aquí'],
   ['learn more', 'más información'],
   ['read more', 'leer más'],
   ['get started', 'comenzar'],
   ['contact us', 'contáctenos'],
-  ['best quality', 'la mejor calidad'],
-  ['securing', 'protegiendo'],
-  ['security', 'seguridad'],
-  ['safety', 'seguridad'],
-  ['tracking', 'seguimiento'],
-  ['deadline', 'fecha límite'],
-  ['leads?', 'contactos'],
-  ['links?', 'enlaces'],
-  ['uploads?', 'carga'],
-  ['downloads?', 'descarga'],
-  ['password', 'contraseña'],
-  ['dashboard', 'panel'],
-  ['apps?', 'aplicación'],
-  ['meeting', 'reunión'],
-  ['checklist', 'lista de verificación'],
-  ['tips', 'consejos'],
+  ['sign[- ]?up', 'registrarse'],
 ];
 
 /**
@@ -265,6 +268,47 @@ describe('sin anglicismos en el copy visible', () => {
     expect(offenders.length).toBeLessThan(5);
     const conClass = offenders.filter((o) => o.includes('class='));
     expect(conClass).toEqual([]);
+  });
+});
+
+describe('los anglicismos convencionales en Chile NO se corrigen', () => {
+  // El guard anterior corrió 63 cambios y casi todos estaban bien. Estos
+  // casos son los que Kammler.namedó explícitamente más los que se le
+  // parecen por la misma razón. Si alguno aparece en la lista de
+  // prohibidos, este test falla y el criterio hay que discutirlo de nuevo.
+  const CONVENCIONALES = [
+    'Controle su sistema desde la app Ajax para automonitoreo',
+    'instalación por parte de un partner certificado',
+    'Los campos de nombre, email y teléfono',
+    'Checklist de actividades, incidencias y horas',
+    'Panel — CRM',
+    'Bandeja de Leads',
+    'Lead no encontrado',
+    'el ritmo del follow-up comercial',
+    'Copia y pega del WhatsApp, mail o conversación',
+    'Aliado / partner',
+    'Correo requerido',
+    'Buscar leads, clientes, cotizaciones',
+  ];
+
+  it('ninguna frase convencional dispara el guard', () => {
+    const falsas: string[] = [];
+    for (const frase of CONVENCIONALES) {
+      for (const [pat] of ANGLICISMOS) {
+        const re = w(pat);
+        re.lastIndex = 0;
+        if (re.test(frase)) falsas.push(`"${pat}" dispara en: ${frase}`);
+      }
+    }
+    expect(falsas).toEqual([]);
+  });
+
+  it('la lista de prohibidos sigue siendo corta y defendible', () => {
+    // Son 17. El tope va holgado a propósito: lo que se quiere evitar es que
+    // vuelva a las ~40 de la primera versión, que marcaban copy bueno. Un
+    // número exacto obliga a pelear con el test cada vez que se agrega una
+    // palabra defendible.
+    expect(ANGLICISMOS.length).toBeLessThanOrEqual(20);
   });
 });
 

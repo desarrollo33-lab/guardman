@@ -376,7 +376,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       { title: 'Productos certificados ecológicos', description: 'Productos de limpieza industriales certificados, con opciones biodegradables según requerimiento del cliente.' },
       { title: 'Planes adaptables al horario', description: 'Opciones diurnas, nocturnas y de fin de semana ajustadas al horario de operación de cada propiedad.' },
       { title: 'Protocolos de sanitización profunda', description: 'Procedimientos especializados para áreas críticas: cocinas, baños, salas de servidores y zonas de alto tráfico.' },
-      { title: 'Reporte mensual detallado', description: 'Lista de verificación de actividades, incidencias y horas ejecutadas con seguimiento mensual de calidad del servicio.' },
+      { title: 'Reporte mensual detallado', description: 'Checklist de actividades, incidencias y horas ejecutadas con seguimiento mensual de calidad del servicio.' },
       { title: 'Maquinaria industrial profesional', description: 'Aspiradoras industriales, máquinas de piso e hidrolavadoras para aseo de grandes superficies y áreas industriales.' },
     ],
     problems: [

@@ -229,7 +229,7 @@ export default function LeadsList() {
       return;
     }
     if (!bulkAssignValue.trim()) {
-      TOAST({ type: 'warning', title: 'Correo requerido', msg: 'Ingrese un correo para asignar.' });
+      TOAST({ type: 'warning', title: 'Email requerido', msg: 'Ingrese un email para asignar.' });
       return;
     }
     const email = bulkAssignValue.trim();
@@ -295,7 +295,7 @@ export default function LeadsList() {
       <div className="leads-toolbar">
         <input
           className="form-input leads-search"
-          placeholder="🔍 Buscar por nombre, correo, empresa, teléfono…"
+          placeholder="🔍 Buscar por nombre, email, empresa, teléfono…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -321,7 +321,7 @@ export default function LeadsList() {
                 onChange={(e) => setBulkAssignValue(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') onBulkAssign(); }}
                 autoFocus
-                aria-label="Correo del comercial"
+                aria-label="Email del comercial"
               />
               <button className="admin-btn admin-btn-primary" onClick={onBulkAssign} disabled={busy || !bulkAssignValue.trim()}>
                 Asignar
@@ -366,7 +366,7 @@ export default function LeadsList() {
           <p className="empty-state-msg">
             {query || statusFilter
               ? 'Intenta ajustar los filtros o la búsqueda.'
-              : 'Cuando lleguen contactos desde los formularios de Contacto o Cotización, aparecerán aquí.'}
+              : 'Cuando lleguen leads desde los formularios de Contacto o Cotización, aparecerán aquí.'}
           </p>
           {(query || statusFilter) && (
             <button className="admin-btn admin-btn-secondary" onClick={() => { setQuery(''); setStatusFilter(''); }}>
@@ -397,7 +397,7 @@ export default function LeadsList() {
               {sorted.map((l) => (
                 <tr key={l.id} className={selected.has(l.id) ? 'row-selected' : ''}>
                   <td data-label=""><input type="checkbox" checked={selected.has(l.id)} onChange={() => toggleOne(l.id)} aria-label={`Seleccionar ${l.name}`} /></td>
-                  <td data-label="Contacto">
+                  <td data-label="Lead">
                     <a href={`/admin/leads/${l.id}`} className="lead-link">
                       <div className="lead-cell">
                         <strong>{l.name}</strong>
@@ -405,7 +405,7 @@ export default function LeadsList() {
                       </div>
                     </a>
                   </td>
-                  <td data-label="Contacto">
+                  <td data-label="Lead">
                     <div className="contact-cell">
                       <a href={`mailto:${l.email}`}>{l.email}</a>
                       <a href={`tel:${l.phone}`} className="contact-phone">{l.phone}</a>
@@ -426,7 +426,7 @@ export default function LeadsList() {
                   <td data-label="Valor" className="num value-cell">{formatCLP(l.value)}</td>
                   <td data-label="Actualizado" className="muted-cell">{relativeTime(l.updated_at)}</td>
                   <td data-label="">
-                    <a href={`/admin/leads/${l.id}`} className="row-action" aria-label="Ver contacto">→</a>
+                    <a href={`/admin/leads/${l.id}`} className="row-action" aria-label="Ver lead">→</a>
                   </td>
                 </tr>
               ))}

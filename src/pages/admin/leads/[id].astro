@@ -13,9 +13,9 @@ if (!id) {
 ---
 
 <AdminLayout
-  title="Detalle del contacto"
+  title="Detalle del lead"
   section="leads"
-  breadcrumb={[{ name: 'Contactos', url: '/admin/leads' }, { name: 'Detalle' }]}
+  breadcrumb={[{ name: 'Leads', url: '/admin/leads' }, { name: 'Detalle' }]}
 >
   <LeadDetail client:only="react" leadId={id} />
 </AdminLayout>

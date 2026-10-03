@@ -89,7 +89,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'cliente.ciclo_decision', 'cliente_mercado', 2, 10,
-     'select', '¿Cuánto tarda el cliente típico en decidir la compra?', 'Queremos conocer el ciclo promedio. Para definir el ritmo del seguimiento comercial.', NULL,
+     'select', '¿Cuánto tarda el cliente típico en decidir la compra?', 'Queremos conocer el ciclo promedio. Para definir el ritmo del follow-up comercial.', NULL,
      0, 1, '["Menos de 1 semana","1 a 4 semanas","1 a 3 meses","Más de 3 meses"]', 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -103,7 +103,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'cliente.comunas_prioridad', 'cliente_mercado', 2, 12,
-     'text', '¿En qué 5 comunas o zonas hay más demanda real de Guardpod?', 'Queremos conocer la geografía. Para que la página web tenga secciones por zona y para orientar SEO local.', 'Las 5 zonas con más clientes o más contactos',
+     'text', '¿En qué 5 comunas o zonas hay más demanda real de Guardpod?', 'Queremos conocer la geografía. Para que la página web tenga secciones por zona y para orientar SEO local.', 'Las 5 zonas con más clientes o más leads',
      0, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -159,7 +159,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'prod.frase_testimonio', 'producto_cliente', 3, 8,
-     'textarea', '¿Cuál es la mejor frase real que le dijo un cliente después de usar Guardpod?', 'Queremos conocer la frase textual del cliente. Aunque sea ordinaria, aunque sea mal redactada. Lo que se usa como testimonio.', 'Copia y pega del WhatsApp, correo o conversación. La frase exacta',
+     'textarea', '¿Cuál es la mejor frase real que le dijo un cliente después de usar Guardpod?', 'Queremos conocer la frase textual del cliente. Aunque sea ordinaria, aunque sea mal redactada. Lo que se usa como testimonio.', 'Copia y pega del WhatsApp, mail o conversación. La frase exacta',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -194,14 +194,14 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'casos.cliente_perdido', 'casos_vividos', 4, 5,
-     'textarea', '¿Por qué el último cliente que NO firmó decidió no avanzar?', 'Queremos conocer la razón real. Lo que el cliente dijo cuando le preguntaste por qué. Aunque incomode.', 'La razón real que le dieron cuando les preguntaste por qué no avanzó',
+     'textarea', '¿Por qué el último cliente que NO firmó decidió no avanzar?', 'Queremos conocer la razón real. Lo que el cliente dijo cuando le preguntó por qué. Aunque incomode.', 'La razón real que le dieron cuando les preguntó por qué no avanzó',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'casos.frase_pre_firma', 'casos_vividos', 4, 6,
-     'textarea', '¿Cuál fue la frase EXACTA del último cliente antes de firmar?', 'Queremos conocer la frase que cerró el negocio. La más persuasiva. La que se usa como cierre del proceso de venta.', 'Copia y pega del WhatsApp, correo o transcripción',
+     'textarea', '¿Cuál fue la frase EXACTA del último cliente antes de firmar?', 'Queremos conocer la frase que cerró el negocio. La más persuasiva. La que se usa como cierre del proceso de venta.', 'Copia y pega del WhatsApp, mail o transcripción',
      1, 0, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -355,7 +355,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'ventas.cuando_cliente_calla', 'ventas', 7, 3,
-     'textarea', '¿Qué hace cuando un cliente deja de responder?', 'Queremos conocer el seguimiento. Cuántos intentos, qué dices, cuándo das por perdido.', 'El proceso de seguimiento que usa',
+     'textarea', '¿Qué hace cuando un cliente deja de responder?', 'Queremos conocer el seguimiento. Cuántos intentos, qué dices, cuándo das por perdido.', 'El proceso de follow-up que usa',
      0, 0, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -363,13 +363,13 @@ INSERT INTO guardpod_questions
   VALUES
     ('v1', 'ventas.fuentes_lead', 'ventas', 7, 4,
      'multiselect', '¿De dónde llegan los clientes que contratan?', 'Queremos conocer los canales que más convierten.', NULL,
-     0, 1, '["Web / formulario","WhatsApp directo","Vendedor en terreno","Referido de otro cliente","Aliado / socio","LinkedIn","Google Ads","Instagram","Otro"]', 0);
+     0, 1, '["Web / formulario","WhatsApp directo","Vendedor en terreno","Referido de otro cliente","Aliado / partner","LinkedIn","Google Ads","Instagram","Otro"]', 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'ventas.tasa_conversion', 'ventas', 7, 5,
-     'select', 'Aproximadamente, ¿qué porcentaje de contactos cierra como cliente?', 'Queremos conocer la tasa de conversión real. Aunque sea estimado.', NULL,
+     'select', 'Aproximadamente, ¿qué porcentaje de leads cierra como cliente?', 'Queremos conocer la tasa de conversión real. Aunque sea estimado.', NULL,
      0, 0, '["Menos del 5%","5–10%","10–20%","20–40%","Más del 40%","No lo sé con certeza"]', 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,
@@ -404,7 +404,7 @@ INSERT INTO guardpod_questions
      help_text, real_world_prompt, real_world_required, required, options_json, seo_relevance)
   VALUES
     ('v1', 'vis.vision_3_anios', 'vision', 9, 1,
-     'textarea', '¿Cómo imaginaría Guardpod dentro de 3 años?', 'Queremos conocer la visión cruda. Cifras, geografías, productos concretos.', 'Lo que le dirías a un socio escéptico en 60 segundos',
+     'textarea', '¿Cómo imaginaría Guardpod dentro de 3 años?', 'Queremos conocer la visión cruda. Cifras, geografías, productos concretos.', 'Lo que le diría a un socio escéptico en 60 segundos',
      1, 1, NULL, 0);
 INSERT INTO guardpod_questions
     (version, question_key, section, section_order, question_order, question_type, label,

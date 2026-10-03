@@ -1,14 +1,15 @@
--- 0005: registro neutro y sin anglicismos en el cuestionario GuardPod.
+-- 0005: el cuestionario GuardPod en español neutro, sin voseo.
 --
 -- Por qué una migración y no editar 0003: 0003 ya está aplicada en D1. Editar
 -- el archivo de una migración aplicada hace que el repo describa un estado
 -- que la base no tiene, y un despliegue sobre otra base diverge en silencio.
--- Acá solo se corrigen label / help_text / real_world_prompt; options_json y
--- el resto de la estructura no cambian.
+--
+-- Solo registro: los anglicismos del seed (follow-up, mail, partner) se
+-- dejan como estaban, porque son uso convencional en Chile.
 --
 -- El texto viejo ya no está en el repo (los dos archivos del seed quedaron
--- corregidos). Este archivo se generó diffeando el seed contra git HEAD, así
--- que los 36 question_key salen de las claves que existen de verdad.
+-- corregidos). Este archivo se generó diffeando el seed contra 2035960^, así
+-- que los 32 question_key salen de claves que existen de verdad.
 --
 -- NO se pudo aplicar desde el entorno de desarrollo: el token OAuth de
 -- wrangler no tiene alcance de D1 remoto (APIError 7403, "The given account
@@ -42,10 +43,6 @@ UPDATE guardpod_questions SET help_text = 'Queremos conocer el dolor que lo trae
 UPDATE guardpod_questions SET real_world_prompt = 'La frase exacta que le dijo el último cliente nuevo'
   WHERE question_key = 'cliente.dolor_principal';
 
--- cliente.ciclo_decision / help_text
-UPDATE guardpod_questions SET help_text = 'Queremos conocer el ciclo promedio. Para definir el ritmo del seguimiento comercial.'
-  WHERE question_key = 'cliente.ciclo_decision';
-
 -- cliente.pregunta_frecuente / label
 UPDATE guardpod_questions SET label = '¿Cuál es la pregunta que más le hace un cliente antes de firmar?'
   WHERE question_key = 'cliente.pregunta_frecuente';
@@ -53,10 +50,6 @@ UPDATE guardpod_questions SET label = '¿Cuál es la pregunta que más le hace u
 -- cliente.pregunta_frecuente / real_world_prompt
 UPDATE guardpod_questions SET real_world_prompt = 'La pregunta exacta que más le han hecho antes de firmar'
   WHERE question_key = 'cliente.pregunta_frecuente';
-
--- cliente.comunas_prioridad / real_world_prompt
-UPDATE guardpod_questions SET real_world_prompt = 'Las 5 zonas con más clientes o más contactos'
-  WHERE question_key = 'cliente.comunas_prioridad';
 
 -- prod.que_resuelve / real_world_prompt
 UPDATE guardpod_questions SET real_world_prompt = 'Lo que el cliente le dijo: "lo que pasa es que en mi obra..."'
@@ -70,21 +63,17 @@ UPDATE guardpod_questions SET real_world_prompt = 'Casos reales donde dijo "mira
 UPDATE guardpod_questions SET label = '¿Cuál es la mejor frase real que le dijo un cliente después de usar Guardpod?'
   WHERE question_key = 'prod.frase_testimonio';
 
--- prod.frase_testimonio / real_world_prompt
-UPDATE guardpod_questions SET real_world_prompt = 'Copia y pega del WhatsApp, correo o conversación. La frase exacta'
-  WHERE question_key = 'prod.frase_testimonio';
-
 -- casos.peor_queja / real_world_prompt
 UPDATE guardpod_questions SET real_world_prompt = 'La queja más dura, la que le hizo pensar "esto no puede repetirse"'
   WHERE question_key = 'casos.peor_queja';
 
--- casos.cliente_perdido / real_world_prompt
-UPDATE guardpod_questions SET real_world_prompt = 'La razón real que le dieron cuando les preguntaste por qué no avanzó'
+-- casos.cliente_perdido / help_text
+UPDATE guardpod_questions SET help_text = 'Queremos conocer la razón real. Lo que el cliente dijo cuando le preguntó por qué. Aunque incomode.'
   WHERE question_key = 'casos.cliente_perdido';
 
--- casos.frase_pre_firma / real_world_prompt
-UPDATE guardpod_questions SET real_world_prompt = 'Copia y pega del WhatsApp, correo o transcripción'
-  WHERE question_key = 'casos.frase_pre_firma';
+-- casos.cliente_perdido / real_world_prompt
+UPDATE guardpod_questions SET real_world_prompt = 'La razón real que le dieron cuando les preguntó por qué no avanzó'
+  WHERE question_key = 'casos.cliente_perdido';
 
 -- casos.situacion_inusual / real_world_prompt
 UPDATE guardpod_questions SET real_world_prompt = 'Algo que le pasó con un cliente que no le había pasado antes'
@@ -143,16 +132,8 @@ UPDATE guardpod_questions SET label = '¿Qué hace cuando un cliente deja de res
   WHERE question_key = 'ventas.cuando_cliente_calla';
 
 -- ventas.cuando_cliente_calla / real_world_prompt
-UPDATE guardpod_questions SET real_world_prompt = 'El proceso de seguimiento que usa'
+UPDATE guardpod_questions SET real_world_prompt = 'El proceso de follow-up que usa'
   WHERE question_key = 'ventas.cuando_cliente_calla';
-
--- ventas.fuentes_lead / options_json
-UPDATE guardpod_questions SET options_json = '["Web / formulario", "WhatsApp directo", "Vendedor en terreno", "Referido de otro cliente", "Aliado / socio", "LinkedIn", "Google Ads", "Instagram", "Otro"]'
-  WHERE question_key = 'ventas.fuentes_lead';
-
--- ventas.tasa_conversion / label
-UPDATE guardpod_questions SET label = 'Aproximadamente, ¿qué porcentaje de contactos cierra como cliente?'
-  WHERE question_key = 'ventas.tasa_conversion';
 
 -- legal.permisos_cliente / real_world_prompt
 UPDATE guardpod_questions SET real_world_prompt = 'Lo que le explica al cliente cuando pregunta'
@@ -160,4 +141,8 @@ UPDATE guardpod_questions SET real_world_prompt = 'Lo que le explica al cliente 
 
 -- vis.vision_3_anios / label
 UPDATE guardpod_questions SET label = '¿Cómo imaginaría Guardpod dentro de 3 años?'
+  WHERE question_key = 'vis.vision_3_anios';
+
+-- vis.vision_3_anios / real_world_prompt
+UPDATE guardpod_questions SET real_world_prompt = 'Lo que le diría a un socio escéptico en 60 segundos'
   WHERE question_key = 'vis.vision_3_anios';

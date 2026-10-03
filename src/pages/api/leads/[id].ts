@@ -74,7 +74,7 @@ export const GET: APIRoute = async ({ params, request }) => {
     .first<Record<string, unknown>>();
 
   if (!row) {
-    return json({ ok: false, error: 'Contacto no encontrado.' }, 404, origin);
+    return json({ ok: false, error: 'Lead no encontrado.' }, 404, origin);
   }
 
   return json({ ok: true, lead: row }, 200, origin);
@@ -150,7 +150,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     .bind(id)
     .first<{ id: string }>();
   if (!exists) {
-    return json({ ok: false, error: 'Contacto no encontrado.' }, 404, origin);
+    return json({ ok: false, error: 'Lead no encontrado.' }, 404, origin);
   }
 
   const sets: string[] = ["updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')"];

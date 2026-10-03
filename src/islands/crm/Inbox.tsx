@@ -146,8 +146,8 @@ export default function Inbox() {
           setRecentlyMoved({ lead: prev.find((l) => l.id === id)!, toStatus: newStatus });
           (window as unknown as { gmToast?: (o: unknown) => void }).gmToast?.({
             type: 'success',
-            title: 'Contacto movido',
-            msg: `${prev.find((l) => l.id === id)?.name ?? 'Contacto'} → ${STATUS_LABELS[newStatus] ?? newStatus}`,
+            title: 'Lead movido',
+            msg: `${prev.find((l) => l.id === id)?.name ?? 'Lead'} → ${STATUS_LABELS[newStatus] ?? newStatus}`,
           });
         }
       } catch (err) {
@@ -164,7 +164,7 @@ export default function Inbox() {
     if (!skipConfirm && newStatus === 'lost') {
       (window as unknown as { gmConfirm?: (o: unknown) => void }).gmConfirm?.({
         title: '¿Marcar como perdido?',
-        msg: 'El contacto saldrá de la bandeja. Se puede revertir manualmente.',
+        msg: 'El lead saldrá de la bandeja. Se puede revertir manualmente.',
         danger: true,
         confirmLabel: 'Sí, marcar como perdido',
         onConfirm: doMove,
@@ -246,7 +246,7 @@ export default function Inbox() {
         </div>
         <input
           className="form-input inbox-search"
-          placeholder="🔍 Buscar contacto…"
+          placeholder="🔍 Buscar lead…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -264,8 +264,8 @@ export default function Inbox() {
               <p className="empty-state-title">Bandeja vacía</p>
               <p className="empty-state-msg">
                 {query
-                  ? 'No hay contactos que coincidan con su búsqueda.'
-                  : 'Todos los contactos han sido procesados. ¡Buen trabajo!'}
+                  ? 'No hay leads que coincidan con su búsqueda.'
+                  : 'Todos los leads han sido procesados. ¡Buen trabajo!'}
               </p>
               {query && (
                 <button className="admin-btn admin-btn-secondary" onClick={() => setQuery('')}>
@@ -334,7 +334,7 @@ export default function Inbox() {
           ) : (
             <div className="panel empty-panel">
               <div className="empty-state-graphic">👈</div>
-              <p className="empty-state-title">Seleccione un contacto</p>
+              <p className="empty-state-title">Seleccione un lead</p>
               <p className="empty-state-msg">Toca una tarjeta para ver el detalle completo, llamar o cambiar estado.</p>
             </div>
           )}

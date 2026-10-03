@@ -169,7 +169,7 @@ export default function Pipeline() {
         });
         window.gmToast?.({
           type: 'success',
-          title: 'Contacto movido',
+          title: 'Lead movido',
           msg: `Estado actualizado a ${toStatus}`,
         });
       } catch (err) {
@@ -185,7 +185,7 @@ export default function Pipeline() {
     if (!skipConfirm && toStatus === 'lost') {
       (window as unknown as { gmConfirm?: (o: unknown) => void }).gmConfirm?.({
         title: '¿Marcar como perdido?',
-        msg: 'El contacto se moverá a la columna "Perdidos". Se puede revertir manualmente.',
+        msg: 'El lead se moverá a la columna "Perdidos". Se puede revertir manualmente.',
         danger: true,
         confirmLabel: 'Sí, marcar como perdido',
         onConfirm: doMove,
@@ -286,7 +286,7 @@ export default function Pipeline() {
       <div className="pipeline-toolbar">
         <input
           className="form-input pipeline-search"
-          placeholder="🔍 Buscar por nombre, correo, empresa…"
+          placeholder="🔍 Buscar por nombre, email, empresa…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -347,7 +347,7 @@ export default function Pipeline() {
                       <button
                         type="button"
                         className="kanban-card-menu-btn"
-                        aria-label="Mover contacto"
+                        aria-label="Mover lead"
                         title="Mover a otra etapa"
                         onClick={(e) => { e.stopPropagation(); openMoveMenu(l, e); }}
                       >⋮</button>
