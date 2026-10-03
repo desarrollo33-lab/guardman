@@ -167,7 +167,10 @@ ${SOLUTIONS.map(
 export const GET = () =>
   new Response(text, {
     headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
+      // El manifiesto ARD declara esta entrada como `text/markdown`, así que el
+      // header tiene que decir lo mismo. Servirla como text/plain sería
+      // contradecir el propio manifiesto: el media type es parte del contrato.
+      'Content-Type': 'text/markdown; charset=utf-8',
       'Cache-Control': 'public, max-age=3600',
     },
   });

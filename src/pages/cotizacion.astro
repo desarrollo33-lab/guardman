@@ -2,6 +2,7 @@
 // /cotizacion — formulario detallado (migración 1:1 del live).
 // v4.2 — usa componentes del sistema de diseño: Icon, HowItWorks, LeadCTA, TrustSignals, LeadForm.
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { MCP_TOOLS } from '../lib/mcp-card';
 import { SERVICE_NAMES, LOCATIONS, COVERAGE_PHRASE_LONG } from '../lib/constants';
 import { SERVICES } from '../lib/content';
 import Icon from '../components/Icon.astro';
@@ -47,7 +48,7 @@ const leadFormSections = [
   {
     title: 'Detalles del servicio',
     fields: [
-      { name: 'location', label: 'Comuna donde necesitas el servicio', type: 'select' as const, required: true, options: locations, paramDescription: 'Comuna donde se prestará el servicio. GuardMan cubre 12 comunas de la Región Metropolitana y 2 de Valparaíso.' },
+      { name: 'location', label: 'Comuna donde necesitas el servicio', type: 'select' as const, required: true, options: locations, paramDescription: `Comuna donde se prestará el servicio. GuardMan cubre ${COVERAGE_PHRASE_LONG}.` },
       { name: 'service', label: 'Servicio de interés', type: 'select' as const, required: true, options: services.map((s) => s.name), paramDescription: 'Servicio que se quiere cotizar. Elegir "No estoy seguro — necesito asesoría" si no se tiene claro.' },
       { name: 'property_type', label: 'Tipo de propiedad', type: 'select' as const, options: propertyTypes, paramDescription: 'Tipo de inmueble o instalación a proteger.' },
       { name: 'guards_count', label: '¿Cuántos guardias necesitas?', type: 'select' as const, options: guardsCounts, paramDescription: 'Cantidad estimada de guardias. No hay mínimo.' },
@@ -89,11 +90,7 @@ const leadFormSections = [
         trackName="cotizacion"
         successRedirect="/gracias?type=cotizacion"
         footNote="Sus datos están seguros. No compartimos información con terceros. Le contactaremos una sola vez para enviar su cotización."
-        webmcp={{
-          name: 'guardman_solicitar_cotizacion',
-          description:
-            'Registra una solicitud de cotización de seguridad privada para GuardMan Chile. La respuesta comercial es humana y llega en menos de 24 horas hábiles; no devuelve precio. Use esta herramienta cuando la persona pida cotizar vigilancia, guardias, CCTV o control de accesos.',
-        }}
+        webmcp={MCP_TOOLS[0].webmcp}
       />
     </div>
   </section>

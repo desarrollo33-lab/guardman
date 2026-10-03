@@ -69,6 +69,31 @@ test.describe('public site', () => {
     expect(text).toContain('Disallow: /api');
   });
 
+  test('documentos para agentes se sirven con el media type que declara el manifiesto', async ({ request }) => {
+    // El manifiesto dice text/markdown. Servirlos como text/plain sería decir
+    // una cosa y entregar otra: el media type es parte del contrato.
+    for (const path of ['/llms.txt', '/llms-servicios.md', '/llms-cobertura.md', '/llms-marco-legal.md', '/llms-guias.md']) {
+      const res = await request.get(path);
+      expect(res.status(), `${path} no responde 200`).toBe(200);
+      expect(res.headers()['content-type'], `${path} con content-type incorrecto`).toContain('text/markdown');
+      expect((await res.text()).length, `${path} vino vacío`).toBeGreaterThan(500);
+    }
+  });
+
+  test('el manifiesto declara una MCP server card que existe', async ({ request }) => {
+    const card = await request.get('/.well-known/mcp.json');
+    expect(card.status()).toBe(200);
+    expect(card.headers()['content-type']).toContain('application/mcp-server-card+json');
+    const json = await card.json();
+    expect(json.tools.map((t: { name: string }) => t.name)).toContain('guardman_solicitar_cotizacion');
+
+    // Y el manifiesto la referencia de verdad.
+    const manifest = await (await request.get('/.well-known/ard.json')).json();
+    const mcpEntry = manifest.entries.find((e: { type: string }) => e.type === 'application/mcp-server-card+json');
+    expect(mcpEntry, 'el manifiesto no declara ninguna MCP server card').toBeTruthy();
+    expect(mcpEntry.url).toContain('/.well-known/mcp.json');
+  });
+
   test('health endpoint allows only guardman.cl + localhost', async ({ request }) => {
     const res = await request.get('/api/health', { headers: { Origin: 'https://evil.example' } });
     expect(res.status()).toBe(200);
