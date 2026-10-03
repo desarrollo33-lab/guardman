@@ -27,8 +27,8 @@ const locationsByZone = ZONES.map((zone) => ({
 ---
 
 <BaseLayout
-  title="Cobertura de Seguridad Privada en Santiago y Valparaíso"
-  description={`GuardMan Chile cubre ${COVERAGE_PHRASE_LONG}. Personal OS-10 disponible en Las Condes, Vitacura, Lo Barnechea, Santiago Centro, Huechuraba, Quilicura y más. Mapa operativo verificado.`}
+  title="Seguridad Privada en Santiago y Valparaíso"
+  description={`GuardMan Chile cubre ${COVERAGE_PHRASE_LONG}. Personal OS-10 disponible en Las Condes, Vitacura, Lo Barnechea, Santiago Centro, Huechuraba, Quilicura y más. Mapa verificado.`}
   breadcrumbs={[{ name: 'Inicio', url: '/' }, { name: 'Ubicaciones', url: '/ubicaciones' }]}
   showCluster={true}
   clusterType="servicios"
@@ -94,7 +94,7 @@ const locationsByZone = ZONES.map((zone) => ({
       <h2 class="section-title" style="color:#fff">¿Necesita cobertura en su comuna?</h2>
       <p class="section-subtitle" style="color:rgba(255,255,255,.7);max-width:600px;margin:0 auto 28px">Si no encuentra su comuna en la lista, contáctenos. Evaluamos solicitudes en otras zonas del país con planes de despliegue escalonado.</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-        <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar para mi propiedad</a>
         <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg"><Icon name="phone" size={16} /> {SITE.PHONE}</a>
       </div>
     </div>

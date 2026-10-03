@@ -45,3 +45,10 @@ imagenes guardman/
 
 # originales de re-encode (scripts/reencode-images.mjs; recuperables desde git)
 .reenc-src/
+
+# research/ — auditorías de copy y espejos de sitios competidores.
+# El .md con la propuesta sí se versiona, el HTML descargado no: son cientos de
+# archivos de terceros y pesan más que todo el código del repo.
+research/**/html/
+research/**/text/
+research/**/manifest.json

@@ -2,7 +2,7 @@
 // Homepage v4.0 — Optimizada para captura de leads.
 // Hero persuasivo + trust signals + cómo funciona + CTA inline + cluster.
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SERVICE_NAMES, LOCATIONS, ZONE_COLORS, FAQ_HOME, SITE, COVERAGE_PHRASE_LONG, COVERAGE_PHRASE_TOTAL, IMAGE_VERSION } from '../lib/constants';
+import { SERVICE_NAMES, LOCATIONS, ZONE_COLORS, FAQ_HOME, SITE, COVERAGE_PHRASE_LONG, COVERAGE_PHRASE_TOTAL, RM_COMMUNES_LIST, VS_COMMUNES_LIST, IMAGE_VERSION } from '../lib/constants';
 import { ICONS, SERVICE_ICONS } from '../lib/icons';
 import { SERVICES, ZONAS } from '../lib/content';
 import Icon from '../components/Icon.astro';
@@ -137,7 +137,7 @@ const markers = LOCATIONS.map((l) => {
       <div class="hero-ctas">
         <a href="/cotizacion" class="btn btn-primary btn-lg">
           <Icon name="shield" size={16} />
-          Solicitar Cotización
+          Cotizar para mi propiedad
         </a>
         <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg">
           <Icon name="phone" size={16} />
@@ -190,7 +190,7 @@ const markers = LOCATIONS.map((l) => {
     variant="inline"
     title="¿Listo para proteger su propiedad?"
     subtitle="Reciba una propuesta personalizada sin compromiso. Nuestro equipo comercial le contacta en menos de 24 horas hábiles con un plan diseñado a su medida."
-    primaryText="Solicitar Cotización"
+    primaryText="Cotizar para mi propiedad"
   />
 
   <!-- SERVICIOS -->
@@ -407,13 +407,13 @@ const markers = LOCATIONS.map((l) => {
       <h2 class="section-title" style="text-align:center;max-width:700px;margin:0 auto 12px">Protección profesional para su tranquilidad</h2>
       <p class="section-subtitle" style="text-align:center;max-width:600px;margin:0 auto 28px">Más de 10 años protegiendo empresas y residencias con guardias certificados, tecnología propia y atención personalizada de un equipo que conoce su comuna.</p>
       <div style="text-align:center;margin-bottom:48px">
-        <a href="/cotizacion" class="btn btn-primary btn-lg">Solicitar cotización</a>
+        <a href="/cotizacion" class="btn btn-primary btn-lg">Cotizar para mi propiedad</a>
         <a href={`tel:${SITE.PHONE_TEL}`} class="btn btn-outline-light btn-lg" style="margin-left:12px">Llamar al {SITE.PHONE}</a>
       </div>
       <hr style="border:0;border-top:1px solid rgba(255,255,255,.1);margin:0 0 48px" />
       <span class="section-label">Cobertura regional</span>
       <h2 class="section-title">Presencia en {COVERAGE_PHRASE_LONG}</h2>
-      <p class="section-subtitle">Atendemos en Las Condes, Vitacura, Lo Barnechea, La Reina, Santiago Centro, Huechuraba, Quilicura, Conchalí, Pudahuel, Renca, Lampa y La Pintana, además de Los Andes y San Felipe. Cobertura operativa con respuesta coordinada entre zonas.</p>
+      <p class="section-subtitle">Atendemos en {RM_COMMUNES_LIST}, además de {VS_COMMUNES_LIST}. Cobertura operativa con respuesta coordinada entre zonas.</p>
 
       <div class="coverage-split" style="margin-top:28px">
         <div class="coverage-zones">
@@ -452,6 +452,6 @@ const markers = LOCATIONS.map((l) => {
     variant="footer"
     title="Hablemos de su seguridad"
     subtitle="Nuestro equipo comercial está disponible 24/7 para responder consultas y diseñar una solución a su medida. Cotización personalizada en menos de 24 horas hábiles."
-    primaryText="Solicitar Cotización"
+    primaryText="Cotizar para mi propiedad"
   />
 </BaseLayout>

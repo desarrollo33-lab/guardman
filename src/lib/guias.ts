@@ -98,7 +98,7 @@ export const GUIDES: GuidePage[] = [
         body: [
           'La cobertura 24/7 y la cobertura diurna no son el mismo servicio ni tienen la misma dotación. Este es el eje que más se negocia, porque es el que define la estructura del turno.',
           'Un edificio con recepción nocturna activa tiene una necesidad distinta de uno donde el conserje cierra a las 20:00 y el resto del horario queda sin cobertura presencial.',
-          'También incide la calidad de esa cobertura: un turno de 12 horas es físicamente distinto de un turno de 8, tanto para laBSDBs sostenida del guardia como para la capacidad real de respuesta. No es el mismo servicio aunque ambos se llamen "guardia de seguridad".',
+          'También incide la calidad de esa cobertura: un turno de 12 horas es físicamente distinto de un turno de 8, tanto para la carga sostenida del guardia como para la capacidad real de respuesta. No es el mismo servicio aunque ambos se llamen "guardia de seguridad".',
         ],
       },
     ],
@@ -133,7 +133,7 @@ export const GUIDES: GuidePage[] = [
       {
         mistake: 'Pedir un número por teléfono sin visita previa',
         consequence:
-          'El número que se da por teléfono no puede ser correcto. Sin ver el sitio, cualquier respuesta es una estimación, y una estimación mal dimensionada se traduce en Either un gasto de más o un hueco de seguridad.',
+          'El número que se da por teléfono no puede ser correcto. Sin ver el sitio, cualquier respuesta es una estimación, y una estimación mal dimensionada se traduce en un gasto de más o en un hueco de seguridad.',
       },
       {
         mistake: 'Comparar cotizaciones que cubren servicios distintos',
@@ -155,7 +155,7 @@ export const GUIDES: GuidePage[] = [
       {
         heading: 'Por qué no publicamos el número',
         body: [
-          'Muchos sitios answered "cuántos guardias necesito" con una tabla de ratios por superficie o por cantidad de unidades. Puede ser un punto de partida, pero un número sin evaluación de sitio no es una recomendación profesional.',
+          'Muchos sitios responden "cuántos guardias necesito" con una tabla de ratios por superficie o por cantidad de unidades. Puede ser un punto de partida, pero un número sin evaluación de sitio no es una recomendación profesional.',
           'Más aún en seguridad privada: los ratios que circulan en internet suelen provenir de contextos de otros países, con otras normas, otras jornadas y otros niveles de riesgo. Aplicados sin ajuste a un edificio chileno, pueden quedar muy por encima o muy por debajo de lo que el sitio realmente necesita.',
           'Por eso preferimos no publicar ratios. Lo que sí hacemos es explicar cómo razonamos la dotación, para que puedas evaluar la propuesta que recibas de cualquier proveedor, incluido nosotros.',
         ],
@@ -195,7 +195,7 @@ export const GUIDES: GuidePage[] = [
       },
       {
         q: '¿Qué pasa si mi edificio no necesita vigilancia privada?',
-        a: 'Es una conclusión válida y laCsvamos a decir. Si la infraestructura, la iluminación y el historial del edificio hacen innecesaria una dotación permanente, lo indicado es decirlo. Agregar personal donde no se necesita es un gasto sin retorno.',
+        a: 'Es una conclusión válida y conviene decirlo. Si la infraestructura, la iluminación y el historial del edificio hacen innecesaria una dotación permanente, lo indicado es decirlo. Agregar personal donde no se necesita es un gasto sin retorno.',
       },
       {
         q: '¿Cada cuánto conviene revisar la dotación?',
@@ -465,8 +465,8 @@ export const GUIDES: GuidePage[] = [
         name: 'Autorización',
         question: '¿La empresa está autorizada por la Subsecretaría de Prevención del Delito?',
         body: [
-          'Bajo la Ley 21.659, solo pueden prestar servicios de seguridad privada las empresaspcs autorizadas por la Subsecretaría de Prevención del Delito. La autorización es verificable.',
-          'Una empresa que no puede acreditar su autorización, o que responde de forma vaga cuando se le pregunta, estáFuera del sistema legal. Ese es el punto de partida y no hay compensaciones por el resto de las características.',
+          'Bajo la Ley 21.659, solo pueden prestar servicios de seguridad privada las empresas autorizadas por la Subsecretaría de Prevención del Delito. La autorización es verificable.',
+          'Una empresa que no puede acreditar su autorización, o que responde de forma vaga cuando se le pregunta, está fuera del sistema legal. Ese es el punto de partida y no hay compensaciones por el resto de las características.',
         ],
       },
       {
@@ -474,14 +474,14 @@ export const GUIDES: GuidePage[] = [
         question: '¿El personal tiene acreditación vigente y hay proceso de renovación?',
         body: [
           'Todo el personal que ejerce funciones de seguridad privada necesita acreditación OS-10 vigente. La credencial tiene una vigencia de tres años y requiere renovación.',
-          'La pregunta que importa no es si el personal está acreditado hoy, sino si existe un proceso de renovación. Una empresa conProcesses ordenado lo demuestra entregando el registro de credenciales con sus fechas.',
+          'La pregunta que importa no es si el personal está acreditado hoy, sino si existe un proceso de renovación. Una empresa con procesos ordenados lo demuestra entregando el registro de credenciales con sus fechas.',
         ],
       },
       {
         name: 'Estructura',
         question: '¿Cómo se sostiene la operación día a día?',
         body: [
-          'El punto donde más se differentiates a las empresas es en la estructura: rotación, supervisión, reemplazo y documentación. Son los cuatro elementos que separan a un proveedor que opera de uno que intermediates.',
+          'El punto donde más se diferencia una empresa de otra es la estructura: rotación, supervisión, reemplazo y documentación. Son los cuatro elementos que separan a un proveedor que opera de uno que intermedia.',
           'Un intermediario puede tener mejores precios y personal acreditado, pero delega la estructura. En seguridad privada eso se traduce en que no hay nadie que responda por la continuidad del servicio.',
         ],
       },

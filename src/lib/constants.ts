@@ -65,6 +65,53 @@ export const SERVICE_NAMES: Record<string, string> = {
 
 export const SERVICE_SLUGS = Object.keys(SERVICE_NAMES);
 
+/**
+ * Nombre corto para titles y breadcrumbs.
+ *
+ * El nombre completo va bien en el H1 y en el cuerpo, pero
+ * "PPI (Protección de Personas Importantes)" son 39 caracteres: con la comuna y
+ * la marca el title se pasa de 60 y se corta. Medido 2026-10-03 sobre las 242
+ * URLs en producción, 164 titles quedaban truncados en el resultado de búsqueda.
+ *
+ * Acá se acorta SOLO el title. El H1 conserva el nombre completo, porque ahí no
+ * hay presupuesto y la keyword larga sigue siendo la que se indexa en el H1.
+ * Los servicios que no aparecen acá usan `SERVICE_NAMES`.
+ */
+export const SERVICE_TITLE_NAMES: Record<string, string> = {
+  'cctv-videovigilancia': 'CCTV',
+  'escoltas-privados': 'Escoltas PPI',
+};
+
+export const serviceTitleName = (slug: string): string =>
+  SERVICE_TITLE_NAMES[slug] ?? SERVICE_NAMES[slug] ?? slug;
+
+/**
+ * Nombre del servicio en minúscula, para usar DENTRO de una frase.
+ *
+ * Antes las plantillashacían `svc.name.toLowerCase()`, y eso rompía dos cosas
+ * a la vez en las 176 páginas servicio×comuna: la abreviatura interna aparecía
+ * en el encabezado ("Por qué elegir **ppi** (Protección de Personas
+ * Importantes) en Santiago Centro") y la marca perdía su capitalización
+ * ("Por qué elegir **guardpod** en Las Condes"). Verificado en producción.
+ *
+ * Reglas, en orden:
+ *   - Si la primera palabra es una sigla o una marca propia, NO se toca:
+ *     "CCTV Videovigilancia" y "Guardpod" se quedan como vienen.
+ *   - Si la primera palabra es un artículo o preposición, se lowercasea igual
+ *     ("El Aseo de Seguridad" → "el aseo de seguridad"), porque ahí lo que
+ *     empieza la frase no es la marca.
+ *   - En cualquier otro caso solo baja la primera letra, que es lo que se
+ *     busca al escribir "la operación de guardias de seguridad en Las Condes".
+ */
+const SIGLAS_Y_MARCAS = new Set(['cctv', 'ppi', 'guardpod', 'guardman', 'ajax', 'os-10']);
+
+export const serviceNameInSentence = (name: string): string => {
+  const first = name.split(' ')[0] ?? '';
+  if (SIGLAS_Y_MARCAS.has(first.toLowerCase())) return name;
+  if (first === 'El' || first === 'La' || first === 'Los' || first === 'Las') return name;
+  return name.charAt(0).toLowerCase() + name.slice(1);
+};
+
 export const SECTOR_NAMES: Record<string, string> = {
   residencial: 'Residencial',
   comercial: 'Comercial',
@@ -229,8 +276,22 @@ export const SITE_DESCRIPTION =
   `Cobertura en ${COVERAGE_RM.length} comunas de la Región Metropolitana más ` +
   `${COVERAGE_VS.length} en Valparaíso (${COVERAGE_TOTAL} en total).`;
 
-export const LOCATION_SLUGS = LOCATIONS.map((l) => l.slug) as readonly string[];
-export const LOCATION_NAMES: Record<string, string> = Object.fromEntries(
+// ───────────────────────────────────────────────────────────────
+// Content Signals (draft IETF draft-romm-aipref-contentsignals)
+//
+// Una sola definición para los dos lugares donde se emite: la directiva dentro
+// de robots.txt (solo para crawlers de IA, ver `pages/robots.txt.ts`) y el
+// header HTTP en cada página HTML (ver `middleware.ts`). Antes el texto estaba
+// duplicado y la política solo regía el archivo, no el documento.
+//
+// `ai-train=no` cierra el uso para entrenar. `search=yes, ai-input=yes` deja
+// abierta la lectura y la cita por asistentes, que es la intención declarada del
+// cliente. No confundir con los bots: el bloqueo por User-Agent (GPTBot,
+// ClaudeBot) lo aplica Cloudflare, esto es la capa declarativa.
+// ───────────────────────────────────────────────────────────────
+export const CONTENT_SIGNALS = 'ai-train=no, search=yes, ai-input=yes';
+
+export const LOCATION_SLUGS = LOCATIONS.map((l) => l.slug) as readonly string[];export const LOCATION_NAMES: Record<string, string> = Object.fromEntries(
   LOCATIONS.map((l) => [l.slug, l.name]),
 );
 
