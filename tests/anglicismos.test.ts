@@ -147,15 +147,21 @@ function textoVisible(linea: string): string {
  * Procesar línea por línea no sirve: un `<link …>` partido en tres líneas no
  * loBORRA ninguna regex de una línea, y `{page.lead}` parecía copy.
  */
-function textoVisibleConLineas(src: string): { texto: string; lineaDe: (i: number) => number } {
+function textoVisibleConLineas(src: string): { texto: string; lineaDe: (i: number) => number; fmFin: number } {
   const enmascara = (s: string) => s.replace(/[^\n]/g, ' ');
   let t = src;
+  let fmFin = -1;
 
-  // frontmatter
+  // frontmatter: se enmascara para el escaneo de PLANTILLA, pero sus
+  // literales se escanean aparte (ver el bucle de abajo). Ahí vive copy real:
+  // props, arrays de features y de FAQ. La primera version de este guard lo
+  // tapaba entero y por eso se le escapó "partner certificado" en la FAQ de
+  // /ajax-systems.
   if (t.startsWith('---')) {
     const cierre = t.indexOf('\n---', 3);
     if (cierre > 0) {
-      t = t.slice(0, cierre + 4).split('').map((c) => (c === '\n' ? '\n' : ' ')).join('') + t.slice(cierre + 4).split('\n').slice(1).join('\n');
+      fmFin = cierre + 4;
+      t = t.slice(0, fmFin).split('').map((c) => (c === '\n' ? '\n' : ' ')).join('') + t.slice(fmFin);
     }
   }
   // <script>…</script>
@@ -196,7 +202,7 @@ function textoVisibleConLineas(src: string): { texto: string; lineaDe: (i: numbe
     }
     return lo + 1;
   };
-  return { texto: t, lineaDe };
+  return { texto: t, lineaDe, fmFin };
 }
 
 for (const file of [...walk('src'), ...TAMBIEN.map((f) => f)]) {
@@ -206,10 +212,11 @@ for (const file of [...walk('src'), ...TAMBIEN.map((f) => f)]) {
   const esAstro = file.endsWith('.astro');
 
   // Para .astro: texto visible de la plantilla. Para datos: literales.
-  const { texto: vis, lineaDe } = esAstro
+  const { texto: vis, lineaDe, fmFin } = esAstro
     ? textoVisibleConLineas(src)
-    : { texto: src, lineaDe: (i: number) => src.slice(0, i).split('\n').length };
+    : { texto: src, lineaDe: (i: number) => src.slice(0, i).split('\n').length, fmFin: -1 };
 
+  // 1) Texto de plantilla (entre etiquetas), con todo lo técnico enmascarado.
   if (esAstro) {
     for (const [pat, esp] of ANGLICISMOS) {
       const re = w(pat);
@@ -221,10 +228,13 @@ for (const file of [...walk('src'), ...TAMBIEN.map((f) => f)]) {
         offenders.push(`${rel}:${n}  "${g[0]}" → ${esp}   …${ctx}…`);
       }
     }
-    continue;
   }
 
-  src.split(/\r?\n/).forEach((linea, i) => {
+  // 2) Literales: en los .astro, SOLO dentro del frontmatter (props, arrays de
+  //    features y FAQ); en .ts/.tsx/.sql, en todo el archivo.
+  const ambito = esAstro ? src.slice(0, fmFin) : src;
+  const offset = 0;
+  ambito.split(/\r?\n/).forEach((linea, i) => {
     for (const m of linea.matchAll(/'([^']{6,})'|"([^"]{6,})"/g)) {
       const texto = m[1] ?? m[2] ?? '';
       if (!/[a-zA-Z]{3}/.test(texto)) continue;
