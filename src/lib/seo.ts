@@ -185,25 +185,24 @@ export function serviceSchema(opts: {
         name: 'Chile',
       },
     ],
-    hasOfferCatalog: {
-      '@type': 'OfferCatalog',
-      name: 'Planes de Seguridad Privada',
-      itemListElement: [
-        {
-          '@type': 'Offer',
-          itemOffered: { '@type': 'Service', name: opts.name },
-          priceCurrency: 'CLP',
-          priceSpecification: {
-            '@type': 'PriceSpecification',
-            priceCurrency: 'CLP',
-            minPrice: 350000,
-            maxPrice: 6800000,
-            valueAddedTaxIncluded: true,
-          },
-          availability: 'https://schema.org/InStock',
-        },
-      ],
-    },
+    // SIN `hasOfferCatalog`.
+    //
+    // Se eliminó el 2026-10-03 por decisión del cliente. Publicaba
+    // `minPrice: 350000 / maxPrice: 6800000`, y eso rompía dos cosas a la vez:
+    //
+    //   1. Contradecía la regla del repo (authority.ts:12): "Prohibido publicar
+    //      ratios de dotación, tarifas ni operativas sensibles". El precio de
+    //      un contrato de seguridad privada es exactamente eso.
+    //   2. Los precios no estaban visibles en la página. La guía de datos
+    //      estructurados de Google exige que el marcado describa contenido
+    //      visible: un `Offer` con precio que no aparece en el HTML es un
+    //      enriquecimiento que el buscador no puede verificar, y es la forma
+    //      más común de disparar una acción manual por discrepancia de precio.
+    //
+    // Un `Offer` sin precio tampoco sirve: schema.org lo trata como oferta sin
+    // información de compra, que es peor que no declarar oferta. Si alguna vez
+    // se publican tarifas, el bloque vuelve CON el precio visible en la misma
+    // página, y no antes.
     audience: { '@type': 'BusinessAudience', audienceType: 'Empresas y residencias en Chile' },
   };
 }

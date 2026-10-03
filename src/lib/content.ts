@@ -324,7 +324,7 @@ export const SERVICES: Record<string, ServiceContent> = {
     faqs: [
       { q: '¿Qué es una auditoría de seguridad y para qué sirve?', a: 'Es un examen sistemático de las medidas de protección física, tecnológica y procedimental de una propiedad. Identifica vulnerabilidades, evalúa riesgos y propone mejoras concretas bajo estándares OS-10.' },
       { q: '¿Cuánto dura y qué incluye?', a: 'Entre 4 y 8 horas para una empresa o condominio estándar. Incluye inspección en terreno, revisión de documentación, análisis de sistemas y entrevistas. Entregamos informe escrito con hallazgos y recomendaciones.' },
-      { q: '¿Cuál es el precio?', a: 'Varía según alcance y complejidad. Una auditoría básica puede partir desde $150.000. Ofrecemos presupuestos personalizados sin compromiso.' },
+      { q: '¿Cuál es el precio?', a: 'Varía según el alcance, el número de recintos y la profundidad del análisis. Lo que determina el valor es cuántas horas de terreno se dedican y qué se revisa. Le entregamos el presupuesto después de la visita, con el detalle de qué incluye cada etapa.' },
       { q: '¿Necesito auditoría si ya tengo guardias y cámaras?', a: 'Sí. Muchas veces los sistemas están mal configurados, las cámaras tienen ángulos ciegos o los guardias carecen de protocolos claros. Una auditoría detecta estas brechas y optimiza los recursos existentes.' },
     ],
   },
