@@ -10,6 +10,7 @@ import Icon from '../../../components/Icon.astro';
 import StaffSection from '../../../components/StaffSection.astro';
 import RelatedLinks from '../../../components/RelatedLinks.astro';
 import { SERVICE_BRIDGE, bridgeItems } from '../../../lib/internal-links';
+import { coverageDe, faqsDe, metodoDe, cierreDe, problemasDe, nombreEnOracion, dedupeFaqs } from '../../../lib/combo-copy';
 
 export const prerender = true;
 
@@ -106,31 +107,28 @@ const keywordsOf = (text: string) =>
     .split(/[^a-záéíóúñü]+/)
     .filter((w) => w.length > 7);
 
-const coveragePoints = locFeatures
-  .filter((f) => {
-    const kw = keywordsOf(f);
-    // Exige 2 palabras en común: evita que una coincidencia aislada
-    // produzca un match que no significa nada.
-    return kw.filter((k) => svcCorpus.includes(k)).length >= 2;
-  })
-  .slice(0, 4);
-
-// Si la intersección es vacía (combinación sin material compartido), se
-// muestran los problemas de la comuna como contexto honesto: qué pasa en
-// ese lugar y por qué el servicio existe. Sigue siendo contenido único.
-const coverageFallback = locProblems.slice(0, 3);
-
+// El bloque de cobertura y la FAQ salen de `lib/combo-copy.ts`, que cruza los
+// datos que YA existen en `LOCATIONS[slug]` (6 features y 3 FAQs escritas para
+// esa comuna) con el servicio de la página. Antes esta página usaba 4 bullets
+// con un filtro por palabra en común y 1 FAQ del SERVICIO con un `replace` del
+// nombre de la comuna: el mismo texto en las 16, que es de donde salía el 52%
+// de repetición medido en la auditoría.
+//
+// `metodo` depende de `certified`, que se declara más abajo; por eso se calcula
+// acá solo lo que no depende de él y `metodo` se arma junto a `certified`.
+const cobertura = coverageDe(loc, serviceSlug);
+const coveragePoints = cobertura.puntos;
+const cierre = cierreDe(loc, serviceSlug);
+const problemas = problemasDe(loc, serviceSlug);
 
 const comboFeatures = svc.features.slice(0, 8).map(f => ({
   title: f.title,
   description: f.description,
 }));
 
-// Combo FAQs adaptadas al nombre de la comuna
-const comboFaqs = svc.faqs.slice(0, 5).map(f => ({
-  q: f.q.replace(/Las Condes|la comuna/g, loc.name),
-  a: f.a.replace(/Las Condes|la comuna/g, loc.name),
-}));
+// FAQ: primero las de la comuna (3), después las del servicio hasta 6. Las de
+// comuna van primero porque son las que distinguen esta URL de sus hermanas.
+const comboFaqs = faqsDe(loc, serviceSlug).map(f => ({ q: f.q, a: f.a }));
 
 // Servicios relacionados (3 para 'Tambien te puede interesar')
 const otrosServicios = Object.entries(SERVICE_NAMES)
@@ -156,6 +154,7 @@ const otrasUbicaciones = LOCATIONS.filter((l) => l.slug !== locationSlug);
 // cortaba antes de la comuna, que es justo la keyword que trae la búsqueda.
 // El H1 de más abajo sigue con el nombre completo. Ver `TITLE_MAX` en lib/seo.
 const certified = svc.certified !== false;
+const metodo = certified ? metodoDe(loc, serviceSlug) : null;
 const seoTitle = certified
   ? `${serviceTitleName(serviceSlug)} en ${loc.name} OS-10`
   : `${serviceTitleName(serviceSlug)} en ${loc.name}`;
@@ -198,12 +197,21 @@ const heroLead = certified
   }}
   location={locSchema}
   // La FAQ de la comuna se suma a las del servicio. Antes solo se usaban
-// las del servicio con un replace de 'Las Condes'; la de la comuna nunca
+  // las del servicio con un replace de 'Las Condes'; la de la comuna nunca
   // se mostraba, y es la que responde la pregunta específica del lugar.
-  faq={[
+  //
+  // `comboFaqs` YA incluye las de la comuna (son las primeras 3, ver `faqsDe`
+  // en lib/combo-copy), así que acá solo se agregan las del servicio que
+  // falten. Sin el `dedupe`, la última FAQ de la comuna salía dos veces en el
+  // JSON-LD: se vio la pregunta sobre tiempo de respuesta repetida en la
+  // posicion 3 y en la 7, porque la ultima FAQ de la comuna entraba dos veces.
+  faq={dedupeFaqs([
     ...comboFaqs.map(f => ({ question: f.q, answer: f.a })),
-    ...(locFaq ? [{ question: locFaq.q, answer: locFaq.a }] : []),
-  ]}
+    ...(svc.faqs ?? []).map(f => ({
+      question: f.q.split('Las Condes').join(loc.name).split('la comuna').join(loc.name),
+      answer: f.a.split('Las Condes').join(loc.name).split('la comuna').join(loc.name),
+    })),
+  ])}
   showCluster={true}
   clusterType="servicio"
   clusterExclude={serviceSlug}
@@ -233,9 +241,7 @@ const heroLead = certified
             <h2>{svc.name} en {loc.name}</h2>
             <p>{locIntro}</p>
             <p>{intro}</p>
-            {certified && (
-              <p>En {loc.name} el servicio se define a partir de una visita al sitio: accesos, infraestructura de videovigilancia existente, horarios de operación y el perfil de riesgo del propertiario. La dotación y los turnos se calculan con esa información, no con una estimación genérica.</p>
-            )}
+            {metodo && <p>{metodo}</p>}
           </div>
 
           {/* Bloque de cobertura: contenido ÚNICO de esta comuna. Antes
@@ -245,29 +251,17 @@ const heroLead = certified
             <h2>Qué operamos en {loc.name}</h2>
             {coveragePoints.length > 0 ? (
               <>
-                <p>
-                  La operación de {serviceNameInSentence(svc.name)} en {loc.name} se concentra en los
-                  siguientes puntos, que son los que definen la cobertura en esta comuna:
-                </p>
+                <p>{cobertura.intro}</p>
                 <ul class="coverage-list">
                   {coveragePoints.map((p) => (
-                    <li><Icon name="check" size={15} /> <span>{p}</span></li>
+                    <li>
+                      <Icon name={cobertura.esFallback ? 'warn' : 'check'} size={15} /> <span>{p}</span>
+                    </li>
                   ))}
                 </ul>
               </>
             ) : (
-              <>
-                <p>
-                  En {loc.name} operamos en el marco general de {serviceNameInSentence(svc.name)}, sin
-                  una especialización distinta a la del resto de la zona. Lo que sí es
-                  específico de esta comuna son las condiciones que enfrentamos en el sitio:
-                </p>
-                <ul class="coverage-list">
-                  {coverageFallback.map((p) => (
-                    <li><Icon name="warn" size={15} /> <span>{p}</span></li>
-                  ))}
-                </ul>
-              </>
+              <p>{cobertura.intro}</p>
             )}
           </div>
 
@@ -285,8 +279,12 @@ const heroLead = certified
 
           <div class="block" data-od-id="block-issues">
             <h2>Problemas que resolvemos en {loc.name}</h2>
+            <p style="margin-bottom:18px">
+              Los cuatro primeros son los que se repiten en {loc.name}. Los siguientes son los
+              habituales del servicio en toda la zona.
+            </p>
             <div class="detail-issues-grid">
-              {svc.problems.slice(0, 6).map((p) => (
+              {problemas.map((p) => (
                 <div class="detail-issue-card">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                   <span>{p}</span>
@@ -313,7 +311,9 @@ const heroLead = certified
           </div>
 
           <div class="block" data-od-id="block-faq">
-            <h2>Preguntas frecuentes</h2>
+            <h2>Preguntas sobre {nombreEnOracion(serviceSlug, svc.name)} en {loc.name}</h2>            <p style="margin-bottom:18px">
+              Las preguntas que más nos hacen los clientes de {loc.name} para este servicio.
+            </p>
             <div class="detail-faq">
               {comboFaqs.map((f, i) => (
                 <details open={i === 0}>
@@ -322,6 +322,11 @@ const heroLead = certified
                 </details>
               ))}
             </div>
+          </div>
+
+          <div class="block" data-od-id="block-cierre">
+            <h2>Por qué operamos en {loc.name}</h2>
+            <p>{cierre}</p>
           </div>
 
           <RelatedLinks
