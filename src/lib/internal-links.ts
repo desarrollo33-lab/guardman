@@ -303,7 +303,7 @@ export const SERVICE_BRIDGE: Record<string, BridgeLink[]> = {
     {
       href: '/seguridad-privada/que-puede-hacer-un-guardia',
       label: 'Qué puede y qué no puede hacer un guardia',
-      note: 'El alcance legal de la figura que vas a contratar.',
+      note: 'El alcance legal de la figura que usted contrata.',
     },
     {
       href: '/seguridad-privada/funciones-guardia-en-condominio',

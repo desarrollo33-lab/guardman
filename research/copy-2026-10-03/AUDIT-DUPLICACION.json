@@ -1,0 +1,156 @@
+{
+  "aseo": {
+    "paginas": 17,
+    "palabrasPromedio": 1227,
+    "similitudContraHermanas": {
+      "min": 18,
+      "promedio": 21,
+      "max": 22
+    },
+    "palabrasRepetidasContraHermana": 639,
+    "ejemploComun": [
+      "El trabajo se realiza con personal propio uniformado, productos certificados y un supervisor de terreno asignado a cada cuenta.",
+      "Necesidad de sanitización profunda en oficinas y áreas comunes después del horario laboral."
+    ]
+  },
+  "auditoria-seguridad": {
+    "paginas": 17,
+    "palabrasPromedio": 1340,
+    "similitudContraHermanas": {
+      "min": 19,
+      "promedio": 24,
+      "max": 24
+    },
+    "palabrasRepetidasContraHermana": 710,
+    "ejemploComun": [
+      "Evaluamos los controles existentes, identificamos brechas y entregamos un plan priorizado por nivel de riesgo y costo de implementación.",
+      "La dotación y los turnos se calculan con esa información, no con una estimación genérica."
+    ]
+  },
+  "cctv-videovigilancia": {
+    "paginas": 17,
+    "palabrasPromedio": 1387,
+    "similitudContraHermanas": {
+      "min": 19,
+      "promedio": 24,
+      "max": 24
+    },
+    "palabrasRepetidasContraHermana": 712,
+    "ejemploComun": [
+      "La cobertura municipal y la seguridad privada son complementarias: nosotros complementamos la seguridad pública con vigilancia sobre los activos que nos contratan.",
+      "Diseñamos el sistema según la superficie a cubrir, los puntos de acceso y el nivel de riesgo del sitio."
+    ]
+  },
+  "control-de-accesos": {
+    "paginas": 17,
+    "palabrasPromedio": 1301,
+    "similitudContraHermanas": {
+      "min": 19,
+      "promedio": 23,
+      "max": 24
+    },
+    "palabrasRepetidasContraHermana": 652,
+    "ejemploComun": [
+      "El diseño del sistema se hace sobre el flujo real de la propiedad: cantidad de accesos, horarios, tipo de visitantes y registro de cada ingreso.",
+      "La dotación y los turnos se calculan con esa información, no con una estimación genérica."
+    ]
+  },
+  "escoltas-privados": {
+    "paginas": 17,
+    "palabrasPromedio": 1304,
+    "similitudContraHermanas": {
+      "min": 20,
+      "promedio": 24,
+      "max": 25
+    },
+    "palabrasRepetidasContraHermana": 670,
+    "ejemploComun": [
+      "Trabajamos con equipos certificados OS-10, evaluación previa de riesgos y coordinación con los organismos de seguridad competentes.",
+      "La dotación y los turnos se calculan con esa información, no con una estimación genérica."
+    ]
+  },
+  "guard-pod": {
+    "paginas": 17,
+    "palabrasPromedio": 1312,
+    "similitudContraHermanas": {
+      "min": 19,
+      "promedio": 23,
+      "max": 24
+    },
+    "palabrasRepetidasContraHermana": 701,
+    "ejemploComun": [
+      "Guardpod es un sistema autónomo que opera sin conexión eléctrica ni a internet.",
+      "La dotación y los turnos se calculan con esa información, no con una estimación genérica."
+    ]
+  },
+  "guardias-de-seguridad": {
+    "paginas": 17,
+    "palabrasPromedio": 1572,
+    "similitudContraHermanas": {
+      "min": 21,
+      "promedio": 25,
+      "max": 26
+    },
+    "palabrasRepetidasContraHermana": 874,
+    "ejemploComun": [
+      "El equipo está compuesto por personal certificado OS-10, con cobertura los 7 días de la semana y supervisión desde nuestra central de monitoreo.",
+      "Cada sitio se dimensiona según el riesgo real de la propiedad, no con una dotación genérica."
+    ]
+  },
+  "monitoreo-24-7": {
+    "paginas": 17,
+    "palabrasPromedio": 1377,
+    "similitudContraHermanas": {
+      "min": 19,
+      "promedio": 23,
+      "max": 24
+    },
+    "palabrasRepetidasContraHermana": 745,
+    "ejemploComun": [
+      "Cada alerta se valida antes de escalar: el punto es reducir falsos positivos, no generar más notificaciones.",
+      "La dotación y los turnos se calculan con esa información, no con una estimación genérica."
+    ]
+  },
+  "seguridad-deportiva": {
+    "paginas": 17,
+    "palabrasPromedio": 1364,
+    "similitudContraHermanas": {
+      "min": 19,
+      "promedio": 23,
+      "max": 24
+    },
+    "palabrasRepetidasContraHermana": 674,
+    "ejemploComun": [
+      "El personal asignado es certificado OS-10.",
+      "La dotación y los turnos se calculan con esa información, no con una estimación genérica."
+    ]
+  },
+  "seguridad-eventos": {
+    "paginas": 17,
+    "palabrasPromedio": 1325,
+    "similitudContraHermanas": {
+      "min": 20,
+      "promedio": 24,
+      "max": 25
+    },
+    "palabrasRepetidasContraHermana": 704,
+    "ejemploComun": [
+      "El servicio incluye control de accesos, cobertura de puntos críticos y coordinación con Carabineros cuando el nivel de riesgo lo requiere.",
+      "La dotación y los turnos se calculan con esa información, no con una estimación genérica."
+    ]
+  },
+  "seguridad-industrial": {
+    "paginas": 17,
+    "palabrasPromedio": 1295,
+    "similitudContraHermanas": {
+      "min": 19,
+      "promedio": 23,
+      "max": 24
+    },
+    "palabrasRepetidasContraHermana": 675,
+    "ejemploComun": [
+      "Evaluamos el sitio y definimos los puestos de guardia necesarios según el riesgo real.",
+      "La dotación y los turnos se calculan con esa información, no con una estimación genérica."
+    ]
+  }
+}
